@@ -269,7 +269,7 @@ def __main__():
         else:
             # 旧项目旧存着吧
             log("存储已有文件："+ProjectName)
-            with open(ProjectName, 'w') as f:
+            with open(ProjectName, 'w', encoding='utf-8') as f:
                 json.dump(dataset[0], f)
             tkinter.messagebox.showinfo(title='已存储', message='项目已经存储至：'+ProjectName)
         global is_save
@@ -288,7 +288,7 @@ def __main__():
             return
         ProjectName = fn
         log("新建文件："+ProjectName)
-        with open(ProjectName, 'w') as f:
+        with open(ProjectName, 'w', encoding='utf-8') as f:
             json.dump(dataset[0], f)
         tkinter.messagebox.showinfo(title='已存储', message='项目已经存储至：'+ProjectName)
         global is_save
@@ -1054,12 +1054,19 @@ def __main__():
 
 
     def changePackName(event):
-        dataset[0]['mainset']['PackName'] = tkinter.simpledialog.askstring(title='修改主设置', prompt='修改包名', initialvalue='Ryoun')
+        a = tkinter.simpledialog.askstring(title='修改主设置', prompt='修改包名', initialvalue='Ryoun')
+        if a == None:
+            return
+        dataset[0]['mainset']['PackName'] = a
+        del a 
         RefreshMain()
 
 
     def changeMusicTitle(event):
-        dataset[0]['mainset']['MusicTitle'] = tkinter.simpledialog.askstring(title='修改主设置', prompt='修改音乐标题', initialvalue='Noname')
+        a = tkinter.simpledialog.askstring(title='修改主设置', prompt='修改音乐标题', initialvalue='Noname')
+        if a == None:
+            return
+        dataset[0]['mainset']['MusicTitle'] = a 
         RefreshMain()
 
 
@@ -1070,20 +1077,26 @@ def __main__():
 
     def changePlayerSelect(event):
         dataset[0]['mainset']['PlayerSelect'] = tkinter.simpledialog.askstring(title='修改主设置', prompt='修改玩家选择器\n注意！要加上中括号[]', initialvalue='')
-        if not dataset[0]['mainset']['PlayerSelect']:
+        if dataset[0]['mainset']['PlayerSelect'] == None:
             dataset[0]['mainset']['PlayerSelect'] = ''
         RefreshMain()
 
 
     def changeEntityName(event):
         global NowMusic
-        dataset[0]['musics'][NowMusic]['set']['EntityName'] = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨的执行实体名：', initialvalue='musicSupport')
+        a = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨的执行实体名：', initialvalue='musicSupport')
+        if a == None:
+            return
+        dataset[0]['musics'][NowMusic]['set']['EntityName'] = a 
         RefreshMusic(NowMusic)
 
 
     def changeScoreboardName(event):
         global NowMusic
-        dataset[0]['musics'][NowMusic]['set']['ScoreboardName'] = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨所用的积分板：', initialvalue='musicSupport')
+        a = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨所用的积分板：', initialvalue='musicSupport')
+        if a == None:
+            return
+        dataset[0]['musics'][NowMusic]['set']['ScoreboardName'] = a 
         RefreshMusic(NowMusic)
 
 
@@ -1112,7 +1125,10 @@ def __main__():
 
     def changeFileName(event):
         global NowMusic
-        dataset[0]['musics'][NowMusic]['set']['FileName'] = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨生成的文件名：', initialvalue='Music')
+        a = tkinter.simpledialog.askstring(title='修改节设置', prompt='修改本音轨生成的文件名：', initialvalue='Music')
+        if a == None:
+            return
+        dataset[0]['musics'][NowMusic]['set']['FileName'] = a
         RefreshMusic(NowMusic)
 
 
