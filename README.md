@@ -15,10 +15,10 @@
 
 #### Windows7+
 
-0.  [下载]<https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip>本程序
+0.  [下载](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)本程序
 1.  安装Python 3.8.10 
-    [下载64位安装包]<https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe>
-    [下载32位安装包]<https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe>
+    [下载64位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
+    [下载32位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
 2.  以管理员身份运行 补全库.py 
     -   按下 Ctrl+Shift+Esc 打开任务管理器
     -   点击 "文件" 菜单中的 运行新任务 命令
@@ -53,17 +53,10 @@ python3 Musicreater.py
 
 ### 致谢
 
-1.  感谢由 [Fuckcraft]<https://gitee.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能
+1.  感谢由 [Fuckcraft](https://gitee.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
 2.  感谢 昀梦 <QQ1515399885> 找出指令生成错误bug并指正
 3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
 4.  感谢广大群友为此程序提供的测试等支持
+5.  若您为我找出了错误但您的名字没有显示在此列表中，请联系我！
 
 
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)

@@ -890,6 +890,59 @@ def __main__():
 
 
 
+    def world2RyStruct():
+        outdir = tkinter.filedialog.askdirectory(title='请选择世界文件夹生成的位置', initialdir=r'./');
+        if outdir == None or outdir == '':
+            return;
+        else:
+            outdir+='/';
+        while True:
+            try:
+                begp = tkinter.simpledialog.askstring(title = '坐标信息输入',prompt='请输入区域选择的开始坐标：',initialvalue = '16 4 16')
+                if begp == None or begp == '':
+                    return;
+                begp = [int(begp.split(' ')[0]), int(begp.split(' ')[1]), int(begp.split(' ')[2])]
+            except:
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
+                continue
+            break
+        while True:
+            try:
+                endp = tkinter.simpledialog.askstring(title = '坐标信息输入',prompt='请输入区域选择的结束坐标：',initialvalue = '16 4 16')
+                if endp == None or endp == '':
+                    return;
+                endp = [int(endp.split(' ')[0]), int(endp.split(' ')[1]), int(endp.split(' ')[2])]
+            except:
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
+                continue
+            break
+        isAir = tkinter.messagebox.askyesno("请确认","所选区块导出时是否需要保留空气方块？")
+        fileName = tkinter.filedialog.asksaveasfilename(title='生成.RyStruct文件', initialdir=r'./', filetypes=[('音·创结构文件', '.RyStruct'), ('全部类型', '*')], defaultextension='*.RyStruct',initialfile='*.RyStruct')
+        if fileName == None or fileName == '':
+            log("取消")
+            return;
+        from msctspt.transfer import ryStruct
+        rys = ryStruct()
+        rys.World2Rys(outdir,begp,endp,isAir)
+        try:
+            with open(fileName,'w',encoding='utf-8') as f:
+                json.dump(rys,f)
+            tkinter.messagebox.showinfo("成功✔",'文件已生成\n'+fileName)
+        except:
+            tkinter.messagebox.showerror("失败❌",'文件无法生成\n'+fileName)
+
+
+    def world2BDX():
+        tkinter.messagebox.showerror("错误",'本功能尚未开发。')
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1115,7 +1168,7 @@ def __main__():
 
 
 
-    #创建生成函数菜单
+    #创建函数菜单
     funcmenu = tk.Menu(main_menu_bar, tearoff=0)
     funcmenu.add_command(label=u"生成文件至...", command=MakeCMD)
     funcmenu.add_command(label=u"生成函数包至...", command=MakeCMDdir)
@@ -1126,28 +1179,33 @@ def __main__():
 
 
 
-    #创建生成至世界菜单
+    #创建世界菜单
     worldmenu = tk.Menu(main_menu_bar, tearoff=0);
     worldmenu.add_command(label=u"将音乐以方块存储生成地图", command=ToBlockWorldEpt);
     worldmenu.add_command(label=u"将音乐以方块存储载入地图…", command=ToBlockWorld);
-    worldmenu.add_command(label=u"生成符合当前音乐的函数播放器…", command=MakeFuncPlayer);
-    worldmenu.add_separator();
+    worldmenu.add_separator()
     worldmenu.add_command(label=u"将音乐以指令存储生成地图", command=ToCmdWorldEpt);
     worldmenu.add_command(label=u"将音乐以指令存储载入地图…", command=ToCmdWorld);
-    worldmenu.add_command(label=u"将选中音轨以指令存储生成.bdx文件", command=toScbBDXfile)
-    worldmenu.add_separator();
+    worldmenu.add_separator()
     worldmenu.add_command(label=u"将音乐以音符盒存储生成地图", command=toRSworldEPT);
     worldmenu.add_command(label=u"将音乐以音符盒存储载入地图…", command=toRSworld);
-    worldmenu.add_separator();
-    worldmenu.add_command(label=u"将函数载入世界…", command=func2World);
-    worldmenu.add_command(label=u"将大函数分割并建立执行链…", command=bigFunc2World);
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=u"世界", menu=worldmenu);
 
 
+    # 创建其他功能菜单
+    otherMenu = tk.Menu(main_menu_bar, tearoff=0)
+    otherMenu.add_command(label=u"生成符合当前音乐的函数播放器…", command=MakeFuncPlayer)
+    worldmenu.add_separator();
+    otherMenu.add_command(label=u"将选中音轨以指令存储生成.bdx文件…", command=toScbBDXfile)
+    otherMenu.add_command(label=u"由地图导出至.bdx文件…", command=world2BDX)
+    otherMenu.add_command(label=u"由地图导出至.RyStruct文件…", command=world2RyStruct)
+    worldmenu.add_separator();
+    worldmenu.add_command(label=u"将函数载入世界…", command=func2World);
+    worldmenu.add_command(label=u"将大函数分割并建立执行链…", command=bigFunc2World);
 
 
-    # 创建生成菜单
+    # 创建实验功能菜单
     trymenu = tk.Menu(main_menu_bar, tearoff=0)
     trymenu.add_command(label=u"展示生成结果", command=ShowCMD)
     trymenu.add_command(label=u"建立位于localhost:8080上的websocket服务器播放选中音轨", command=wsPlay)

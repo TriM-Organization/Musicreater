@@ -225,3 +225,57 @@ def note2RSworld(world:str,startpos:list,notes:list,instrument:str,speed:float =
     level.save()
     level.close()
     
+
+
+
+
+
+
+
+
+class ryStruct:
+
+    def __init__(self) -> None:
+        self.RyStruct = dict()
+
+    def World2Rys(self,world:str,startp:list,endp:list,includeAir:bool=False):
+
+        import amulet
+        import amulet_nbt
+        from amulet.api.block import Block
+        from amulet.utils.world_utils import block_coords_to_chunk_coords
+
+        level = amulet.load_level(world)
+        
+        
+        for x in range(startp[0],endp[0]):
+            for y in range(startp[1],endp[1]):
+                for z in range(startp[2],endp[2]):
+
+                    RyStructBlock = dict()
+
+                    cx, cz = block_coords_to_chunk_coords(x, z)
+                    chunk = level.get_chunk(cx, cz, "minecraft:overworld")
+                    universal_block = chunk.block_palette[chunk.blocks[x - 16 * cx, y, z - 16 * cz]]
+                    if universal_block == Block("universal_minecraft","air") and includeAir:
+                        continue
+                    universal_block_entity = chunk.block_entities.get((x, y, z), None)
+                    
+                    RyStructBlock["block"] = str(universal_block)
+                    RyStructBlock["blockEntity"] = str(universal_block_entity)
+
+                    self.RyStruct[(x,y,z)] = RyStructBlock
+        
+
+        return self.RyStruct
+
+
+
+'''
+RyStruct = {
+    (0,0,0) = {
+        "block": str 完整的方块结构
+        "blockEntity": str | 'None'
+    }
+}
+'''
