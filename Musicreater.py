@@ -337,8 +337,8 @@ def __main__():
             with open(fn, 'r', encoding='UTF-8') as c:
                 dataset[0] = json.load(c)
         except:
-            print('找不到文件：'+fn+"，请查看您是否输入正确")
-            log("丢失"+fn)
+            print('无法打开文件：'+fn+"，请查看您是否输入正确")
+            log("无法打开"+fn)
             return
         global is_new_file
         global ProjectName
@@ -1344,6 +1344,27 @@ def __main__():
 
 
     log("启动root.mainloop（窗口）")
+
+
+    if len(sys.argv) != 1:
+        log("初始化打开音·创项目"+sys.argv[1])
+        global is_save
+        is_save = True
+        try:
+            with open(sys.argv[1], 'r', encoding='UTF-8') as c:
+                dataset[0] = json.load(c)
+        except:
+            print('无法打开文件：'+sys.argv[1]+"，请查看您是否输入正确")
+            log("无法打开"+sys.argv[1])
+            return
+        global is_new_file
+        global ProjectName
+        is_new_file = False
+        ProjectName = sys.argv[1]
+        global NowMusic
+        RefreshMain()
+        RefreshMusic(NowMusic)
+
 
     # 进入窗口消息循环
     root.mainloop()
