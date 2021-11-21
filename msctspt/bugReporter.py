@@ -122,6 +122,12 @@ class version:
                 shutil.rmtree(os.getenv('APPDATA')+'\\Musicreater\\')
             except:
                 pass;
-        for i in self.libraries:
-            print("安装库："+i)
-            os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
+            for i in self.libraries:
+                print("安装库："+i)
+                os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
+        else:
+            os.system("sudo apt-get install python3-pip")
+            for i in self.libraries:
+                print("安装库："+i)
+                os.system("sudo python3 -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
+
