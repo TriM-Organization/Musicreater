@@ -10,8 +10,8 @@ Copyright © W-YI 2021
 1.可以导出自定义的结构文件用于存储要导入地图中的结构
 2.进度条
 3.可以将音乐写入音符盒（红乐）
-4.更换tk库为briefcase库
-5.支持安卓系统
+4.更换tk库为briefcase库，支持安卓系统
+5.支持自动给音符盒绑定更多的音色
 6.可以由.schematic文件导入地图，亦可反向处理
 7.支持自定义指令方块区域的长宽高等
 8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://gitee.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）

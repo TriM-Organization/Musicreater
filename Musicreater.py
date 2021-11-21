@@ -37,12 +37,13 @@ __author__ = 'W-YI （金羿）'
 
 import sys
 
-if sys.platform != 'win32':
-    print("您当前的运行环境不符合要求。")
-    print(__author__+" 音·创 当前版本"+__version__)
-    print("按下回车退出程序")
-    input()
-    exit()
+
+# if sys.platform != 'win32':
+#     print("您当前的运行环境不符合要求。")
+#     print(__author__+" 音·创 当前版本"+__version__)
+#     print("按下回车退出程序")
+#     input()
+#     exit()
 
 
 
@@ -164,23 +165,21 @@ def __main__():
 
     print("音·创 正在启动……")
 
-    '''
-    from nmcsup.vers import chkver
-    print("检验或下载支持库")
-    chkver()
-    '''
-
-
-
-    print("更新执行位置...")
-    os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('\\')])
-    print('完成！')
-
-
 
 
     print('载入日志功能...')
     from nmcsup.log import log
+    print('完成！')
+
+
+
+    print("更新执行位置...")
+    if sys.platform == 'win32':
+        os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('\\')])
+        log("更新执行位置，当前文件位置"+__file__)
+    else:
+        os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('/')])
+        log("其他平台：更新执行位置，当前文件位置"+__file__)
     print('完成！')
 
 

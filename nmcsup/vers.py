@@ -2,11 +2,14 @@
 
 
 
+from msctspt.bugReporter import version
 
-VER = ('0.0.3.4','Beta',)
+
+#以下下两个值请在 msctspt/bugReporter 的version类中修改
+VER = version.version
 '''当前版本'''
 
-LIBS = ('mido','amulet','amulet-core','amulet-nbt','piano_transcription_inference','pypinyin','briefcase','toga','pyinstaller','kivy','py7zr')
+LIBS = version.libraries
 '''当前所需库'''
 
 
@@ -46,8 +49,8 @@ def compver(ver1, ver2):
 import os
 
 def InstallLibs(now,LIBS):
-    from os import system as run
     '''比对库信息并安装库'''
+    from os import system as run
     for i in LIBS:
         if not i in now:
             print("安装库："+i)

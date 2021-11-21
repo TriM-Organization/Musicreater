@@ -1,2 +1,2 @@
-from nmcsup.vers import chkver
-chkver()
+from msctspt.bugReporter import version
+version.installLibraries()

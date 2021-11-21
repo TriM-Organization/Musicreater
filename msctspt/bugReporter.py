@@ -1,5 +1,5 @@
 # -*- coding: UTF-8 -*-
-'''提供错误报告的基本操作及方法'''
+'''提供错误报告的基本操作及方法 顺便提供版本更新、安装库等功能'''
 
 
 
@@ -93,3 +93,32 @@ def emailReport(senderName:str = 'Unknown',senderContact:str = 'None',describeti
 
 
 
+
+
+
+class version:
+
+    libraries = ('mido','amulet','amulet-core','amulet-nbt','piano_transcription_inference','pypinyin','briefcase','toga','pyinstaller','kivy','py7zr')
+    '''当前所需库，有一些是开发用的，用户不需要安装'''
+
+    version = ('0.0.3.5','Beta',)
+    '''当前版本'''
+
+    def __init__(self) -> None:
+
+        self.libraries = version.libraries
+        '''当前所需库，有一些是开发用的，用户不需要安装'''
+
+        self.version = version.version
+        '''当前版本'''
+
+    def installLibraries(self):
+        '''安装全部开发用库'''
+        from sys import platform
+        import os
+        if platform == 'win32':
+            import shutil
+            shutil.rmtree(os.getenv('APPDATA')+'\\Musicreater\\')
+        for i in self.libraries:
+            print("安装库："+i)
+            os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
