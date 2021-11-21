@@ -118,7 +118,10 @@ class version:
         import os
         if platform == 'win32':
             import shutil
-            shutil.rmtree(os.getenv('APPDATA')+'\\Musicreater\\')
+            try:
+                shutil.rmtree(os.getenv('APPDATA')+'\\Musicreater\\')
+            except:
+                pass;
         for i in self.libraries:
             print("安装库："+i)
             os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")

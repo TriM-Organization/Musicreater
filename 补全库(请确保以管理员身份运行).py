@@ -1,2 +1,2 @@
 from msctspt.bugReporter import version
-version.installLibraries()
+version.installLibraries(version)
