@@ -1204,6 +1204,8 @@ def __main__():
     worldmenu.add_command(label=u"将函数载入世界…", command=func2World);
     worldmenu.add_command(label=u"将大函数分割并建立执行链…", command=bigFunc2World);
 
+    main_menu_bar.add_cascade(label=u"辅助功能", menu=otherMenu);
+
 
     # 创建实验功能菜单
     trymenu = tk.Menu(main_menu_bar, tearoff=0)
