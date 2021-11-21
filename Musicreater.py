@@ -226,6 +226,18 @@ def __main__():
             if result:
                 SaveProject()
         log("程序正常退出")
+
+        try:
+            global dataset
+            del dataset
+        except:
+            pass;
+        
+        global root
+        root.destroy()
+        del root
+
+
         if clearLog :
             print("清除log（此句不载入日志）")
             try:
@@ -242,16 +254,6 @@ def __main__():
                 pass;
         
         
-
-        try:
-            global dataset
-            del dataset
-        except:
-            pass;
-        
-        global root
-        root.destroy()
-        del root
         exit()
         
 
@@ -926,10 +928,11 @@ def __main__():
         rys.World2Rys(outdir,begp,endp,isAir)
         try:
             with open(fileName,'w',encoding='utf-8') as f:
-                json.dump(rys,f)
+                json.dump(rys.RyStruct,f,sort_keys=True, indent=4, separators=(', ', ': '), ensure_ascii=False)
             tkinter.messagebox.showinfo("成功✔",'文件已生成\n'+fileName)
         except:
-            tkinter.messagebox.showerror("失败❌",'文件无法生成\n'+fileName)
+            tkinter.messagebox.showerror("失败❌",'文件无法生成\n'+fileName+'\n'+str(rys.RyStruct))
+            
 
 
     def world2BDX():

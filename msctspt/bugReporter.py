@@ -101,7 +101,7 @@ class version:
     libraries = ('mido','amulet','amulet-core','amulet-nbt','piano_transcription_inference','pypinyin','briefcase','toga','pyinstaller','kivy','py7zr')
     '''当前所需库，有一些是开发用的，用户不需要安装'''
 
-    version = ('0.0.4','Beta',)
+    version = ('0.0.4.1','Beta',)
     '''当前版本'''
 
     def __init__(self) -> None:
