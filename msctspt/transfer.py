@@ -137,6 +137,13 @@ def note2webs(Notes : list,Instrument:str, speed:float = 5.0, PlayerSelect:str='
 
 
 
+import amulet
+from amulet.api.block import Block
+from amulet.utils.world_utils import block_coords_to_chunk_coords as bc2cc
+from amulet_nbt import TAG_String as ts
+from nmcsup.log import log
+
+
 
 
 
@@ -152,13 +159,10 @@ def note2RSworld(world:str,startpos:list,notes:list,instrument:str,speed:float =
         baseblock: 在中继器下垫着啥方块呢~
     :return 是否生成成功
     '''
-    import amulet
-    from amulet.api.block import Block
-    from amulet.utils.world_utils import block_coords_to_chunk_coords as bc2cc
-    from amulet_nbt import TAG_String as ts
+
 
     from msctspt.values import height2note,instuments
-    from nmcsup.log import log
+    
 
     def formNoteBlock(note:int,instrument:str='note.harp',powered:bool = False):
         '''生成音符盒方块
@@ -235,26 +239,45 @@ def note2RSworld(world:str,startpos:list,notes:list,instrument:str,speed:float =
 
 class ryStruct:
 
-    def __init__(self) -> None:
+    def __init__(self,world:str) -> None:
+        
+
         self.RyStruct = dict()
+        self._world = world
+        self._level = amulet.load_level(world)
 
-    def World2Rys(self,world:str,startp:list,endp:list,includeAir:bool=False):
 
-        import amulet
-        import amulet_nbt
-        from amulet.api.block import Block
-        from amulet.utils.world_utils import block_coords_to_chunk_coords
+    def reloadLevel(self):
+        try:
+            self._level = amulet.load_level(self.world)
+        except:
+            log("无法重载地图")
 
-        level = amulet.load_level(world)
+    def closeLevel(self):
+        try:
+            self._level.close()
+        except:
+            log("无法关闭地图")
+
+
+    def world2Rys(self,startp:list,endp:list,includeAir:bool=False):
+        '''将世界转换为RyStruct字典，注意，此函数运行成功后将关闭地图，若要打开需要运行 reloadLevel
+        :param startp: [x,y,z] 转化的起始坐标
+        :param endp  : [x,y,z] 转换的终止坐标，注意，终止坐标需要大于起始坐标，且最终结果包含终止坐标
+        :param includeAir : bool = False 是否包含空气，即空气是否在生成之时覆盖地图内容
+        :return dict RyStruct '''
+        
+
+        level = self._level
         
         
-        for x in range(startp[0],endp[0]):
-            for y in range(startp[1],endp[1]):
-                for z in range(startp[2],endp[2]):
+        for x in range(startp[0],endp[0]+1):
+            for y in range(startp[1],endp[1]+1):
+                for z in range(startp[2],endp[2]+1):
 
                     RyStructBlock = dict()
 
-                    cx, cz = block_coords_to_chunk_coords(x, z)
+                    cx, cz = bc2cc(x, z)
                     chunk = level.get_chunk(cx, cz, "minecraft:overworld")
                     universal_block = chunk.block_palette[chunk.blocks[x - 16 * cx, y, z - 16 * cz]]
                     if universal_block == Block("universal_minecraft","air") and includeAir:
@@ -264,8 +287,11 @@ class ryStruct:
                     RyStructBlock["block"] = str(universal_block)
                     RyStructBlock["blockEntity"] = str(universal_block_entity)
 
+                    log("载入方块数据"+str(RyStructBlock))
+
                     self.RyStruct[(x,y,z)] = RyStructBlock
         
+        level.close()
 
         return self.RyStruct
 

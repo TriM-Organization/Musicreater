@@ -227,31 +227,33 @@ def __main__():
                 SaveProject()
         log("程序正常退出")
 
+        
+        
+        
+
+
         try:
             global dataset
             del dataset
+            global root
+            root.destroy()
+            del root
         except:
             pass;
-        
-        global root
-        root.destroy()
-        del root
+
 
 
         if clearLog :
             print("清除log（此句不载入日志）")
             try:
-                shutil.rmtree("./log/")
+                if os.path.exists("./log/"):
+                    shutil.rmtree("./log/")
+                if os.path.exists("./logs/"):
+                    shutil.rmtree("./logs/")
+                if os.path.exists("./cache/"):
+                    shutil.rmtree("./cache/")
             except:
-                pass;
-            try:
-                shutil.rmtree("./logs/")
-            except:
-                pass;
-            try:
-                shutil.rmtree("./cache/")
-            except:
-                pass;
+                print("无法清除日志及临时文件")
         
         
         exit()
@@ -924,14 +926,15 @@ def __main__():
             log("取消")
             return;
         from msctspt.transfer import ryStruct
-        rys = ryStruct()
-        rys.World2Rys(outdir,begp,endp,isAir)
+        rys = ryStruct(outdir)
+        rys.world2Rys(begp,endp,isAir)
         try:
             with open(fileName,'w',encoding='utf-8') as f:
                 json.dump(rys.RyStruct,f,sort_keys=True, indent=4, separators=(', ', ': '), ensure_ascii=False)
             tkinter.messagebox.showinfo("成功✔",'文件已生成\n'+fileName)
         except:
             tkinter.messagebox.showerror("失败❌",'文件无法生成\n'+fileName+'\n'+str(rys.RyStruct))
+            rys.closeLevel()
             
 
 
@@ -1033,10 +1036,10 @@ def __main__():
 
     # 刷新主要部分
     def RefreshMain():
-        LabelPackName['text'] = '包名： '+dataset[0]['mainset']['PackName']
-        LabelMusicTitle['text'] = '音乐标题： '+dataset[0]['mainset']['MusicTitle']
+        LabelPackName['text'] = '包名： '+str(dataset[0]['mainset']['PackName'])
+        LabelMusicTitle['text'] = '音乐标题： '+str(dataset[0]['mainset']['MusicTitle'])
         LabelIsRepeat['text'] = '是否重复： '+str(dataset[0]['mainset']['IsRepeat'])
-        LabelPlayerSelect['text'] = '玩家选择器:'+dataset[0]['mainset']['PlayerSelect']
+        LabelPlayerSelect['text'] = '玩家选择器:'+str(dataset[0]['mainset']['PlayerSelect'])
         MusicList_var.set(())  # 为列表框设置新值
         for i in range(len(dataset[0]['musics'])):
             ListMusicList.insert(tk.END, i)
@@ -1384,7 +1387,7 @@ def __main__():
 
     # 进入窗口消息循环
     root.mainloop()
-
+    log("退出")
     del filemenu, editmenu, helpmenu
 
     exitapp()

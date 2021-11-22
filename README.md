@@ -1,6 +1,6 @@
 # Musicreater
 
-#### 介绍
+### 介绍
 音·创(Musicreater)是由金羿(W-YI)开发的一款《我的世界》基岩版音乐生成辅助软件
 
 欢迎加群：861684859
@@ -8,7 +8,7 @@
 ### 软件架构
 
 软件采用Python作为第一语言，目前还没有使用其他语言辅助。现在的图形库是tkinter，后期将使用BeeWare兼容安卓
-现阶段支持Windows7+，Linux(版本嘛，支持Python3就好)
+现阶段支持Windows7+，Linux(版本嘛，支持Python3.8就好)
 
 
 ### 安装教程
@@ -19,7 +19,7 @@
 1.  安装Python 3.8.10 
     [下载64位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
     [下载32位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
-2.  以管理员身份运行 补全库.py 
+2.  以管理员身份运行 补全库.py :
     -   按下 Ctrl+Shift+Esc 打开任务管理器
     -   点击 "文件" 菜单中的 运行新任务 命令
     -   输入 `cmd` 并框选 "以管理员身份运行" 按下 "确定"
@@ -47,9 +47,9 @@ python3 Musicreater.py
 
 ### 使用说明
 
-1.  别急，还没写
-2.  xxxx
-3.  xxxx
+1.  直接运行就好
+2.  看得懂简体中文字的不一定全会用
+3.  最好要懂一点点英文
 
 ### 致谢
 
