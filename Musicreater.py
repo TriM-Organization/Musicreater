@@ -178,8 +178,11 @@ def __main__():
         os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('\\')])
         log("更新执行位置，当前文件位置"+__file__)
     else:
-        os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('/')])
-        log("其他平台：更新执行位置，当前文件位置"+__file__)
+        try:
+            os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('/')])
+        except:
+            pass
+        log("其他平台："+sys.platform+"更新执行位置，当前文件位置"+__file__)
     print('完成！')
 
 
