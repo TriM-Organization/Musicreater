@@ -8,6 +8,7 @@
 ### 软件架构
 
 软件采用Python作为第一语言，目前还没有使用其他语言辅助。现在的图形库是tkinter，后期将使用BeeWare兼容安卓
+
 现阶段支持Windows7+，Linux(版本嘛，支持Python3.8就好)
 
 
@@ -54,7 +55,7 @@ python3 Musicreater.py
 ### 致谢
 
 1.  感谢由 [Fuckcraft](https://gitee.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
-2.  感谢 昀梦 <QQ1515399885> 找出指令生成错误bug并指正
+2.  感谢 昀梦＜QQ1515399885＞ 找出指令生成错误bug并指正
 3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
 4.  感谢广大群友为此程序提供的测试等支持
 5.  若您为我找出了错误但您的名字没有显示在此列表中，请联系我！
