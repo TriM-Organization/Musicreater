@@ -896,7 +896,7 @@ def __main__():
 
 
     def world2RyStruct():
-        outdir = tkinter.filedialog.askdirectory(title='请选择世界文件夹生成的位置', initialdir=r'./');
+        outdir = tkinter.filedialog.askdirectory(title='请选择世界文件夹所在的位置', initialdir=r'./');
         if outdir == None or outdir == '':
             return;
         else:
@@ -1219,13 +1219,13 @@ def __main__():
     # 创建其他功能菜单
     otherMenu = tk.Menu(main_menu_bar, tearoff=0)
     otherMenu.add_command(label=u"生成符合当前音乐的函数播放器…", command=MakeFuncPlayer)
-    worldmenu.add_separator();
+    otherMenu.add_separator();
     otherMenu.add_command(label=u"将选中音轨以指令存储生成.bdx文件…", command=toScbBDXfile)
     otherMenu.add_command(label=u"由地图导出至.bdx文件…", command=world2BDX)
     otherMenu.add_command(label=u"由地图导出至.RyStruct文件…", command=world2RyStruct)
-    worldmenu.add_separator();
-    worldmenu.add_command(label=u"将函数载入世界…", command=func2World);
-    worldmenu.add_command(label=u"将大函数分割并建立执行链…", command=bigFunc2World);
+    otherMenu.add_separator();
+    otherMenu.add_command(label=u"将函数载入世界…", command=func2World);
+    otherMenu.add_command(label=u"将大函数分割并建立执行链…", command=bigFunc2World);
 
     main_menu_bar.add_cascade(label=u"辅助功能", menu=otherMenu);
 
@@ -1389,7 +1389,7 @@ def __main__():
     # 进入窗口消息循环
     root.mainloop()
     log("退出")
-    del filemenu, editmenu, helpmenu
+    del filemenu, editmenu, helpmenu, otherMenu
 
     exitapp()
 

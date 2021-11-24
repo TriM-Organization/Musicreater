@@ -200,12 +200,12 @@ def Blocks2World(world:str,dire:list,Datas:list):
     from nmcsup.const import Blocks
     level = amulet.load_level(world)
     i = 0
-    def setblock(block:Block,pos:list):
+    def setblock(block:str,pos:list):
         '''pos : list[int,int,int]'''
         cx, cz = block_coords_to_chunk_coords(pos[0], pos[2])
         chunk = level.get_chunk(cx, cz, "minecraft:overworld")
         offset_x, offset_z = pos[0] - 16 * cx, pos[2] - 16 * cz
-        chunk.blocks[offset_x, pos[1], offset_z] = level.block_palette.get_add_block(block)
+        chunk.blocks[offset_x, pos[1], offset_z] = level.block_palette.get_add_block(Block("minecraft",block))
         chunk.changed = True
     for j in Datas:
         if dire[1]+1 >= 255:

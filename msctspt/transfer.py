@@ -55,7 +55,7 @@ def formCmdBlock(direction:list,command:str,particularValue:int,impluse:int,cond
 
 
 
-def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:str, PlayerSelect:str='',isProsess:bool=False) :
+def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:str, PlayerSelect:str='',isProsess:bool=False,height:int = 200) :
     '''使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
@@ -65,6 +65,7 @@ def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:s
         Instrument: 播放的乐器
         PlayerSelect: 执行的玩家选择器
         isProsess: 是否显示进度条（会很卡）
+        height: 生成结构的最高高度
     :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件'''
 
 
@@ -84,11 +85,11 @@ def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:s
     blocks = [formCmdBlock(dire,cdl.pop(0),1,1)]
     dire[1]+=1;
     for j in cdl:
-        if dire[1]+i > 200:
+        if dire[1]+i > height:
             dire[0]+=1
             i=0
             down = not down
-        if dire[1]+i == 200 :
+        if dire[1]+i == height :
             blocks.append(formCmdBlock([dire[0],dire[1]+i,dire[2]],j,5,2,False,False))
         else:
             if down:
@@ -97,7 +98,7 @@ def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:s
                 blocks.append(formCmdBlock([dire[0],dire[1]+i,dire[2]],j,1,2,False,False))
         i+=1
     del i, cdl, down, cmd
-    return BdxConverter(filePath,'RyounMusicreater',blocks)
+    return BdxConverter(filePath,'Build by RyounMusicreater',blocks)
 
 
 
