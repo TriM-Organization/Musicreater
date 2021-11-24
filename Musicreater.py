@@ -228,9 +228,7 @@ def __main__():
                 SaveProject()
         log("程序正常退出")
 
-        
-        
-        
+
 
 
         try:
