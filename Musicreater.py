@@ -224,9 +224,7 @@ def __main__():
     def exitapp():
         global is_save
         if is_save != True:
-            result = tkinter.messagebox.askyesno(title='提示', message='您当前的项目已修改但未存储，是否先保存当前项目？')
-            log('询问是否存储:'+str(result))
-            if result:
+            if tkinter.messagebox.askyesno(title='提示', message='您当前的项目已修改但未存储，是否先保存当前项目？'):
                 SaveProject()
         log("程序正常退出")
 
@@ -959,11 +957,11 @@ def __main__():
 
     #使用邮件反馈bug
     def sendBugReport():
-        from msctspt.bugReporter import emailReport
+        from msctspt.bugReporter import report
         name = tkinter.simpledialog.askstring(title = '邮件反馈信息输入',prompt='您的称呼')
         contact = tkinter.simpledialog.askstring(title = '邮件反馈信息输入',prompt='您的联系方式')
         describetion = tkinter.simpledialog.askstring(title = '邮件反馈信息输入',prompt='您对问题的描述')
-        emailReport(name,contact,describetion);
+        report(name,contact,describetion).emailReport()
         del name,contact,describetion
 
 
