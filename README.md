@@ -16,7 +16,8 @@
 
 #### Windows7+
 
-0.  [下载](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)本程序
+0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)
+    [Github下载](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序
 1.  安装Python 3.8.10 
     [下载64位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
     [下载32位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
@@ -54,10 +55,15 @@ python3 Musicreater.py
 
 ### 致谢
 
-1.  感谢由 [Fuckcraft](https://gitee.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
+1.  感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
 2.  感谢 昀梦＜QQ1515399885＞ 找出指令生成错误bug并指正
 3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
 4.  感谢广大群友为此程序提供的测试等支持
 5.  若您为我找出了错误但您的名字没有显示在此列表中，请联系我！
 
 
+### 作者<金羿>联系方式
+
+1.  QQ       2647547478
+2.  电邮      EillesWan2006@163.com W-YI_DoctorYI@outlook.com
+3.  微信      WYI_DoctorYI

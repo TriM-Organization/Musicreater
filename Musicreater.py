@@ -175,8 +175,11 @@ def __main__():
 
     print("更新执行位置...")
     if sys.platform == 'win32':
-        os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('\\')])
-        log("更新执行位置，当前文件位置"+__file__)
+        try:
+            os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('\\')])
+            log("更新执行位置，当前文件位置"+__file__)
+        except:
+            pass
     else:
         try:
             os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('/')])
