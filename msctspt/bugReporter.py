@@ -102,7 +102,7 @@ class version:
     libraries = ('mido','amulet','amulet-core','amulet-nbt','piano_transcription_inference','pypinyin','briefcase','toga','pyinstaller','kivy','py7zr','websockets')
     '''当前所需库，有一些是开发用的，用户不需要安装'''
 
-    version = ('0.0.4.2','Beta',)
+    version = ('0.0.4.3','Beta',)
     '''当前版本'''
 
     def __init__(self) -> None:
@@ -126,8 +126,9 @@ class version:
             for i in self.libraries:
                 print("安装库："+i)
                 os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
-        else:
+        elif platform == 'linux':
             os.system("sudo apt-get install python3-pip")
+            os.system("sudo apt-get install python3-tkinter")
             for i in self.libraries:
                 print("安装库："+i)
                 os.system("sudo python3 -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")

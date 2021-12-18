@@ -14,7 +14,7 @@ Copyright © W-YI 2021
 5.支持自动给音符盒绑定更多的音色
 6.可以由.schematic文件导入地图，亦可反向处理
 7.支持自定义指令方块区域的长宽高等
-8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://gitee.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）
+8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://github.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）
 9.支持使用红石播放指令音乐
 10.支持采用延时的播放器
 11.支持使用bdx导出结构
