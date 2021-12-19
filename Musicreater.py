@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+#! python3
 
 # W-YI 金羿
 # QQ 2647547478

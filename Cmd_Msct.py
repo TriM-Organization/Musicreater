@@ -341,7 +341,7 @@ def __main__():
 
 
 
-    print(__author__+" 音·创<命令行模式> 当前核心版本 "+__version__+'\n')
+    print(__author__+" 音·创 —— 当前核心版本 "+__version__+'\n')
 
     nowWorkPath = os.path.split(os.path.realpath(__file__))[0]
 

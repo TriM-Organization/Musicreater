@@ -17,7 +17,7 @@
 #### Windows7+
 
 0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)
-    [Github下载](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序
+    [Github下载（慢）](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序
 1.  安装Python 3.8.10 
     [下载64位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
     [下载32位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
