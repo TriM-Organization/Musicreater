@@ -12,8 +12,6 @@
 #  代码写的并非十分的漂亮，还请大佬多多包涵；本软件源代码依照Apache软件协议公开
 
 
-
-
 import json
 import os
 import shutil
@@ -28,14 +26,7 @@ __version__ = version.version[1]+version.version[0]
 __author__ = 'W-YI （金羿）'
 
 
-
-
-
-
 log("系统工作————————加载变量及函数")
-
-
-
 
 
 print("更新执行位置...")
@@ -45,21 +36,17 @@ if sys.platform == 'win32':
     log("更新执行位置，当前文件位置"+__file__)
 else:
     try:
-        os.chdir(__file__[:len(__file__)-__file__[len(__file__)::-1].index('/')])
+        os.chdir(__file__[:len(__file__) -
+                 __file__[len(__file__)::-1].index('/')])
     except:
         pass
     log("其他平台："+sys.platform+"更新执行位置，当前文件位置"+__file__)
 print('完成！')
 
 
-
-
 def __main__():
 
     print('建立变量，存入内存，载入字典常量函数')
-
-
-
 
     # 主体部分
 
@@ -126,7 +113,6 @@ def __main__():
         },
     ]
 
-
     global is_new_file
     global is_save
     global ProjectName
@@ -136,8 +122,6 @@ def __main__():
     is_save = True
     ProjectName = ''
     NowMusic = 0
-
-
 
     def DMM():  # 反回字典用于编辑
         datasetmodelpart = {
@@ -151,34 +135,29 @@ def __main__():
         }
         return datasetmodelpart
 
-
     print("完成")
 
-
-
     # 菜单命令
-    print('加载菜单命令...');
+    print('加载菜单命令...')
 
     def exitapp(cmd):
 
-        log("程序正常退出",False)
+        log("程序正常退出", False)
         global is_save
         if is_save == False:
             if '/s' in cmd:
                 saveProject()
             else:
                 print("您尚未保存，请使用 /s 开关保存并退出")
-                return 
-
+                return
 
         try:
             global dataset
             del dataset
         except:
-            pass;
+            pass
 
-
-        if '/c' in cmd :
+        if '/c' in cmd:
             print("清除log（此句不载入日志）")
             try:
                 if os.path.exists("./log/"):
@@ -189,46 +168,36 @@ def __main__():
                     shutil.rmtree("./cache/")
             except:
                 print("无法清除日志及临时文件")
-        
-        
+
         exit()
-        
 
     print('退出函数加载完成！')
-    
-    
+
     print("载入文件读取函数")
 
-    def ReadFile(fn:str) -> list:
+    def ReadFile(fn: str) -> list:
         from nmcsup.nmcreader import ReadFile as fileRead
         k = fileRead(fn)
-        if k == False :
+        if k == False:
             log("找不到"+fn)
             return
         else:
             return k
 
-
-    def ReadMidi(midfile:str) -> str:
+    def ReadMidi(midfile: str) -> str:
         from nmcsup.nmcreader import ReadMidi as midiRead
         k = midiRead(midfile)
-        if k == False :
+        if k == False:
             log("找不到"+midfile)
             return
         else:
             return k
 
-
     print('完成！')
-
-
-
-
 
     print("载入命令函数")
 
-
-    def saveProject(cmd:list):
+    def saveProject(cmd: list):
         global is_new_file
         if '/a' in cmd:
             log("另存项目")
@@ -238,24 +207,20 @@ def __main__():
                 print("初次存储请使用 /a 开关规定存储文件名")
                 log("文件为未保存")
                 return
-            
+
         log("存储文件："+ProjectName)
         with open(ProjectName, 'w', encoding='utf-8') as f:
             json.dump(dataset[0], f)
         global is_save
         is_save = True
 
-
     print('保存项目函数加载完成！')
 
-
-
-    
-    
-    def loadMusic(cmd:list):
+    def loadMusic(cmd: list):
         if '/mid' in cmd:
             th = NewThread(ReadMidi, (cmd[cmd.index('/mid')+1],))
             th.start()
+
             def midiSPT(th):
                 for i in th.getResult():
                     datas = DMM()
@@ -269,6 +234,7 @@ def __main__():
         elif '/txt' in cmd:
             th = NewThread(ReadFile, (cmd[cmd.index('/txt')+1],))
             th.start()
+
             def midiSPT(th):
                 for i in th.getResult():
                     datas = DMM()
@@ -290,10 +256,9 @@ def __main__():
             global is_save
             is_save = False
 
-            
     print('音轨载入函数加载完成！')
 
-    def funBuild(cmd:list):
+    def funBuild(cmd: list):
         if '/file' in cmd:
             from msctspt.funcOpera import makeFuncFiles
             makepath = cmd[cmd.index('/file')+1]
@@ -312,20 +277,21 @@ def __main__():
             makepath = cmd[cmd.index('/mcpack')+1]
             if makepath[-1] != '/':
                 makepath += '/'
-                
+
             if not os.path.exists('./temp/'):
                 os.makedirs('./temp/')
             makeFunDir(dataset[0], './temp/')
-            shutil.move('./temp/'+dataset[0]['mainset']['PackName'] +"Pack/behavior_packs/"+dataset[0]['mainset']['PackName']+"/functions",'./')
-            shutil.move('./temp/'+dataset[0]['mainset']['PackName'] +"Pack/behavior_packs/"+dataset[0]['mainset']['PackName']+"/manifest.json",'./')
+            shutil.move('./temp/'+dataset[0]['mainset']['PackName'] +
+                        "Pack/behavior_packs/"+dataset[0]['mainset']['PackName']+"/functions", './')
+            shutil.move('./temp/'+dataset[0]['mainset']['PackName'] + "Pack/behavior_packs/" +
+                        dataset[0]['mainset']['PackName']+"/manifest.json", './')
             with zipfile.ZipFile(makepath+dataset[0]['mainset']['PackName']+'.mcpack', "w") as zipobj:
                 for i in os.listdir('./functions/'):
                     zipobj.write('./functions/'+i)
                 zipobj.write('./manifest.json')
-            shutil.move('./functions','./temp/')
-            shutil.move('./manifest.json','./temp/')
+            shutil.move('./functions', './temp/')
+            shutil.move('./manifest.json', './temp/')
             shutil.rmtree("./temp/")
-    
 
     print("函数建立函数加载完成")
 
@@ -334,12 +300,9 @@ def __main__():
     else:
         os.system("clear")
 
-
-    if sys.platform in ('win32','linux'):
+    if sys.platform in ('win32', 'linux'):
         print("您当前的运行环境为标准桌面，您可以打开 Musicreater.py 运行窗口模式的 音·创")
         print("您也可以输入 win 指令在不退出命令行模式的同时打开窗口模式\n")
-
-
 
     print(__author__+" 音·创 —— 当前核心版本 "+__version__+'\n')
 
@@ -360,9 +323,11 @@ def __main__():
             def run(cmd):
                 os.system(cmd)
             if sys.platform == 'win32':
-                NewThread(run,("python "+os.path.split(os.path.realpath(__file__))[0]+"/Musicreater.py",)).start()
+                NewThread(run, ("python "+os.path.split(os.path.realpath(__file__))
+                          [0]+"/Musicreater.py",)).start()
             else:
-                NewThread(run,("python3 "+os.path.split(os.path.realpath(__file__))[0]+"/Musicreater.py",)).start()
+                NewThread(run, ("python3 "+os.path.split(os.path.realpath(__file__))
+                          [0]+"/Musicreater.py",)).start()
         elif cmd[0] == 'chdir':
             nowWorkPath = os.path.realpath(cmd[1])
             os.chdir(nowWorkPath)
@@ -370,13 +335,6 @@ def __main__():
             funBuild(cmd[1:])
         else:
             os.system(strcmd)
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':
