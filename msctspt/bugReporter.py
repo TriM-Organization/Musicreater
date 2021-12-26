@@ -68,7 +68,7 @@ class report():
         msg["From"] = Header(self.senderName,'utf-8');
         msg["To"] = Header("W-YI (QQ2647547478)",'utf-8');
         #标题
-        msg["Subject"] = '发送来自 '+self.senderName+' 的BUG错误报告';
+        msg["Subject"] = '音·创 - 来自 '+self.senderName+' 的错误报告';
         #正文
         msg.attach(MIMEText("来自"+self.senderName+"( "+self.senderContact+" )的错误描述：\n"+self.describetion,'plain','utf-8'));
         log("添加完毕，正在生成压缩包...")
