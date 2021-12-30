@@ -1,0 +1,49 @@
+[tool.briefcase]
+project_name = "Musicreater"
+bundle = "com.ryoun.musicreater"
+version = "0.0.1"
+url = "https://musicreater.ryoun.com/musicreater"
+license = "Apache Software License"
+author = 'Eilles Wan'
+author_email = "W-YI_DoctorYI@outlook.com"
+
+[tool.briefcase.app.musicreater]
+formal_name = "Musicreater"
+description = "Musicreater is an Eilles's app that is used for creating musics in Minecraft: Bedrock Edition"
+icon = "src/musicreater/resources/musicreater"
+sources = ['src/musicreater']
+requires = []
+
+
+[tool.briefcase.app.musicreater.macOS]
+requires = [
+    'toga-cocoa>=0.3.0.dev20',
+]
+
+[tool.briefcase.app.musicreater.linux]
+requires = [
+    'toga-gtk>=0.3.0.dev20',
+]
+system_requires = [
+    'libgirepository1.0-dev',
+    'libcairo2-dev',
+    'libpango1.0-dev',
+    'libwebkitgtk-3.0-0',
+    'gir1.2-webkit-3.0',
+]
+
+[tool.briefcase.app.musicreater.windows]
+requires = [
+    'toga-winforms>=0.3.0.dev20',
+]
+
+# Mobile deployments
+[tool.briefcase.app.musicreater.iOS]
+requires = [
+    'toga-iOS>=0.3.0.dev20',
+]
+
+[tool.briefcase.app.musicreater.android]
+requires = [
+    'toga-android>=0.3.0.dev20',
+]

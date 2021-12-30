@@ -1,10 +1,12 @@
 # -*- conding: utf8 -*- 
 
 import os 
-from msctspt.funcOpera import keepart
+from src.musicreater.msctspt.funcOpera import keepart
 
 
 l = 0
+
+
 
 for path,dir_list,file_list in os.walk(r"./") :  
     for file_name in file_list:  
