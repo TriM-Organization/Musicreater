@@ -241,7 +241,7 @@ def __main__():
             root.destroy()
             del root
         except:
-            pass;
+            pass
 
 
 
@@ -984,19 +984,19 @@ def __main__():
             tkinter.messagebox.showinfo("完成！✔",'在程序结束后将不会清除日志及临时文件信息。');
 
 
+    
+
+    print('生成部分及其余命令加载完成！')
 
 
-    print('生成部分及其余命令加载完成！');
-
-
-    print('完成！');
+    print('完成！')
 
     # 窗口部分
-    print('增加窗口元素...');
+    print('增加窗口元素...')
     global root
 
-    root.title(u'音·创 - 金羿 - '+VER[1]+VER[0]);
-    root.geometry('800x800');  # 像素
+    root.title(u'音·创 - 金羿 - '+VER[1]+VER[0])
+    root.geometry('900x900')  # 像素
 
     print('完成！')
 
@@ -1154,6 +1154,8 @@ def __main__():
         RefreshMusic(NowMusic)
 
 
+    from nmcsup.vers import resetver
+
     print('按钮点击命令加载完成！')
 
     print('完成！')
@@ -1242,7 +1244,7 @@ def __main__():
 
 
 
-    from nmcsup.vers import resetver
+    
 
     # 创建帮助菜单
     helpmenu = tk.Menu(main_menu_bar, tearoff=0)
@@ -1260,98 +1262,101 @@ def __main__():
 
     # 窗口内容
 
+
+    #上半部分框
     UpFrame = tk.Frame(root)
 
 
+    #左边的框（音乐总设置）
     UpLeftFrame = tk.Frame(UpFrame, bg='white')
-
-    # 文本
+    # 大标题
     tk.Label(UpLeftFrame, text='音乐总设置(项目设置)', font=('', 20)).pack()
-
+    # 按钮式文本
     LabelPackName = tk.Label(UpLeftFrame, bg='white', text='地图/函数包名： ', font=('', 15))
     LabelMusicTitle = tk.Label(UpLeftFrame, bg='white',text='音乐标题： ', font=('', 15))
     LabelIsRepeat = tk.Label(UpLeftFrame, bg='white', text='是否重复： ', font=('', 15))
     LabelPlayerSelect = tk.Label(UpLeftFrame, bg='white', text='玩家选择器:', font=('', 15))
-
+    # 绑定按钮
     LabelPackName.bind("<Button-1>", changePackName)
     LabelMusicTitle.bind("<Button-1>", changeMusicTitle)
     LabelIsRepeat.bind("<Button-1>", changeIsRepeat)
     LabelPlayerSelect.bind("<Button-1>", changePlayerSelect)
-
+    # 装入容器
     LabelPackName.pack()
     LabelMusicTitle.pack()
     LabelIsRepeat.pack()
     LabelPlayerSelect.pack()
-
     # 按钮：重置项目设置
     tk.Button(UpLeftFrame, text='重置项目设置', command=ResetSetting).pack()
+    #装入窗口
+    UpLeftFrame.pack(side='left')
 
 
-    UpLeftFrame.pack(side=tk.LEFT)
 
 
+    # 中间的框容器
     UpMidleFrame = tk.Frame(UpFrame, bg='blue')
-
+    # 列表
     MusicList_var = tk.StringVar()
     ListMusicList = tk.Listbox(UpMidleFrame, listvariable=MusicList_var)
-
     ListMusicList.bind('<ButtonRelease-1>', MusicList_selected)  # 设置选中响应函数
+    ListMusicList.pack(side='left')
+    # 滑块
+    tk.Scrollbar(UpMidleFrame,command=ListMusicList.yview).pack(side='left',fill='y')
+    #装入窗口
+    UpMidleFrame.pack(side='left')
 
-    ListMusicList.pack()
 
 
-    UpMidleFrame.pack(side=tk.LEFT)
-
-
+    #右边的框容器
     UpRightFrame = tk.Frame(UpFrame, bg='white')
-
-
+    # 大标题
     tk.Label(UpRightFrame, text='当前音轨设置(段落设置)', font=('', 20)).pack()
-
+    # 按钮式文本
     LabelEntityName = tk.Label(UpRightFrame, bg='white',text='执行实体名： ', font=('', 15))
     LabelScoreboardName = tk.Label(UpRightFrame, bg='white', text='使用计分板： ', font=('', 15))
     LabelInstrument = tk.Label(UpRightFrame, bg='white',text='所用的乐器： ', font=('', 15))
     LabelFileName = tk.Label(UpRightFrame, bg='white',text='当前音轨名： ', font=('', 15))
-
-
+    # 绑定按钮
     LabelEntityName.bind("<Button-1>", changeEntityName)
     LabelScoreboardName.bind("<Button-1>", changeScoreboardName)
     LabelInstrument.bind("<Button-1>", changeInstrument)
     LabelFileName.bind("<Button-1>", changeFileName)
-
-
+    # 装入框容器
     LabelEntityName.pack()
     LabelScoreboardName.pack()
     LabelInstrument.pack()
     LabelFileName.pack()
-
     # 按钮：删除选中音轨
     tk.Button(UpRightFrame, text='删除选中音轨', command=DelNowMusic).pack()
+    #装入窗口
+    UpRightFrame.pack(side='left')
 
-
-    UpRightFrame.pack(side=tk.LEFT)
-
-
+    #上半部分框容器装入窗口
     UpFrame.pack()
 
 
+
+    # 下半部分框容器
     DownFrame = tk.Frame(root, bg='blue')
 
 
     # 音符列表菜单
     NoteList_var = tk.StringVar()
     ListNoteList = tk.Listbox(DownFrame, listvariable=NoteList_var, width=40, height=30)
-
     ListNoteList.bind('<ButtonRelease-1>', NoteList_selected)  # 设置选中响应函数
-
-    ListNoteList.pack(side=tk.LEFT)
+    ListNoteList.pack(side='left')
+    # 音符列表滑块
+    tk.Scrollbar(DownFrame,command=ListNoteList.yview).pack(side='left',fill='y')
 
 
     # 指令列表菜单
-    ListCMDList = tk.Text(DownFrame)
+    ListCMDList = tk.Text(DownFrame,height=37,width=40)
+    ListCMDList.pack(side='left')
+    # 指令列表滑块
+    tk.Scrollbar(DownFrame,command=ListCMDList.yview).pack(fill='y',side='left')
 
-    ListCMDList.pack(side=tk.RIGHT)
-
+    # 下半部分容器载入窗口
     DownFrame.pack()
 
 
