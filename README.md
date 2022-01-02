@@ -1,34 +1,37 @@
-# Musicreater
+# 音·创 Musicreater
 
 ### 介绍
-音·创(Musicreater)是由金羿(W-YI)开发的一款《我的世界》基岩版音乐生成辅助软件
+音·创 Musicreater 是由金羿(*W-YI*)开发的一款 **《我的世界：基岩版》** 音乐生成辅助软件
 
 欢迎加群：861684859
 
 ### 软件架构
 
-软件采用Python作为第一语言，目前还没有使用其他语言辅助。现在的图形库是tkinter，后期将使用BeeWare兼容安卓
+软件采用 *Python* 作为第一语言，目前还没有使用其他语言辅助。使用 *Tkinter* 为图形库。
 
-现阶段支持Windows7+，Linux(版本嘛，支持Python3.8就好)
+支持 Windows7+ 以及各个支持 Python3.8 的 Linux
 
 
 ### 安装教程
 
+正在到来。
+
+### 从源代码运行教程
+
 #### Windows7+
 
 0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)
-    [Github下载（慢）](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序
+    [Github下载（慢）](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序源代码
 1.  安装Python 3.8.10 
-    [下载64位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
-    [下载32位安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
+    [下载64位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
+    [下载32位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
 2.  以管理员身份运行 补全库.py :
-    -   按下 Ctrl+Shift+Esc 打开任务管理器
-    -   点击 "文件" 菜单中的 运行新任务 命令
-    -   输入 `cmd` 并框选 "以管理员身份运行" 按下 "确定"
-    -   将 "补全库.py" 拖拽入开启的窗口，按下回车
+    -   点击 “开始” 菜单，搜索 `命令提示符`
+    -   右键点击 `命令提示符` 左键点击 “以管理员身份运行”
+    -   将 “补全库.py” 拖拽入开启的窗口，按下回车
 3.  等待安装完成后，双击运行 Musicreater.py
 
-#### Linux (测试版本：Kali 2021.4)
+#### Linux
 
 0.  若你没有足够优秀的环境，推荐先在终端敲：
 ```bash
@@ -56,13 +59,14 @@ python3 Musicreater.py
 ### 致谢
 
 1.  感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
-2.  感谢 昀梦＜QQ1515399885＞ 找出指令生成错误bug并指正
+2.  感谢 昀梦\<QQ1515399885\> 找出指令生成错误bug并指正
 3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
-4.  感谢广大群友为此程序提供的测试等支持
-5.  若您为我找出了错误但您的名字没有显示在此列表中，请联系我！
+4.  感谢由 CMA_2401PT 带来的 BDXWorkShop 供本程序对于bdx操作的指导
+5.  感谢广大群友为此程序提供的测试等支持
+6.  若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
 
 
-### 作者<金羿>联系方式
+### 作者\<*金羿*\>(W-YI)联系方式
 
 1.  QQ       2647547478
 2.  电邮      EillesWan2006@163.com W-YI_DoctorYI@outlook.com

@@ -4,7 +4,7 @@
 # W-YI 金羿
 # QQ 2647547478
 # 音·创 开发交流群 861684859
-# Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com
+# Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 Team-Ryoun 金羿
 # 若需转载或借鉴 请附作者
 
@@ -1340,6 +1340,13 @@ def __main__():
     # 下半部分框容器
     DownFrame = tk.Frame(root, bg='blue')
 
+    import random
+
+    texts = open('./resources/mySayings.txt','r',encoding='utf-8').readlines()
+
+    tk.Label(DownFrame,text=texts[random.randint(0,len(texts)-1)].replace('\n',''),fg='white',bg='black',font=('DengXian Light',20)).pack(fill='x')
+
+    del texts
 
     # 音符列表菜单
     NoteList_var = tk.StringVar()
