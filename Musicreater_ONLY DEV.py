@@ -33,7 +33,9 @@ __author__ = 'W-YI （金羿）'
 
 
 
-from languages.lang import READABLETEXT
+
+
+
 
 
 
@@ -189,7 +191,7 @@ def __main__():
         from nmcsup.nmcreader import ReadFile as fileRead
         k = fileRead(fn)
         if k == False :
-            tk.messagebox.showerror(title=READABLETEXT[0], message="找不到文件😢：{}".format(fn))
+            tk.messagebox.showerror(title="错误❌", message="找不到文件😢：{}".format(fn))
             return
         else:
             return k
@@ -199,7 +201,7 @@ def __main__():
         from nmcsup.nmcreader import ReadMidi as midiRead
         k = midiRead(midfile)
         if k == False :
-            tk.messagebox.showerror(title=READABLETEXT[0], message="找不到文件或无法读取文件😢：{}".format(midfile))
+            tk.messagebox.showerror(title="错误❌", message="找不到文件或无法读取文件😢：{}".format(midfile))
             return
         else:
             return k
@@ -216,7 +218,7 @@ def __main__():
     def exitapp():
         global is_save
         if is_save != True:
-            if tkinter.messagebox.askyesno(title=READABLETEXT[1], message="您当前的项目已修改但未存储，是否先保存当前项目？"):
+            if tkinter.messagebox.askyesno(title="提示❗", message="您当前的项目已修改但未存储，是否先保存当前项目？"):
                 SaveProject()
         log('程序正常退出')
 
@@ -235,7 +237,7 @@ def __main__():
 
 
         if clearLog :
-            print(READABLETEXT[2])
+            print("清除log（此句不载入日志）")
             try:
                 if os.path.exists('./log/'):
                     shutil.rmtree('./log/')
@@ -244,7 +246,7 @@ def __main__():
                 if os.path.exists('./cache/'):
                     shutil.rmtree('./cache/')
             except:
-                print(READABLETEXT[3])
+                print("无法清除日志及临时文件")
         
         
         exit()
@@ -264,7 +266,7 @@ def __main__():
             log('存储已有文件：{}'.format(ProjectName))
             with open(ProjectName, 'w', encoding='utf-8') as f:
                 json.dump(dataset[0], f)
-            tkinter.messagebox.showinfo(title=READABLETEXT[4], message="项目已经存储至：{}".format(ProjectName))
+            tkinter.messagebox.showinfo(title="已存储", message="项目已经存储至：{}".format(ProjectName))
         global is_save
         is_save = True
 
@@ -274,13 +276,13 @@ def __main__():
 
     def SaveAsProject():
         # 另存为项目
-        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./', filetypes=[("音·创工程文件", '.msct'), ("任意类型", '*')], defaultextension='Noname.msct')
+        fn = tkinter.filedialog.asksaveasfilename(title="新建 音·创 项目", initialdir=r'./', filetypes=[("音·创工程文件", '.msct'), ("任意类型", '*')], defaultextension='Noname.msct')
         if fn == None or fn =='':
             return
         ProjectName = fn
         with open(ProjectName, 'w', encoding='utf-8') as f:
             json.dump(dataset[0], f)
-        tkinter.messagebox.showinfo(title=READABLETEXT[4], message="项目已经存储至：{}".format(ProjectName))
+        tkinter.messagebox.showinfo(title="已存储", message="项目已经存储至：{}".format(ProjectName))
         global is_save
         is_save = True
 
@@ -291,10 +293,10 @@ def __main__():
     def openOldProject():
         global is_save
         if is_save != True:
-            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message="您当前的项目已修改但未存储，是否先保存当前项目？")
+            result = tkinter.messagebox.askyesno(title="提示❗", message="您当前的项目已修改但未存储，是否先保存当前项目？")
             if result:
                 SaveProject()
-        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[6], initialdir=r'./', filetypes=[("函数音创工程文件", '.ry.nfc'), ("MMFM0.0.6版本工程文件", '.ry.mfm'), ("全部类型", '*')], multiple=True)
+        fn = tkinter.filedialog.askopenfilename(title="请选择旧类型的项目", initialdir=r'./', filetypes=[("函数音创工程文件", '.ry.nfc'), ("MMFM0.0.6版本工程文件", '.ry.mfm'), ("全部类型", '*')], multiple=True)
         if fn == None or fn == '':
             return
         else:
@@ -307,10 +309,10 @@ def __main__():
     def openProject():
         global is_save
         if is_save != True:
-            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message="您当前的项目已修改但未存储，是否先保存当前项目？")
+            result = tkinter.messagebox.askyesno(title="提示❗", message="您当前的项目已修改但未存储，是否先保存当前项目？")
             if result:
                 SaveProject()
-        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./', filetypes=[("音·创工程文件", '.msct'),("全部类型", '*')], multiple=True)
+        fn = tkinter.filedialog.askopenfilename(title="请选择 音·创 项目", initialdir=r'./', filetypes=[("音·创工程文件", '.msct'),("全部类型", '*')], multiple=True)
         if fn == None or fn == '':
             return
         else:
@@ -319,7 +321,7 @@ def __main__():
             with open(fn, 'r', encoding='UTF-8') as c:
                 dataset[0] = json.load(c)
         except:
-            print(READABLETEXT[8].format(fn))
+            print("无法打开文件：{}，请查看您是否输入正确".format(fn))
             log('无法打开{}'.format(fn))
             return
         global is_new_file
@@ -337,11 +339,11 @@ def __main__():
 
     def appabout():
         aabw = tk.Tk()
-        aabw.title(READABLETEXT[9])
+        aabw.title("音·创 - 关于")
         aabw.geometry('400x600')  # 像素
         tk.Label(aabw, text='', font=('', 15)).pack()
-        tk.Label(aabw, text=READABLETEXT[10], font=('', 35)).pack()
-        tk.Label(aabw, text=READABLETEXT[11].format(VER[1]+VER[0]), font=('', 15)).pack()
+        tk.Label(aabw, text="我的世界音·创", font=('', 35)).pack()
+        tk.Label(aabw, text="当前版本：{}".format(VER[1]+VER[0]), font=('', 15)).pack()
         # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
         # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
         # place的 x、y是(x,y)坐标
@@ -349,14 +351,14 @@ def __main__():
         #tk.Label(aabw, image=pic, width=200, height=200).pack()
         #del pic
         tk.Label(aabw, text='', font=('', 5)).pack()
-        tk.Label(aabw, text=READABLETEXT[12], font=('', 20)).pack()
-        tk.Label(aabw, text=READABLETEXT[13], font=('', 20)).pack()
-        tk.Label(aabw, text=READABLETEXT[14], font=('', 20)).pack()
+        tk.Label(aabw, text="凌云我的世界开发团队", font=('', 20)).pack()
+        tk.Label(aabw, text="×", font=('', 20)).pack()
+        tk.Label(aabw, text="凌云软件开发团队", font=('', 20)).pack()
         tk.Label(aabw, text='', font=('', 15)).pack()
-        tk.Label(aabw, text=READABLETEXT[15], font=('', 15)).pack()
-        tk.Label(aabw, text=READABLETEXT[16], font=('', 15)).pack()
-        tk.Label(aabw, text=READABLETEXT[17], font=('', 15)).pack()
-        tk.Label(aabw, text=READABLETEXT[18], font=('', 15)).pack()
+        tk.Label(aabw, text="唯一开发者：金羿（W-YI）", font=('', 15)).pack()
+        tk.Label(aabw, text="Email: EillesWan@outlook.com", font=('', 15)).pack()
+        tk.Label(aabw, text="QQ: 2647547478", font=('', 15)).pack()
+        tk.Label(aabw, text="讨论群: 861684859", font=('', 15)).pack()
         
         aabw.mainloop()
 
@@ -366,7 +368,7 @@ def __main__():
 
     def apphelp():
         ahpw = tk.Tk()
-        ahpw.title(READABLETEXT[19])
+        ahpw.title("音·创 - 帮助")
         ahpw.geometry('400x600')  # 像素
 
         ahpw.mainloop()
@@ -377,7 +379,7 @@ def __main__():
 
     def FromMP3():
         log('从MP3导入音乐')
-        mp3file = tkinter.filedialog.askopenfilename(title=READABLETEXT[20], initialdir=r'./', filetypes=[("钢琴声音的音频文件", '.mp3 .m4a'), ("全部类型", '*')], multiple=True)
+        mp3file = tkinter.filedialog.askopenfilename(title="请选择钢琴声音的 MP3 文件", initialdir=r'./', filetypes=[("钢琴声音的音频文件", '.mp3 .m4a'), ("全部类型", '*')], multiple=True)
         if mp3file == None or mp3file == '':
             log('取消')
             return
@@ -411,7 +413,7 @@ def __main__():
 
     def FromMidi():
         log('从midi导入音乐')
-        midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./', filetypes=[("Midi文件", '.mid .midi'), ("全部类型", '*')], multiple=True)
+        midfile = tkinter.filedialog.askopenfilename(title="请选择 MIDI 文件", initialdir=r'./', filetypes=[("Midi文件", '.mid .midi'), ("全部类型", '*')], multiple=True)
         if midfile == None or midfile == '':
             log('取消')
             return
@@ -440,7 +442,7 @@ def __main__():
 
     def FromForm():
         log('从文本读入音轨')
-        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[22], initialdir=r'./', filetypes=[("文本文件", '.txt'), ("全部类型", '*')], multiple=True)
+        fn = tkinter.filedialog.askopenfilename(title="请选择 音符文本 文件", initialdir=r'./', filetypes=[("文本文件", '.txt'), ("全部类型", '*')], multiple=True)
         if fn == None or fn =='':
             log('取消')
             return
@@ -467,13 +469,13 @@ def __main__():
 
     def FromText():
         log('写入音符至音轨')
-        dat = tkinter.simpledialog.askstring(title=READABLETEXT[23], prompt="请输入音符：", initialvalue='`1 .2 C')
+        dat = tkinter.simpledialog.askstring(title="获取信息", prompt="请输入音符：", initialvalue='`1 .2 C')
         if dat == None:
             return
         datas = []
         for i in dat.split(' '):
             datas.append([str(i), 1.0])
-        log(READABLETEXT[24].format(str(datas)))
+        log("音符数据写入{}".format(str(datas)))
         from nmcsup.trans import note2list
         datat = DMM()
         datat['notes'] = note2list(datas)
@@ -500,7 +502,7 @@ def __main__():
     def MakeCMD():
         log('生成文件')
         from msctspt.funcOpera import makeFuncFiles
-        file = tkinter.filedialog.askdirectory(title=READABLETEXT[25], initialdir=r'./')
+        file = tkinter.filedialog.askdirectory(title="请选择文件生成的位置", initialdir=r'./')
         if file == None or file =='':
             log('取消')
             return
@@ -511,7 +513,7 @@ def __main__():
     def MakeCMDdir():
         log('生成函数包')
         from msctspt.funcOpera import makeFunDir
-        file = tkinter.filedialog.askdirectory(title=READABLETEXT[26], initialdir=r'./')
+        file = tkinter.filedialog.askdirectory(title="请选择文件夹生成的位置", initialdir=r'./')
         if file == None or file =='':
             log('取消')
             return
@@ -520,7 +522,7 @@ def __main__():
 
 
     def MakePackFile():
-        file = tkinter.filedialog.askdirectory(title=READABLETEXT[27], initialdir=r'./')
+        file = tkinter.filedialog.askdirectory(title="请选择.mcpack文件生成的位置", initialdir=r'./')
         if file == None or file =='':
             log('取消')
             return
@@ -556,15 +558,15 @@ def __main__():
         from nmcsup.trans import Cmd2World, Datas2BlkWorld, Notes2Player
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！")
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！")
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./')
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./')
         if Outdire == None or Outdire == '':
             log('取消')
             return
@@ -589,15 +591,15 @@ def __main__():
         from nmcsup.trans import Cmd2World, Datas2BlkWorld, Notes2Player
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！")
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！")
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./')
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./')
         if Outdire == None or Outdire == '':
             log('取消')
             return
@@ -619,15 +621,15 @@ def __main__():
     def MakeFuncPlayer():
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[30], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择函数包生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return;
         else:
@@ -647,15 +649,15 @@ def __main__():
         from nmcsup.trans import Cmd2World, Note2Cmd
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16');
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16');
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])];
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue;
             break;
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return;
         else:
@@ -673,15 +675,15 @@ def __main__():
         from nmcsup.trans import Cmd2World, Note2Cmd
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return
         else:
@@ -699,20 +701,20 @@ def __main__():
         from nmcsup.trans import Cmd2World
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return;
         else:
             Outdire+='/';
-        Cmd2World(open(tkinter.filedialog.askopenfilename(title=READABLETEXT[31], initialdir=r'./', filetypes=[("我的世界指令函数文件", '.mcfunction'), ("全部类型", '*')], multiple=True)[0],'r',encoding='utf-8').readlines(),Outdire,dire)
+        Cmd2World(open(tkinter.filedialog.askopenfilename(title="请选择 .mcfunction 文件", initialdir=r'./', filetypes=[("我的世界指令函数文件", '.mcfunction'), ("全部类型", '*')], multiple=True)[0],'r',encoding='utf-8').readlines(),Outdire,dire)
 
 
 
@@ -727,22 +729,22 @@ def __main__():
         from nmcsup.trans import Cmd2World
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入执行链生成坐标：",initialvalue = '16 4 16');
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入执行链生成坐标：",initialvalue = '16 4 16');
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])];
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入。");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入。");
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             log('取消')
             return
         else:
             Outdire+='/';
         log('获得地图地址：'+Outdire)
-        fileName = tkinter.filedialog.askopenfilename(title=READABLETEXT[31], initialdir=r'./', filetypes=[("我的世界指令函数文件", '.mcfunction'), ("全部类型", '*')], multiple=True)
+        fileName = tkinter.filedialog.askopenfilename(title="请选择 .mcfunction 文件", initialdir=r'./', filetypes=[("我的世界指令函数文件", '.mcfunction'), ("全部类型", '*')], multiple=True)
         if fileName == None or fileName == '':
             log('取消')
             return;
@@ -752,7 +754,7 @@ def __main__():
         bigFile = open(fileName,'r',encoding='utf-8')
         parts = funSplit(bigFile)
         if parts == -1:
-            tkinter.messagebox.showerror(title=READABLETEXT[0], message="您的函数文件不大于一万条指令，无需进行分割操作。");
+            tkinter.messagebox.showerror(title="错误❌", message="您的函数文件不大于一万条指令，无需进行分割操作。");
             return;
         log('创建函数文件夹')
         packName = fileName[len(fileName)-fileName[::-1].index('/'):fileName.index('.')]
@@ -789,16 +791,16 @@ def __main__():
         from msctspt.transfer import note2bdx
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入执行链生成相对坐标：",initialvalue = '0 0 0');
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入执行链生成相对坐标：",initialvalue = '0 0 0');
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])];
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入。");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入。");
                 continue
             break
         
-        fileName = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[32], initialdir=r'./', filetypes=[("FastBuilder结构文件", '.bdx'), ("全部类型", '*')], defaultextension=dataset[0]['mainset']['PackName']+'.bdx',initialfile=dataset[0]['mainset']['PackName']+'.bdx')
+        fileName = tkinter.filedialog.asksaveasfilename(title="请选择需要生成的.bdx文件", initialdir=r'./', filetypes=[("FastBuilder结构文件", '.bdx'), ("全部类型", '*')], defaultextension=dataset[0]['mainset']['PackName']+'.bdx',initialfile=dataset[0]['mainset']['PackName']+'.bdx')
         if fileName == None or fileName == '':
             log('取消')
             return;
@@ -807,15 +809,15 @@ def __main__():
 
         res = note2bdx(fileName,dire,dataset[0]['musics'][NowMusic]['notes'],dataset[0]['musics'][NowMusic]['set']['ScoreboardName'],dataset[0]['musics'][NowMusic]['set']['Instrument'],dataset[0]['mainset']['PlayerSelect'])
         log('转换结束！\n'+str(res))
-        tkinter.messagebox.showinfo(READABLETEXT[33],"转换结束！\n{}".format(str(res)))
+        tkinter.messagebox.showinfo("完成！✔","转换结束！\n{}".format(str(res)))
 
 
 
 
     def wsPlay():
         from msctspt.transfer import note2webs
-        spd = tkinter.simpledialog.askfloat(READABLETEXT[34],prompt="一秒，音乐走几拍？",initialvalue = '5.0')
-        tkinter.messagebox.showinfo(title=READABLETEXT[35], message="按下确认后，在游戏中使用connect指令连接localhost:8080，即可播放")
+        spd = tkinter.simpledialog.askfloat("输入播放速度",prompt="一秒，音乐走几拍？",initialvalue = '5.0')
+        tkinter.messagebox.showinfo(title="创建中", message="按下确认后，在游戏中使用connect指令连接localhost:8080，即可播放")
         note2webs(dataset[0]['musics'][NowMusic]['notes'],dataset[0]['musics'][NowMusic]['set']['Instrument'],spd,dataset[0]['mainset']['PlayerSelect'])
 
 
@@ -828,15 +830,15 @@ def __main__():
         from msctspt.transfer import note2RSworld
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16');
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16');
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])];
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue;
             break;
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return;
         else:
@@ -854,15 +856,15 @@ def __main__():
         from msctspt.transfer import note2RSworld
         while True:
             try:
-                dire = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入坐标：",initialvalue = '16 4 16')
+                dire = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入坐标：",initialvalue = '16 4 16')
                 if dire == None or dire == '':
                     return;
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
-        Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./');
+        Outdire = tkinter.filedialog.askdirectory(title="请选择世界文件夹生成的位置", initialdir=r'./');
         if Outdire == None or Outdire == '':
             return;
         else:
@@ -875,33 +877,33 @@ def __main__():
 
 
     def world2RyStruct():
-        outdir = tkinter.filedialog.askdirectory(title=READABLETEXT[36], initialdir=r'./');
+        outdir = tkinter.filedialog.askdirectory(title="请选择世界文件夹所在的位置", initialdir=r'./');
         if outdir == None or outdir == '':
             return;
         else:
             outdir+='/';
         while True:
             try:
-                begp = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入区域选择的开始坐标：",initialvalue = '16 4 16')
+                begp = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入区域选择的开始坐标：",initialvalue = '16 4 16')
                 if begp == None or begp == '':
                     return;
                 begp = [int(begp.split(' ')[0]), int(begp.split(' ')[1]), int(begp.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
         while True:
             try:
-                endp = tkinter.simpledialog.askstring(title = READABLETEXT[28],prompt="请输入区域选择的结束坐标：",initialvalue = '16 4 16')
+                endp = tkinter.simpledialog.askstring(title = "坐标信息输入",prompt="请输入区域选择的结束坐标：",initialvalue = '16 4 16')
                 if endp == None or endp == '':
                     return;
                 endp = [int(endp.split(' ')[0]), int(endp.split(' ')[1]), int(endp.split(' ')[2])]
             except:
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message="您输入的格式有误，请重新输入！");
+                tkinter.messagebox.showerror(title="错误❌", message="您输入的格式有误，请重新输入！");
                 continue
             break
-        isAir = tkinter.messagebox.askyesno(READABLETEXT[37],"所选区块导出时是否需要保留空气方块？")
-        fileName = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[38], initialdir=r'./', filetypes=[("音·创结构文件", '.RyStruct'), ("全部类型", '*')], defaultextension='*.RyStruct',initialfile='*.RyStruct')
+        isAir = tkinter.messagebox.askyesno("请确认","所选区块导出时是否需要保留空气方块？")
+        fileName = tkinter.filedialog.asksaveasfilename(title="生成.RyStruct文件", initialdir=r'./', filetypes=[("音·创结构文件", '.RyStruct'), ("全部类型", '*')], defaultextension='*.RyStruct',initialfile='*.RyStruct')
         if fileName == None or fileName == '':
             log('取消')
             return
@@ -911,15 +913,15 @@ def __main__():
         try:
             with open(fileName,'w',encoding='utf-8') as f:
                 json.dump(rys.RyStruct,f,sort_keys=True, indent=4, separators=(', ', ': '), ensure_ascii=False)
-            tkinter.messagebox.showinfo(READABLETEXT[33],"文件已生成\n{}".format(fileName))
+            tkinter.messagebox.showinfo("完成！✔","文件已生成\n{}".format(fileName))
         except:
-            tkinter.messagebox.showerror(READABLETEXT[39],"文件无法生成\n{}\n{}".format(fileName,str(rys.RyStruct)))
+            tkinter.messagebox.showerror("失败❌","文件无法生成\n{}\n{}".format(fileName,str(rys.RyStruct)))
             rys.closeLevel()
             
 
 
     def world2BDX():
-        tkinter.messagebox.showerror(READABLETEXT[0],"本功能尚未开发。")
+        tkinter.messagebox.showerror("错误❌","本功能尚未开发。")
 
 
 
@@ -937,9 +939,9 @@ def __main__():
     #使用邮件反馈bug
     def sendBugReport():
         from msctspt.bugReporter import report
-        name = tkinter.simpledialog.askstring(title = READABLETEXT[40],prompt="您的称呼")
-        contact = tkinter.simpledialog.askstring(title = READABLETEXT[40],prompt="您的联系方式")
-        describetion = tkinter.simpledialog.askstring(title = READABLETEXT[40],prompt="您对问题的描述")
+        name = tkinter.simpledialog.askstring(title = "邮件反馈信息输入",prompt="您的称呼")
+        contact = tkinter.simpledialog.askstring(title = "邮件反馈信息输入",prompt="您的联系方式")
+        describetion = tkinter.simpledialog.askstring(title = "邮件反馈信息输入",prompt="您对问题的描述")
         report(name,contact,describetion).emailReport()
         del name,contact,describetion
 
@@ -957,9 +959,9 @@ def __main__():
         global clearLog;
         clearLog = not clearLog;
         if clearLog:
-            tkinter.messagebox.showinfo(READABLETEXT[33],"在程序结束后将清除日志及临时文件信息。")
+            tkinter.messagebox.showinfo("完成！✔","在程序结束后将清除日志及临时文件信息。")
         else:
-            tkinter.messagebox.showinfo(READABLETEXT[33],"在程序结束后将不会清除日志及临时文件信息。")
+            tkinter.messagebox.showinfo("完成！✔","在程序结束后将不会清除日志及临时文件信息。")
 
 
     
@@ -973,7 +975,7 @@ def __main__():
     print('增加窗口元素...')
     global root
 
-    root.title(READABLETEXT[41].format(VER[1]+VER[0]))
+    root.title("音·创 - 金羿 - {}".format(VER[1]+VER[0]))
     root.geometry('900x900')  # 像素
 
     print('完成！')
@@ -1005,10 +1007,10 @@ def __main__():
 
     # 刷新音轨部分
     def RefreshMusic(Music=0):
-        LabelEntityName['text'] = READABLETEXT[42].format(dataset[0]['musics'][Music]['set']['EntityName'])
-        LabelScoreboardName['text']=READABLETEXT[43].format(dataset[0]['musics'][Music]['set']['ScoreboardName'])
-        LabelInstrument['text'] = READABLETEXT[44].format(dataset[0]['musics'][Music]['set']['Instrument'])
-        LabelFileName['text'] = READABLETEXT[45].format(dataset[0]['musics'][Music]['set']['FileName'])
+        LabelEntityName['text'] = "执行实体名：{}".format(dataset[0]['musics'][Music]['set']['EntityName'])
+        LabelScoreboardName['text']="使用计分板：{}".format(dataset[0]['musics'][Music]['set']['ScoreboardName'])
+        LabelInstrument['text'] = "所用的乐器：{}".format(dataset[0]['musics'][Music]['set']['Instrument'])
+        LabelFileName['text'] = "当前音轨名：{}".format(dataset[0]['musics'][Music]['set']['FileName'])
         NoteList_var.set(())  # 为列表框设置新值
         for i in dataset[0]['musics'][Music]['notes']:
             ListNoteList.insert(tk.END, str(i))
@@ -1016,10 +1018,10 @@ def __main__():
 
     # 刷新主要部分
     def RefreshMain():
-        LabelPackName['text'] = READABLETEXT[46].format(str(dataset[0]['mainset']['PackName']))
-        LabelMusicTitle['text'] = READABLETEXT[47].format(str(dataset[0]['mainset']['MusicTitle']))
-        LabelIsRepeat['text'] = READABLETEXT[48].format(str(dataset[0]['mainset']['IsRepeat']))
-        LabelPlayerSelect['text'] = READABLETEXT[49].format(str(dataset[0]['mainset']['PlayerSelect']))
+        LabelPackName['text'] = "包名：{}".format(str(dataset[0]['mainset']['PackName']))
+        LabelMusicTitle['text'] = "音乐标题：{}".format(str(dataset[0]['mainset']['MusicTitle']))
+        LabelIsRepeat['text'] = "是否重复：{}".format(str(dataset[0]['mainset']['IsRepeat']))
+        LabelPlayerSelect['text'] = "玩家选择器：{}".format(str(dataset[0]['mainset']['PlayerSelect']))
         MusicList_var.set(())  # 为列表框设置新值
         for i in range(len(dataset[0]['musics'])):
             ListMusicList.insert(tk.END, i)
@@ -1037,7 +1039,7 @@ def __main__():
 
 
     def changePackName(event):
-        a = tkinter.simpledialog.askstring(title=READABLETEXT[50], prompt="修改包名", initialvalue='Ryoun')
+        a = tkinter.simpledialog.askstring(title="修改主设置", prompt="修改包名", initialvalue='Ryoun')
         if a == None:
             return
         dataset[0]['mainset']['PackName'] = a
@@ -1046,7 +1048,7 @@ def __main__():
 
 
     def changeMusicTitle(event):
-        a = tkinter.simpledialog.askstring(title=READABLETEXT[50], prompt="修改音乐标题", initialvalue='Noname')
+        a = tkinter.simpledialog.askstring(title="修改主设置", prompt="修改音乐标题", initialvalue='Noname')
         if a == None:
             return
         dataset[0]['mainset']['MusicTitle'] = a 
@@ -1059,7 +1061,7 @@ def __main__():
 
 
     def changePlayerSelect(event):
-        dataset[0]['mainset']['PlayerSelect'] = tkinter.simpledialog.askstring(title=READABLETEXT[50], prompt="修改玩家选择器\n注意！要加上中括号“[]”", initialvalue='')
+        dataset[0]['mainset']['PlayerSelect'] = tkinter.simpledialog.askstring(title="修改主设置", prompt="修改玩家选择器\n注意！要加上中括号“[]”", initialvalue='')
         if dataset[0]['mainset']['PlayerSelect'] == None:
             dataset[0]['mainset']['PlayerSelect'] = ''
         RefreshMain()
@@ -1067,7 +1069,7 @@ def __main__():
 
     def changeEntityName(event):
         global NowMusic
-        a = tkinter.simpledialog.askstring(title=READABLETEXT[51], prompt="修改本音轨的执行实体名", initialvalue='musicSupport')
+        a = tkinter.simpledialog.askstring(title="修改节设置", prompt="修改本音轨的执行实体名", initialvalue='musicSupport')
         if a == None:
             return
         dataset[0]['musics'][NowMusic]['set']['EntityName'] = a 
@@ -1076,7 +1078,7 @@ def __main__():
 
     def changeScoreboardName(event):
         global NowMusic
-        a = tkinter.simpledialog.askstring(title=READABLETEXT[51], prompt="修改本音轨所用的积分板", initialvalue='musicSupport')
+        a = tkinter.simpledialog.askstring(title="修改节设置", prompt="修改本音轨所用的积分板", initialvalue='musicSupport')
         if a == None:
             return
         dataset[0]['musics'][NowMusic]['set']['ScoreboardName'] = a 
@@ -1087,17 +1089,17 @@ def __main__():
         from nmcsup.const import Instuments as inst
         global NowMusic
         while(True):
-            instemp = tkinter.simpledialog.askstring(title=READABLETEXT[51], prompt="修改本音轨所用乐器", initialvalue='note.harp')
+            instemp = tkinter.simpledialog.askstring(title="修改节设置", prompt="修改本音轨所用乐器", initialvalue='note.harp')
             if not instemp in inst.keys():
-                if tkinter.messagebox.askyesno(title=READABLETEXT[1], message="您输入的乐器并非游戏内置乐器，是否继续用您输入的字符作为乐器？"):
+                if tkinter.messagebox.askyesno(title="提示❗", message="您输入的乐器并非游戏内置乐器，是否继续用您输入的字符作为乐器？"):
                     dataset[0]['musics'][NowMusic]['set']['Instrument'] = instemp
                     del instemp
                     break
                 else:
-                    smsg = READABLETEXT[52]
+                    smsg = "游戏内置乐器如下：请输入英文\n"
                     for i, j in inst.items():
                         smsg += i+' : '+j+'\n'
-                    tkinter.messagebox.showinfo(title=READABLETEXT[1], message=smsg)
+                    tkinter.messagebox.showinfo(title="提示❗", message=smsg)
                     del smsg
             else:
                 dataset[0]['musics'][NowMusic]['set']['Instrument'] = instemp
@@ -1108,7 +1110,7 @@ def __main__():
 
     def changeFileName(event):
         global NowMusic
-        a = tkinter.simpledialog.askstring(title=READABLETEXT[51], prompt="修改本音轨生成的文件名", initialvalue='Music')
+        a = tkinter.simpledialog.askstring(title="修改节设置", prompt="修改本音轨生成的文件名", initialvalue='Music')
         if a == None:
             return
         dataset[0]['musics'][NowMusic]['set']['FileName'] = a
@@ -1148,75 +1150,75 @@ def __main__():
     # 创建文件菜单
     filemenu = tk.Menu(main_menu_bar, tearoff=0)
 
-    filemenu.add_command(label=READABLETEXT[53], command=openProject)
-    filemenu.add_command(label=READABLETEXT[54], command=openOldProject)
-    filemenu.add_command(label=READABLETEXT[55], command=SaveProject)
-    filemenu.add_command(label=READABLETEXT[56], command=SaveAsProject)
+    filemenu.add_command(label="打开音·创项目...", command=openProject)
+    filemenu.add_command(label="打开旧项目...", command=openOldProject)
+    filemenu.add_command(label="保存项目", command=SaveProject)
+    filemenu.add_command(label="另存为...", command=SaveAsProject)
 
     filemenu.add_separator()  # 分隔符
 
-    filemenu.add_command(label=READABLETEXT[57], command=exitapp)
+    filemenu.add_command(label="退出", command=exitapp)
 
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[58], menu=filemenu)
+    main_menu_bar.add_cascade(label="文件", menu=filemenu)
 
 
     # 创建编辑菜单
     editmenu = tk.Menu(main_menu_bar, tearoff=0)
-    editmenu.add_command(label=READABLETEXT[59], command=FromMP3)
-    editmenu.add_command(label=READABLETEXT[60], command=FromMidi)
-    editmenu.add_command(label=READABLETEXT[61], command=FromForm)
-    editmenu.add_command(label=READABLETEXT[62], command=FromText)
+    editmenu.add_command(label="从钢琴MP3导入音轨", command=FromMP3)
+    editmenu.add_command(label="从midi导入音轨", command=FromMidi)
+    editmenu.add_command(label="从文本文件导入音轨", command=FromForm)
+    editmenu.add_command(label="输入音符至音轨", command=FromText)
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[63], menu=editmenu)
+    main_menu_bar.add_cascade(label="编辑", menu=editmenu)
 
 
 
     #创建函数菜单
     funcmenu = tk.Menu(main_menu_bar, tearoff=0)
-    funcmenu.add_command(label=READABLETEXT[64], command=MakeCMD)
-    funcmenu.add_command(label=READABLETEXT[65], command=MakeCMDdir)
-    funcmenu.add_command(label=READABLETEXT[66], command=MakePackFile)
+    funcmenu.add_command(label="生成文件至...", command=MakeCMD)
+    funcmenu.add_command(label="生成函数包至...", command=MakeCMDdir)
+    funcmenu.add_command(label="生成附加包文件至...", command=MakePackFile)
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[67], menu=funcmenu)
+    main_menu_bar.add_cascade(label="函数(包)", menu=funcmenu)
 
 
 
 
     #创建世界菜单
     worldmenu = tk.Menu(main_menu_bar, tearoff=0);
-    worldmenu.add_command(label=READABLETEXT[68], command=ToBlockWorldEpt);
-    worldmenu.add_command(label=READABLETEXT[69], command=ToBlockWorld);
+    worldmenu.add_command(label="将音乐以方块存储生成地图", command=ToBlockWorldEpt);
+    worldmenu.add_command(label="将音乐以方块存储载入地图…", command=ToBlockWorld);
     worldmenu.add_separator()
-    worldmenu.add_command(label=READABLETEXT[70], command=ToCmdWorldEpt);
-    worldmenu.add_command(label=READABLETEXT[71], command=ToCmdWorld);
+    worldmenu.add_command(label="将音乐以指令存储生成地图", command=ToCmdWorldEpt);
+    worldmenu.add_command(label="将音乐以指令存储载入地图…", command=ToCmdWorld);
     worldmenu.add_separator()
-    worldmenu.add_command(label=READABLETEXT[72], command=toRSworldEPT);
-    worldmenu.add_command(label=READABLETEXT[73], command=toRSworld);
+    worldmenu.add_command(label="将音乐以音符盒存储生成地图", command=toRSworldEPT);
+    worldmenu.add_command(label="将音乐以音符盒存储载入地图…", command=toRSworld);
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[74], menu=worldmenu);
+    main_menu_bar.add_cascade(label="世界", menu=worldmenu);
 
 
     # 创建其他功能菜单
     otherMenu = tk.Menu(main_menu_bar, tearoff=0)
-    otherMenu.add_command(label=READABLETEXT[75], command=MakeFuncPlayer)
+    otherMenu.add_command(label="生成符合当前音乐的函数播放器…", command=MakeFuncPlayer)
     otherMenu.add_separator();
-    otherMenu.add_command(label=READABLETEXT[76], command=toScbBDXfile)
-    otherMenu.add_command(label=READABLETEXT[77], command=world2BDX)
-    otherMenu.add_command(label=READABLETEXT[78], command=world2RyStruct)
+    otherMenu.add_command(label="将选中音轨以指令存储生成.bdx文件…", command=toScbBDXfile)
+    otherMenu.add_command(label="由地图导出至.bdx文件…", command=world2BDX)
+    otherMenu.add_command(label="由地图导出至.RyStruct文件…", command=world2RyStruct)
     otherMenu.add_separator();
-    otherMenu.add_command(label=READABLETEXT[79], command=func2World);
-    otherMenu.add_command(label=READABLETEXT[80], command=bigFunc2World);
+    otherMenu.add_command(label="将函数载入世界…", command=func2World);
+    otherMenu.add_command(label="将大函数分割并建立执行链…", command=bigFunc2World);
 
-    main_menu_bar.add_cascade(label=READABLETEXT[81], menu=otherMenu);
+    main_menu_bar.add_cascade(label="辅助功能", menu=otherMenu);
 
 
     # 创建实验功能菜单
     trymenu = tk.Menu(main_menu_bar, tearoff=0)
-    trymenu.add_command(label=READABLETEXT[82], command=ShowCMD)
-    trymenu.add_command(label=READABLETEXT[83], command=wsPlay)
+    trymenu.add_command(label="展示生成结果", command=ShowCMD)
+    trymenu.add_command(label="建立位于localhost:8080上的websocket服务器播放选中音轨", command=wsPlay)
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[84], menu=trymenu)
+    main_menu_bar.add_cascade(label="实验功能", menu=trymenu)
 
 
 
@@ -1226,16 +1228,16 @@ def __main__():
 
     # 创建帮助菜单
     helpmenu = tk.Menu(main_menu_bar, tearoff=0)
-    helpmenu.add_command(label=READABLETEXT[85], command=ClearLog)
-    helpmenu.add_command(label=READABLETEXT[86], command=resetver)
+    helpmenu.add_command(label="清除临时文件", command=ClearLog)
+    helpmenu.add_command(label="清除存在文件", command=resetver)
 
     helpmenu.add_separator()  # 分隔符
 
-    helpmenu.add_command(label=READABLETEXT[87], command=apphelp)
-    helpmenu.add_command(label=READABLETEXT[88], command=appabout)
-    helpmenu.add_command(label=READABLETEXT[89],command=sendBugReport)
+    helpmenu.add_command(label="帮助", command=apphelp)
+    helpmenu.add_command(label="关于", command=appabout)
+    helpmenu.add_command(label="发送错误日志反馈",command=sendBugReport)
     # 将子菜单加入到菜单条中
-    main_menu_bar.add_cascade(label=READABLETEXT[90], menu=helpmenu)
+    main_menu_bar.add_cascade(label="帮助与疑问", menu=helpmenu)
 
 
     # 窗口内容
@@ -1248,12 +1250,12 @@ def __main__():
     #左边的框（音乐总设置）
     UpLeftFrame = tk.Frame(UpFrame, bg='white')
     # 大标题
-    tk.Label(UpLeftFrame, text=READABLETEXT[91], font=('', 20)).pack()
+    tk.Label(UpLeftFrame, text="音乐总设置(项目设置)", font=('', 20)).pack()
     # 按钮式文本
-    LabelPackName = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[92], font=('', 15))
-    LabelMusicTitle = tk.Label(UpLeftFrame, bg='white',text=READABLETEXT[93], font=('', 15))
-    LabelIsRepeat = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[94], font=('', 15))
-    LabelPlayerSelect = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[95], font=('', 15))
+    LabelPackName = tk.Label(UpLeftFrame, bg='white', text="地图/函数包名：", font=('', 15))
+    LabelMusicTitle = tk.Label(UpLeftFrame, bg='white',text="音乐标题：", font=('', 15))
+    LabelIsRepeat = tk.Label(UpLeftFrame, bg='white', text="是否重复：", font=('', 15))
+    LabelPlayerSelect = tk.Label(UpLeftFrame, bg='white', text="玩家选择器：", font=('', 15))
     # 绑定按钮
     LabelPackName.bind('<Button-1>', changePackName)
     LabelMusicTitle.bind('<Button-1>', changeMusicTitle)
@@ -1265,7 +1267,7 @@ def __main__():
     LabelIsRepeat.pack()
     LabelPlayerSelect.pack()
     # 按钮：重置项目设置
-    tk.Button(UpLeftFrame, text=READABLETEXT[96], command=ResetSetting).pack()
+    tk.Button(UpLeftFrame, text="重置项目设置", command=ResetSetting).pack()
     #装入窗口
     UpLeftFrame.pack(side='left')
 
@@ -1289,12 +1291,12 @@ def __main__():
     #右边的框容器
     UpRightFrame = tk.Frame(UpFrame, bg='white')
     # 大标题
-    tk.Label(UpRightFrame, text=READABLETEXT[97], font=('', 20)).pack()
+    tk.Label(UpRightFrame, text="当前音轨设置(段落设置)", font=('', 20)).pack()
     # 按钮式文本
-    LabelEntityName = tk.Label(UpRightFrame, bg='white',text=READABLETEXT[98], font=('', 15))
-    LabelScoreboardName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[99], font=('', 15))
-    LabelInstrument = tk.Label(UpRightFrame, bg='white',text=READABLETEXT[100], font=('', 15))
-    LabelFileName = tk.Label(UpRightFrame, bg='white',text=READABLETEXT[101], font=('', 15))
+    LabelEntityName = tk.Label(UpRightFrame, bg='white',text="执行实体名：", font=('', 15))
+    LabelScoreboardName = tk.Label(UpRightFrame, bg='white', text="使用计分板：", font=('', 15))
+    LabelInstrument = tk.Label(UpRightFrame, bg='white',text="所用的乐器：", font=('', 15))
+    LabelFileName = tk.Label(UpRightFrame, bg='white',text="当前音轨名：", font=('', 15))
     # 绑定按钮
     LabelEntityName.bind('<Button-1>', changeEntityName)
     LabelScoreboardName.bind('<Button-1>', changeScoreboardName)
@@ -1306,7 +1308,7 @@ def __main__():
     LabelInstrument.pack()
     LabelFileName.pack()
     # 按钮：删除选中音轨
-    tk.Button(UpRightFrame, text=READABLETEXT[102], command=DelNowMusic).pack()
+    tk.Button(UpRightFrame, text="删除选中音轨", command=DelNowMusic).pack()
     #装入窗口
     UpRightFrame.pack(side='left')
 
@@ -1365,7 +1367,7 @@ def __main__():
             with open(sys.argv[1], 'r', encoding='UTF-8') as c:
                 dataset[0] = json.load(c)
         except:
-            print(READABLETEXT[8].format(sys.argv[1]))
+            print("无法打开文件：{}，请查看您是否输入正确".format(sys.argv[1]))
             log('无法打开'+sys.argv[1])
             return
         global is_new_file
