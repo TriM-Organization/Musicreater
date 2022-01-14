@@ -8,6 +8,21 @@
 # 版权所有 Team-Ryoun 金羿
 # 若需转载或借鉴 请附作者
 
+'''
+   Copyright 2022 Eilles Wan (金羿)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+'''
 
 #  代码写的并非十分的漂亮，还请大佬多多包涵；本软件源代码依照Apache软件协议公开
 
@@ -1318,12 +1333,10 @@ def __main__():
     # 下半部分框容器
     DownFrame = tk.Frame(root, bg='blue')
 
+    #经典名言语录
     import random
-
     texts = open('./resources/myWords.txt','r',encoding='utf-8').readlines()
-
     tk.Label(DownFrame,text=texts[random.randint(0,len(texts)-1)].replace('\n','').replace('\\n','\n'),fg='white',bg='black',font=('DengXian Light',20)).pack(fill='x')
-
     del texts
 
     # 音符列表菜单

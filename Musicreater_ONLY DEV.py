@@ -33,7 +33,7 @@ __author__ = 'W-YI （金羿）'
 
 
 
-
+from languages.lang import READABLETEXT
 
 
 
@@ -1320,12 +1320,10 @@ def __main__():
     # 下半部分框容器
     DownFrame = tk.Frame(root, bg='blue')
 
+    #经典名言语录
     import random
-
     texts = open('./resources/myWords.txt','r',encoding='utf-8').readlines()
-
     tk.Label(DownFrame,text=texts[random.randint(0,len(texts)-1)].replace('\n','').replace('\\n','\n'),fg='white',bg='black',font=('DengXian Light',20)).pack(fill='x')
-
     del texts
 
     # 音符列表菜单
