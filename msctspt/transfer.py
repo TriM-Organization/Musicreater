@@ -13,7 +13,7 @@ def hans2pinyin(hans,style=3):
     result = lazy_pinyin(hans=hans,style=style)
     final = ''
     for i in result:
-        final += i;
+        final += i
     return final
 
 
@@ -83,7 +83,7 @@ def note2bdx(filePath:str,dire:list,Notes : list,ScoreboardName:str,Instrument:s
     i = 0
     down = False
     blocks = [formCmdBlock(dire,cdl.pop(0),1,1)]
-    dire[1]+=1;
+    dire[1]+=1
     for j in cdl:
         if dire[1]+i > height:
             dire[0]+=1
@@ -124,12 +124,12 @@ def note2webs(Notes : list,Instrument:str, speed:float = 5.0, PlayerSelect:str='
         await fcwslib.tellraw(websocket, '已连接服务器——音·创'+VER[1]+VER[0]+' 作者：金羿(W-YI)')
         if isProsess:
             length = len(Notes)
-            j = 1;
+            j = 1
         for i in range(len(Notes)):
             await fcwslib.send_command(websocket,'execute @a'+PlayerSelect+' ~ ~ ~ playsound '+Instrument+' @s ~ ~ ~ 1000 '+str(Notes[i][0])+' 1000')
             if isProsess:
                 fcwslib.send_command(websocket,'execute @a'+PlayerSelect+' ~ ~ ~ title @s actionbar §e▶  播放中：  §a'+str(j)+'/'+str(length)+'  ||  '+str(int(j/length*1000)/10))
-                j+=1;
+                j+=1
             time.sleep(Notes[i][1]/speed)
 
     fcwslib.run_server(run_server)
@@ -170,19 +170,19 @@ def note2RSworld(world:str,startpos:list,notes:list,instrument:str,speed:float =
         :param note: 0~24
         :return Block()'''
         if powered:
-            powered = 'true';
+            powered = 'true'
         else:
-            powered = 'false';
+            powered = 'false'
         return Block('universal_minecraft','noteblock',{"instrument":ts(instrument.replace("note.",'')),'note':ts(str(note)),'powered':ts(powered)})
     
     def formRepeater(delay:int,facing:str,locked:bool=False,powered:bool=False):
         '''生成中继器方块
         :param delay: 1~4
         :return Block()'''
-        if powered:powered = 'true';
-        else:powered = 'false';
-        if locked:locked = 'true';
-        else:locked = 'false';
+        if powered:powered = 'true'
+        else:powered = 'false'
+        if locked:locked = 'true'
+        else:locked = 'false'
         return Block('universal_minecraft','repeater',{"delay":ts(str(delay)),'facing':ts(facing),'locked':ts(locked),'powered':ts(powered)})
         
     

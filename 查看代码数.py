@@ -16,12 +16,12 @@ for path,dir_list,file_list in os.walk(r"./") :
                 try:
                     code -= code[code.index('#'):]
                 except:
-                    pass;
+                    pass
                 if code:
                     print("\t"+code)
                     l+=1
                 else:
-                    pass;
+                    pass
 
 input("\n最终代码行数为："+str(l))
 

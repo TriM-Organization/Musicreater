@@ -21,7 +21,7 @@ def makeZip(sourceDir, outFilename,compression = 8,exceptFile = None):
     for parent, dirnames, filenames in os.walk(sourceDir):
         for filename in filenames:
             if filename == exceptFile:
-                continue;
+                continue
             print(filename)
             pathfile = os.path.join(parent, filename)
             arcname = pathfile[pre_len:].strip(os.path.sep)   #相对路径
@@ -43,51 +43,51 @@ class report():
         ''':param senderName 发送者名称
         :param senderContact 发送者联系方式
         :param describetion 问题描述'''
-        self.senderName = senderName;
-        self.senderContact = senderContact;
-        self.describetion = describetion;
+        self.senderName = senderName
+        self.senderContact = senderContact
+        self.describetion = describetion
         if not self.senderName :
-            self.senderName = 'Unknown';
+            self.senderName = 'Unknown'
         if not self.senderContact :
-            self.senderContact = 'None';
+            self.senderContact = 'None'
     
     
     
     def emailReport(self):
         '''使用E-mail方法发送当前的日志和临时文件等'''
         import smtplib
-        from email.mime.text import MIMEText;
-        from email.mime.multipart import MIMEMultipart;
-        from email.header import Header;
+        from email.mime.text import MIMEText
+        from email.mime.multipart import MIMEMultipart
+        from email.header import Header
         from nmcsup.log import log 
         log("发送错误报告")
-        import os;
+        import os
         log("添加标题与正文")
-        msg = MIMEMultipart();
+        msg = MIMEMultipart()
         #发送者与接收者显示名称
-        msg["From"] = Header(self.senderName,'utf-8');
-        msg["To"] = Header("W-YI (QQ2647547478)",'utf-8');
+        msg["From"] = Header(self.senderName,'utf-8')
+        msg["To"] = Header("W-YI (QQ2647547478)",'utf-8')
         #标题
-        msg["Subject"] = '音·创 - 来自 '+self.senderName+' 的错误报告';
+        msg["Subject"] = '音·创 - 来自 '+self.senderName+' 的错误报告'
         #正文
-        msg.attach(MIMEText("来自"+self.senderName+"( "+self.senderContact+" )的错误描述：\n"+self.describetion,'plain','utf-8'));
+        msg.attach(MIMEText("来自"+self.senderName+"( "+self.senderContact+" )的错误描述：\n"+self.describetion,'plain','utf-8'))
         log("添加完毕，正在生成压缩包...")
-        makeZip("./","Temps&Logs.zip",exceptFile="Temps&Logs.zip");
-        attafile=MIMEText(open("Temps&Logs.zip",'rb').read(),"base64",'gb2312');
-        attafile["Content-Type"] = 'application/octet-stream';
-        attafile["Content-Disposition"] = 'attachment;filename="BugReport_from_'+self.senderName+'.zip"';
-        msg.attach(attafile);
+        makeZip("./","Temps&Logs.zip",exceptFile="Temps&Logs.zip")
+        attafile=MIMEText(open("Temps&Logs.zip",'rb').read(),"base64",'gb2312')
+        attafile["Content-Type"] = 'application/octet-stream'
+        attafile["Content-Disposition"] = 'attachmentfilename="BugReport_from_'+self.senderName+'.zip"'
+        msg.attach(attafile)
         log("完毕，准备发送")
         try:
             smtp = smtplib.SMTP()
-            smtp.connect("smtp.163.com");
-            #smtp.login("RyounDevTeam@163.com","RyounDaiYi99");
+            smtp.connect("smtp.163.com")
+            #smtp.login("RyounDevTeam@163.com","RyounDaiYi99")
             #SIQQKQQYCZRVIDFJ是授权密码
-            smtp.login("RyounDevTeam@163.com","SIQQKQQYCZRVIDFJ");
+            smtp.login("RyounDevTeam@163.com","SIQQKQQYCZRVIDFJ")
             smtp.sendmail("RyounDevTeam@163.com",["RyounDevTeam@163.com",],msg.as_string())
             log("错误汇报邮件已发送")
         except smtplib.SMTPException as e:
-            log("错误汇报邮件发送失败：\n"+str(e));
+            log("错误汇报邮件发送失败：\n"+str(e))
         log("清空内存和临时文件")
         del msg,attafile
         os.remove("./Temps&Logs.zip")
@@ -102,7 +102,7 @@ class version:
     libraries = ('mido','amulet','amulet-core','amulet-nbt','piano_transcription_inference','pypinyin','pyinstaller','py7zr','websockets','torch')
     '''当前所需库，有一些是开发用的，用户不需要安装'''
 
-    version = ('0.0.0','Delta',)
+    version = ('0.0.1','Delta',)
     '''当前版本'''
 
     def __init__(self) -> None:
@@ -122,12 +122,13 @@ class version:
             try:
                 shutil.rmtree(os.getenv('APPDATA')+'\\Musicreater\\')
             except:
-                pass;
+                pass
             for i in self.libraries:
                 print("安装库："+i)
                 os.system("python -m pip install "+i+" -i https://pypi.tuna.tsinghua.edu.cn/simple")
         elif platform == 'linux':
             os.system("sudo apt-get install python3-pip")
+            os.system("sudo apt-get install python3-tk")
             os.system("sudo apt-get install python3-tkinter")
             for i in self.libraries:
                 print("安装库："+i)

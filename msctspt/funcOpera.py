@@ -12,21 +12,21 @@ def delPart(Data,starter,ender,includeStart :bool= True,includend :bool= True):
     starter与ender若为None则默认从首或尾开始'''
     try:
         if starter == None:
-            includeStart = True;
-            starter = Data[0];
+            includeStart = True
+            starter = Data[0]
         if ender == None:
-            includend = True;
-            ender = Data[len(Data)-1];
+            includend = True
+            ender = Data[len(Data)-1]
         if includend:
             if includeStart:
-                return Data[Data.index(starter):len(Data)-Data[len(Data)::-1].index(ender)];
+                return Data[Data.index(starter):len(Data)-Data[len(Data)::-1].index(ender)]
             else:
-                return Data[Data.index(starter)+1:len(Data)-Data[len(Data)::-1].index(ender)];
+                return Data[Data.index(starter)+1:len(Data)-Data[len(Data)::-1].index(ender)]
         else:
             if includeStart:
-                return Data[Data.index(starter):len(Data)-Data[len(Data)::-1].index(ender)-1];
+                return Data[Data.index(starter):len(Data)-Data[len(Data)::-1].index(ender)-1]
             else:
-                return Data[Data.index(starter)+1:len(Data)-Data[len(Data)::-1].index(ender)-1];
+                return Data[Data.index(starter)+1:len(Data)-Data[len(Data)::-1].index(ender)-1]
     except:
         return 0
 
@@ -37,21 +37,21 @@ def keepart(Data,starter,ender,includeStart :bool= True,includend :bool= True):
     starter与ender若为None则默认从首或尾开始'''
     try:
         if starter == None:
-            includeStart = True;
-            starter = Data[0];
+            includeStart = True
+            starter = Data[0]
         if ender == None:
-            includend = True;
-            ender = Data[len(Data)-1];
+            includend = True
+            ender = Data[len(Data)-1]
         if includend:
             if includeStart:
-                return Data[Data.index(starter):Data.index(ender)+1];
+                return Data[Data.index(starter):Data.index(ender)+1]
             else:
-                return Data[Data.index(starter)+1:Data.index(ender)+1];
+                return Data[Data.index(starter)+1:Data.index(ender)+1]
         else:
             if includeStart:
-                return Data[Data.index(starter):Data.index(ender)];
+                return Data[Data.index(starter):Data.index(ender)]
             else:
-                return Data[Data.index(starter)+1:Data.index(ender)];
+                return Data[Data.index(starter)+1:Data.index(ender)]
     except:
         return 0
 
@@ -66,13 +66,13 @@ def keepart(Data,starter,ender,includeStart :bool= True,includend :bool= True):
 def lenFunction(fun) -> int:
     '''取得函数指令部分长度，即忽略#开头的注释'''
     try:
-        l = 0;
+        l = 0
         for i in fun:
             if i.replace(" ",'')[0] == '#':
-                l += 1;
-        return len(fun)-l;
+                l += 1
+        return len(fun)-l
     except:
-        return -1;
+        return -1
 
 
 
@@ -82,21 +82,21 @@ def funSplit(bigFile,maxCmdLen : int = 10000 ):
     返回-1为大小低于maxCmdLen最长函数指令长度'''
     bigFile = bigFile.readlines()
     if lenFunction(bigFile) < maxCmdLen:
-        return -1;
-    part = [];
-    parts = [];
-    l = 0;
+        return -1
+    part = []
+    parts = []
+    l = 0
     for i in bigFile:
         if i.replace(" ",'')[0] == '#':
-            part.append(i+'\n');
+            part.append(i+'\n')
         else:
-            part.append(i+'\n');
-            l += 1;
+            part.append(i+'\n')
+            l += 1
         if l >= 10000:
             parts.append(part)
-            part = [];
-            l = 0;
-    return parts;
+            part = []
+            l = 0
+    return parts
 
 
 

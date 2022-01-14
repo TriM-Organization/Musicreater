@@ -147,7 +147,7 @@ def Cmd2World(cmd:list,world:str,dire:list):
     chunk.block_entities[(dire[0], dire[1], dire[2])] = universal_block_entity
     chunk.changed = True
     #集体上移
-    dire[1]+=1;
+    dire[1]+=1
     #真正开始
     down = False
     for j in cdl:
