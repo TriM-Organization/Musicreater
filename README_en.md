@@ -11,6 +11,8 @@ Using *Python* to develop, using Tkinter as a graphics library.
 
 Support Windows7+ && Linux (that supports Python3.8)
 
+***ATTENTION TO DEVELOPERS!!! TO SUPPORT DIFFERENT LANGUAGES, PLEASE USE CONSTANT `READABLETEXT` TO OUTPUT!!! IF YOU NEED TO SUPPLEMENT, PLEASE ADD THEM IN SIMPLEFIED CHINESE\'S LANGUAGE FILE(zhCN.py), WHEATHER WHAT LANGUAGE YOU USE!!!***
+
 
 ### Installation
 
