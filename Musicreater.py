@@ -658,6 +658,7 @@ def __main__():
             except ValueError:  # 测试完为ValueError，故修改语法
                 tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[117])
                 continue
+            break
         Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./')
         if Outdire is None or Outdire == '':
             return
