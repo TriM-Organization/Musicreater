@@ -22,7 +22,10 @@ READABLETEXT = {
     12: """凌云我的世界开发团队\n×\n凌云计算机应用软件开发团队""",
     13: "确定",
     14: "请输入音符",
-    15: (("- 开发者 -", False), ("金羿 Eilles", True), ("EillesWan@outlook.com", False), ("QQ 2647547478", False)),
+    15: (("- 开发者 -", False),
+        ("金羿 Eilles", True), ("EillesWan@outlook.com", False), ("QQ 2647547478", False),
+        ("bgArray “诸葛亮与八卦阵”",True),("QQ 474037765",False),
+    ),
     # 此处是开发者列表，其中每个元组第一项为显示文本，第二项为此文本是否为开发者名字
     16: "- 翻译者 -",
     # 17:"",
