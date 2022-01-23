@@ -836,8 +836,12 @@ def __main__():
         res = note2bdx(fileName, dire, dataset[0]['musics'][NowMusic]['notes'],
                        dataset[0]['musics'][NowMusic]['set']['ScoreboardName'],
                        dataset[0]['musics'][NowMusic]['set']['Instrument'], dataset[0]['mainset']['PlayerSelect'])
+        
         log('转换结束！\n' + str(res))
         tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
+
+
+
 
     def wsPlay():
         from msctspt.transfer import note2webs

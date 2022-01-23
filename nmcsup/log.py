@@ -14,6 +14,9 @@ main_path = './log/'
 
 position = main_path + time
 
+if not os.path.exists('./log/'):
+    os.makedirs('./log/')
+
 logger = logging.getLogger(__name__)
 logger.setLevel(level=logging.INFO)
 handler = logging.FileHandler(position + ".logger")
@@ -40,7 +43,7 @@ StrStartTime = str(datetime.datetime.now()).replace(':', '_')[:-7]
 """字符串型的程序开始时间"""
 
 
-def log(info: str = '', isPrinted: bool = False, isLoggerLibRecord: bool = True):
+def log(info: str = '', isPrinted: bool = True, isLoggerLibRecord: bool = True):
     # isLoggerLibRecord: 是否同时在logger库中记录
     """将信息连同当前时间载入日志"""
     if not os.path.exists('./log/'):
