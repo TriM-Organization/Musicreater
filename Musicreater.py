@@ -232,6 +232,7 @@ def __main__():
 
         if clearLog:
             print(READABLETEXT[2])
+            err = True
             try:
                 if os.path.exists('./log/'):
                     shutil.rmtree('./log/')
@@ -239,8 +240,12 @@ def __main__():
                     shutil.rmtree('./logs/')
                 if os.path.exists('./cache/'):
                     shutil.rmtree('./cache/')
+                err = False
             except ZeroDivisionError:   # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，所以既然是pass就随便填一个错误
                 print(READABLETEXT[3])
+            finally:
+                if err is True:
+                    print(READABLETEXT[3])
 
         exit()
 
@@ -660,6 +665,7 @@ def __main__():
             except ValueError:  # 测试完为ValueError，故修改语法
                 tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[117])
                 continue
+            break
         Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./')
         if Outdire is None or Outdire == '':
             return

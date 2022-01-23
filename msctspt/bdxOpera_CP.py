@@ -4,6 +4,10 @@ import brotli
 '''感谢由 Charlie_Ping “查理平” 带来的bdx转换代码'''
 
 
+# 诸葛亮与八卦阵帮忙修改语法 日期：---2022年1月19日
+# 统计：致命（三级）错误：0个；警告（二级）错误：0个；语法（一级）错误：7个
+
+
 class BdxConverter:
     __header = "BD@"
     __bin_header = b"BDX"
@@ -42,8 +46,8 @@ class BdxConverter:
         :return: list 给出的所有方块种类名称
         """
         block_type = set()
-        for block in self.blocks:
-            block_type.add(block["block_name"])
+        for block_ in self.blocks:
+            block_type.add(block_["block_name"])
         block_type = list(block_type)
         return block_type
 
@@ -74,6 +78,7 @@ class BdxConverter:
             f.write(brotli.compress(_bytes))
             f.close()
         return
+
     def upload_blocks(self):
         """
         计算差值
@@ -83,17 +88,17 @@ class BdxConverter:
         :return:
         """
         _types = b""
-        for block in self.blocks:
+        for block_ in self.blocks:
             # print(f"当前方块：{block['block_name']}, 位置： {block['direction']}]")
-            diff = self.move_pointer(self.direction, block["direction"])
+            diff = self.move_pointer(self.direction, block_["direction"])
             _types += diff
-            if block["block_name"] in ["command_block",
-                                       "chain_command_block",
-                                       "repeating_command_block"]:
-                _types += self.obtain_command_block(block)
+            if block_["block_name"] in ["command_block",
+                                        "chain_command_block",
+                                        "repeating_command_block"]:
+                _types += self.obtain_command_block(block_)
             else:
-                _types += self.obtain_universal_block(block)
-            self.direction = block["direction"]
+                _types += self.obtain_universal_block(block_)
+            self.direction = block_["direction"]
         return _types
 
     def move_pointer(self, direction: list, new_direction):
@@ -148,21 +153,21 @@ class BdxConverter:
             return pointer_type + num_byte
         return pointer_type
 
-    def obtain_universal_block(self, block):
+    def obtain_universal_block(self, block1):
         """
         给定一个方块， 返回此方块在这个bdx中的id和方块data
-        :param block: {block_name: str,particular_value: int}
+        :param block1: {block_name: str,particular_value: int}
         :return: bytes
         """
-        block_id = b"\x07" + self.block_type.index(block["block_name"]).to_bytes(2, byteorder="big", signed=False)
-        particular_value = block["particular_value"].to_bytes(2, byteorder="big", signed=False)
+        block_id = b"\x07" + self.block_type.index(block1["block_name"]).to_bytes(2, byteorder="big", signed=False)
+        particular_value = block1["particular_value"].to_bytes(2, byteorder="big", signed=False)
         block_header = block_id + particular_value
         return block_header
 
-    def obtain_command_block(self, block):
+    def obtain_command_block(self, block1):
         """
         给定一个命令方块，返回命令方块各种数据
-        :param block: {
+        :param block1: {
             "direction": [x: int, y: int, z: int]
             "block_name": str,
             "particular_value": int,
@@ -179,22 +184,23 @@ class BdxConverter:
         :return: bytes of command_block
         """
 
-        block_id = b"\x1b" + self.block_type.index(block["block_name"]).to_bytes(2, byteorder="big", signed=False)
-        particular_value = block["particular_value"].to_bytes(2, byteorder="big", signed=False)
+        block_id = b"\x1b" + self.block_type.index(block1["block_name"]).to_bytes(2, byteorder="big", signed=False)
+        particular_value = block1["particular_value"].to_bytes(2, byteorder="big", signed=False)
         block_header = block_id + particular_value
         for i in [
-            block["impluse"].to_bytes(4, byteorder="big", signed=False),
-            bytes(block["command"], encoding="utf-8") + b"\x00",
-            bytes(block["customName"], encoding="utf-8") + b"\x00",
-            bytes(block["lastOutput"], encoding="utf-8") + b"\x00",
-            block["tickdelay"].to_bytes(4, byteorder="big", signed=True),
-            block["executeOnFirstTick"].to_bytes(1, byteorder="big"),
-            block["trackOutput"].to_bytes(1, byteorder="big"),
-            block["conditional"].to_bytes(1, byteorder="big"),
-            block["needRedstone"].to_bytes(1, byteorder="big")
+            block1["impluse"].to_bytes(4, byteorder="big", signed=False),
+            bytes(block1["command"], encoding="utf-8") + b"\x00",
+            bytes(block1["customName"], encoding="utf-8") + b"\x00",
+            bytes(block1["lastOutput"], encoding="utf-8") + b"\x00",
+            block1["tickdelay"].to_bytes(4, byteorder="big", signed=True),
+            block1["executeOnFirstTick"].to_bytes(1, byteorder="big"),
+            block1["trackOutput"].to_bytes(1, byteorder="big"),
+            block1["conditional"].to_bytes(1, byteorder="big"),
+            block1["needRedstone"].to_bytes(1, byteorder="big")
         ]:
             block_header += i
         return block_header
+
 
 if __name__ == '__main__':
     block = [{"direction": [-1, -1, -1], "block_name": "concrete", "particular_value": 5},
@@ -212,4 +218,4 @@ if __name__ == '__main__':
               },
              {"direction": [3, 4, 1], "block_name": "concrete", "particular_value": 6},
              {"direction": [-123412133, 4, 1], "block_name": "concrete", "particular_value": 7}]
-    bdx = BdxConverter("./test02.bdx", "Charlie_Ping",block)
+    bdx = BdxConverter("./test02.bdx", "Charlie_Ping", block)
