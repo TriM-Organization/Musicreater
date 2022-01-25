@@ -151,9 +151,7 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
             j = 1
         for i in range(len(Notes)):
             await fcwslib.send_command(websocket,
-                                       'execute @a' + PlayerSelect + ' ~ ~ ~ playsound ' + Instrument +
-                                       ' @s ~ ~ ~ 1000 ' + str(
-                                           Notes[i][0]) + ' 1000')
+                                       f'execute @a{PlayerSelect} ~ ~ ~ playsound {Instrument} @s ~ ~ ~ 1000 {Notes[i][0]} 1000')
             if isProsess:
                 fcwslib.send_command(websocket,
                                      'execute @a' + PlayerSelect + ' ~ ~ ~ title @s actionbar §e▶  播放中：  §a' + str(
