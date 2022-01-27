@@ -87,22 +87,22 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
         height: 生成结构的最高高度
     :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件"""
 
-    from msctspt.transfer import formCmdBlock
+    # from msctspt.transfer import formCmdBlock
     from nmcsup.trans import Note2Cmd
     from msctspt.bdxOpera_CP import BdxConverter
     cmd = Note2Cmd(Notes, ScoreboardName, Instrument, PlayerSelect, isProsess)
     cdl = []
     for i in cmd:
-        e = True
+        # e = True
         try:
             if (i[:i.index('#')].replace(' ', '') != '\n') and (i[:i.index('#')].replace(' ', '') != ''):
                 cdl.append(i[:i.index('#')])
-            e = False
-        except ValueError:
+            # e = False
+        except:  # ValueError
             cdl.append(i)
-        finally:
-            if e is True:
-                cdl.append(i)
+        # finally:
+        #     if e is True:
+        #         cdl.append(i)
     i = 0
     down = False
     blocks = [formCmdBlock(dire, cdl.pop(0), 1, 1)]
@@ -137,7 +137,7 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
 
     import time
     import fcwslib
-    import asyncio
+    # import asyncio
     from nmcsup.log import log
     from nmcsup.vers import VER
 
@@ -146,16 +146,15 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
         await fcwslib.tellraw(websocket, '已连接服务器——音·创' + VER[1] + VER[0] + ' 作者：金羿(W-YI)')
         length = len(Notes)
         j = 1
-        if isProsess:
-            length = len(Notes)
-            j = 1
         for i in range(len(Notes)):
             await fcwslib.send_command(websocket,
-                                       f'execute @a{PlayerSelect} ~ ~ ~ playsound {Instrument} @s ~ ~ ~ 1000 {Notes[i][0]} 1000')
+                                       f'execute @a{PlayerSelect} ~ ~ ~ playsound {Instrument} @s ~ ~ ~ 1000 '
+                                       f'{Notes[i][0]} 1000')
             if isProsess:
-                fcwslib.send_command(websocket,
-                                     'execute @a' + PlayerSelect + ' ~ ~ ~ title @s actionbar §e▶  播放中：  §a' + str(
-                                         j) + '/' + str(length) + '  ||  ' + str(int(j / length * 1000) / 10))
+                await fcwslib.send_command(websocket,
+                                           'execute @a' + PlayerSelect + ' ~ ~ ~ title @s actionbar §e▶  播放中：  §a' +
+                                           str(
+                                             j) + '/' + str(length) + '  ||  ' + str(int(j / length * 1000) / 10))
                 j += 1
             time.sleep(Notes[i][1] / speed)
 
@@ -256,15 +255,15 @@ def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed
             startpos[1] += posadder[1]
             startpos[2] += posadder[2]
 
-    e = True
+    # e = True
     try:
         placeNoteBlock()
-        e = False
-    except ValueError:
+        # e = False
+    except:  # ValueError
         log("无法放置方块了，可能是因为区块未加载叭")
-    finally:
-        if e:
-            log("无法放置方块了，可能是因为区块未加载叭")
+    # finally:
+    #     if e:
+    #         log("无法放置方块了，可能是因为区块未加载叭")
     level.save()
     level.close()
 
@@ -278,26 +277,26 @@ class ryStruct:
         self._level = amulet.load_level(world)
 
     def reloadLevel(self):
-        e = True
+        # e = True
         try:
             self._level = amulet.load_level(self.world)
-            e = False
-        except ValueError:
+            # e = False
+        except:  # ValueError
             log("无法重载地图")
-        finally:
-            if e:
-                log("无法重载地图")
+        # finally:
+        #     if e:
+        #         log("无法重载地图")
 
     def closeLevel(self):
-        e = True
+        # e = True
         try:
             self._level.close()
-            e = False
-        except ValueError:
+            # e = False
+        except:  # ValueError
             log("无法关闭地图")
-        finally:
-            if e:
-                log("无法重载地图")
+        # finally:
+        #     if e:
+        #         log("无法重载地图")
 
     def world2Rys(self, startp: list, endp: list, includeAir: bool = False):
         """将世界转换为RyStruct字典，注意，此函数运行成功后将关闭地图，若要打开需要运行 reloadLevel

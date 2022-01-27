@@ -50,6 +50,7 @@ import os
 import shutil
 import sys
 import threading
+import pickle
 import tkinter as tk
 import tkinter.filedialog
 import tkinter.messagebox
@@ -64,8 +65,6 @@ __author__ = 'W-YI （金羿）'
 dire = ""
 begp = ""
 endp = ""
-
-
 
 print('建立变量，存入内存，载入字典常量函数')
 
@@ -111,6 +110,7 @@ dataset=[
 dataset = [
     {
         'mainset': {
+            'ReadMethod': 'old',
             'PackName': 'Ryoun',
             'MusicTitle': 'Noname',
             'IsRepeat': False,
@@ -170,6 +170,7 @@ def __main__():
 
     print('载入日志功能...')
     from nmcsup.log import log
+    from nmcsup.log import end
     print('完成！')
 
     print('更新执行位置...')
@@ -209,12 +210,24 @@ def __main__():
         else:
             return k
 
+    def LoadMidi(midfile: str):  # -> str
+        from nmcsup.nmcreader import midi_conversion
+        k = midi_conversion(midfile)
+        if k is False:
+            tk.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[105].format(midfile))
+            return
+        else:
+            return k
+
     print('完成！')
 
     # 菜单命令
     print('加载菜单命令...')
 
     def exitapp():
+        if os.path.isfile("1.pkl"):
+            # os.remove("1.pkl")
+            pass
         global is_save
         if is_save is not True:
             if tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106]):
@@ -227,25 +240,31 @@ def __main__():
             global root
             root.destroy()
             del root
-        except FileNotFoundError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，所以既然是pass就随便填一个错误
+        except tkinter.TclError:
             pass
 
         if clearLog:
             print(READABLETEXT[2])
-            err = True
-            try:
-                if os.path.exists('./log/'):
-                    shutil.rmtree('./log/')
-                if os.path.exists('./logs/'):
-                    shutil.rmtree('./logs/')
-                if os.path.exists('./cache/'):
-                    shutil.rmtree('./cache/')
-                err = False
-            except ZeroDivisionError:   # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，所以既然是pass就随便填一个错误
-                print(READABLETEXT[3])
-            finally:
-                if err is True:
-                    print(READABLETEXT[3])
+            # err = True
+            # try:
+            end()
+            if os.path.exists('./log/'):
+                shutil.rmtree('./log/')
+            if os.path.exists('./logs/'):
+                shutil.rmtree('./logs/')
+            if os.path.exists('./cache/'):
+                shutil.rmtree('./cache/')
+            if os.path.exists('./nmcsup/log/'):
+                shutil.rmtree('./nmcsup/log/')
+            if os.path.exists('./nmcsup/logs/'):
+                shutil.rmtree('./nmcsup/logs/')
+            # err = False
+            # except:
+            #     print(READABLETEXT[3])
+            #
+            # finally:
+            # if err is True:
+            # print(READABLETEXT[3])
 
         exit()
 
@@ -257,13 +276,29 @@ def __main__():
             SaveAsProject()
             return
         else:
-            # 旧项目旧存着吧
-            log('存储已有文件：{}'.format(ProjectName))
-            with open(ProjectName, 'w', encoding='utf-8') as f:
-                json.dump(dataset[0], f)
-            tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
-        global is_save
-        is_save = True
+            try:
+                # 旧项目旧存着吧
+                log('存储已有文件：{}'.format(ProjectName))
+                with open(ProjectName, 'w', encoding='utf-8') as f:
+                    json.dump(dataset[0], f)
+                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
+                global is_save
+                is_save = True
+            except TypeError:
+                SaveNewProject()
+                return
+
+    def SaveNewProject():
+        if is_new_file:
+            # 新的项目相等于另存为
+            SaveAsNewProject()
+            return
+        else:
+            with open(ProjectName, 'wb') as f:
+                pickle.dump(dataset, f)
+                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
+                global is_save
+                is_save = True
 
     print('保存项目命令加载完成！')
 
@@ -274,9 +309,29 @@ def __main__():
                                                   defaultextension='Noname.msct')
         if fn is None or fn == '':
             return
+        try:
+            Project_Name = fn
+            with open(Project_Name, 'w', encoding='utf-8') as f:
+                json.dump(dataset[0], f)
+            tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+            global is_save
+            is_save = True
+        except TypeError:
+            Project_Name = fn
+            with open(Project_Name, 'wb') as f:
+                pickle.dump(dataset[0], f)
+            tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+            is_save = True
+
+    def SaveAsNewProject():
+        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
+                                                  filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[109], '*')],
+                                                  defaultextension='Noname.msct')
+        if fn is None or fn == '':
+            return
         Project_Name = fn
-        with open(Project_Name, 'w', encoding='utf-8') as f:
-            json.dump(dataset[0], f)
+        with open(Project_Name, 'wb') as f:
+            pickle.dump(dataset[0], f)
         tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
         global is_save
         is_save = True
@@ -319,6 +374,41 @@ def __main__():
 
         except json.decoder.JSONDecodeError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
             # json.decoder.JSONDecodeError
+            print(READABLETEXT[8].format(fn))
+            log('无法打开{}'.format(fn))
+            return
+        global is_new_file
+        global ProjectName
+        is_new_file = False
+        ProjectName = fn
+        del fn
+        global NowMusic
+        RefreshMain()
+        RefreshMusic(NowMusic)
+
+    def openNewProject():
+        global is_save
+        if is_save is not True:
+            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
+            if result:
+                SaveProject()
+        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
+                                                filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
+                                                multiple=True)
+        if fn is None or fn == '':
+            return
+        else:
+            fn = fn[0]
+        try:
+            try:
+                with open(fn, 'rb') as C:
+                    dataset[0] = pickle.load(C)
+            except IndexError:
+                with open(fn, 'rb') as C:
+                    dataset[0] = pickle.load(C)[0]
+
+        except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+            # pickle.UnpicklingError
             print(READABLETEXT[8].format(fn))
             log('无法打开{}'.format(fn))
             return
@@ -441,6 +531,36 @@ def __main__():
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
 
+    def MidiClass():
+        log('从midi导入音乐并采用新读取方式')
+        midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./',
+                                                     filetypes=[(READABLETEXT[114], '.mid .midi'),
+                                                                (READABLETEXT[112], '*')], multiple=True)
+        if midfile is None or midfile == '':
+            log('取消')
+            return
+        else:
+            midfile = midfile[0]
+        th = NewThread(LoadMidi, (midfile,))
+        th.start()
+        del midfile
+
+        def midiSPT(th_):
+            for i in th_.getResult():
+                datas = DMM()
+                datas['notes'] = i
+                dataset[0]['musics'].append(datas)
+            del th_
+            global is_save
+            is_save = False
+            global NowMusic
+            RefreshMain()
+            RefreshMusic(NowMusic)
+
+        threading.Thread(target=midiSPT, args=(th,)).start()
+        del th
+        dataset[0]['mainset']['ReadMethod'] = "new"
+
     print('读midi命令加载完成！')
 
     def FromForm():
@@ -512,6 +632,16 @@ def __main__():
         else:
             makeFuncFiles(dataset[0], file + '/')
 
+    def MakeNewCMD():
+        log('生成新文件')
+        from msctspt.funcOpera import makeNewFuncFiles
+        file = tkinter.filedialog.askdirectory(title=READABLETEXT[25], initialdir=r'./')
+        if file is None or file == '':
+            log('取消')
+            return
+        else:
+            makeNewFuncFiles(dataset[0], file + '/')
+
     def MakeCMDdir():
         log('生成函数包')
         from msctspt.funcOpera import makeFunDir
@@ -521,6 +651,16 @@ def __main__():
             return
         else:
             makeFunDir(dataset[0], file + '/')
+
+    def MakeNewCMDdir():
+        log('生成新函数包与材质包')
+        from msctspt.funcOpera import makeNewFunDir
+        file = tkinter.filedialog.askdirectory(title=READABLETEXT[26], initialdir=r'./')
+        if file is None or file == '':
+            log('取消')
+            return
+        else:
+            makeNewFunDir(dataset[0], file + '/')
 
     def MakePackFile():
         file = tkinter.filedialog.askdirectory(title=READABLETEXT[27], initialdir=r'./')
@@ -548,6 +688,63 @@ def __main__():
         shutil.move('./functions', './temp/')
         shutil.move('./manifest.json', './temp/')
         shutil.rmtree('./temp/')
+
+    def MakeNewFunctionPackFile():
+        file = tkinter.filedialog.askdirectory(title=READABLETEXT[27], initialdir=r'./')
+        if file is None or file == '':
+            log('取消')
+            return
+        import zipfile
+
+        from msctspt.funcOpera import makeNewFunDir
+        log('生成附加包文件')
+        if not os.path.exists('./temp/'):
+            os.makedirs('./temp/')
+        makeNewFunDir(dataset[0], './temp/')
+
+        shutil.move('./temp/{}Pack/behavior_packs/{}/functions'.format(dataset[0]['mainset']['PackName'],
+                                                                       dataset[0]['mainset']['PackName']), './')
+
+        shutil.move('./temp/{}Pack/behavior_packs/{}/manifest.json'.format(dataset[0]['mainset']['PackName'],
+                                                                           dataset[0]['mainset']['PackName']), './')
+
+        with zipfile.ZipFile('{}/{}.mcpack'.format(file, dataset[0]['mainset']['PackName']), 'w') as zipobj:
+            for i in os.listdir('./functions/'):
+                zipobj.write('./functions/{}'.format(i))
+            zipobj.write('./manifest.json')
+        shutil.move('./functions', './temp/')
+        shutil.move('./manifest.json', './temp/')
+        shutil.rmtree('./temp/')
+
+    def MakeNewFunctionPack_ResourcesPacks_File():  # 这个是直接复制资源包（散包）
+        file = tkinter.filedialog.askdirectory(title=READABLETEXT[27], initialdir=r'./')
+        if file is None or file == '':
+            log('取消')
+            return
+        from bgArrayLib.sy_resourcesPacker import scatteredPack
+        scatteredPack(file)
+        import zipfile
+
+        from msctspt.funcOpera import makeNewFunDir
+        log('生成附加包文件')
+        if not os.path.exists('./temp/'):
+            os.makedirs('./temp/')
+        makeNewFunDir(dataset[0], './temp/')
+
+        shutil.move('./temp/{}Pack/behavior_packs/{}/functions'.format(dataset[0]['mainset']['PackName'],
+                                                                       dataset[0]['mainset']['PackName']), './')
+
+        shutil.move('./temp/{}Pack/behavior_packs/{}/manifest.json'.format(dataset[0]['mainset']['PackName'],
+                                                                           dataset[0]['mainset']['PackName']), './')
+
+        with zipfile.ZipFile('{}/{}.mcpack'.format(file, dataset[0]['mainset']['PackName']), 'w') as zipobj:
+            for i in os.listdir('./functions/'):
+                zipobj.write('./functions/{}'.format(i))
+            zipobj.write('./manifest.json')
+        shutil.move('./functions', './temp/')
+        shutil.move('./manifest.json', './temp/')
+        shutil.rmtree('./temp/')
+
 
     # 转为空方块世界
     def ToBlockWorldEpt():
@@ -836,12 +1033,8 @@ def __main__():
         res = note2bdx(fileName, dire, dataset[0]['musics'][NowMusic]['notes'],
                        dataset[0]['musics'][NowMusic]['set']['ScoreboardName'],
                        dataset[0]['musics'][NowMusic]['set']['Instrument'], dataset[0]['mainset']['PlayerSelect'])
-        
         log('转换结束！\n' + str(res))
         tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
-
-
-
 
     def wsPlay():
         from msctspt.transfer import note2webs
@@ -944,19 +1137,19 @@ def __main__():
         from msctspt.transfer import ryStruct
         rys = ryStruct(outdir)
         rys.world2Rys(begp, endp, isAir)
-        error1 = True
+        # error1 = True
         try:
             with open(fileName, 'w', encoding='utf-8') as f:
                 json.dump(rys.RyStruct, f, sort_keys=True, indent=4, separators=(', ', ': '), ensure_ascii=False)
             tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[131].format(fileName))
-            error1 = False
-        except FileNotFoundError:
+            # error1 = False
+        except:
             tkinter.messagebox.showerror(READABLETEXT[39], READABLETEXT[132].format(fileName, str(rys.RyStruct)))
             rys.closeLevel()
-        finally:
-            if error1 is True:
-                tkinter.messagebox.showerror(READABLETEXT[39], READABLETEXT[132].format(fileName, str(rys.RyStruct)))
-                rys.closeLevel()
+        # finally:
+        # if error1 is True:
+        # tkinter.messagebox.showerror(READABLETEXT[39], READABLETEXT[132].format(fileName, str(rys.RyStruct)))
+        # rys.closeLevel()
 
     def world2BDX():
         tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[133])
@@ -1029,6 +1222,7 @@ def __main__():
     # 刷新主要部分
     def RefreshMain():
         LabelPackName['text'] = READABLETEXT[46].format(str(dataset[0]['mainset']['PackName']))
+        # print(LabelPackName)
         LabelMusicTitle['text'] = READABLETEXT[47].format(str(dataset[0]['mainset']['MusicTitle']))
         LabelIsRepeat['text'] = READABLETEXT[48].format(str(dataset[0]['mainset']['IsRepeat']))
         LabelPlayerSelect['text'] = READABLETEXT[49].format(str(dataset[0]['mainset']['PlayerSelect']))
@@ -1162,6 +1356,12 @@ def __main__():
     filemenu.add_command(label=READABLETEXT[55], command=SaveProject)
     filemenu.add_command(label=READABLETEXT[56], command=SaveAsProject)
 
+    filemenu.add_separator()
+
+    filemenu.add_command(label=READABLETEXT[149], command=openNewProject)
+    filemenu.add_command(label=READABLETEXT[150], command=SaveNewProject)
+    filemenu.add_command(label=READABLETEXT[151], command=SaveAsNewProject)
+
     filemenu.add_separator()  # 分隔符
 
     filemenu.add_command(label=READABLETEXT[57], command=exitapp)
@@ -1175,6 +1375,8 @@ def __main__():
     editmenu.add_command(label=READABLETEXT[60], command=FromMidi)
     editmenu.add_command(label=READABLETEXT[61], command=FromForm)
     editmenu.add_command(label=READABLETEXT[62], command=FromText)
+    editmenu.add_separator()
+    editmenu.add_command(label=READABLETEXT[148], command=MidiClass)
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[63], menu=editmenu)
 
@@ -1183,6 +1385,12 @@ def __main__():
     funcmenu.add_command(label=READABLETEXT[64], command=MakeCMD)
     funcmenu.add_command(label=READABLETEXT[65], command=MakeCMDdir)
     funcmenu.add_command(label=READABLETEXT[66], command=MakePackFile)
+    funcmenu.add_separator()
+    funcmenu.add_command(label=READABLETEXT[147], command=MakeNewCMD)
+    funcmenu.add_command(label=READABLETEXT[153], command=MakeNewCMDdir)
+    funcmenu.add_command(label=READABLETEXT[154], command=MakeNewFunctionPackFile)
+    funcmenu.add_command(label=READABLETEXT[155], command=MakeNewFunctionPack_ResourcesPacks_File)
+
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[67], menu=funcmenu)
 
@@ -1223,6 +1431,7 @@ def __main__():
     helpmenu = tk.Menu(main_menu_bar, tearoff=0)
     helpmenu.add_command(label=READABLETEXT[85], command=ClearLog)
     helpmenu.add_command(label=READABLETEXT[86], command=resetver)
+    helpmenu.add_command(label=READABLETEXT[152], command=end)
 
     helpmenu.add_separator()  # 分隔符
 

@@ -6,6 +6,7 @@
 
 from nmcsup.log import log
 from nmcsup.const import notes
+import pickle
 
 
 # 从格式文本文件读入一个音轨并存入一个列表
@@ -67,6 +68,113 @@ def ReadMidi(midfile: str):  # -> list
     return Notes
 
 
+class Note:
+    def __init__(self, channel, pitch, velocity, time, time_position, instrument):
+        self.channel = channel
+        self.pitch = pitch
+        self.velocity = velocity
+        self.delay = time
+        self.time_position = time_position
+        self.instrument = instrument
+        self.CD = "d"
+
+    def get_CD(self, start, end):
+        if end - start > 1.00:
+            self.CD = "c"
+        else:
+            self.CD = "d"
+
+
+def midi_conversion(midfile: str):
+    import mido
+    # from msctspt.threadOpera import NewThread
+    from bgArrayLib.bpm import get
+
+    def Time(mt, tpb_a, bpm_a):
+        return round(mt / tpb_a / bpm_a * 60 * 20)
+    Notes = []
+    tracks = []
+    note_list = []
+    close = []
+    on = []
+    off = []
+    instruments = []
+    isPercussion = False
+    try:
+        mid = mido.MidiFile(midfile)
+    except FileNotFoundError:
+        log("找不到文件或无法读取文件" + midfile)
+        return False
+    tpb = mid.ticks_per_beat
+    bpm = get(midfile)
+    # 解析
+    # def loadMidi(track1):
+    for track in mid.tracks:
+        overallTime = 0.0
+        instrument = 0
+        for i in track:
+            overallTime += i.time
+            try:
+                if i.channel != 9:
+                    # try:
+                    #     log("event_type(事件): " + str(i.type) + " channel(音轨): " + str(i.channel) + " note/pitch(音高): " +
+                    #         str(i[2]) +
+                    #         " velocity(力度): " + str(i.velocity) + " time(间隔时间): " + str(i.time) +
+                    #         " overallTime/globalTime/timePosition: " + str(overallTime) + " \n")
+                    # except AttributeError:
+                    #     log("event_type(事件): " + str(i.type) + " thing(内容)：" + str(i) + " \n")
+                    if 'program_change' in str(i):
+                        instrument = i.program
+                        if instrument > 119:  # 音色不够
+                            pass
+                        else:
+                            instruments.append(i.program)
+                    if 'note_on' in str(i) and i.velocity > 0:
+                        print(i)
+                        # print(i.note)
+                        # print([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+                        tracks.append([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+                        note_list.append([i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument])
+                        on.append([i.note, Time(overallTime, tpb, bpm)])
+                        # return [Note(i.channel, i, i.velocity, i.time, Time(overallTime, tpb, bpm))]
+                    if 'note_off' in str(i) or 'note_on' in str(i) and i.velocity == 0:
+                        # print(i)
+                        # print([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm))])
+                        close.append([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+                        off.append([i.note, Time(overallTime, tpb, bpm)])
+                        # return [Note(i.channel, i, i.velocity, i.time, Time(overallTime, tpb, bpm))]
+            except AttributeError:
+                pass
+            if 'note_on' in str(i) and i.channel == 9:
+                if 'note_on' in str(i) and i.velocity > 0:
+                    print(i)
+                    # print(i.note)
+                    # print([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), -1)])
+                    tracks.append([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), -1)])
+                    note_list.append([i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), -1])
+                    on.append([i.note, Time(overallTime, tpb, bpm)])
+                    isPercussion = True
+                    # return [Note(i.channel, i, i.velocity, i.time, Time(overallTime, tpb, bpm))]
+        Notes.append(tracks)
+    if instruments is []:
+        instruments.append(0)
+    instruments = list(set(instruments))
+    with open("1.pkl", 'wb') as b:
+        pickle.dump([instruments, isPercussion], b)
+
+    # for j, track in enumerate(mid.tracks):
+    #     th = NewThread(loadMidi, (track,))
+    #     th.start()
+    #     Notes.append(th.getResult())
+
+    # print(Notes)
+    print(Notes.__len__())
+    # print(note_list)
+    print(instruments)
+    return Notes
+    # return [Notes, note_list]
+
+
 def ReadOldProject(fn: str):  # -> list
     import json
     from nmcsup.trans import note2list
@@ -82,3 +190,12 @@ def ReadOldProject(fn: str):  # -> list
         dataset['musics'][i]['notes'] = note2list(dataset['musics'][i]['notes'])
     # 返回 音轨列表 选择器
     return dataset
+
+
+if __name__ == '__main__':
+    # a = midi_conversion("L:\\0WorldMusicCreater-MFMS new edition\\框架\\v0.3.2\\Musicreater\\测试用\\同道殊途标准.mid")
+    # midi_conversion("L:\\0WorldMusicCreater-MFMS new edition\\框架\\v0.3.2\\Musicreater\\测试用\\"
+    #                 "Illusionary_Daytime_--------幻昼.mid")
+    # a = midi_conversion(r"C:\Users\lc\Documents\MuseScore3\乐谱\架子鼓.mid")
+    a = midi_conversion(r"C:\Users\lc\Documents\MuseScore3\乐谱\stay2.mid")
+    # print(a)
