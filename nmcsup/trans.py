@@ -17,7 +17,7 @@ from amulet_nbt import TAG_String, TAG_Compound, TAG_Byte
 # 输入一个列表 [ [str, float ], [], ... ] 音符str 值为持续时间float
 def note2list(Notes: list) -> list:
     from nmcsup.const import notes
-    
+
     def change(base):
         enwo = {
             'a': 'A',
@@ -88,20 +88,57 @@ def Note2Cmd(Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: st
              isProsess: bool = False) -> list:
     commands = []
     a = 0.0
-    if isProsess:
-        length = len(Notes)
-        j = 1
-        for i in range(len(Notes)):
+    length = len(Notes)
+    j = 1
+    for i in range(len(Notes)):
+        commands.append("execute @a" + PlayerSelect + " ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" + str(
+            int((a + 2) * 5 + int(Notes[i][1] * 5))) + "}] ~ ~ ~ playsound " + Instrument + " @s ~ ~ ~ 1000 " + str(
+            Notes[i][0]) + " 1000\n")
+        a += Notes[i][1]
+        if isProsess:
             commands.append("execute @a" + PlayerSelect + " ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" + str(
-                int((a + 2) * 5 + int(Notes[i][1] * 5))) + "}] ~ ~ ~ playsound " + Instrument + " @s ~ ~ ~ 1000 " + str(
-                Notes[i][0]) + " 1000\n")
-            a += Notes[i][1]
-            if isProsess:
-                commands.append("execute @a" + PlayerSelect + " ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" + str(
-                    int((a + 2) * 5 + int(Notes[i][1] * 5))) + "}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a" + str(
-                    j) + "/" + str(length) + "  ||  " + str(int(j / length * 1000) / 10) + "\n")
-                j += 1
-        commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+                int((a + 2) * 5 + int(Notes[i][1] * 5))) + "}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a" + str(
+                j) + "/" + str(length) + "  ||  " + str(int(j / length * 1000) / 10) + "\n")
+            j += 1
+    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    return commands
+# def newDataStructureCounterChange():
+
+
+def classList_conversion(List: list, ScoreboardName: str,
+                         isProsess: bool = False) -> list:
+    from bgArrayLib.compute import round_up
+    commands = []
+    length = len(List)
+    j = 1
+    print(List)
+    for k in range(len(List)):
+        i = List[k][0]
+        print(i)
+        print(type(i))
+        try:
+            if i.instrument > 119:
+                pass
+            else:
+                commands.append("execute @e[scores={" +
+                                ScoreboardName + "=" + str(round_up(i.time_position)).replace(".0", "") + "}] ~ ~" +
+                                str(127 - i.velocity) +
+                                " ~ playsound " +
+                                str(i.instrument) +
+                                str(i.CD) + "." +
+                                str(i.pitch)
+                                + " @a ~ ~ ~ 1000 1.0 1000\n")
+                if isProsess:
+                    commands.append("execute @a"" ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" +
+                                    str(round_up(i.time_position)).replace(".0", "") +
+                                    "}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a" +
+                                    str(j) + "/" + str(length) + "  ||  " + str(int(j / length * 1000) / 10) + "\n")
+                    j += 1
+        except AttributeError:
+            pass
+            # a += List[i][1]
+    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    print(commands)
     return commands
 
 
@@ -117,16 +154,16 @@ def Cmd2World(cmd: list, world: str, dire: list):
     level = amulet.load_level(world)
     cdl = []
     for i in cmd:
-        e = True
+        # e = True
         try:
             if (i[:i.index('#')].replace(' ', '') != '\n') and (i[:i.index('#')].replace(' ', '') != ''):
                 cdl.append(i[:i.index('#')])
-            e = False
-        except ValueError:
+            # e = False
+        except:
             cdl.append(i)
-        finally:
-            if e is True:
-                cdl.append(i)
+        # finally:
+        #     if e is True:
+        #         cdl.append(i)
     i = 0
     # 第一个是特殊
     universal_block = Block('universal_minecraft', 'command_block',
@@ -243,3 +280,10 @@ def Notes2Player(Note, dire: list, CmdData: dict):
 def Datas2BlkWorld(NoteData, world: str, dire: list):
     for i in range(len(NoteData)):
         Blocks2World(world, [dire[0], dire[1], dire[2] + i], NoteData[i])
+
+
+if __name__ == '__main__':
+    from nmcreader import midi_conversion
+    path = "L:\\0WorldMusicCreater-MFMS new edition\\框架\\v0.3.2\\Musicreater\\测试用\\同道殊途标准.mid"
+    b = midi_conversion(path)
+    classList_conversion(b, "n")

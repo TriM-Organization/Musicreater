@@ -5,7 +5,6 @@
 import logging
 import os
 import datetime
-import sys
 
 StrStartTime = str(datetime.datetime.now()).replace(':', '_')[:-7]
 time = StrStartTime
@@ -14,11 +13,16 @@ main_path = './log/'
 
 position = main_path + time
 
+logger = logging.getLogger(__name__)
+logger.setLevel(level=logging.INFO)
+
 if not os.path.exists('./log/'):
     os.makedirs('./log/')
 
-logger = logging.getLogger(__name__)
-logger.setLevel(level=logging.INFO)
+# try:
+# handler = logging.FileHandler(position + ".logger")
+# except FileNotFoundError:
+# os.makedirs('./log/')
 handler = logging.FileHandler(position + ".logger")
 print(position + ".logger")
 
@@ -32,9 +36,6 @@ console.setLevel(logging.INFO)
 logger.addHandler(handler)
 logger.addHandler(console)
 
-print("using Timbre_resources_package_generator_lib \n --made by 诸葛亮与八卦阵")
-print(sys.path[0].replace("nmcsup\\logger", "log\\"))
-
 # import logger
 
 # 载入日志功能
@@ -43,14 +44,25 @@ StrStartTime = str(datetime.datetime.now()).replace(':', '_')[:-7]
 """字符串型的程序开始时间"""
 
 
-def log(info: str = '', isPrinted: bool = True, isLoggerLibRecord: bool = True):
-    # isLoggerLibRecord: 是否同时在logger库中记录
+def log(info: str = '', isPrinted: bool = False, isLoggerLibRecord: bool = True, isWrite: bool = False):
+    """
+    info: 信息
+    isPrinted: 是否print（仅限金羿log，python官方的logging照常输出）
+    isLoggerLibRecord: 是否同时在logger库中记录
+    isWrite: 是否write（仅限金羿log，python官方的logging照常输出）
+    """
     """将信息连同当前时间载入日志"""
     if not os.path.exists('./log/'):
         os.makedirs('./log/')
-    with open('./log/' + StrStartTime + '.msct.log', 'a', encoding='UTF-8') as f:
-        f.write(str(datetime.datetime.now())[11:19] + '	' + info + '\n')
+    if isWrite:
+        with open('./log/' + StrStartTime + '.msct.log', 'a', encoding='UTF-8') as f:
+            f.write(str(datetime.datetime.now())[11:19] + '	' + info + '\n')
     if isPrinted:
         print(str(datetime.datetime.now())[11:19] + '	' + info)
     if isLoggerLibRecord:
         logger.info(info)
+
+
+def end():
+    logging.disable(logging.INFO)
+    logging.shutdown()
