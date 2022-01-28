@@ -30,10 +30,11 @@ manifest = {
 def resources_pathSetting(newPath: str = ""):
     if not os.path.isfile("./bgArrayLib/resourcesPath.rpposi") and newPath == "":
         return [False, 1]  # 1:没有路径文件
-    elif not os.path.isfile("./bgArrayLib/resourcesPath.rpposi") and newPath != "":
+    elif newPath != "":  # not os.path.isfile("./bgArrayLib/resourcesPath.rpposi") and
         path = newPath
+        print(path)
         with open("./bgArrayLib/resourcesPath.rpposi", 'w') as w:
-            path = w.write(path)
+            w.write(path)
         if "mcpack(国际版推荐)格式_25.0" in os.listdir(path) and "zip格式_25.0" in os.listdir(path):
             return [True, path, 1]  # 1:都有
         elif "mcpack(国际版推荐)格式_25.0" in os.listdir(path) and "zip格式_25.0" not in os.listdir(path):
@@ -42,7 +43,7 @@ def resources_pathSetting(newPath: str = ""):
             return [True, path, 3]  # 3:有zip
         else:
             return [False, 2]  # 2:路径文件指示错误
-    if os.path.isfile("./bgArrayLib/resourcesPath.rpposi"):
+    if os.path.isfile("./bgArrayLib/resourcesPath.rpposi" and newPath == ""):
         with open("./bgArrayLib/resourcesPath.rpposi", 'r') as f:
             path = f.read()
         if "mcpack(国际版推荐)格式_25.0" in os.listdir(path) and "zip格式_25.0" in os.listdir(path):

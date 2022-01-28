@@ -225,14 +225,14 @@ def __main__():
     print('加载菜单命令...')
 
     def exitapp():
-        if os.path.isfile("1.pkl"):
-            # os.remove("1.pkl")
-            pass
         global is_save
         if is_save is not True:
             if tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106]):
                 SaveProject()
         log('程序正常退出')
+
+        if os.path.isfile("1.pkl"):
+            os.remove("1.pkl")
 
         try:
             global dataset
@@ -294,8 +294,14 @@ def __main__():
             SaveAsNewProject()
             return
         else:
+            save_list = [dataset]
+            try:
+                with open("1.pkl", 'rb') as r:
+                    save_list.append(pickle.load(r))
+            except FileNotFoundError:
+                pass
             with open(ProjectName, 'wb') as f:
-                pickle.dump(dataset, f)
+                pickle.dump(save_list, f)
                 tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
                 global is_save
                 is_save = True
@@ -330,8 +336,15 @@ def __main__():
         if fn is None or fn == '':
             return
         Project_Name = fn
+        save_list = [dataset]
+        try:
+            with open("1.pkl", 'rb') as r:
+                save_list.append(pickle.load(r))
+        except FileNotFoundError:
+            pass
+        print(save_list)
         with open(Project_Name, 'wb') as f:
-            pickle.dump(dataset[0], f)
+            pickle.dump(save_list, f)
         tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
         global is_save
         is_save = True
@@ -398,15 +411,28 @@ def __main__():
         if fn is None or fn == '':
             return
         else:
+            # print(fn)
             fn = fn[0]
+            # print(fn)
+        log("尝试打开：" + fn)
         try:
             try:
                 with open(fn, 'rb') as C:
-                    dataset[0] = pickle.load(C)
-            except IndexError:
+                    global dataset
+                    # print(pickle.load(C))
+                    read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # print(read)
+                    dataset = read[0]
+                    pkl1 = read[1]
+                    log("读取新文件成功")
+                with open("1.pkl", 'wb') as w:
+                    pickle.dump(pkl1, w)
+            except KeyError:
                 with open(fn, 'rb') as C:
-                    dataset[0] = pickle.load(C)[0]
-
+                    dataset[0] = pickle.load(C)
+                log("读取新文件成功")
         except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
             # pickle.UnpicklingError
             print(READABLETEXT[8].format(fn))
@@ -721,8 +747,17 @@ def __main__():
         if file is None or file == '':
             log('取消')
             return
-        from bgArrayLib.sy_resourcesPacker import scatteredPack
-        scatteredPack(file)
+        from bgArrayLib.sy_resourcesPacker import resources_pathSetting
+        result = resources_pathSetting(file)
+        print(result)
+        if result[0] is False:
+            if result[1] == 1:
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[157])
+            if result[1] == 2:
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[158])
+        else:
+            from bgArrayLib.sy_resourcesPacker import scatteredPack
+            scatteredPack(file)
         import zipfile
 
         from msctspt.funcOpera import makeNewFunDir
@@ -745,6 +780,21 @@ def __main__():
         shutil.move('./manifest.json', './temp/')
         shutil.rmtree('./temp/')
 
+    def changeResourcesPath():
+        file = tkinter.filedialog.askdirectory(title=READABLETEXT[27], initialdir=r'./')
+        if file is None or file == '':
+            log('取消')
+            return
+        from bgArrayLib.sy_resourcesPacker import resources_pathSetting
+        result = resources_pathSetting(file)
+        print(result)
+        if result[0] is False:
+            if result[1] == 1:
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[157])
+            if result[1] == 2:
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[158])
+        else:
+            tkinter.messagebox.showinfo(title=READABLETEXT[1], message=READABLETEXT[159])
 
     # 转为空方块世界
     def ToBlockWorldEpt():
@@ -1178,8 +1228,9 @@ def __main__():
     # 窗口部分
     print('增加窗口元素...')
     global root
+    global __version__
 
-    root.title(READABLETEXT[41].format(VER[1] + VER[0]))
+    root.title(READABLETEXT[41].format(__version__))
     root.geometry('900x900')  # 像素
 
     print('完成！')
@@ -1432,6 +1483,7 @@ def __main__():
     helpmenu.add_command(label=READABLETEXT[85], command=ClearLog)
     helpmenu.add_command(label=READABLETEXT[86], command=resetver)
     helpmenu.add_command(label=READABLETEXT[152], command=end)
+    helpmenu.add_command(label=READABLETEXT[156], command=changeResourcesPath)
 
     helpmenu.add_separator()  # 分隔符
 
