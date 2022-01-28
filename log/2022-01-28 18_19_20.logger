@@ -1,4 +1,0 @@
-2022-01-28 18:19:20,019 - nmcsup.log - INFO - 更新执行位置，当前文件位置 L:\0WorldMusicCreater-MFMS new edition\框架\v0.5.3\Musicreater\Musicreater.py
-2022-01-28 18:19:20,503 - nmcsup.log - INFO - 启动root.mainloop（窗口）
-2022-01-28 18:19:48,827 - nmcsup.log - INFO - 从midi导入音乐并采用类读取方式
-2022-01-28 18:19:57,915 - nmcsup.log - INFO - 刷新音轨0
