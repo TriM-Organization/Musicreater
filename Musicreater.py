@@ -1436,11 +1436,11 @@ def __main__():
     funcmenu.add_command(label=READABLETEXT[64], command=MakeCMD)
     funcmenu.add_command(label=READABLETEXT[65], command=MakeCMDdir)
     funcmenu.add_command(label=READABLETEXT[66], command=MakePackFile)
-    funcmenu.add_separator()
-    funcmenu.add_command(label=READABLETEXT[147], command=MakeNewCMD)
-    funcmenu.add_command(label=READABLETEXT[153], command=MakeNewCMDdir)
-    funcmenu.add_command(label=READABLETEXT[154], command=MakeNewFunctionPackFile)
-    funcmenu.add_command(label=READABLETEXT[155], command=MakeNewFunctionPack_ResourcesPacks_File)
+    # funcmenu.add_separator()
+    # funcmenu.add_command(label=READABLETEXT[147], command=MakeNewCMD)
+    # funcmenu.add_command(label=READABLETEXT[153], command=MakeNewCMDdir)
+    # funcmenu.add_command(label=READABLETEXT[154], command=MakeNewFunctionPackFile)
+    # funcmenu.add_command(label=READABLETEXT[155], command=MakeNewFunctionPack_ResourcesPacks_File)
 
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[67], menu=funcmenu)
@@ -1483,7 +1483,7 @@ def __main__():
     helpmenu.add_command(label=READABLETEXT[85], command=ClearLog)
     helpmenu.add_command(label=READABLETEXT[86], command=resetver)
     helpmenu.add_command(label=READABLETEXT[152], command=end)
-    helpmenu.add_command(label=READABLETEXT[156], command=changeResourcesPath)
+    # helpmenu.add_command(label=READABLETEXT[156], command=changeResourcesPath)
 
     helpmenu.add_separator()  # 分隔符
 
