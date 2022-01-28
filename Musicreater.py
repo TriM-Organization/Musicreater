@@ -219,6 +219,15 @@ def __main__():
         else:
             return k
 
+    def MidiAnalysisClass(midfile: str):
+        from nmcsup.nmcreader import midiClassReader
+        k = midiClassReader(midfile)
+        if k is False:
+            tk.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[105].format(midfile))
+            return
+        else:
+            return k
+
     print('完成！')
 
     # 菜单命令
@@ -285,13 +294,13 @@ def __main__():
                 global is_save
                 is_save = True
             except TypeError:
-                SaveNewProject()
+                SaveClassProject()
                 return
 
     def SaveNewProject():
         if is_new_file:
             # 新的项目相等于另存为
-            SaveAsNewProject()
+            SaveAsClassProject()  # SaveAsNewProject()
             return
         else:
             save_list = [dataset]
@@ -302,6 +311,18 @@ def __main__():
                 pass
             with open(ProjectName, 'wb') as f:
                 pickle.dump(save_list, f)
+                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
+                global is_save
+                is_save = True
+
+    def SaveClassProject():
+        if is_new_file:
+            # 新的项目相等于另存为
+            SaveAsClassProject()
+            return
+        else:
+            with open(ProjectName, 'wb') as f:
+                pickle.dump(dataset, f)
                 tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
                 global is_save
                 is_save = True
@@ -345,6 +366,19 @@ def __main__():
         print(save_list)
         with open(Project_Name, 'wb') as f:
             pickle.dump(save_list, f)
+        tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+        global is_save
+        is_save = True
+
+    def SaveAsClassProject():
+        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
+                                                  filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[109], '*')],
+                                                  defaultextension='Noname.msct')
+        if fn is None or fn == '':
+            return
+        Project_Name = fn
+        with open(Project_Name, 'wb') as f:
+            pickle.dump(dataset, f)
         tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
         global is_save
         is_save = True
@@ -429,6 +463,51 @@ def __main__():
                     log("读取新文件成功")
                 with open("1.pkl", 'wb') as w:
                     pickle.dump(pkl1, w)
+            except KeyError:
+                with open(fn, 'rb') as C:
+                    dataset[0] = pickle.load(C)
+                log("读取新文件成功")
+        except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+            # pickle.UnpicklingError
+            print(READABLETEXT[8].format(fn))
+            log('无法打开{}'.format(fn))
+            return
+        global is_new_file
+        global ProjectName
+        is_new_file = False
+        ProjectName = fn
+        del fn
+        global NowMusic
+        RefreshMain()
+        RefreshMusic(NowMusic)
+
+    def openClassProject():
+        global is_save
+        if is_save is not True:
+            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
+            if result:
+                SaveProject()
+        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
+                                                filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
+                                                multiple=True)
+        if fn is None or fn == '':
+            return
+        else:
+            # print(fn)
+            fn = fn[0]
+            # print(fn)
+        log("尝试打开：" + fn)
+        try:
+            try:
+                with open(fn, 'rb') as C:
+                    global dataset
+                    # print(pickle.load(C))
+                    read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                    # print(read)
+                    dataset = read
+                    log("读取新文件成功")
             except KeyError:
                 with open(fn, 'rb') as C:
                     dataset[0] = pickle.load(C)
@@ -557,8 +636,41 @@ def __main__():
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
 
-    def MidiClass():
-        log('从midi导入音乐并采用新读取方式')
+    def NewFromMidi():
+        try:
+            tkinter.messagebox.showinfo("开发提示", "因为一些原因这个功能暂时取消")
+        except tkinter.TclError:
+            log('从midi导入音乐并采用新读取方式')
+            midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./',
+                                                         filetypes=[(READABLETEXT[114], '.mid .midi'),
+                                                                    (READABLETEXT[112], '*')], multiple=True)
+            if midfile is None or midfile == '':
+                log('取消')
+                return
+            else:
+                midfile = midfile[0]
+            th = NewThread(LoadMidi, (midfile,))
+            th.start()
+            del midfile
+
+            def midiSPT(th_):
+                for i in th_.getResult():
+                    datas = DMM()
+                    datas['notes'] = i
+                    dataset[0]['musics'].append(datas)
+                del th_
+                global is_save
+                is_save = False
+                global NowMusic
+                RefreshMain()
+                RefreshMusic(NowMusic)
+
+            threading.Thread(target=midiSPT, args=(th,)).start()
+            del th
+            dataset[0]['mainset']['ReadMethod'] = "new"
+
+    def FromMidiClass():
+        log('从midi导入音乐并采用类读取方式')
         midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./',
                                                      filetypes=[(READABLETEXT[114], '.mid .midi'),
                                                                 (READABLETEXT[112], '*')], multiple=True)
@@ -567,7 +679,7 @@ def __main__():
             return
         else:
             midfile = midfile[0]
-        th = NewThread(LoadMidi, (midfile,))
+        th = NewThread(MidiAnalysisClass, (midfile,))
         th.start()
         del midfile
 
@@ -585,7 +697,7 @@ def __main__():
 
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
-        dataset[0]['mainset']['ReadMethod'] = "new"
+        dataset[0]['mainset']['ReadMethod'] = "class"
 
     print('读midi命令加载完成！')
 
@@ -1407,11 +1519,17 @@ def __main__():
     filemenu.add_command(label=READABLETEXT[55], command=SaveProject)
     filemenu.add_command(label=READABLETEXT[56], command=SaveAsProject)
 
+    # filemenu.add_separator()
+    #
+    # filemenu.add_command(label=READABLETEXT[149], command=openNewProject)
+    # filemenu.add_command(label=READABLETEXT[150], command=SaveNewProject)
+    # filemenu.add_command(label=READABLETEXT[151], command=SaveAsNewProject)
+
     filemenu.add_separator()
 
-    filemenu.add_command(label=READABLETEXT[149], command=openNewProject)
-    filemenu.add_command(label=READABLETEXT[150], command=SaveNewProject)
-    filemenu.add_command(label=READABLETEXT[151], command=SaveAsNewProject)
+    filemenu.add_command(label=READABLETEXT[161], command=openClassProject)
+    filemenu.add_command(label=READABLETEXT[162], command=SaveClassProject)
+    filemenu.add_command(label=READABLETEXT[163], command=SaveAsClassProject)
 
     filemenu.add_separator()  # 分隔符
 
@@ -1427,7 +1545,8 @@ def __main__():
     editmenu.add_command(label=READABLETEXT[61], command=FromForm)
     editmenu.add_command(label=READABLETEXT[62], command=FromText)
     editmenu.add_separator()
-    editmenu.add_command(label=READABLETEXT[148], command=MidiClass)
+    editmenu.add_command(label=READABLETEXT[160], command=FromMidiClass)
+    editmenu.add_command(label=READABLETEXT[148], command=NewFromMidi)
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[63], menu=editmenu)
 

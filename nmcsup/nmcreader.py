@@ -92,6 +92,7 @@ def midi_conversion(midfile: str):
 
     def Time(mt, tpb_a, bpm_a):
         return round(mt / tpb_a / bpm_a * 60 * 20)
+
     Notes = []
     tracks = []
     note_list = []
@@ -117,7 +118,8 @@ def midi_conversion(midfile: str):
             try:
                 if i.channel != 9:
                     # try:
-                    #     log("event_type(事件): " + str(i.type) + " channel(音轨): " + str(i.channel) + " note/pitch(音高): " +
+                    #     log("event_type(事件): " + str(i.type) + " channel(音轨): " + str(i.channel) +
+                    #     " note/pitch(音高): " +
                     #         str(i[2]) +
                     #         " velocity(力度): " + str(i.velocity) + " time(间隔时间): " + str(i.time) +
                     #         " overallTime/globalTime/timePosition: " + str(overallTime) + " \n")
@@ -133,14 +135,17 @@ def midi_conversion(midfile: str):
                         print(i)
                         # print(i.note)
                         # print([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
-                        tracks.append([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
-                        note_list.append([i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument])
+                        tracks.append(
+                            [Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+                        note_list.append(
+                            [i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument])
                         on.append([i.note, Time(overallTime, tpb, bpm)])
                         # return [Note(i.channel, i, i.velocity, i.time, Time(overallTime, tpb, bpm))]
                     if 'note_off' in str(i) or 'note_on' in str(i) and i.velocity == 0:
                         # print(i)
                         # print([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm))])
-                        close.append([Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+                        close.append(
+                            [Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
                         off.append([i.note, Time(overallTime, tpb, bpm)])
                         # return [Note(i.channel, i, i.velocity, i.time, Time(overallTime, tpb, bpm))]
             except AttributeError:
@@ -173,6 +178,35 @@ def midi_conversion(midfile: str):
     print(instruments)
     return Notes
     # return [Notes, note_list]
+
+
+def midiClassReader(midfile: str):
+    import mido
+    from bgArrayLib.bpm import get
+
+    def Time(mt, tpb_a, bpm_a):
+        return round(mt / tpb_a / bpm_a * 60 * 20)
+    Notes = []
+    tracks = []
+    try:
+        mid = mido.MidiFile(midfile)
+    except FileNotFoundError:
+        log("找不到文件或无法读取文件" + midfile)
+        return False
+    tpb = mid.ticks_per_beat
+    bpm = get(midfile)
+    for track in mid.tracks:
+        overallTime = 0.0
+        instrument = 0
+        for i in track:
+            overallTime += i.time
+            if 'note_on' in str(i) and i.velocity > 0:
+                print(i)
+                tracks.append(
+                    [Note(i.channel, i.note, i.velocity, i.time, Time(overallTime, tpb, bpm), instrument)])
+        Notes.append(tracks)
+    print(Notes.__len__())
+    return Notes
 
 
 def ReadOldProject(fn: str):  # -> list
