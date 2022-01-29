@@ -1182,7 +1182,7 @@ def __main__():
                     return
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except ValueError:  # 测试完为ValueError，故修改语法
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[120])
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[117])
                 continue
             break
         Outdire = tkinter.filedialog.askdirectory(title=READABLETEXT[29], initialdir=r'./')
@@ -1253,7 +1253,7 @@ def __main__():
                     return
                 dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
             except ValueError:  # 测试完为ValueError，故修改语法
-                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[120])
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[117])
                 continue
             break
 

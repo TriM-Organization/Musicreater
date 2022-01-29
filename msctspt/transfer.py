@@ -72,14 +72,14 @@ def formCmdBlock(direction: list, command: str, particularValue: int, impluse: i
             }
 
 
-def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: str = '',
-             isProsess: bool = False, height: int = 200):
+def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instrument: str,
+            PlayerSelect: str = '', isProsess: bool = False, height: int = 200):
     """使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
         dire: 指令方块在地图中生成的起始位置（相对位置）
         Notes: 以 list[ list[ float我的世界playsound指令音调 , float延续时常（单位s） ] ] 格式存储的音符列表
-        例如Musicreater.py的(dataset[0]['musics'][NowMusic]['notes'])
+                例如Musicreater.py的(dataset[0]['musics'][NowMusic]['notes'])
         ScoreboardName: 用于执行的计分板名称
         Instrument: 播放的乐器
         PlayerSelect: 执行的玩家选择器
@@ -124,6 +124,23 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
     return BdxConverter(filePath, 'Build by RyounMusicreater', blocks)
 
 
+def music2BDX(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instrument: str,
+            PlayerSelect: str = '', isProsess: bool = False, height: int = 200):
+    """使用方法同Note2Cmd
+    :param 参数说明：
+        filePath: 生成.bdx文件的位置
+        dire: 指令方块在地图中生成的起始位置（相对位置）
+        Notes: 以 list[ list[ float我的世界playsound指令音调 , float延续时常（单位s） ] ] 格式存储的音符列表
+                例如Musicreater.py的(dataset[0]['musics'][NowMusic]['notes'])
+        ScoreboardName: 用于执行的计分板名称
+        Instrument: 播放的乐器
+        PlayerSelect: 执行的玩家选择器
+        isProsess: 是否显示进度条（会很卡）
+        height: 生成结构的最高高度
+    :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件"""
+    pass
+
+
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):
     """传入音符，在oaclhost:8080上建立websocket服务器以供我的世界connect/wssever指令连接
     :param 参数说明：
@@ -162,7 +179,7 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
 
 
 def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed: float = 2.5,
-                 posadder: list = [1, 0, 0], baseblock: str = 'stone'):  # -> bool
+                 posadder: iterable = (1, 0, 0), baseblock: str = 'stone'):  # -> bool
     """传入音符，生成以音符盒存储的红石音乐
     :param 参数说明：
         world: 地图文件的路径
