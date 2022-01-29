@@ -280,108 +280,106 @@ def __main__():
     print('退出命令加载完成！')
 
     def SaveProject():
+        global is_save
         if is_new_file:
             # 新的项目相等于另存为
             SaveAsProject()
             return
         else:
-            try:
+            if dataset[0].get('mainset').get('ReadMethod') == "old":
                 # 旧项目旧存着吧
                 log('存储已有文件：{}'.format(ProjectName))
                 with open(ProjectName, 'w', encoding='utf-8') as f:
                     json.dump(dataset[0], f)
                 tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
-                global is_save
                 is_save = True
-            except TypeError:
-                SaveClassProject()
+            elif dataset[0].get('mainset').get('ReadMethod') == "class":  # 这部分相当SaveClassProject()函数
+                # if is_new_file:
+                #     # 新的项目相等于另存为
+                #     SaveAsClassProject()
+                #     return
+                # else:
+                with open(ProjectName, 'wb') as f:
+                    pickle.dump(dataset, f)
+                    tkinter.messagebox.showinfo(title=READABLETEXT[4],
+                                                message=READABLETEXT[107].format(ProjectName))
+                    is_save = True
+                # return
+            elif dataset[0].get('mainset').get('ReadMethod') == "new":  # 这部分相当于SaveNewProject()函数
+                # if is_new_file:  # 这部分相当于SaveAsNewProject()函数
+                #     # 新的项目相等于另存为
+                #     SaveAsNewProject()
+                #     return
+                # else:
+                save_list = [dataset]
+                try:
+                    with open("1.pkl", 'rb') as r:
+                        save_list.append(pickle.load(r))
+                except FileNotFoundError:
+                    pass
+                with open(ProjectName, 'wb') as f:
+                    pickle.dump(save_list, f)
+                    tkinter.messagebox.showinfo(title=READABLETEXT[4],
+                                                message=READABLETEXT[107].format(ProjectName))
+                    is_save = True
                 return
 
-    def SaveNewProject():
-        if is_new_file:
-            # 新的项目相等于另存为
-            SaveAsClassProject()  # SaveAsNewProject()
-            return
-        else:
+    print('保存项目命令加载完成！')
+
+    def SaveAsProject():
+        global is_save
+        if dataset[0].get('mainset').get('ReadMethod') == "old":
+            # 另存为项目
+            fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
+                                                      filetypes=[(READABLETEXT[108][0], '.msct'),
+                                                                 (READABLETEXT[109], '*')],
+                                                      defaultextension='Noname.msct')
+            if fn is None or fn == '':
+                return
+            try:
+                Project_Name = fn
+                with open(Project_Name, 'w', encoding='utf-8') as f:
+                    json.dump(dataset[0], f)
+                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+                is_save = True
+            except TypeError:
+                Project_Name = fn
+                with open(Project_Name, 'wb') as f:
+                    pickle.dump(dataset[0], f)
+                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+                is_save = True
+        elif dataset[0].get('mainset').get('ReadMethod') == "class":  # 等于SaveAsNewProject()函数
+            fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
+                                                      filetypes=[(READABLETEXT[108][1], '.msctn'),
+                                                                 (READABLETEXT[109], '*')],
+                                                      defaultextension='Noname.msctn')
+            if fn is None or fn == '':
+                return
+            Project_Name = fn
+            with open(Project_Name, 'wb') as f:
+                pickle.dump(dataset, f)
+            tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
+
+            is_save = True
+        elif dataset[0].get('mainset').get('ReadMethod') == "new":  # 等于SaveAsClassProject()函数
+            fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
+                                                      filetypes=[(READABLETEXT[108][2], '.msctx'),
+                                                                 (READABLETEXT[109], '*')],
+                                                      defaultextension='Noname.msctx')
+            if fn is None or fn == '':
+                return
+            Project_Name = fn
             save_list = [dataset]
             try:
                 with open("1.pkl", 'rb') as r:
                     save_list.append(pickle.load(r))
             except FileNotFoundError:
                 pass
-            with open(ProjectName, 'wb') as f:
-                pickle.dump(save_list, f)
-                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
-                global is_save
-                is_save = True
-
-    def SaveClassProject():
-        if is_new_file:
-            # 新的项目相等于另存为
-            SaveAsClassProject()
-            return
-        else:
-            with open(ProjectName, 'wb') as f:
-                pickle.dump(dataset, f)
-                tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(ProjectName))
-                global is_save
-                is_save = True
-
-    print('保存项目命令加载完成！')
-
-    def SaveAsProject():
-        # 另存为项目
-        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
-                                                  filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[109], '*')],
-                                                  defaultextension='Noname.msct')
-        if fn is None or fn == '':
-            return
-        try:
-            Project_Name = fn
-            with open(Project_Name, 'w', encoding='utf-8') as f:
-                json.dump(dataset[0], f)
-            tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
-            global is_save
-            is_save = True
-        except TypeError:
-            Project_Name = fn
+            print(save_list)
             with open(Project_Name, 'wb') as f:
-                pickle.dump(dataset[0], f)
+                pickle.dump(save_list, f)
             tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
             is_save = True
-
-    def SaveAsNewProject():
-        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
-                                                  filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[109], '*')],
-                                                  defaultextension='Noname.msct')
-        if fn is None or fn == '':
-            return
-        Project_Name = fn
-        save_list = [dataset]
-        try:
-            with open("1.pkl", 'rb') as r:
-                save_list.append(pickle.load(r))
-        except FileNotFoundError:
-            pass
-        print(save_list)
-        with open(Project_Name, 'wb') as f:
-            pickle.dump(save_list, f)
-        tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
-        global is_save
-        is_save = True
-
-    def SaveAsClassProject():
-        fn = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[5], initialdir=r'./',
-                                                  filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[109], '*')],
-                                                  defaultextension='Noname.msct')
-        if fn is None or fn == '':
-            return
-        Project_Name = fn
-        with open(Project_Name, 'wb') as f:
-            pickle.dump(dataset, f)
-        tkinter.messagebox.showinfo(title=READABLETEXT[4], message=READABLETEXT[107].format(Project_Name))
-        global is_save
-        is_save = True
 
     print('另存项目命令加载完成！')
 
@@ -404,73 +402,81 @@ def __main__():
 
     def openProject():
         global is_save
+        global dataset
         if is_save is not True:
             result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
             if result:
                 SaveProject()
         fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
-                                                filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
+                                                filetypes=[(READABLETEXT[108][0], '.msct'),
+                                                           (READABLETEXT[108][1], '.msctn'),  # msctn: 音创新文件（用类方法解析）
+                                                           (READABLETEXT[108][2], '.msctx'),  # msctx: 音创测试文件（用来支持多乐器解析）
+                                                           (READABLETEXT[112], '*')],
                                                 multiple=True)
         if fn is None or fn == '':
             return
         else:
             fn = fn[0]
-        try:
-            with open(fn, 'r', encoding='UTF-8') as C:
-                dataset[0] = json.load(C)
-
-        except json.decoder.JSONDecodeError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
-            # json.decoder.JSONDecodeError
-            print(READABLETEXT[8].format(fn))
-            log('无法打开{}'.format(fn))
-            return
-        global is_new_file
-        global ProjectName
-        is_new_file = False
-        ProjectName = fn
-        del fn
-        global NowMusic
-        RefreshMain()
-        RefreshMusic(NowMusic)
-
-    def openNewProject():
-        global is_save
-        if is_save is not True:
-            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
-            if result:
-                SaveProject()
-        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
-                                                filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
-                                                multiple=True)
-        if fn is None or fn == '':
-            return
-        else:
-            # print(fn)
-            fn = fn[0]
-            # print(fn)
         log("尝试打开：" + fn)
-        try:
+        if str(fn)[str(fn).rfind("."):] == ".msct":  # str(fn)[str(fn).rfind("."):] ->文件格式返回".xxx"
             try:
-                with open(fn, 'rb') as C:
-                    global dataset
-                    # print(pickle.load(C))
-                    read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # print(read)
-                    dataset = read[0]
-                    pkl1 = read[1]
+                try:
+                    with open(fn, 'r', encoding='UTF-8') as C:
+                        dataset[0] = json.load(C)
+                    log("读取工程文件成功")
+                except UnicodeDecodeError:
+                    print(READABLETEXT[8].format(fn))
+                    log('无法打开{}'.format(fn))
+                    return
+            except json.decoder.JSONDecodeError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+                # json.decoder.JSONDecodeError
+                print(READABLETEXT[8].format(fn))
+                log('无法打开{}'.format(fn))
+                return
+        elif str(fn)[str(fn).rfind("."):] == ".msctx":
+            try:
+                try:
+                    with open(fn, 'rb') as C:
+                        # print(pickle.load(C))
+                        read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # print(read)
+                        dataset = read[0]
+                        pkl1 = read[1]
+                        log("读取新文件成功")
+                    with open("1.pkl", 'wb') as w:
+                        pickle.dump(pkl1, w)
+                except KeyError:
+                    with open(fn, 'rb') as C:
+                        dataset[0] = pickle.load(C)
                     log("读取新文件成功")
-                with open("1.pkl", 'wb') as w:
-                    pickle.dump(pkl1, w)
-            except KeyError:
-                with open(fn, 'rb') as C:
-                    dataset[0] = pickle.load(C)
-                log("读取新文件成功")
-        except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
-            # pickle.UnpicklingError
-            print(READABLETEXT[8].format(fn))
-            log('无法打开{}'.format(fn))
+            except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+                # pickle.UnpicklingError
+                print(READABLETEXT[8].format(fn))
+                log('无法打开{}'.format(fn))
+                return
+        elif str(fn)[str(fn).rfind("."):] == ".msctn":
+            try:
+                try:
+                    with open(fn, 'rb') as C:
+                        # print(pickle.load(C))
+                        read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+                        # print(read)
+                        dataset = read
+                        log("读取新文件成功")
+                except KeyError:
+                    with open(fn, 'rb') as C:
+                        dataset[0] = pickle.load(C)
+                    log("读取新文件成功")
+            except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+                # pickle.UnpicklingError
+                print(READABLETEXT[8].format(fn))
+                log('无法打开{}'.format(fn))
+                return
+        else:
             return
         global is_new_file
         global ProjectName
@@ -481,50 +487,98 @@ def __main__():
         RefreshMain()
         RefreshMusic(NowMusic)
 
-    def openClassProject():
-        global is_save
-        if is_save is not True:
-            result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
-            if result:
-                SaveProject()
-        fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
-                                                filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
-                                                multiple=True)
-        if fn is None or fn == '':
-            return
-        else:
-            # print(fn)
-            fn = fn[0]
-            # print(fn)
-        log("尝试打开：" + fn)
-        try:
-            try:
-                with open(fn, 'rb') as C:
-                    global dataset
-                    # print(pickle.load(C))
-                    read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
-                    # print(read)
-                    dataset = read
-                    log("读取新文件成功")
-            except KeyError:
-                with open(fn, 'rb') as C:
-                    dataset[0] = pickle.load(C)
-                log("读取新文件成功")
-        except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
-            # pickle.UnpicklingError
-            print(READABLETEXT[8].format(fn))
-            log('无法打开{}'.format(fn))
-            return
-        global is_new_file
-        global ProjectName
-        is_new_file = False
-        ProjectName = fn
-        del fn
-        global NowMusic
-        RefreshMain()
-        RefreshMusic(NowMusic)
+    # def openNewProject():
+    #     global is_save
+    #     if is_save is not True:
+    #         result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
+    #         if result:
+    #             SaveProject()
+    #     fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
+    #                                             filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
+    #                                             multiple=True)
+    #     if fn is None or fn == '':
+    #         return
+    #     else:
+    #         # print(fn)
+    #         fn = fn[0]
+    #         # print(fn)
+    #     log("尝试打开：" + fn)
+    #     try:
+    #         try:
+    #             with open(fn, 'rb') as C:
+    #                 global dataset
+    #                 # print(pickle.load(C))
+    #                 read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # print(read)
+    #                 dataset = read[0]
+    #                 pkl1 = read[1]
+    #                 log("读取新文件成功")
+    #             with open("1.pkl", 'wb') as w:
+    #                 pickle.dump(pkl1, w)
+    #         except KeyError:
+    #             with open(fn, 'rb') as C:
+    #                 dataset[0] = pickle.load(C)
+    #             log("读取新文件成功")
+    #     except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+    #         # pickle.UnpicklingError
+    #         print(READABLETEXT[8].format(fn))
+    #         log('无法打开{}'.format(fn))
+    #         return
+    #     global is_new_file
+    #     global ProjectName
+    #     is_new_file = False
+    #     ProjectName = fn
+    #     del fn
+    #     global NowMusic
+    #     RefreshMain()
+    #     RefreshMusic(NowMusic)
+
+    # def openClassProject():
+    #     global is_save
+    #     if is_save is not True:
+    #         result = tkinter.messagebox.askyesno(title=READABLETEXT[1], message=READABLETEXT[106])
+    #         if result:
+    #             SaveProject()
+    #     fn = tkinter.filedialog.askopenfilename(title=READABLETEXT[7], initialdir=r'./',
+    #                                             filetypes=[(READABLETEXT[108], '.msct'), (READABLETEXT[112], '*')],
+    #                                             multiple=True)
+    #     if fn is None or fn == '':
+    #         return
+    #     else:
+    #         # print(fn)
+    #         fn = fn[0]
+    #         # print(fn)
+    #     log("尝试打开：" + fn)
+    #     try:
+    #         try:
+    #             with open(fn, 'rb') as C:
+    #                 global dataset
+    #                 # print(pickle.load(C))
+    #                 read = pickle.load(C)  # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # 重要的事情说三遍！！！pickle.load只能load一次，所以多load几次就有bug，要一次读完！
+    #                 # print(read)
+    #                 dataset = read
+    #                 log("读取新文件成功")
+    #         except KeyError:
+    #             with open(fn, 'rb') as C:
+    #                 dataset[0] = pickle.load(C)
+    #             log("读取新文件成功")
+    #     except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
+    #         # pickle.UnpicklingError
+    #         print(READABLETEXT[8].format(fn))
+    #         log('无法打开{}'.format(fn))
+    #         return
+    #     global is_new_file
+    #     global ProjectName
+    #     is_new_file = False
+    #     ProjectName = fn
+    #     del fn
+    #     global NowMusic
+    #     RefreshMain()
+    #     RefreshMusic(NowMusic)
 
     print('打开项目命令加载完成！')
 
@@ -562,10 +616,32 @@ def __main__():
     print('关于命令加载完成！')
 
     def apphelp():
+        def funcHelp():
+            funTK = tk.Tk()
+            funTK.title("函数功能查询")
+            funTK.geometry('1200x1000')
+            thingLabel = tk.Label(funTK, text="函数功能查询", font=('', 20))
+            thingLabel.pack()
+            aLabel = tk.Label(funTK, text="""文件：\n  
+            打开音·创项目...: 打开三种类型的音创文件(.msct, .msctn, .msctx)\n
+            打开旧项目...: 打开两种类型的音创文件(.ry.nfc, .ry.mfm)\n
+            保存项目: 自动选择保存类型，并保存为音创文件(.msct, .msctn, .msctx)\n
+            另存为...: 自动选择另存为类型，并保存为音创文件(.msct, .msctn, .msctx)\n
+            退出  : 退出程序\n\n
+            编辑：\n
+            从midi导入音轨: 以旧方法(列表方法)解析midi，如果你使用这个方法解析，意味着你选择.msct文件\n
+            从midi导入音轨且用新方法解析: 以新方法(类方法)解析midi，并解析乐器信息，如果你使用这个方法解析，意味着你选择.msctx文件\n
+                注意！！！这个功能暂时只用于支持雪莹乐器资源包，如果你不是为了这个，最好别用！\n
+            从midi导入音轨且用类方法解析: 以类方法解析midi，如果你使用这个方法解析，意味着你选择.msctn文件\n
+                注意！！！这个功能暂时在开发中！！！别用！\n
+            """, font=('宋体', 12))
+            aLabel.pack()
+
         ahpw = tk.Tk()
         ahpw.title(READABLETEXT[19])
         ahpw.geometry('400x600')  # 像素
-
+        tk.Label(ahpw, text="帮助", font=('楷体', 32)).grid(row=0, column=2)
+        tk.Button(ahpw, text="函数功能查询", command=funcHelp, font=('楷体', 20)).grid(row=1, column=1)
         ahpw.mainloop()
 
     print('帮助命令加载完成！')
@@ -1503,9 +1579,7 @@ def __main__():
     from nmcsup.vers import resetver
 
     print('按钮点击命令加载完成！')
-
     print('完成！')
-
     print('加载菜单与页面...')
 
     # 创建一个菜单
@@ -1525,11 +1599,11 @@ def __main__():
     # filemenu.add_command(label=READABLETEXT[150], command=SaveNewProject)
     # filemenu.add_command(label=READABLETEXT[151], command=SaveAsNewProject)
 
-    filemenu.add_separator()
-
-    filemenu.add_command(label=READABLETEXT[161], command=openClassProject)
-    filemenu.add_command(label=READABLETEXT[162], command=SaveClassProject)
-    filemenu.add_command(label=READABLETEXT[163], command=SaveAsClassProject)
+    # filemenu.add_separator()
+    #
+    # filemenu.add_command(label=READABLETEXT[161], command=openClassProject)
+    # filemenu.add_command(label=READABLETEXT[162], command=SaveClassProject)
+    # filemenu.add_command(label=READABLETEXT[163], command=SaveAsClassProject)
 
     filemenu.add_separator()  # 分隔符
 
@@ -1555,11 +1629,11 @@ def __main__():
     funcmenu.add_command(label=READABLETEXT[64], command=MakeCMD)
     funcmenu.add_command(label=READABLETEXT[65], command=MakeCMDdir)
     funcmenu.add_command(label=READABLETEXT[66], command=MakePackFile)
-    # funcmenu.add_separator()
-    # funcmenu.add_command(label=READABLETEXT[147], command=MakeNewCMD)
-    # funcmenu.add_command(label=READABLETEXT[153], command=MakeNewCMDdir)
-    # funcmenu.add_command(label=READABLETEXT[154], command=MakeNewFunctionPackFile)
-    # funcmenu.add_command(label=READABLETEXT[155], command=MakeNewFunctionPack_ResourcesPacks_File)
+    funcmenu.add_separator()
+    funcmenu.add_command(label=READABLETEXT[147], command=MakeNewCMD)
+    funcmenu.add_command(label=READABLETEXT[153], command=MakeNewCMDdir)
+    funcmenu.add_command(label=READABLETEXT[154], command=MakeNewFunctionPackFile)
+    funcmenu.add_command(label=READABLETEXT[155], command=MakeNewFunctionPack_ResourcesPacks_File)
 
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[67], menu=funcmenu)
@@ -1602,7 +1676,7 @@ def __main__():
     helpmenu.add_command(label=READABLETEXT[85], command=ClearLog)
     helpmenu.add_command(label=READABLETEXT[86], command=resetver)
     helpmenu.add_command(label=READABLETEXT[152], command=end)
-    # helpmenu.add_command(label=READABLETEXT[156], command=changeResourcesPath)
+    helpmenu.add_command(label=READABLETEXT[156], command=changeResourcesPath)
 
     helpmenu.add_separator()  # 分隔符
 
