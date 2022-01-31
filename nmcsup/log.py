@@ -44,7 +44,7 @@ StrStartTime = str(datetime.datetime.now()).replace(':', '_')[:-7]
 """字符串型的程序开始时间"""
 
 
-def log(info: str = '', isPrinted: bool = False, isLoggerLibRecord: bool = True, isWrite: bool = False):
+def log(info: str = '', isWrite: bool = True, isPrinted: bool = False, isLoggerLibRecord: bool = True):
     """
     info: 信息
     isPrinted: 是否print（仅限金羿log，python官方的logging照常输出）
@@ -52,6 +52,9 @@ def log(info: str = '', isPrinted: bool = False, isLoggerLibRecord: bool = True,
     isWrite: 是否write（仅限金羿log，python官方的logging照常输出）
     """
     """将信息连同当前时间载入日志"""
+    # 致后来的开发者：请让金羿的log存在吧，不然他自己都看不懂你们写了什么了
+    # 我指的是程序内部
+    # ——金羿
     if not os.path.exists('./log/'):
         os.makedirs('./log/')
     if isWrite:

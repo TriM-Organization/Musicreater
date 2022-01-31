@@ -83,6 +83,9 @@ def Mp32Mid(mp3File, midFile):
     PianoTranscription(device="cpu").transcribe(audio, midFile)
 
 
+
+
+
 # 传入一个音符列表转为指令列表
 def Note2Cmd(Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: str = '',
              isProsess: bool = False) -> list:
@@ -105,41 +108,22 @@ def Note2Cmd(Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: st
 # def newDataStructureCounterChange():
 
 
-def classList_conversion(List: list, ScoreboardName: str,
-                         isProsess: bool = False) -> list:
-    from bgArrayLib.compute import round_up
-    commands = []
-    length = len(List)
-    j = 1
-    print(List)
-    for k in range(len(List)):
-        i = List[k][0]
-        print(i)
-        print(type(i))
-        try:
-            if i.instrument > 119:
-                pass
-            else:
-                commands.append("execute @e[scores={" +
-                                ScoreboardName + "=" + str(round_up(i.time_position)).replace(".0", "") + "}] ~ ~" +
-                                str(127 - i.velocity) +
-                                " ~ playsound " +
-                                str(i.instrument) +
-                                str(i.CD) + "." +
-                                str(i.pitch)
-                                + " @a ~ ~ ~ 1000 1.0 1000\n")
-                if isProsess:
-                    commands.append("execute @a"" ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" +
-                                    str(round_up(i.time_position)).replace(".0", "") +
-                                    "}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a" +
-                                    str(j) + "/" + str(length) + "  ||  " + str(int(j / length * 1000) / 10) + "\n")
-                    j += 1
-        except AttributeError:
-            pass
-            # a += List[i][1]
-    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
-    print(commands)
-    return commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 简单载入方块

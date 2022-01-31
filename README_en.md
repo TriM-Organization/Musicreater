@@ -6,10 +6,10 @@ Musicreater(音·创) is an Eilles(*W-YI*)'s app that is used for creating music
 Welcome to join our QQ group: 861684859
 
 ###Author
-金羿Eilles: the main author, who developed the predecessor of the main machine of sound creation, "function music generator"
-and "world sound creation".
 
-bgArray "诸葛亮与八卦阵": fix bugs, improve code aesthetics, add new functions, change data format, etc.
+Eilles (金羿)：The main author, who developed the most and especially the principal parts of Musicreater, and its predecessors, which has been called as "*Minecraft Function Music Maker*", "*Note Fun Creater*", "*Note World Creater*"(now ,they are united as ***Musicreater***!)
+
+bgArray "诸葛亮与八卦阵": Fix bugs, improve code aesthetics, add new functions, change data format, etc.
 
 ### Framework
 
@@ -66,35 +66,31 @@ python3 Musicreater.py
 3.  The English Edition is comming soon.
 
 
-###Explanation of bgArray 诸葛亮与八卦阵 (unnecessary)
-1. First! The tips here are for those who want to use the multi tone resource package. If you want to download the 
-   Shenyu resource package (Shenyu's own link): https://pan.baidu.com/s/11uoq5zwN7c3rX-98DqVpJg
-Extraction code: ek3t
-2. Download to a location on your own computer. Note that it does not need to be placed under this project. The audio 
-   resource package is large. You can choose to download only:
-`神羽资源包_乐器、音源的资源包\羽音缭绕-midiout_25.0` this folder.
-3. You can also download only:
-`神羽资源包_乐器\音源的资源包\羽音缭绕-midiout_25.0\mcpack(国际版推荐)格式_25.0` or:
-   `神羽资源包_乐器\音源的资源包\羽音缭绕-midiout_25.0\zip格式_25.0`
-4. The next step is the key: bind the resource package in the sound creation
-5. First, open Musicreater - > help and questions - > [Shenyu resource package location selection]: select Folder At this time,
-Will jump out of the selection box, the key comes, select: ***your mcpack (International Version recommended)_ 25.0 folder or ZIP format_ 25.0 folder, outside! folder! Note that it's the folder outside***
-For example, my file path is as follows:
-`L:\shenyu\音源的资源包\羽音缭绕-midiout_25.0` here is: `神羽资源包_25.0_使用方法.xls`, 
-`mcpack(国际版推荐)格式_25.0`, `zip格式_25.0` two folders and one .xls file, and you're in sound creation
-You should also select this folder:**L:\shenyu\音源的资源包\羽音缭绕-midiout_25.0**
-6. If you want to use the voice resource package function, you should use Musicreater - > Edit - > Import audio tracks from MIDI and parse them with a new method, and then use it
+### Explanation of bgArray 诸葛亮与八卦阵 (unnecessary)
+
+1. First! The tips here are for those who want to use the multi tone resource package, [Shenyu resource package (Shenyu's own link)](https://pan.baidu.com/s/11uoq5zwN7c3rX-98DqVpJg) \(Extraction code: `ek3t`\)
+2. Download it to any location on your PC. Note that it does ***not*** need to be placed in the directory where *Musicreater* are. The audio resource package is large, so you can choose to download only:`神羽资源包_乐器、音源的资源包\羽音缭绕-midiout_25.0`.
+    Also, you can download only `神羽资源包_乐器\音源的资源包\羽音缭绕-midiout_25.0\mcpack(国际版推荐)格式_25.0` or 
+    `神羽资源包_乐器\音源的资源包\羽音缭绕-midiout_25.0\zip格式_25.0`.
+4. The next step is the most IMPORTANT: to bind the resource package to *Musicreater*
+    First, open *Musicreater*->Q&A->Select \[MiraclePlumeResourcePack\]... .At this time, in the selection box,
+    the IMPORTANT step comes, select: ***The directory you downloaded: `羽音缭绕-midiout_25.0`, or also the parent directory `mcpack(国际版推荐)格式_25.0`or`zip格式_25.0`***
+    For example, my file path is as follows:
+    `L:\shenyu\音源的资源包\羽音缭绕-midiout_25.0` and in the directory, there are two folders and one .xls file:
+    `神羽资源包_25.0_使用方法.xls`, `mcpack(国际版推荐)格式_25.0` and `zip格式_25.0`, so in *Musicreater* you should also select this folder: **L:\shenyu\音源的资源包\羽音缭绕-midiout_25.0**
+6. If you want to use the Miracle Plume Bedrock Edition Audio Resource Pack to make .mcfunction s, you should use Musicreater -> Edit - > Import audio tracks from MIDI and parse them with a new method, and then use it
 Musicreater - > function (package) - > the following four new functions
 
 ### Thanks
 
-1.  Thank [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”and so on for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
+1.  Thank [Fuckcraft](https://github.com/fuckcraft) (“鸣凤鸽子” ,etc) for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
+    -   *!! They have given me the rights to directly copy the lib into Musicreater*
 2.  Thank 昀梦\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* Created.
 3.  Thank Charlie_Ping “查理平” for bdx convert funtion.
 4.  Thank CMA_2401PT for BDXWorkShop as the .bdx structure's operation guide.
-5.  Thanks for the bedrock audio resource pack brought by miracle plume "Shenyu" \<QQshenyu40403\>
+5.  Thank Miracle Plume “神羽” \<QQshenyu40403\> for the Miracle Plume Bedrock Edition Audio Resource Pack
 6.  Thanks for a lot of groupmates who support me and help me to test the program.
-7.  If u have give me some help but u haven't been in the list, please contact me.
+7.  If you have give me some help but u haven't been in the list, please contact me.
 
 
 ### Contact *Eilles(W-YI)*(金羿)
@@ -103,6 +99,6 @@ Musicreater - > function (package) - > the following four new functions
 2.  E-mail   EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 3.  WeChat   WYI_DoctorYI
 
-### Author bgArray 诸葛亮与八卦阵 contact information
+### Contact *bgArray*(诸葛亮与八卦阵)
 
 1.  QQ       4740437765

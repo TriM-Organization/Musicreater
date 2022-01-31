@@ -81,31 +81,7 @@ print('建立变量，存入内存，载入字典常量函数')
 #
 # 新增音轨：  dataset[第几个项目]['musics'].append(datasetmodelpart)
 #
-'''
-dataset=[
-            {
-                'mainset':{
-                    'PackName':'Ryoun',
-                    'MusicTitle':'Noname',
-                    'IsRepeat':False,
-                    'PlayerSelect':''
-                },
-                'musics':[
-                    {
-                        'set':{
-                            'EntityName':'music_support',
-                            'ScoreboardName':'music_support',
-                            'Instrument':'harp',
-                            'FileName':'Music'
-                        },
-                        'notes':[
-                            [0.0,1.0],
-                        ]
-                    },
-                ],
-            },
-        ]
-'''
+
 
 dataset = [
     {
@@ -125,19 +101,57 @@ dataset = [
                     'FileName': 'Music'
                 },
                 'notes': [
-                    [0.0, 1.0],
+                    
                 ]
             },
         ],
     },
 ]
+'''一个项目中的全部数据。格式参照：
+[
+    {
+        'mainset':{
+            'PackName':'Ryoun',
+            'MusicTitle':'Noname',
+            'IsRepeat':False,
+            'PlayerSelect':''
+        },
+        'musics':[
+            {
+                'set':{
+                    'EntityName':'music_support',
+                    'ScoreboardName':'music_support',
+                    'Instrument':'harp',
+                    'FileName':'Music'
+                },
+                'notes':[
+                    - Note对象
+                    或
+                    - [MC音调, 持续时间(s)]
+                ]
+            },
+        ],
+    },
+]
+'''
 
 is_new_file = True
+'''这是否是一个新建的项目？'''
+
 is_save = True
+'''当前项目是否已保存？'''
+
 ProjectName = ''
+'''项目名称，即打开的msct文件名'''
+
 clearLog = False
+'''是否在程序结束时移除日志'''
+
 NowMusic = 0
+'''当前音轨'''
+
 root = tk.Tk()
+'''主窗口'''
 
 
 def DMM():  # 反回字典用于编辑
@@ -163,6 +177,7 @@ def __main__():
     音·创 开发交流群 861684859\n
     Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com\n
     版权所有 Team-Ryoun 金羿\n
+    代码根据Apache 2.0 协议开源\n
     若需转载或借鉴 请附作者\n
     """
 
@@ -444,13 +459,13 @@ def __main__():
                         # print(read)
                         dataset = read[0]
                         pkl1 = read[1]
-                        log("读取新文件成功")
+                        log(f"读取新文件成功:\n{str(dataset[0])}")
                     with open("1.pkl", 'wb') as w:
                         pickle.dump(pkl1, w)
                 except KeyError:
                     with open(fn, 'rb') as C:
                         dataset[0] = pickle.load(C)
-                    log("读取新文件成功")
+                    log(f"读取新文件成功:\n{str(dataset[0])}")
             except pickle.UnpicklingError:  # 程序规范修改：根据新的语法标准：except后面不能没有错误类型，测试后改为：
                 # pickle.UnpicklingError
                 print(READABLETEXT[8].format(fn))
@@ -1696,10 +1711,10 @@ def __main__():
     # 大标题
     tk.Label(UpLeftFrame, text=READABLETEXT[91], font=('', 20)).pack()
     # 按钮式文本
-    LabelPackName = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[46], font=('', 15))
-    LabelMusicTitle = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[47], font=('', 15))
-    LabelIsRepeat = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[48], font=('', 15))
-    LabelPlayerSelect = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[49], font=('', 15))
+    LabelPackName = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[46].format(str(dataset[0]['mainset']['PackName'])), font=('', 15))
+    LabelMusicTitle = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[47].format(str(dataset[0]['mainset']['MusicTitle'])), font=('', 15))
+    LabelIsRepeat = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[48].format(str(dataset[0]['mainset']['IsRepeat'])), font=('', 15))
+    LabelPlayerSelect = tk.Label(UpLeftFrame, bg='white', text=READABLETEXT[49].format(str(dataset[0]['mainset']['PlayerSelect'])), font=('', 15))
     # 绑定按钮
     LabelPackName.bind('<Button-1>', changePackName)
     LabelMusicTitle.bind('<Button-1>', changeMusicTitle)
@@ -1732,10 +1747,10 @@ def __main__():
     # 大标题
     tk.Label(UpRightFrame, text=READABLETEXT[97], font=('', 20)).pack()
     # 按钮式文本
-    LabelEntityName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[42], font=('', 15))
-    LabelScoreboardName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[43], font=('', 15))
-    LabelInstrument = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[44], font=('', 15))
-    LabelFileName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[45], font=('', 15))
+    LabelEntityName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[42].format(dataset[0]['musics'][NowMusic]['set']['EntityName']), font=('', 15))
+    LabelScoreboardName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[43].format(dataset[0]['musics'][NowMusic]['set']['ScoreboardName']), font=('', 15))
+    LabelInstrument = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[44].format(dataset[0]['musics'][NowMusic]['set']['Instrument']), font=('', 15))
+    LabelFileName = tk.Label(UpRightFrame, bg='white', text=READABLETEXT[45].format(dataset[0]['musics'][NowMusic]['set']['FileName']), font=('', 15))
     # 绑定按钮
     LabelEntityName.bind('<Button-1>', changeEntityName)
     LabelScoreboardName.bind('<Button-1>', changeScoreboardName)
@@ -1793,7 +1808,6 @@ def __main__():
     if len(sys.argv) != 1:
         log('初始化打开音·创项目' + sys.argv[1])
         global is_save
-        global dataset
         is_save = True
         error = True
         try:
@@ -1813,7 +1827,6 @@ def __main__():
         global ProjectName
         is_new_file = False
         ProjectName = sys.argv[1]
-        global NowMusic
         RefreshMain()
         RefreshMusic(NowMusic)
 

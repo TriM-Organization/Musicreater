@@ -5,7 +5,11 @@
 # 统计：致命（三级）错误：0个；警告（二级）错误：4个--未解决1个；语法（一级）错误：302个
 
 
+# 可序列化对象，即可迭代对象
+from typing import Iterable
+
 import amulet
+
 from amulet.api.block import Block
 from amulet.utils.world_utils import block_coords_to_chunk_coords as bc2cc
 from amulet_nbt import TAG_String as ts
@@ -20,6 +24,104 @@ def hans2pinyin(hans, style=3):
     for i in result:
         final += i
     return final
+
+
+
+
+
+
+
+
+
+def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSelection: str = '',
+                         isProsess: bool = False) -> list:
+    from bgArrayLib.compute import round_up
+    commands = []
+    length = len(List)
+    j = 1
+    print(List)
+    for k in range(len(List)):
+        i = List[k][0]
+        print(i)
+        print(type(i))
+        try:
+            if i.instrument > 119:
+                pass
+            else:
+                commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} ~ playsound {i.instrument}{i.CD}.{i.pitch} @a ~ ~ ~ 1000 1.0 1000\n")
+                if isProsess:
+                    commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
+                    j += 1
+        except AttributeError:
+            pass
+            # a += List[i][1]
+    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    print(commands)
+    return commands
+
+
+
+
+
+
+
+
+
+
+
+def classList_conversion(List: list, ScoreboardName: str, isProsess: bool = False) -> list:
+    from bgArrayLib.compute import round_up
+    commands = []
+    length = len(List)
+    j = 1
+    print(List)
+    for k in range(len(List)):
+        i = List[k][0]
+        print(i)
+        print(type(i))
+        try:
+            if i.instrument > 119:
+                pass
+            else:
+                commands.append("execute @e[scores={" +
+                                ScoreboardName + "=" + str(round_up(i.time_position)).replace(".0", "") + "}] ~ ~" +
+                                str(127 - i.velocity) +
+                                " ~ playsound " +
+                                str(i.instrument) +
+                                str(i.CD) + "." +
+                                str(i.pitch)
+                                + " @a ~ ~ ~ 1000 1.0 1000\n")
+                if isProsess:
+                    commands.append("execute @a"" ~ ~ ~ execute @s[scores={" + ScoreboardName + "=" +
+                                    str(round_up(i.time_position)).replace(".0", "") +
+                                    "}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a" +
+                                    str(j) + "/" + str(length) + "  ||  " + str(int(j / length * 1000) / 10) + "\n")
+                    j += 1
+        except AttributeError:
+            pass
+            # a += List[i][1]
+    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    print(commands)
+    return commands
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def formCmdBlock(direction: list, command: str, particularValue: int, impluse: int, condition: bool = False,
@@ -124,21 +226,46 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
     return BdxConverter(filePath, 'Build by RyounMusicreater', blocks)
 
 
-def music2BDX(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instrument: str,
-            PlayerSelect: str = '', isProsess: bool = False, height: int = 200):
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def music2BDX(filePath: str, dire: list, music: dict, isProsess: bool = False, height: int = 200):
     """使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
         dire: 指令方块在地图中生成的起始位置（相对位置）
-        Notes: 以 list[ list[ float我的世界playsound指令音调 , float延续时常（单位s） ] ] 格式存储的音符列表
-                例如Musicreater.py的(dataset[0]['musics'][NowMusic]['notes'])
-        ScoreboardName: 用于执行的计分板名称
-        Instrument: 播放的乐器
-        PlayerSelect: 执行的玩家选择器
+        music: 详见 Musicreater.py - dataset[0]
         isProsess: 是否显示进度条（会很卡）
         height: 生成结构的最高高度
     :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件"""
-    pass
+    from msctspt.bdxOpera_CP import BdxConverter
+    cmdLists = []
+    for track in music['musics']:
+        classList_conversion_SinglePlayer(track['notes'],track['set']['ScoreboardName'],music['mainset']['PlayerSelect'],isProsess)
+
+
+
+
+
+
+
+
+
+
 
 
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):
@@ -178,8 +305,12 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
     fcwslib.run_server(run_server)
 
 
+
+
+
+
 def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed: float = 2.5,
-                 posadder: iterable = (1, 0, 0), baseblock: str = 'stone'):  # -> bool
+                 posadder: Iterable = (1, 0, 0), baseblock: str = 'stone'):  # -> bool
     """传入音符，生成以音符盒存储的红石音乐
     :param 参数说明：
         world: 地图文件的路径
@@ -285,6 +416,11 @@ def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed
     level.close()
 
 
+
+
+
+
+
 class ryStruct:
 
     def __init__(self, world: str) -> None:
@@ -347,6 +483,9 @@ class ryStruct:
         level.close()
 
         return self.RyStruct
+
+
+
 
 
 """
