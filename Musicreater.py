@@ -1724,14 +1724,7 @@ def __main__():
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[74], menu=worldmenu)
 
-    # 创建辅助功能菜单
-    otherMenu = tk.Menu(main_menu_bar, tearoff=0)
-    otherMenu.add_command(label=READABLETEXT[75], command=MakeFuncPlayer)
-    otherMenu.add_separator()
-    otherMenu.add_command(label=READABLETEXT[79], command=func2World)
-    otherMenu.add_command(label=READABLETEXT[80], command=bigFunc2World)
 
-    main_menu_bar.add_cascade(label=READABLETEXT[81], menu=otherMenu)
 
     # 创建结构功能菜单
     structureMenu = tk.Menu(main_menu_bar, tearoff=0)
@@ -1741,9 +1734,18 @@ def __main__():
     structureMenu.add_separator()
     structureMenu.add_command(label=READABLETEXT[78], command=world2RyStruct)
 
-    main_menu_bar.add_cascade(label=READABLETEXT[81], menu=structureMenu)
+    main_menu_bar.add_cascade(label=READABLETEXT[95], menu=structureMenu)
 
 
+
+    # 创建辅助功能菜单
+    otherMenu = tk.Menu(main_menu_bar, tearoff=0)
+    otherMenu.add_command(label=READABLETEXT[75], command=MakeFuncPlayer)
+    otherMenu.add_separator()
+    otherMenu.add_command(label=READABLETEXT[79], command=func2World)
+    otherMenu.add_command(label=READABLETEXT[80], command=bigFunc2World)
+
+    main_menu_bar.add_cascade(label=READABLETEXT[81], menu=otherMenu)
 
 
     # 创建实验功能菜单

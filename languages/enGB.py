@@ -105,7 +105,7 @@ READABLETEXT = {
     92: "Export music as .BDX...",
     93: "请输入指令链生成最高相对高度(≥5)",
     94: "❌You should input a number which is not lower then 4, please reinput again.",
-    # 95:"",
+    95: "Structure",
     96: "Reset Main Options",
     97: "Track Options",
     # 98:"",
