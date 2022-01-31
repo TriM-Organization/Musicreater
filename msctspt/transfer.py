@@ -25,7 +25,7 @@ def hans2pinyin(hans, style=3):
     return final
 
 
-def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, Instrument: str, playerSelection: str = '',
+def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSelection: str = '',
                                       isProsess: bool = False) -> list:
     from bgArrayLib.compute import round_up
     commands = []
@@ -43,7 +43,7 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, Instrumen
                 commands.append(
                     f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
                     f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
-                    f"~ playsound {Instrument} @s ~ ~ ~ 1000 {i.pitch} 1000\n")
+                    f"~ playsound {i.instrument} @s ~ ~ ~ 1000 {i.pitch} 1000\n")
                 if isProsess:
                     commands.append(
                         f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
