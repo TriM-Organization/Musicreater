@@ -270,4 +270,4 @@ if __name__ == '__main__':
     from nmcreader import midi_conversion
     path = "L:\\0WorldMusicCreater-MFMS new edition\\框架\\v0.3.2\\Musicreater\\测试用\\同道殊途标准.mid"
     b = midi_conversion(path)
-    classList_conversion(b, "n")
+    # classList_conversion(b, "n")

@@ -97,7 +97,7 @@ class version:
         )
     """当前所需库，有一些是开发用的，用户不需要安装"""
 
-    version = ('0.1.0', 'Delta',)
+    version = ('0.1.5', 'Delta',)
     """当前版本"""
 
     def __init__(self) -> None:
@@ -107,8 +107,9 @@ class version:
 
         self.version = version.version
         """当前版本"""
+        
 
-    def installLibraries(self):
+    def installLibraries(self,index:str = 'https://pypi.tuna.tsinghua.edu.cn/simple'):
         """安装全部开发用库"""
         from sys import platform
         import os
@@ -116,15 +117,21 @@ class version:
             import shutil
             try:
                 shutil.rmtree(os.getenv('APPDATA') + '\\Musicreater\\')
-            except FloatingPointError:
+            except FileNotFoundError:
                 pass
             for i in self.libraries:
                 print("安装库：" + i)
-                os.system("python -m pip install " + i + " -i https://pypi.tuna.tsinghua.edu.cn/simple")
+                os.system(f"python -m pip install {i} -i {index}")
         elif platform == 'linux':
             os.system("sudo apt-get install python3-pip")
             os.system("sudo apt-get install python3-tk")
             os.system("sudo apt-get install python3-tkinter")
             for i in self.libraries:
                 print("安装库：" + i)
-                os.system("sudo python3 -m pip install " + i + " -i https://pypi.tuna.tsinghua.edu.cn/simple")
+                os.system(f"sudo python3 -m pip install {i} -i {index}")
+    
+
+    def __call__(self):
+        '''直接安装库，顺便返回一下当前版本'''
+        self.installLibraries()
+        return self.version

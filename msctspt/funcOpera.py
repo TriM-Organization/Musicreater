@@ -159,7 +159,7 @@ def makeFuncFiles(musicset, path='./'):
 
 def makeNewFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
-    from nmcsup.trans import classList_conversion
+    from msctspt.transfer import classList_conversion
     commands = []
     starts = []
     starts.__len__()

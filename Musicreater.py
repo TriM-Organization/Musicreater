@@ -1258,6 +1258,7 @@ def __main__():
         del cmdlist, behaviorUuid, Outdire, fileName, bigFile, parts, dire, packName, packDire
 
     def toScbBDXfile():
+        log('单音轨转BDX')
         from msctspt.transfer import note2bdx
         global dire
         while True:
@@ -1288,6 +1289,63 @@ def __main__():
                        dataset[0]['musics'][NowMusic]['set']['Instrument'], dataset[0]['mainset']['PlayerSelect'])
         log('转换结束！\n' + str(res))
         tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
+
+
+
+    def toBDXfile():
+        log('整首歌转BDX')
+        from msctspt.transfer import music2BDX
+        global dire
+        while True:
+            try:
+                dire = tkinter.simpledialog.askstring(title=READABLETEXT[28], prompt=READABLETEXT[122],
+                                                      initialvalue='0 0 0')
+                if dire is None or dire == '':
+                    return
+                dire = [int(dire.split(' ')[0]), int(dire.split(' ')[1]), int(dire.split(' ')[2])]
+            except ValueError:  # 测试完为ValueError，故修改语法
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[117])
+                continue
+            break
+
+        fileName = tkinter.filedialog.asksaveasfilename(title=READABLETEXT[32], initialdir=r'./',
+                                                        filetypes=[(READABLETEXT[123], '.bdx'),
+                                                                   (READABLETEXT[112], '*')],
+                                                        defaultextension=dataset[0]['mainset']['PackName'] + '.bdx',
+                                                        initialfile=dataset[0]['mainset']['PackName'] + '.bdx')
+        
+        maxHeight = 200
+
+        while True:
+            maxHeight = tkinter.simpledialog.askinteger(title=READABLETEXT[28],
+                                                        prompt=READABLETEXT[93],
+                                                        initialvalue='200')
+            if maxHeight >= 5:
+                break
+            elif maxHeight == None:
+                log('取消')
+                return
+            else:
+                tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[94])
+                continue
+        
+        if fileName is None or fileName == '':
+            log('取消')
+            return
+
+        log('获得文件名：' + fileName)
+
+        res = music2BDX(fileName, dire, dataset[0],)
+        log('转换结束！\n' + str(res))
+        tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
+
+
+
+
+
+
+
+
 
     def wsPlay():
         from msctspt.transfer import note2webs
@@ -1666,18 +1724,27 @@ def __main__():
     # 将子菜单加入到菜单条中
     main_menu_bar.add_cascade(label=READABLETEXT[74], menu=worldmenu)
 
-    # 创建其他功能菜单
+    # 创建辅助功能菜单
     otherMenu = tk.Menu(main_menu_bar, tearoff=0)
     otherMenu.add_command(label=READABLETEXT[75], command=MakeFuncPlayer)
-    otherMenu.add_separator()
-    otherMenu.add_command(label=READABLETEXT[76], command=toScbBDXfile)
-    otherMenu.add_command(label=READABLETEXT[77], command=world2BDX)
-    otherMenu.add_command(label=READABLETEXT[78], command=world2RyStruct)
     otherMenu.add_separator()
     otherMenu.add_command(label=READABLETEXT[79], command=func2World)
     otherMenu.add_command(label=READABLETEXT[80], command=bigFunc2World)
 
     main_menu_bar.add_cascade(label=READABLETEXT[81], menu=otherMenu)
+
+    # 创建结构功能菜单
+    structureMenu = tk.Menu(main_menu_bar, tearoff=0)
+    structureMenu.add_command(label=READABLETEXT[92], command=toBDXfile)
+    structureMenu.add_command(label=READABLETEXT[76], command=toScbBDXfile)
+    structureMenu.add_command(label=READABLETEXT[77], command=world2BDX)
+    structureMenu.add_separator()
+    structureMenu.add_command(label=READABLETEXT[78], command=world2RyStruct)
+
+    main_menu_bar.add_cascade(label=READABLETEXT[81], menu=structureMenu)
+
+
+
 
     # 创建实验功能菜单
     trymenu = tk.Menu(main_menu_bar, tearoff=0)

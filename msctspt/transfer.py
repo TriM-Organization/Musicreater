@@ -48,14 +48,14 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
             if i.instrument > 119:
                 pass
             else:
-                commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} ~ playsound {i.instrument}{i.CD}.{i.pitch} @a ~ ~ ~ 1000 1.0 1000\n")
+                commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} ~ playsound {i.instrument}{i.CD}.{i.pitch} @s ~ ~ ~ 1000 1.0 1000\n")
                 if isProsess:
                     commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
                     j += 1
-        except AttributeError:
+        except :
             pass
             # a += List[i][1]
-    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
     print(commands)
     return commands
 
@@ -100,7 +100,7 @@ def classList_conversion(List: list, ScoreboardName: str, isProsess: bool = Fals
         except AttributeError:
             pass
             # a += List[i][1]
-    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
     print(commands)
     return commands
 
@@ -124,26 +124,56 @@ def classList_conversion(List: list, ScoreboardName: str, isProsess: bool = Fals
 
 
 
-def formCmdBlock(direction: list, command: str, particularValue: int, impluse: int, condition: bool = False,
+def formCmdBlock(direction: Iterable, command: str, particularValue: int, impluse: int = 0, condition: bool = False,
                  needRedstone: bool = True, tickDelay: int = 0, customName: str = '', lastOutput: str = '',
                  executeOnFirstTick: bool = False, trackOutput: bool = True):
     """
     使用指定项目返回指定的指令方块格式字典
-    :param trackOutput:
-    :param executeOnFirstTick:
-    :param lastOutput:
-    :param customName:
-    :param tickDelay:
-    :param needRedstone:
-    :param condition:
-    :param impluse:
+    :param direction: `list[x: int, y: int, z: int]`
+        方块位置
+    :param command: `str`
+        指令
     :param particularValue:
-    :param command:
-    :param direction:
+        方块特殊值，即朝向
+            :0	下	无条件
+            :1	上	无条件
+            :2	z轴负方向	无条件
+            :3	z轴正方向	无条件
+            :4	x轴负方向	无条件
+            :5	x轴正方向	无条件
+            :6	下	无条件
+            :7	下	无条件
 
-    :return: 指令方块字典结构
-    """
-    """
+            :8	下	有条件
+            :9	上	有条件
+            :10	z轴负方向	有条件
+            :11	z轴正方向	有条件
+            :12	x轴负方向	有条件
+            :13	x轴正方向	有条件
+            :14	下	有条件
+            :14	下	有条件
+        注意！此处特殊值中的条件会被下面condition参数覆写
+    :param impluse: `int 0|1|2`
+        方块类型
+            0脉冲 1循环 2连锁
+    :param condition: `bool`
+        是否有条件
+    :param needRedstone: `bool`
+        是否需要红石
+    :param tickDelay: `int`
+        执行延时
+    :param customName: `str`
+        悬浮字
+    :param lastOutput: `str`
+        上次输出字符串，注意此处需要留空
+    :param executeOnFirstTick: `bool`
+        执行第一个已选项(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
+    :param trackOutput: `bool`
+        是否输出
+
+    :return: 指令方块字典结构，如下
+    '''
+    '''
     :param block: {
         "direction": [x: int, y: int, z: int]  #方块位置
         "block_name": str,  #方块名称（无需指定，默认为command_block）
@@ -187,13 +217,14 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
         PlayerSelect: 执行的玩家选择器
         isProsess: 是否显示进度条（会很卡）
         height: 生成结构的最高高度
-    :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件"""
+    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
 
     # from msctspt.transfer import formCmdBlock
     from nmcsup.trans import Note2Cmd
     from msctspt.bdxOpera_CP import BdxConverter
     cmd = Note2Cmd(Notes, ScoreboardName, Instrument, PlayerSelect, isProsess)
     cdl = []
+    # 此处是处理一下，防止有注释
     for i in cmd:
         # e = True
         try:
@@ -243,7 +274,7 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
 
 
 
-def music2BDX(filePath: str, dire: list, music: dict, isProsess: bool = False, height: int = 200):
+def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200, isSquare: bool = False):
     """使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
@@ -251,11 +282,51 @@ def music2BDX(filePath: str, dire: list, music: dict, isProsess: bool = False, h
         music: 详见 Musicreater.py - dataset[0]
         isProsess: 是否显示进度条（会很卡）
         height: 生成结构的最高高度
-    :return 返回一个BdxConverter类（实际上没研究过），同时在指定位置生成.bdx文件"""
+        isSquare: 生成的结构是否需要遵循生成正方形原则
+    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
     from msctspt.bdxOpera_CP import BdxConverter
-    cmdLists = []
+
+    blocks = []
+    '''需要放置的方块'''
+    baseDire = direction
+
+    direction = list(direction)
+
     for track in music['musics']:
-        classList_conversion_SinglePlayer(track['notes'],track['set']['ScoreboardName'],music['mainset']['PlayerSelect'],isProsess)
+        cmdList = classList_conversion_SinglePlayer(track['notes'],track['set']['ScoreboardName'],music['mainset']['PlayerSelect'],isProsess)    
+        dire = direction
+        down = False
+        '''当前是否为向下的阶段？'''
+        #开头的指令方块
+        blocks.append(formCmdBlock(dire, f"scoreboard players add @a{music['mainset']['PlayerSelect']} {track['set']['ScoreboardName']} 1", 1, 1))
+        dire[1] += 1
+        blocks.append(formCmdBlock(dire, cmdList.pop(0), 2,needRedstone=False))
+        dire[1] += 1
+        # :0	下	无条件
+        # :1	上	无条件
+        # :2	z轴负方向	无条件
+        # :3	z轴正方向	无条件
+        # :4	x轴负方向	无条件
+        # :5	x轴正方向	无条件
+        for cmd in cmdList:
+            blocks.append(formCmdBlock(dire,cmd,5 if (down == False and dire[1] == height+direction[1]) or (down and dire[1] == direction+1) else 0 if down else 1,2,needRedstone=False))
+            
+            if down:
+                if dire[1] > direction[1]+1:
+                    dire[1]-=1
+            else:
+                if dire[1] < height+direction[1]:
+                    dire[1]+=1
+            
+            if (down == False and dire[1] == height+direction[1]) or (down and dire[1] == direction+1):
+                down = not down
+                dire[0] += 1
+        direction[2] += 2
+
+
+     
+    return BdxConverter(filePath, 'Build by Ryoun Musicreater', blocks)
+
 
 
 
