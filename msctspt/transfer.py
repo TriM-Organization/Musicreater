@@ -1,6 +1,5 @@
 """音·创 的转换工具库"""
 
-
 # 诸葛亮与八卦阵帮忙修改语法 日期：---2022年1月19日
 # 统计：致命（三级）错误：0个；警告（二级）错误：4个--未解决1个；语法（一级）错误：302个
 
@@ -26,15 +25,8 @@ def hans2pinyin(hans, style=3):
     return final
 
 
-
-
-
-
-
-
-
-def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSelection: str = '',
-                         isProsess: bool = False) -> list:
+def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, Instrument: str, playerSelection: str = '',
+                                      isProsess: bool = False) -> list:
     from bgArrayLib.compute import round_up
     commands = []
     length = len(List)
@@ -48,11 +40,17 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
             if i.instrument > 119:
                 pass
             else:
-                commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} ~ playsound {i.instrument}{i.CD}.{i.pitch} @s ~ ~ ~ 1000 1.0 1000\n")
+                commands.append(
+                    f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
+                    f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
+                    f"~ playsound {Instrument} @s ~ ~ ~ 1000 {i.pitch} 1000\n")
                 if isProsess:
-                    commands.append(f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}={str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
+                    commands.append(
+                        f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
+                        f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ "
+                        f"title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
                     j += 1
-        except :
+        except:
             pass
             # a += List[i][1]
     # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
@@ -60,13 +58,37 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
     return commands
 
 
-
-
-
-
-
-
-
+def newList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSelection: str = '',
+                                    isProsess: bool = False) -> list:
+    from bgArrayLib.compute import round_up
+    commands = []
+    length = len(List)
+    j = 1
+    print(List)
+    for k in range(len(List)):
+        i = List[k][0]
+        print(i)
+        print(type(i))
+        try:
+            if i.instrument > 119:
+                pass
+            else:
+                commands.append(
+                    f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
+                    f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
+                    f"~ playsound {i.instrument}{i.CD}.{i.pitch} @s ~ ~ ~ 1000 1.0 1000\n")
+                if isProsess:
+                    commands.append(
+                        f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
+                        f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ "
+                        f"title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
+                    j += 1
+        except:
+            pass
+            # a += List[i][1]
+    # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
+    print(commands)
+    return commands
 
 
 def classList_conversion(List: list, ScoreboardName: str, isProsess: bool = False) -> list:
@@ -103,25 +125,6 @@ def classList_conversion(List: list, ScoreboardName: str, isProsess: bool = Fals
     # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
     print(commands)
     return commands
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 def formCmdBlock(direction: Iterable, command: str, particularValue: int, impluse: int = 0, condition: bool = False,
@@ -172,7 +175,7 @@ def formCmdBlock(direction: Iterable, command: str, particularValue: int, implus
         是否输出
 
     :return: 指令方块字典结构，如下
-    '''
+    """
     '''
     :param block: {
         "direction": [x: int, y: int, z: int]  #方块位置
@@ -188,7 +191,7 @@ def formCmdBlock(direction: Iterable, command: str, particularValue: int, implus
         "conditional": int,  #是否有条件 1 bytes
         "needRedstone": int  #是否需要红石 1 bytes
     }
-    """
+    '''
     return {"direction": direction,
             "block_name": "command_block",
             "particular_value": particularValue,
@@ -205,7 +208,7 @@ def formCmdBlock(direction: Iterable, command: str, particularValue: int, implus
 
 
 def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instrument: str,
-            PlayerSelect: str = '', isProsess: bool = False, height: int = 200):
+             PlayerSelect: str = '', isProsess: bool = False, height: int = 200):
     """使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
@@ -257,24 +260,8 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
     return BdxConverter(filePath, 'Build by RyounMusicreater', blocks)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200, isSquare: bool = False):
+def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
+              isSquare: bool = False):
     """使用方法同Note2Cmd
     :param 参数说明：
         filePath: 生成.bdx文件的位置
@@ -293,14 +280,18 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
     direction = list(direction)
 
     for track in music['musics']:
-        cmdList = classList_conversion_SinglePlayer(track['notes'],track['set']['ScoreboardName'],music['mainset']['PlayerSelect'],isProsess)    
+        cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
+                                                    music['mainset']['PlayerSelect'], isProsess)
         dire = direction
         down = False
         '''当前是否为向下的阶段？'''
-        #开头的指令方块
-        blocks.append(formCmdBlock(dire, f"scoreboard players add @a{music['mainset']['PlayerSelect']} {track['set']['ScoreboardName']} 1", 1, 1))
+        # 开头的指令方块
+        blocks.append(formCmdBlock(dire,
+                                   f"scoreboard players add @a{music['mainset']['PlayerSelect']} "
+                                   f"{track['set']['ScoreboardName']} 1",
+                                   1, 1))
         dire[1] += 1
-        blocks.append(formCmdBlock(dire, cmdList.pop(0), 2,needRedstone=False))
+        blocks.append(formCmdBlock(dire, cmdList.pop(0), 2, needRedstone=False))
         dire[1] += 1
         # :0	下	无条件
         # :1	上	无条件
@@ -309,34 +300,22 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         # :4	x轴负方向	无条件
         # :5	x轴正方向	无条件
         for cmd in cmdList:
-            blocks.append(formCmdBlock(dire,cmd,5 if (down == False and dire[1] == height+direction[1]) or (down and dire[1] == direction+1) else 0 if down else 1,2,needRedstone=False))
-            
+            blocks.append(formCmdBlock(dire, cmd, 5 if (down is False and dire[1] == height + direction[1]) or (
+                    down and dire[1] == direction + 1) else 0 if down else 1, 2, needRedstone=False))
+
             if down:
-                if dire[1] > direction[1]+1:
-                    dire[1]-=1
+                if dire[1] > direction[1] + 1:
+                    dire[1] -= 1
             else:
-                if dire[1] < height+direction[1]:
-                    dire[1]+=1
-            
-            if (down == False and dire[1] == height+direction[1]) or (down and dire[1] == direction+1):
+                if dire[1] < height + direction[1]:
+                    dire[1] += 1
+
+            if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction + 1):
                 down = not down
                 dire[0] += 1
         direction[2] += 2
 
-
-     
     return BdxConverter(filePath, 'Build by Ryoun Musicreater', blocks)
-
-
-
-
-
-
-
-
-
-
-
 
 
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):
@@ -369,15 +348,11 @@ def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: st
                 await fcwslib.send_command(websocket,
                                            'execute @a' + PlayerSelect + ' ~ ~ ~ title @s actionbar §e▶  播放中：  §a' +
                                            str(
-                                             j) + '/' + str(length) + '  ||  ' + str(int(j / length * 1000) / 10))
+                                               j) + '/' + str(length) + '  ||  ' + str(int(j / length * 1000) / 10))
                 j += 1
             time.sleep(Notes[i][1] / speed)
 
     fcwslib.run_server(run_server)
-
-
-
-
 
 
 def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed: float = 2.5,
@@ -407,7 +382,7 @@ def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed
             powered = 'true'
         else:
             powered = 'false'
-        return Block('universal_minecraft', 'noteblock',
+        return Block('universal_minecraft', 'notebooks',
                      {"instrument": ts(instrument1.replace("note.", '')), 'note': ts(str(note)),
                       'powered': ts(powered)})
 
@@ -487,11 +462,6 @@ def note2RSworld(world: str, startpos: list, notes: list, instrument: str, speed
     level.close()
 
 
-
-
-
-
-
 class ryStruct:
 
     def __init__(self, world: str) -> None:
@@ -554,9 +524,6 @@ class ryStruct:
         level.close()
 
         return self.RyStruct
-
-
-
 
 
 """

@@ -92,15 +92,6 @@ def funSplit(bigFile, maxCmdLen: int = 10000):
     return parts
 
 
-
-
-
-
-
-
-
-
-
 # 注意！播放器应该为个人独立播放器，此处bug需要修改
 def makeFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
@@ -148,18 +139,48 @@ def makeFuncFiles(musicset, path='./'):
     log("完成============================")
 
 
-
-
-
-
-
-
-
+def makeFunDir(musicset, path='./'):
+    """在指定目录下生成函数包文件夹"""
+    import os
+    import uuid
+    log("=============================生成函数包文件夹")
+    # note,packname="Ryoun",FileName="Music",EntityName_='music_support',ScoreboardName_='music_support',
+    # MusicTitle_='Noname',PlayerSelect_='',Repeat_=False,Instrument_='harp'
+    try:
+        os.makedirs(path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
+            'PackName'] + "/functions")
+        log("已创建目录" + path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
+            'PackName'] + "/functions")
+    except FileExistsError:
+        log("目录已有无需创建")
+        pass
+    # 判断文件皆存在
+    if not (os.path.exists(
+            path + musicset['mainset']['PackName'] + "Pack/world_behavior_packs.json") and os.path.exists(
+        path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
+            'PackName'] + "/manifest.json")):
+        log("创建manifest.json以及world_behavior_packs.json")
+        behaviorUuid = uuid.uuid4()
+        with open(path + musicset['mainset']['PackName'] + "Pack/world_behavior_packs.json", "w") as f:
+            f.write("[\n  {\"pack_id\": \"" + str(behaviorUuid) + "\",\n  \"version\": [ 0, 0, 1 ]}\n]")
+        p = path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset']['PackName'] + \
+            "/manifest.json"
+        with open(p, "w") as f:
+            f.write("{\n  \"format_version\": 1,\n  \"header\": {\n    \"description\": \"" + musicset['mainset'][
+                'PackName'] + " Pack : behavior pack\",\n    \"version\": [ 0, 0, 1 ],\n    \"name\": \"" +
+                    musicset['mainset']['PackName'] + "Pack\",\n    \"uuid\": \"" + str(
+                behaviorUuid) + "\"\n  },\n  \"modules\": [\n    {\n      \"description\": \"" + musicset['mainset'][
+                        'PackName'] + " Pack : behavior pack\",\n      \"type\": \"data\",\n      \"version\":"
+                                      " [ 0, 0, 1 ],\n      \"uuid\": \"" + str(
+                uuid.uuid4()) + "\"\n    }\n  ]\n}")
+    makeFuncFiles(musicset, path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
+        'PackName'] + "/functions/")
+    log("完成============================")
 
 
 def makeNewFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
-    from msctspt.transfer import classList_conversion
+    from msctspt.transfer import newList_conversion_SinglePlayer
     commands = []
     starts = []
     starts.__len__()
@@ -175,17 +196,19 @@ def makeNewFuncFiles(musicset, path='./'):
     for i in range(len(musicset['musics'])):
         log('写入第' + str(i) + '个数据')
         # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
-        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset'][
+        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
+        #                 [
         #                     'PlayerSelect'] + " title " + musicset['mainset']['MusicTitle'] + "\n")
         # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
-        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset'][
+        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
+        #                 [
         #                     'PlayerSelect'] + " subtitle 本函数乐曲由§b§l凌云§r§3函数音乐创建§r生成\n")
         if len(musicset['musics'][i]['notes']) > maxlen:
             maxlen = len(musicset['musics'][i]['notes'])
         with open(path + musicset['mainset']['MusicTitle'] + '_Part' + str(i) + '.mcfunction', 'w',
                   encoding='UTF-8') as f:
-            f.writelines(classList_conversion(musicset['musics'][i]['notes'],
-                                              musicset['musics'][i]['set']['ScoreboardName']))
+            f.writelines(newList_conversion_SinglePlayer(musicset['musics'][i]['notes'],
+                                                         musicset['musics'][i]['set']['ScoreboardName']))
     if musicset['mainset']['IsRepeat']:
         log("增加重复语句")
         for i in range(len(musicset['musics'])):
@@ -245,7 +268,61 @@ def makeNewFunDir(musicset, path='./'):
     log("完成============================")
 
 
-def makeFunDir(musicset, path='./'):
+def makeClassFuncFiles(musicset, path='./'):
+    """在指定目录下生成函数文件"""
+    from msctspt.transfer import classList_conversion_SinglePlayer
+    commands = []
+    starts = []
+    starts.__len__()
+    starts.append("scoreboard objectives add " + musicset['musics'][0]['set']['ScoreboardName'] + " dummy\n")
+    starts.append("summon armor_stand " + musicset['musics'][0]['set']['EntityName'] + '\n')
+    starts.append("scoreboard objectives setdisplay sidebar " + musicset['musics'][0]['set']['ScoreboardName'] + '\n')
+    starts.append("scoreboard players set @e[type=armor_stand, name=\"" + musicset['musics'][0]['set']['EntityName'] +
+                  "\"] " + musicset['musics'][0]['set']['ScoreboardName'] + " 0" + '\n')
+    log("=========================正在在此处生成文件:" + path)
+    commands.append("scoreboard players add @e[name=\"" + musicset['musics'][0]['set']['EntityName'] + "\"] " +
+                    musicset['musics'][0]['set']['ScoreboardName'] + " 1\n")
+    maxlen = -1
+    for i in range(len(musicset['musics'])):
+        log('写入第' + str(i) + '个数据')
+        # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
+        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
+        #                 [
+        #                     'PlayerSelect'] + " title " + musicset['mainset']['MusicTitle'] + "\n")
+        # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
+        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
+        #                 [
+        #                     'PlayerSelect'] + " subtitle 本函数乐曲由§b§l凌云§r§3函数音乐创建§r生成\n")
+        if len(musicset['musics'][i]['notes']) > maxlen:
+            maxlen = len(musicset['musics'][i]['notes'])
+        with open(path + musicset['mainset']['MusicTitle'] + '_Part' + str(i) + '.mcfunction', 'w',
+                  encoding='UTF-8') as f:
+            f.writelines(classList_conversion_SinglePlayer(musicset['musics'][i]['notes'],
+                                                           musicset['musics'][i]['set']['ScoreboardName'],
+                                                           musicset['musics'][i]['set']['Instrument'],
+                                                           musicset['mainset']['PlayerSelect'],
+                                                           True))
+    if musicset['mainset']['IsRepeat']:
+        log("增加重复语句")
+        for i in range(len(musicset['musics'])):
+            commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
+                            musicset['musics'][i]['set']['ScoreboardName'] + "=" + str(
+                (maxlen + 2) * 10) + "}] ~~~ scoreboard players set @e[name=\"" + musicset['musics'][i]['set'][
+                                'EntityName'] + "\"] " + musicset['musics'][i]['set']['ScoreboardName'] + " -1\n")
+    log("增加版权语句")
+    commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿），bgArray（诸葛亮与八卦阵）\n")
+    starts.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿），bgArray（诸葛亮与八卦阵）\n")
+    log("写入支持文件")
+    with open(path + musicset['mainset']['MusicTitle'] + '_Support.mcfunction', 'w', encoding='UTF-8') as f:
+        f.writelines(commands)
+    log("写入开始文件")
+    with open(path + 'Start_' + musicset['mainset']['MusicTitle'] + '.mcfunction', 'w', encoding='UTF-8') as f:
+        f.writelines(starts)
+    del commands, starts, maxlen
+    log("完成============================")
+
+
+def makeClassFunDir(musicset, path='./'):
     """在指定目录下生成函数包文件夹"""
     import os
     import uuid
@@ -265,7 +342,6 @@ def makeFunDir(musicset, path='./'):
             path + musicset['mainset']['PackName'] + "Pack/world_behavior_packs.json") and os.path.exists(
         path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
             'PackName'] + "/manifest.json")):
-
         log("创建manifest.json以及world_behavior_packs.json")
         behaviorUuid = uuid.uuid4()
         with open(path + musicset['mainset']['PackName'] + "Pack/world_behavior_packs.json", "w") as f:
@@ -280,7 +356,7 @@ def makeFunDir(musicset, path='./'):
                         'PackName'] + " Pack : behavior pack\",\n      \"type\": \"data\",\n      \"version\":"
                                       " [ 0, 0, 1 ],\n      \"uuid\": \"" + str(
                 uuid.uuid4()) + "\"\n    }\n  ]\n}")
-    makeFuncFiles(musicset, path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
+    makeClassFuncFiles(musicset, path + musicset['mainset']['PackName'] + "Pack/behavior_packs/" + musicset['mainset'][
         'PackName'] + "/functions/")
     log("完成============================")
 

@@ -5,7 +5,6 @@
 
 from nmcsup.log import log
 
-
 import amulet
 import amulet_nbt
 from amulet.api.block import Block
@@ -83,9 +82,6 @@ def Mp32Mid(mp3File, midFile):
     PianoTranscription(device="cpu").transcribe(audio, midFile)
 
 
-
-
-
 # 传入一个音符列表转为指令列表
 def Note2Cmd(Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: str = '',
              isProsess: bool = False) -> list:
@@ -105,25 +101,9 @@ def Note2Cmd(Notes: list, ScoreboardName: str, Instrument: str, PlayerSelect: st
             j += 1
     commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
     return commands
+
+
 # def newDataStructureCounterChange():
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # 简单载入方块
@@ -264,10 +244,3 @@ def Notes2Player(Note, dire: list, CmdData: dict):
 def Datas2BlkWorld(NoteData, world: str, dire: list):
     for i in range(len(NoteData)):
         Blocks2World(world, [dire[0], dire[1], dire[2] + i], NoteData[i])
-
-
-if __name__ == '__main__':
-    from nmcreader import midi_conversion
-    path = "L:\\0WorldMusicCreater-MFMS new edition\\框架\\v0.3.2\\Musicreater\\测试用\\同道殊途标准.mid"
-    b = midi_conversion(path)
-    # classList_conversion(b, "n")

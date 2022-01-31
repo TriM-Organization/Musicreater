@@ -1,14 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-
-
 from nmcsup.log import log
 import pickle
-
-
-
-
 
 
 class Note:
@@ -28,7 +22,7 @@ class Note:
             self.CD = "d"
 
 
-def midi_conversion(midfile: str):
+def midiNewReader(midfile: str):
     import mido
     # from msctspt.threadOpera import NewThread
     from bgArrayLib.bpm import get
@@ -129,6 +123,7 @@ def midiClassReader(midfile: str):
 
     def Time(mt, tpb_a, bpm_a):
         return round(mt / tpb_a / bpm_a * 60 * 20)
+
     Notes = []
     tracks = []
     try:
@@ -150,13 +145,3 @@ def midiClassReader(midfile: str):
         Notes.append(tracks)
     print(Notes.__len__())
     return Notes
-
-
-
-
-
-
-
-
-
-
