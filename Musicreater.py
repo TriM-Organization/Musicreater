@@ -1468,7 +1468,7 @@ def __main__():
 
     root.title(READABLETEXT[41].format(__version__))
     root.geometry('900x900')  # 像素
-    root.iconbitmap('./resources/musicreater.ico','./resources/musicreater.ico')
+    root.iconbitmap('./resources/musicreater.ico', './resources/musicreater.ico')
 
     print('完成！')
 

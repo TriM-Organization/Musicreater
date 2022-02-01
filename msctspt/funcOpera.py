@@ -92,7 +92,6 @@ def funSplit(bigFile, maxCmdLen: int = 10000):
     return parts
 
 
-# 注意！播放器应该为个人独立播放器，此处bug需要修改
 def makeFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
     from nmcsup.trans import Note2Cmd
@@ -137,6 +136,20 @@ def makeFuncFiles(musicset, path='./'):
         f.writelines(starts)
     del commands, starts, maxlen
     log("完成============================")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def makeFunDir(musicset, path='./'):
@@ -299,7 +312,6 @@ def makeClassFuncFiles(musicset, path='./'):
                   encoding='UTF-8') as f:
             f.writelines(classList_conversion_SinglePlayer(musicset['musics'][i]['notes'],
                                                            musicset['musics'][i]['set']['ScoreboardName'],
-                                                           musicset['musics'][i]['set']['Instrument'],
                                                            musicset['mainset']['PlayerSelect'],
                                                            True))
     if musicset['mainset']['IsRepeat']:
