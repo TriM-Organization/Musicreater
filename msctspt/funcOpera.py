@@ -92,7 +92,7 @@ def funSplit(bigFile, maxCmdLen: int = 10000):
     return parts
 
 
-# 注意！播放器应该为个人独立播放器，此处bug需要修改
+
 def makeFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
     from nmcsup.trans import Note2Cmd
@@ -139,6 +139,20 @@ def makeFuncFiles(musicset, path='./'):
     log("完成============================")
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 def makeFunDir(musicset, path='./'):
     """在指定目录下生成函数包文件夹"""
     import os
@@ -178,37 +192,38 @@ def makeFunDir(musicset, path='./'):
     log("完成============================")
 
 
-def makeNewFuncFiles(musicset, path='./'):
+
+
+
+
+
+
+
+def makeNewFuncFiles(musicset, path='./', isProsess:bool = False):
     """在指定目录下生成函数文件"""
     from msctspt.transfer import newList_conversion_SinglePlayer
     commands = []
     starts = []
     starts.__len__()
     starts.append("scoreboard objectives add " + musicset['musics'][0]['set']['ScoreboardName'] + " dummy\n")
-    starts.append("summon armor_stand " + musicset['musics'][0]['set']['EntityName'] + '\n')
-    starts.append("scoreboard objectives setdisplay sidebar " + musicset['musics'][0]['set']['ScoreboardName'] + '\n')
-    starts.append("scoreboard players set @e[type=armor_stand, name=\"" + musicset['musics'][0]['set']['EntityName'] +
-                  "\"] " + musicset['musics'][0]['set']['ScoreboardName'] + " 0" + '\n')
+    # starts.append("summon armor_stand " + musicset['musics'][0]['set']['EntityName'] + '\n')
+    # starts.append("scoreboard objectives setdisplay sidebar " + musicset['musics'][0]['set']['ScoreboardName'] + '\n')
+    # starts.append("scoreboard players set @e[type=armor_stand, name=\"" + musicset['musics'][0]['set']['EntityName'] +"\"] " + musicset['musics'][0]['set']['ScoreboardName'] + " 0" + '\n')
+
     log("=========================正在在此处生成文件:" + path)
-    commands.append("scoreboard players add @e[name=\"" + musicset['musics'][0]['set']['EntityName'] + "\"] " +
-                    musicset['musics'][0]['set']['ScoreboardName'] + " 1\n")
+
+    # commands.append("scoreboard players add @e[name=\"" + musicset['musics'][0]['set']['EntityName'] + "\"] " + musicset['musics'][0]['set']['ScoreboardName'] + " 1\n")
     maxlen = -1
     for i in range(len(musicset['musics'])):
         log('写入第' + str(i) + '个数据')
-        # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
-        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
-        #                 [
-        #                     'PlayerSelect'] + " title " + musicset['mainset']['MusicTitle'] + "\n")
-        # commands.append("execute @e[name=\"" + musicset['musics'][i]['set']['EntityName'] + "\",scores={" +
-        #                 musicset['musics'][i]['set']['ScoreboardName'] + "=1..10}] ~~~ title @a" + musicset['mainset']
-        #                 [
-        #                     'PlayerSelect'] + " subtitle 本函数乐曲由§b§l凌云§r§3函数音乐创建§r生成\n")
+
         if len(musicset['musics'][i]['notes']) > maxlen:
             maxlen = len(musicset['musics'][i]['notes'])
         with open(path + musicset['mainset']['MusicTitle'] + '_Part' + str(i) + '.mcfunction', 'w',
                   encoding='UTF-8') as f:
             f.writelines(newList_conversion_SinglePlayer(musicset['musics'][i]['notes'],
-                                                         musicset['musics'][i]['set']['ScoreboardName']))
+                                                         musicset['musics'][i]['set']['ScoreboardName'],
+                                                         musicset['musics'][i]['set']['Instrument']))
     if musicset['mainset']['IsRepeat']:
         log("增加重复语句")
         for i in range(len(musicset['musics'])):
@@ -227,6 +242,19 @@ def makeNewFuncFiles(musicset, path='./'):
         f.writelines(starts)
     del commands, starts, maxlen
     log("完成============================")
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 def makeNewFunDir(musicset, path='./'):

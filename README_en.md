@@ -83,14 +83,15 @@ Musicreater - > function (package) - > the following four new functions
 
 ### Thanks
 
-1.  Thank [Fuckcraft](https://github.com/fuckcraft) (“鸣凤鸽子” ,etc) for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
+1.  Thank [Fuckcraft](https://github.com/fuckcraft) *(“鸣凤鸽子” ,etc)* for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
     -   *!! They have given me the rights to directly copy the lib into Musicreater*
-2.  Thank 昀梦\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* Created.
-3.  Thank Charlie_Ping “查理平” for bdx convert funtion.
-4.  Thank CMA_2401PT for BDXWorkShop as the .bdx structure's operation guide.
-5.  Thank Miracle Plume “神羽” \<QQshenyu40403\> for the Miracle Plume Bedrock Edition Audio Resource Pack
-6.  Thanks for a lot of groupmates who support me and help me to test the program.
-7.  If you have give me some help but u haven't been in the list, please contact me.
+2.  Thank *昀梦*\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* Created.
+3.  Thank *Charlie_Ping “查理平”* for bdx convert funtion.
+4.  Thank *CMA_2401PT* for BDXWorkShop as the .bdx structure's operation guide.
+5.  Thank *Miracle Plume “神羽”* \<QQshenyu40403\> for the Miracle Plume Bedrock Edition Audio Resource Pack
+6.  Thank *Arthur Morgan* for his/her biggest support for Musicreater
+7.  Thanks for a lot of groupmates who support me and help me to test the program.
+8.  If you have give me some help but u haven't been in the list, please contact me.
 
 
 ### Contact *Eilles(W-YI)*(金羿)
