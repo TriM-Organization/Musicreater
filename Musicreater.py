@@ -623,52 +623,67 @@ def __main__():
         del midfile
 
         def midiSPT(th_):
-            for i in th_.getResult():
-                datas = DMM()
-                datas['notes'] = i
-                dataset[0]['musics'].append(datas)
-            del th_
-            global is_save
-            is_save = False
-            global NowMusic
-            RefreshMain()
-            RefreshMusic(NowMusic)
+            try:
+                try:
+                    for i in th_.getResult():
+                        datas = DMM()
+                        datas['notes'] = i
+                        dataset[0]['musics'].append(datas)
+                    del th_
+                    global is_save
+                    is_save = False
+                    global NowMusic
+                    RefreshMain()
+                    RefreshMusic(NowMusic)
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+            except AttributeError:
+                try:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
 
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
 
     def FromNewMidi():
-        try:
-            tkinter.messagebox.showinfo("开发提示", "因为一些原因这个功能暂时取消")
-        except tkinter.TclError:
-            log('从midi导入音乐并采用新读取方式')
-            midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./',
-                                                         filetypes=[(READABLETEXT[114], '.mid .midi'),
-                                                                    (READABLETEXT[112], '*')], multiple=True)
-            if midfile is None or midfile == '':
-                log('取消')
-                return
-            else:
-                midfile = midfile[0]
-            th = NewThread(LoadMidi, (midfile,))
-            th.start()
-            del midfile
+        log('从midi导入音乐并采用新读取方式')
+        midfile = tkinter.filedialog.askopenfilename(title=READABLETEXT[21], initialdir=r'./',
+                                                     filetypes=[(READABLETEXT[114], '.mid .midi'),
+                                                                (READABLETEXT[112], '*')], multiple=True)
+        if midfile is None or midfile == '':
+            log('取消')
+            return
+        else:
+            midfile = midfile[0]
+        th = NewThread(LoadMidi, (midfile,))
+        th.start()
+        del midfile
 
-            def midiSPT(th_):
-                for i in th_.getResult():
-                    datas = DMM()
-                    datas['notes'] = i
-                    dataset[0]['musics'].append(datas)
-                del th_
-                global is_save
-                is_save = False
-                global NowMusic
-                RefreshMain()
-                RefreshMusic(NowMusic)
+        def midiSPT(th_):
+            try:
+                try:
+                    for i in th_.getResult():
+                        datas = DMM()
+                        datas['notes'] = i
+                        dataset[0]['musics'].append(datas)
+                    del th_
+                    global is_save
+                    is_save = False
+                    global NowMusic
+                    RefreshMain()
+                    RefreshMusic(NowMusic)
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+            except AttributeError:
+                try:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
 
-            threading.Thread(target=midiSPT, args=(th,)).start()
-            del th
-            dataset[0]['mainset']['ReadMethod'] = "new"
+        threading.Thread(target=midiSPT, args=(th,)).start()
+        del th
+        dataset[0]['mainset']['ReadMethod'] = "new"
 
     def FromClassMidi():
         log('从midi导入音乐并采用类读取方式')
@@ -685,17 +700,25 @@ def __main__():
         del midfile
 
         def midiSPT(th_):
-            for i in th_.getResult():
-                datas = DMM()
-                datas['notes'] = i
-                dataset[0]['musics'].append(datas)
-            del th_
-            global is_save
-            is_save = False
-            global NowMusic
-            RefreshMain()
-            RefreshMusic(NowMusic)
-
+            try:
+                try:
+                    for i in th_.getResult():
+                        datas = DMM()
+                        datas['notes'] = i
+                        dataset[0]['musics'].append(datas)
+                    del th_
+                    global is_save
+                    is_save = False
+                    global NowMusic
+                    RefreshMain()
+                    RefreshMusic(NowMusic)
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+            except AttributeError:
+                try:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+                except OSError:
+                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
         dataset[0]['mainset']['ReadMethod'] = "class"
@@ -865,37 +888,38 @@ def __main__():
             log('取消')
             return
         from bgArrayLib.sy_resourcesPacker import resources_pathSetting
-        result = resources_pathSetting(file)
+        result = resources_pathSetting()
         print(result)
         if result[0] is False:
             if result[1] == 1:
                 tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[157])
             if result[1] == 2:
                 tkinter.messagebox.showerror(title=READABLETEXT[0], message=READABLETEXT[158])
+            return
         else:
-            from bgArrayLib.sy_resourcesPacker import scatteredPack
-            scatteredPack(file)
-        import zipfile
+            import zipfile
 
-        from msctspt.funcOpera import makeNewFunDir
-        log('生成附加包文件')
-        if not os.path.exists('./temp/'):
-            os.makedirs('./temp/')
-        makeNewFunDir(dataset[0], './temp/')
+            from msctspt.funcOpera import makeNewFunDir
+            log('生成附加包文件')
+            if not os.path.exists('./temp/'):
+                os.makedirs('./temp/')
+            makeNewFunDir(dataset[0], './temp/')
 
-        shutil.move('./temp/{}Pack/behavior_packs/{}/functions'.format(dataset[0]['mainset']['PackName'],
-                                                                       dataset[0]['mainset']['PackName']), './')
-
-        shutil.move('./temp/{}Pack/behavior_packs/{}/manifest.json'.format(dataset[0]['mainset']['PackName'],
+            shutil.move('./temp/{}Pack/behavior_packs/{}/functions'.format(dataset[0]['mainset']['PackName'],
                                                                            dataset[0]['mainset']['PackName']), './')
 
-        with zipfile.ZipFile('{}/{}.mcpack'.format(file, dataset[0]['mainset']['PackName']), 'w') as zipobj:
-            for i in os.listdir('./functions/'):
-                zipobj.write('./functions/{}'.format(i))
-            zipobj.write('./manifest.json')
-        shutil.move('./functions', './temp/')
-        shutil.move('./manifest.json', './temp/')
-        shutil.rmtree('./temp/')
+            shutil.move('./temp/{}Pack/behavior_packs/{}/manifest.json'.format(dataset[0]['mainset']['PackName'],
+                                                                               dataset[0]['mainset']['PackName']), './')
+
+            with zipfile.ZipFile('{}/{}.mcpack'.format(file, dataset[0]['mainset']['PackName']), 'w') as zipobj:
+                for i in os.listdir('./functions/'):
+                    zipobj.write('./functions/{}'.format(i))
+                zipobj.write('./manifest.json')
+            shutil.move('./functions', './temp/')
+            shutil.move('./manifest.json', './temp/')
+            shutil.rmtree('./temp/')
+            from bgArrayLib.sy_resourcesPacker import scatteredPack
+            scatteredPack(file)
 
     print('完成加载乐器类生成函数函数。')
     print('开始加载乐器音色资源绑定函数。')

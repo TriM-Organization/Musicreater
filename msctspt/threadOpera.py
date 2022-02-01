@@ -14,12 +14,21 @@ class NewThread(threading.Thread):
         self.args = args
 
     def run(self):
-        self.result = self.func(*self.args)
+        try:
+            self.result = self.func(*self.args)
+        except OSError:
+            pass
 
     def getResult(self):
         threading.Thread.join(self)  # 等待线程执行完毕
         try:
-            return self.result
+            try:
+                try:
+                    return self.result
+                except OSError:
+                    return None
+            except IOError:
+                return None
         except ValueError:
             return None
 

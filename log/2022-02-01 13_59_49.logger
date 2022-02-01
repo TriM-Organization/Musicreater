@@ -1,0 +1,16 @@
+2022-02-01 13:59:49,339 - nmcsup.log - INFO - 更新执行位置，当前文件位置 L:\0WorldMusicCreater-MFMS new edition\功能\v0.7.2\Musicreater\Musicreater.py
+2022-02-01 13:59:49,410 - nmcsup.log - INFO - 启动root.mainloop（窗口）
+2022-02-01 14:00:37,654 - nmcsup.log - INFO - 从midi导入音乐并采用新读取方式
+2022-02-01 14:00:45,806 - nmcsup.log - INFO - 生成附加包文件
+2022-02-01 14:00:45,809 - nmcsup.log - INFO - =============================生成函数包文件夹
+2022-02-01 14:00:45,810 - nmcsup.log - INFO - 已创建目录./temp/RyounPack/behavior_packs/Ryoun/functions
+2022-02-01 14:00:45,811 - nmcsup.log - INFO - 创建manifest.json以及world_behavior_packs.json
+2022-02-01 14:00:45,986 - nmcsup.log - INFO - =========================正在在此处生成文件:./temp/RyounPack/behavior_packs/Ryoun/functions/
+2022-02-01 14:00:45,987 - nmcsup.log - INFO - 写入第0个数据
+2022-02-01 14:00:45,988 - nmcsup.log - INFO - 写入第1个数据
+2022-02-01 14:00:46,097 - nmcsup.log - INFO - 写入第2个数据
+2022-02-01 14:00:46,297 - nmcsup.log - INFO - 增加版权语句
+2022-02-01 14:00:46,298 - nmcsup.log - INFO - 写入支持文件
+2022-02-01 14:00:46,299 - nmcsup.log - INFO - 写入开始文件
+2022-02-01 14:00:46,300 - nmcsup.log - INFO - 完成============================
+2022-02-01 14:00:46,301 - nmcsup.log - INFO - 完成============================

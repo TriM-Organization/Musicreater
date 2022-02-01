@@ -25,9 +25,10 @@ def hans2pinyin(hans, style=3):
     return final
 
 
-def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSelection: str = '',
+def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, Instrument: str, playerSelection: str = '',
                                       isProsess: bool = False) -> list:
     from bgArrayLib.compute import round_up
+    from bgArrayLib.pitchStrConstant import pitch
     commands = []
     length = len(List)
     j = 1
@@ -43,7 +44,7 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
                 commands.append(
                     f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
                     f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
-                    f"~ playsound {i.instrument} @s ~ ~ ~ 1000 {i.pitch} 1000\n")
+                    f"~ playsound {Instrument} @s ~ ~ ~ 1000 {pitch.get(str(i.pitch))} 1000\n")
                 if isProsess:
                     commands.append(
                         f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
@@ -282,6 +283,10 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
     for track in music['musics']:
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
+        if len(cmdList) == 0:
+            continue
+        elif cmdList is []:
+            continue
         dire = direction
         down = False
         '''当前是否为向下的阶段？'''

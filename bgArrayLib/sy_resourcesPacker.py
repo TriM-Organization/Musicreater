@@ -43,7 +43,7 @@ def resources_pathSetting(newPath: str = ""):
             return [True, path, 3]  # 3:有zip
         else:
             return [False, 2]  # 2:路径文件指示错误
-    if os.path.isfile("./bgArrayLib/resourcesPath.rpposi" and newPath == ""):
+    if os.path.isfile("./bgArrayLib/resourcesPath.rpposi") and newPath == "":
         with open("./bgArrayLib/resourcesPath.rpposi", 'r') as f:
             path = f.read()
         if "mcpack(国际版推荐)格式_25.0" in os.listdir(path) and "zip格式_25.0" in os.listdir(path):
@@ -61,12 +61,12 @@ def choose_resources():
     global mpN
     back_list = []
     try:
-        with open(r"L:\0WorldMusicCreater-MFMS new edition\框架\v0.3.2\Musicreater\1.pkl", 'rb') as rb:
+        with open(r"1.pkl", 'rb') as rb:
             instrument = list(pickle.load(rb))
         print(instrument)
     except FileNotFoundError:
         try:
-            with open(r"L:\0WorldMusicCreater-MFMS new edition\框架\v0.3.2\Musicreater\nmcsup\1.pkl", 'rb') as rb:
+            with open(r"./nmcsup/1.pkl", 'rb') as rb:
                 instrument = list(pickle.load(rb))
             print(instrument)
         except FileNotFoundError:
