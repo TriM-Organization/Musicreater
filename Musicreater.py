@@ -700,25 +700,16 @@ def __main__():
         del midfile
 
         def midiSPT(th_):
-            try:
-                try:
-                    for i in th_.getResult():
-                        datas = DMM()
-                        datas['notes'] = i
-                        dataset[0]['musics'].append(datas)
-                    del th_
-                    global is_save
-                    is_save = False
-                    global NowMusic
-                    RefreshMain()
-                    RefreshMusic(NowMusic)
-                except OSError:
-                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
-            except AttributeError:
-                try:
-                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
-                except OSError:
-                    tkinter.messagebox.showerror(READABLETEXT[0], READABLETEXT[167])
+            for i in th_.getResult():
+                datas = DMM()
+                datas['notes'] = i
+                dataset[0]['musics'].append(datas)
+            del th_
+            global is_save
+            is_save = False
+            global NowMusic
+            RefreshMain()
+            RefreshMusic(NowMusic)
         threading.Thread(target=midiSPT, args=(th,)).start()
         del th
         dataset[0]['mainset']['ReadMethod'] = "class"

@@ -6,8 +6,8 @@ def mt2gt(mt, tpb_a, bpm_a):
     return round(mt / tpb_a / bpm_a * 60)
 
 
-def get(mf):
-    mid = mido.MidiFile(mf)
+def get(mid:mido.MidiFile):
+    # mid = mido.MidiFile(mf)
     long = mid.length
     tpb = mid.ticks_per_beat
     bpm = 20
@@ -45,13 +45,13 @@ def get(mf):
     return list(last_dic.keys())[0]
 
 
-def compute(mf):
-    mid = mido.MidiFile(mf)
+def compute(mid:mido.MidiFile):
     answer = 60000000/mid.ticks_per_beat
     print(answer)
     return answer
 
 
 if __name__ == '__main__':
-    get(r"C:\Users\lc\Documents\MuseScore3\乐谱\乐谱\Bad style - Time back.mid")
-    compute(r"C:\Users\lc\Documents\MuseScore3\乐谱\乐谱\Bad style - Time back.mid")
+    mid = mido.MidiFile(r"C:\Users\lc\Documents\MuseScore3\乐谱\乐谱\Bad style - Time back.mid")
+    get(mid)
+    compute(mid)

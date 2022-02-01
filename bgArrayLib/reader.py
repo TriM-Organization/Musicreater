@@ -40,11 +40,11 @@ def midiNewReader(midfile: str):
     isPercussion = False
     try:
         mid = mido.MidiFile(midfile)
-    except FileNotFoundError:
+    except Exception:
         log("找不到文件或无法读取文件" + midfile)
         return False
     tpb = mid.ticks_per_beat
-    bpm = get(midfile)
+    bpm = get(mid)
     # 解析
     # def loadMidi(track1):
     for track in mid.tracks:
@@ -127,12 +127,13 @@ def midiClassReader(midfile: str):
     Notes = []
     tracks = []
     try:
-        mid = mido.MidiFile(midfile)
-    except FileNotFoundError:
+        mid = mido.MidiFile(filename=midfile,clip=True)
+    except Exception:
         log("找不到文件或无法读取文件" + midfile)
         return False
+    log("midi已经载入了。")
     tpb = mid.ticks_per_beat
-    bpm = get(midfile)
+    bpm = get(mid)
     for track in mid.tracks:
         overallTime = 0.0
         instrument = 0
