@@ -13,7 +13,7 @@
 """
    Copyright 2022 Eilles Wan (金羿)
 
-   Licensed under the Apache License, Version 2.0 (the 'License')
+   Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
@@ -1468,6 +1468,7 @@ def __main__():
 
     root.title(READABLETEXT[41].format(__version__))
     root.geometry('900x900')  # 像素
+    root.iconbitmap('./resources/musicreater.ico','./resources/musicreater.ico')
 
     print('完成！')
 
