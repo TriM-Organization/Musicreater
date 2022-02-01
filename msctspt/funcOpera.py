@@ -92,7 +92,6 @@ def funSplit(bigFile, maxCmdLen: int = 10000):
     return parts
 
 
-
 def makeFuncFiles(musicset, path='./'):
     """在指定目录下生成函数文件"""
     from nmcsup.trans import Note2Cmd
@@ -327,7 +326,6 @@ def makeClassFuncFiles(musicset, path='./'):
                   encoding='UTF-8') as f:
             f.writelines(classList_conversion_SinglePlayer(musicset['musics'][i]['notes'],
                                                            musicset['musics'][i]['set']['ScoreboardName'],
-                                                           musicset['musics'][i]['set']['Instrument'],
                                                            musicset['mainset']['PlayerSelect'],
                                                            True))
     if musicset['mainset']['IsRepeat']:

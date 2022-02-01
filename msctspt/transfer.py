@@ -29,6 +29,7 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
                                       isProsess: bool = False) -> list:
     from bgArrayLib.compute import round_up
     from bgArrayLib.pitchStrConstant import pitch
+    from bgArrayLib.instrumentConstant import instrument_list
     commands = []
     length = len(List)
     j = 1
@@ -38,20 +39,18 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
         print(i)
         print(type(i))
         try:
-            if i.instrument > 119:
-                pass
-            else:
+            commands.append(
+                f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
+                f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
+                f"~ playsound note.{instrument_list.get(str(i.instrument))} @s ~ ~ ~ "
+                f"1000 {pitch.get(str(i.pitch))} 1000\n")
+            if isProsess:
                 commands.append(
                     f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
-                    f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~{127 - i.velocity} "
-                    f"~ playsound {i.instrument} @s ~ ~ ~ 1000 {pitch.get(str(i.pitch))} 1000\n")
-                if isProsess:
-                    commands.append(
-                        f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
-                        f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ "
-                        f"title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
-                    j += 1
-        except:
+                    f"{str(round_up(i.time_position)).replace('.0', '')}}}] ~ ~ ~ "
+                    f"title @s actionbar §e▶  播放中：  §a{j}/{length}  ||  {int(j / length * 1000) / 10}\n")
+                j += 1
+        except Exception:
             pass
             # a += List[i][1]
     # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
