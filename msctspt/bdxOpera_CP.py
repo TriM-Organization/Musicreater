@@ -7,7 +7,7 @@ import brotli
 class BdxConverter:
     __header = "BD@"
     __bin_header = b"BDX"
-    __generator_author = b"&Charlie_Ping"
+    __generator_author = b"&Musicreater"
 
     keys = {
         # x--, x++, addSmallX(-128~127), addX(-32768~32767), addBigX(-2147483648~2147483647)
@@ -50,9 +50,7 @@ class BdxConverter:
     @property
     def create_and_upload_file(self):
         """
-        （瞎用property？ 害怕
         创建一个bdx文件
-        要close！
         :return: 一个文件对象
         """
         _dir = os.path.dirname(self.file_path)
@@ -73,7 +71,8 @@ class BdxConverter:
         with open(self.file_path, "ab+") as f:
             f.write(brotli.compress(_bytes))
             f.close()
-        return
+        return open(self.file_path,'a+')
+    
     def upload_blocks(self):
         """
         计算差值
@@ -83,6 +82,8 @@ class BdxConverter:
         :return:
         """
         _types = b""
+
+
         for block in self.blocks:
             # print(f"当前方块：{block['block_name']}, 位置： {block['direction']}]")
             diff = self.move_pointer(self.direction, block["direction"])
@@ -94,6 +95,8 @@ class BdxConverter:
             else:
                 _types += self.obtain_universal_block(block)
             self.direction = block["direction"]
+
+        
         return _types
 
     def move_pointer(self, direction: list, new_direction):

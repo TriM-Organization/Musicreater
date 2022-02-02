@@ -1766,7 +1766,7 @@ def __main__():
     tk.Button(UpLeftFrame, text=READABLETEXT[96], command=ResetSetting).pack()
     # 装入窗口
     UpLeftFrame.pack(side='left')
-
+    
     # 中间的框容器
     UpMidleFrame = tk.Frame(UpFrame, bg='blue')
     # 列表

@@ -260,6 +260,10 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
     return BdxConverter(filePath, 'Build by RyounMusicreater', blocks)
 
 
+
+
+
+
 def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
               isSquare: bool = False):
     """使用方法同Note2Cmd
@@ -272,20 +276,22 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         isSquare: 生成的结构是否需要遵循生成正方形原则
     :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
     from msctspt.bdxOpera_CP import BdxConverter
+    from msctspt.threadOpera import NewThread
 
-    blocks = []
+    allblocks = []
     '''需要放置的方块'''
     baseDire = direction
 
     direction = list(direction)
 
-    for track in music['musics']:
+    def trackDealing(direction,track):
+        blocks = []
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
         if len(cmdList) == 0:
-            continue
+            return
         elif cmdList is []:
-            continue
+            return
         dire = direction
         down = False
         '''当前是否为向下的阶段？'''
@@ -306,7 +312,6 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         for cmd in cmdList:
             blocks.append(formCmdBlock(dire, cmd, 5 if (down is False and dire[1] == height + direction[1]) or (
                     down and dire[1] == direction + 1) else 0 if down else 1, 2, needRedstone=False))
-
             if down:
                 if dire[1] > direction[1] + 1:
                     dire[1] -= 1
@@ -317,9 +322,18 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
             if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction + 1):
                 down = not down
                 dire[0] += 1
+        return blocks
+
+    threads = []
+    for track in music['musics']:
+        threads.append(NewThread(trackDealing,(direction,track)))
+        threads[threads.__len__()-1].start()
         direction[2] += 2
 
-    return BdxConverter(filePath, 'Build by Ryoun Musicreater', blocks)
+    for th in threads:
+        allblocks += th.getResult()
+
+    return BdxConverter(filePath, 'Build by Ryoun Musicreater', allblocks)
 
 
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):
