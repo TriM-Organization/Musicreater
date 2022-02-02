@@ -222,23 +222,17 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
         height: 生成结构的最高高度
     :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
 
-    # from msctspt.transfer import formCmdBlock
     from nmcsup.trans import Note2Cmd
     from msctspt.bdxOpera_CP import BdxConverter
     cmd = Note2Cmd(Notes, ScoreboardName, Instrument, PlayerSelect, isProsess)
     cdl = []
-    # 此处是处理一下，防止有注释
+    
     for i in cmd:
-        # e = True
-        try:
+        if '#' in i:
             if (i[:i.index('#')].replace(' ', '') != '\n') and (i[:i.index('#')].replace(' ', '') != ''):
                 cdl.append(i[:i.index('#')])
-            # e = False
-        except:  # ValueError
+        else:
             cdl.append(i)
-        # finally:
-        #     if e is True:
-        #         cdl.append(i)
     i = 0
     down = False
     blocks = [formCmdBlock(dire, cdl.pop(0), 1, 1)]
@@ -261,10 +255,7 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
 
 
 
-
-
-
-def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
+def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
               isSquare: bool = False):
     """使用方法同Note2Cmd
     :param 参数说明：
@@ -274,8 +265,7 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         isProsess: 是否显示进度条（会很卡）
         height: 生成结构的最高高度
         isSquare: 生成的结构是否需要遵循生成正方形原则
-    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
-    from msctspt.bdxOpera_CP import BdxConverter
+    :return 返回一个列表，其中包含了音乐生成的所有的指令方块数据"""
     from msctspt.threadOpera import NewThread
 
     allblocks = []
@@ -333,7 +323,32 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
     for th in threads:
         allblocks += th.getResult()
 
-    return BdxConverter(filePath, 'Build by Ryoun Musicreater', allblocks)
+    return allblocks
+
+
+
+
+
+
+
+
+
+
+
+def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
+              isSquare: bool = False):
+    """使用方法同Note2Cmd
+    :param 参数说明：
+        filePath: 生成.bdx文件的位置
+        dire: 指令方块在地图中生成的起始位置（相对位置）
+        music: 详见 Musicreater.py - dataset[0]
+        isProsess: 是否显示进度条（会很卡）
+        height: 生成结构的最高高度
+        isSquare: 生成的结构是否需要遵循生成正方形原则
+    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
+    from msctspt.bdxOpera_CP import BdxConverter
+    return BdxConverter(filePath, 'Build by Ryoun Musicreater', music2cmdBlocks(direction,music,isProsess,height,isSquare)
+)
 
 
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):

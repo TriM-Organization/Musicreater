@@ -89,7 +89,7 @@ Musicreater - > function (package) - > the following four new functions
 3.  Thank *Charlie_Ping “查理平”* for bdx convert funtion.
 4.  Thank *CMA_2401PT* for BDXWorkShop as the .bdx structure's operation guide.
 5.  Thank *Miracle Plume “神羽”* \<QQshenyu40403\> for the Miracle Plume Bedrock Edition Audio Resource Pack
-6.  Thank *Arthur Morgan* for his/her biggest support for Musicreater
+6.  Thank *Arthur Morgan* for his/her biggest support for the debugging of Musicreater
 7.  Thanks for a lot of groupmates who support me and help me to test the program.
 8.  If you have give me some help but u haven't been in the list, please contact me.
 

@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# ! python3
 
 
 # W-YI 金羿
@@ -61,7 +60,7 @@ from msctspt.threadOpera import NewThread
 from nmcsup.vers import VER
 
 __version__ = VER[1] + VER[0]
-__author__ = 'W-YI （金羿）'
+__author__ = '金羿Eilles & 诸葛亮与八卦阵bgArray'
 dire = ""
 begp = ""
 endp = ""
