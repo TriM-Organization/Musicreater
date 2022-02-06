@@ -38,13 +38,8 @@ __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
 
 
-import tkinter
-import tkinter.simpledialog as sdialog
-import tkinter.filedialog as fdialog
 
 
-
-from msctLib.settings import settings
 
 
 
