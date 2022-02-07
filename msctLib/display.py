@@ -8,6 +8,8 @@ import tkinter as tk
 import tkinter.simpledialog as sdialog
 import tkinter.filedialog as fdialog
 
+from tkinter import *
+
 root = tk.Tk()
 
 class disp:
@@ -21,8 +23,21 @@ class disp:
             'title' : self.setTitle,
             'geometry': self.setGeometry,
             'iconbitmap': self.setIcon,
+            'menu': self.setMenu,
+            'widget': self.setWidget,
         }
         '''注：此处为引导传参，若传参错误且debug模式关闭则不会有任何反馈'''
+
+        for func,args in kwgs:
+            if func in self.FUNCLIST.keys():
+                if type(args) == type([]):
+                    self.FUNCLIST[func](*args)
+                if type(args) == type({}):
+                    self.FUNCLIST[func](**args)
+                else:
+                    self.FUNCLIST[func](args)
+            elif debug:
+                raise KeyError(f'无法定位函数{func}')
 
     def setTitle(self,title:str = '') -> None:
         self.root.title = title
@@ -45,3 +60,14 @@ class disp:
                     menu.add_separator()
             mainMenuBar.add_cascade(label=menuName,menu=menu)
             menus.append(menu)
+    
+    def setWidget(self,**kwgs) -> None:
+        pass
+
+
+
+
+class ProgressBar:
+
+    def __init__(self,root) -> None:
+        pass

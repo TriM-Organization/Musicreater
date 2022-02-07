@@ -61,9 +61,7 @@ from nmcsup.vers import VER
 
 __version__ = VER[1] + VER[0]
 __author__ = '金羿Eilles & 诸葛亮与八卦阵bgArray'
-dire = ""
-begp = ""
-endp = ""
+
 
 print('建立变量，存入内存，载入字典常量函数')
 

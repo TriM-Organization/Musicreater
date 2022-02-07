@@ -37,11 +37,11 @@ from msctspt.bugReporter import version
 __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
 
+from msctLib.display import *
 
+from msctLib.function import *
 
-
-
-
+from msctLib.data import uniteIO
 
 
 
@@ -50,7 +50,11 @@ __author__ = '金羿Eilles'
 
 def __main__():
     
-    pass
+    disp(
+        root,
+        False,
+        
+    )
 
 
 
