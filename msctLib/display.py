@@ -40,9 +40,11 @@ class disp:
                 raise KeyError(f'无法定位函数{func}')
 
     def setTitle(self,title:str = '') -> None:
+        '''设置窗口标题'''
         self.root.title = title
     
     def setGeometry(self,geometry) -> None:
+        '''设置窗口大小'''
         self.root.geometry(geometry)
     
     def setIcon(self,*icon) -> None:
