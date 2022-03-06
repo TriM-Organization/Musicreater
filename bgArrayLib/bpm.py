@@ -1,12 +1,22 @@
 import mido
 import numpy
 
+'''
+bpm
+bites per minutes
+每分钟的拍数
+'''
 
 def mt2gt(mt, tpb_a, bpm_a):
     return round(mt / tpb_a / bpm_a * 60)
 
 
-def get(mid:mido.MidiFile):
+def get(mid:mido.MidiFile) -> int:
+    '''传入一个 MidiFile, 返回其音乐的bpm
+    :param mid : mido.MidFile
+        mido库识别的midi文件数据
+    :return bpm : int
+    '''
     # mid = mido.MidiFile(mf)
     long = mid.length
     tpb = mid.ticks_per_beat
