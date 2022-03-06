@@ -5,7 +5,7 @@ Musicreater(音·创) is an Eilles(*W-YI*)'s app that is used for creating music
 
 Welcome to join our QQ group: 861684859
 
-###Author
+### Author
 
 Eilles (金羿)：The main author, who developed the most and especially the principal parts of Musicreater, and its predecessors, which has been called as "*Minecraft Function Music Maker*", "*Note Fun Creater*", "*Note World Creater*"(now ,they are united as ***Musicreater***!)
 

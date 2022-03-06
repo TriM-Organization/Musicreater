@@ -62,7 +62,12 @@ class disp:
             menus.append(menu)
     
     def setWidget(self,**kwgs) -> None:
+        self._wordviewBar = tk.Label(self.root)
         pass
+
+    def setWordView(self, **kwgs) -> None:
+        for key,value in kwgs.items():
+            self._wordviewBar[key] = value
 
 
 
