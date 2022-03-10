@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+'''此文件为音·创的插件加载程序，为了满足各平台需求，使用的是CLI界面'''
 
 # W-YI 金羿
 # QQ 2647547478
@@ -31,26 +31,10 @@
 # 下面为正文
 
 
-
-from msctspt.bugReporter import version
-
-__ver__ = f'{version.version[1]} {version.version[0]}'
-__author__ = '金羿Eilles'
-
-from msctLib.display import *
-
-from msctLib.function import *
-
-from msctLib.data import uniteIO
-
-
-
-
-
-
-def __main__():
-    
-    disp()
+print("""
+音·创 插件管理
+Musicreater PLUGINS Management
+""")
 
 
 
@@ -60,5 +44,6 @@ def __main__():
 
 
 
-if __name__ == '__main__':
-    __main__()
+
+
+

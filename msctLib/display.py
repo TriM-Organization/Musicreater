@@ -22,57 +22,99 @@ BLACK = (18, 17, 16)
 
 
 
-class disp:
 
-    # 正在修改，没改完
-    def __init__(self,root:tk.Tk = tk.Tk(),debug:bool = False,title:str = '',
-                 geometry : str = '0x0', iconbitmap : tuple = ('',''), menuWidget:dict = {},
-                 wordView : str = '音·创 Musicreater', ) -> None:
-        '''传入root参数为窗口根，kwgs详见开发说明|指南'''
+
+backgroundColor = WHITE
+frontgroundColor = BLACK
+loadingColor = DEFAULTBLUE
+errorColor = RED
+okColor = GREEN
+tipsColor = PURPLE
+
+
+
+class disp:
+    '''音·创 的基本Tk窗口显示库'''
+
+    def __init__(self, root: tk.Tk = tk.Tk(), debug: bool = False, title: str = '音·创',
+                 geometry: str = '0x0', iconbitmap: tuple = ('', ''), menuWidget: dict = {},
+                 wordView: str = '音·创 Musicreater', buttons: list = [], settingBox: list = [],
+                 notemap: list = []) -> None:
+        '''使用参数建立基本的 音·创 窗口
+        :param root 根窗口
+        :param debug 是否将日志输出到控制台
+        :param title 窗口标题
+        wordview: str #言论部分显示的字样
+        button: list = [ # 操作按钮部分
+            dict = {
+                按钮名称 : tuple(按钮图标,执行函数)
+            },
+        ],
+        settingbox: list = [ # 设置部分显示的字样及其对应的设置函数
+            (
+                设置名称:str,
+                值类型:tuple,
+                显示内容:str,
+                设置操作函数:<function>,
+            )
+        ],
+        map: list = [ # 一首曲目的音符数据
+            音符数据
+        ]
+        '''
 
         self.root = root
 
-        self.FUNCLIST = {
-            'title' : self.setTitle,
-            'geometry': self.setGeometry,
-            'iconbitmap': self.setIcon,
-            'menu': self.setMenu,
-            'widget': self.setWidget,
-        }
-        '''注：此处为引导传参，若传参错误且debug模式关闭则不会有任何反馈'''
+        self.setTitle(title,debug)
+        self.setGeometry(geometry,debug)
+        self.setIcon(*iconbitmap,debug=debug)
+        self.setMenu(menuWidget)
 
-        for func,args in kwgs:
-            if func in self.FUNCLIST.keys():
-                if type(args) == type([]):
-                    self.FUNCLIST[func](*args)
-                if type(args) == type({}):
-                    self.FUNCLIST[func](**args)
-                else:
-                    self.FUNCLIST[func](args)
-            elif debug:
-                raise KeyError(f'无法定位函数{func}')
+        self.initWidget(wordView,buttons,settingBox,notemap)
 
     def setTitle(self,title:str = '',debug : bool = False) -> None:
         '''设置窗口标题'''
         self.root.title = title
         if debug:
+            log(f"设置窗口标题{title}")
             
     
-    def setGeometry(self,geometry) -> None:
+    def setGeometry(self,geometry:str = '0x0',debug:bool = False) -> None:
         '''设置窗口大小'''
         self.root.geometry(geometry)
+        if debug:
+            log(f"设置窗口大小{geometry}")
     
-    def setIcon(self,*icon) -> None:
-        '''设置窗口图标'''
-        self.root.iconbitmap(*icon)
+    def setIcon(self,bitmap:str = './musicreater.ico',default:str = '',debug:bool = False) -> None:
+        '''设置窗口图标
+        注意，default参数仅在Windows下有效，其意为将所有没有图标的窗口设置默认图标
+        如果在非Windows环境使用default参数，一个Error将被升起'''
+        if not debug:
+            try:
+                if default:
+                    self.root.iconbitmap(bitmap,default)
+                    log(f'设置图标为{bitmap}，默认为{default}')
+                else:
+                    self.root.iconbitmap(bitmap)
+                    log(f'设置图标为{bitmap}')
+                return True
+            except Exception as e:
+                log(str(e),'ERROR')
+                return False
+        else:
+            self.root.iconbitmap(bitmap,default)
+            return 
     
-    def setMenu(self,**kwgs) -> None:
+    def setMenu(self,menuWidgets: dict = {}) -> None:
         '''设置根菜单'''
-        if not kwgs:
+        if not menuWidgets:
+            # 如果传入空参数则返回当前菜单
             return self.RootMenu
+        # 如果不是空参数则新建菜单
         self.RootMenu = {}
         self.mainMenuBar = tk.Menu(self.root)
-        for menuName,menuCmd in kwgs.items():
+        for menuName,menuCmd in menuWidgets.items():
+            # 取得一个菜单名和一堆菜单函数及其显示名称
             menu = tk.Menu(self.mainMenuBar,tearoff=0)
             for cmdName,cmdFunc in menuCmd.items():
                 if cmdName:
@@ -83,14 +125,24 @@ class disp:
             self.RootMenu[menuName] = menu
         self.root.config(menu=self.mainMenuBar)
     
-    def addMenu(self,menuRoot:str = '',menuLabel:str = '',menuCommand:str = None):
-        '''增加一个菜单项'''
+    def addMenu(self,menuRoot:str = '',menuLabel:str = '',menuCommand:function = None):
+        '''增加一个菜单项
+        :param menuRoot : str
+            菜单的根菜单，即所属的菜单上的文字
+        :param menuLabel : str
+            所需要增加的项目显示的文字
+        :param menuCommand : <function>
+            '''
         if menuRoot in self.RootMenu.keys:
+            # 如果已经有父菜单
             if menuLabel:
+                # 增加菜单指令
                 self.RootMenu[menuRoot].add_command(label = menuLabel, command = menuCommand)
             else:
+                # 增加分隔栏
                 self.RootMenu[menuRoot].add_separator()
         else:
+            # 没有父菜单则新增一个父菜单
             menu = tk.Menu(self.mainMenuBar,tearoff=False)
             if menuLabel:
                 menu.add_command(label = menuLabel, command = menuCommand)
@@ -100,14 +152,22 @@ class disp:
             self.RootMenu[menuRoot] = menu
 
         
-    
-    def setWidget(self,**kwgs) -> None:
-        self._wordviewBar = tk.Label(self.root)
-        pass
+    def initWidget(self, wordView: str = '音·创 Musicreater', buttons: list = [],
+                   settingBox: list = [], notemap: list = []) -> None:
+        '''设置窗口小部件，分为：
+        :言·论 WordView
+        :快捷按钮面板 ButtonBar
+        :设置框 SettingBar
+        :音轨框 TrackBar
+        :各个音轨的显示框 TrackFrame
+        :信息显示版 InfoBar
+        '''
+        self._wordviewBar = tk.Label(self.root,bg=frontgroundColor,fg=backgroundColor,text = wordView)
 
-    def setWordView(self, **kwgs) -> None:
-        for key,value in kwgs.items():
-            self._wordviewBar[key] = value
+        self.setWordView(wordView)
+
+    def setWordView(self, text:str) -> None:
+        self._wordviewBar['text'] = text
 
 
 
