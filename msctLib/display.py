@@ -31,6 +31,9 @@ errorColor = RED
 okColor = GREEN
 tipsColor = PURPLE
 
+# 注：UI界面字体、代码字体
+fontPattern = ('DengXian Light','Fira Code')
+
 
 
 class disp:

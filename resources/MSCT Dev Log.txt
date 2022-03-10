@@ -22,7 +22,7 @@ Copyright © W-YI 2022
 13.支持识别曲谱（简谱）图片解析音乐
 14.支持使用瀑布流的方式播放音乐
 15.支持读入Everyone Piano的曲谱文件（.eop）
-16.支持读入Musescore的曲谱文件（.mscz、.mscx）
+16.支持读入Musescore的通用曲谱文件，即musicXML（.mscz、.mscx）
 17.支持自动搜寻地图目录位置（网易&微软）
 18.支持读入JPword曲谱文件（.jpd）
 19.新的UI设计，以及UI主题文件
