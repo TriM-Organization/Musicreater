@@ -71,6 +71,8 @@ class disp:
         self.setTitle(title,debug)
         self.setGeometry(geometry,debug)
         self.setIcon(*iconbitmap,debug=debug)
+
+
         self.setMenu(menuWidget)
 
         self.initWidget(wordView,buttons,settingBox,notemap)
@@ -171,6 +173,47 @@ class disp:
 
     def setWordView(self, text:str) -> None:
         self._wordviewBar['text'] = text
+
+
+
+
+def authorMenu(authors:tuple = (('金羿','EillesWan@outlook.com'),('诸葛亮与八卦阵','474037765'))):
+    '''自定义作者界面'''
+    from languages.lang import 
+    aabw = tk.Tk()
+    aabw.title(READABLETEXT[9])
+    aabw.geometry('550x600')  # 像素
+    tk.Label(aabw, text='', font=('', 15)).pack()
+    tk.Label(aabw, text=READABLETEXT[10], font=('', 35)).pack()
+    tk.Label(aabw, text=READABLETEXT[11].format(VER[1] + VER[0]), font=('', 15)).pack()
+    # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
+    # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
+    # place的 x、y是(x,y)坐标
+    # pic = tk.PhotoImage(file='./bin/pics/Ryoun_S.png')
+    # tk.Label(aabw, image=pic, width=200, height=200).pack()
+    # del pic
+    tk.Label(aabw, text='', font=('', 5)).pack()
+    tk.Label(aabw, text=READABLETEXT[12], font=('', 20)).pack()
+    tk.Label(aabw, text='', font=('', 15)).pack()
+    for i in READABLETEXT[15]:
+        tk.Label(aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')).pack()
+    tk.Label(aabw, text='', font=('', 5)).pack()
+    if DEFAULTLANGUAGE != 'zh-CN':
+        tk.Label(aabw, text=READABLETEXT[16], font=('', 15)).pack()
+        for i in READABLETEXT['Translator']:
+            tk.Label(aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')).pack()
+
+    def exitAboutWindow():
+        aabw.destroy()
+
+    tk.Button(aabw, text=READABLETEXT[13], command=exitAboutWindow).pack()
+
+    aabw.mainloop()
+
+
+
+
+
 
 
 
