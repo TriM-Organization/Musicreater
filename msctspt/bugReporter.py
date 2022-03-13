@@ -93,7 +93,7 @@ class report:
 class version:
     libraries = (
         'mido', 'amulet', 'amulet-core', 'amulet-nbt', 'piano_transcription_inference', 'pypinyin',
-        'pyinstaller','py7zr','websockets', 'torch'
+        'pyinstaller','py7zr','websockets', 'torch','requests'
         )
     """当前所需库，有一些是开发用的，用户不需要安装"""
 
