@@ -10,7 +10,7 @@
 
 
 """
-   Copyright 2022 Eilles Wan (金羿)
+   Copyright 2022 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
