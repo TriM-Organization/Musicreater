@@ -36,11 +36,15 @@ LANGUAGELIST = {
 
 # 对于旧版本音·创的语言支持
 # 重构之后将停止使用
-from languages.zhCN import READABLETEXT
+try:
+    from languages.zhCN import READABLETEXT
+except:
+    pass
 
-
-from msctLib.log import log
-
+try:
+    from msctLib.log import log
+except:
+    pass
 
 
 if not DEFAULTLANGUAGE == 'zh-CN':
@@ -96,6 +100,35 @@ if __name__ == '__main__':
 
     root.geometry('900x600')
 
+    Orignrame = tk.Frame(root)
+    Translaterame = tk.Frame(root)
+
+
+    Orignscrollbar = tk.Scrollbar(Orignrame)
+    Origntextbar = tk.Text(Orignrame)
+
+
+    Translatetextbar = tk.Text(Translaterame)
+    Translatescrollbar = tk.Scrollbar(Translaterame)
+
+    Origntextbar.pack(side='left', fill='y')
+    Orignscrollbar.pack(side='left', fill='y')
+    
+    Translatescrollbar.pack(side='right', fill='y')
+    Translatetextbar.pack(side='right', fill='y')
+
+    Orignscrollbar.config(command=Origntextbar.yview)
+    Origntextbar.config(yscrollcommand=Orignscrollbar.set)
+
+    
+    Translatescrollbar.config(command=Translatetextbar.yview)
+    Translatetextbar.config(yscrollcommand=Translatescrollbar.set)
+
+
+
+    Origntextbar.insert('end', 'TEST')
+
+    tk.mainloop(  )
 
 
 
