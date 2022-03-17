@@ -18,12 +18,12 @@ LANGUAGELIST = {
         "正體中文,台灣省",
     ),
     # 'zh-HK': (
-    #     "简体中文 中国大陆",
+    #     "繁体中文 香港",
     #     "Traditional Chinese, the Hong Kong Special Administrative Region",
     #     "繁體中文,香港特別行政區",
     # ),
     # 'zh-MO': (
-    #     "简体中文 中国大陆",
+    #     "繁体中文 澳门",
     #     "Traditional Chinese, the Macao Special Administrative Region",
     #     "繁體中文,澳門特別行政區",
     # ),
@@ -41,28 +41,31 @@ try:
 except:
     pass
 
-try:
-    from msctLib.log import log
-except:
-    pass
+
+
+def __loadLanguage(languageFilename : str):
+    with open(languageFilename,'r',encoding='utf-8') as languageFile :
+        _text = {}
+        for line in languageFile:
+            line = line.split(' ',1)
+            _text[line[0]] = line[1].replace('\n','')
+    langkeys = _text.keys()
+    with open(languageFilename.replace(languageFilename[-10:-5],'zh-CN'),'r',encoding='utf-8') as defaultLangFile:
+        for line in defaultLangFile:
+            line = line.split(' ',1)
+            if not line[0] in langkeys:
+                _text[line[0]] = line[1].replace('\n','')
+                from msctLib.log import log
+                log(f'丢失对于 {line[0]} 的本地化文本','WARRING')
+                langkeys = _text.keys()
+    return _text
+
+
 
 
 if not DEFAULTLANGUAGE == 'zh-CN':
     if DEFAULTLANGUAGE in LANGUAGELIST.keys():
-        with open('./languages/'+DEFAULTLANGUAGE+'.lang','r',encoding='utf-8') as languageFile :
-            _text = {}
-            for line in languageFile:
-                line = line.split(' ')
-                _text.append[line[0]] = line[1]
-        langkeys = _text.keys()
-        with open('./languages/zh-CN.lang','r',encoding='utf-8') as defaultLangFile:
-            for line in defaultLangFile:
-                line = line.split(' ')
-                if not line[0] in langkeys:
-                    _text[line[0]] = line[1]
-                    log(f'丢失对于 {line[0]} 的本地化文本','WARRING')
-                    langkeys = _text.keys()
-        _TEXT = _text.copy()
+        _TEXT = __loadLanguage('./languages/'+DEFAULTLANGUAGE+'.lang')
     else:
         raise KeyError(f'无法打开默认语言{DEFAULTLANGUAGE}')
 
@@ -73,6 +76,7 @@ def wordTranslate(singleWord:str,debug: bool = False):
     try:
         return requests.post('https://fanyi.baidu.com/sug', data={'kw': f'{singleWord}'}).json()['data'][0]['v'].split('; ')[0]
     except:
+        from msctLib.log import log
         log(f"无法翻译文本{singleWord}",level='WARRING',isPrinted=debug)
         return None
 
@@ -82,11 +86,14 @@ def wordTranslate(singleWord:str,debug: bool = False):
 
 
 
-def _(text:str):
+def _(text:str,debug:bool = False):
     try:
         return _TEXT[text]
     except:
-        raise KeyError(f'无法找到翻译文本{text}')
+        if debug:
+            raise KeyError(f'无法找到翻译文本{text}')
+        else:
+            return None
 
 
 
@@ -95,25 +102,53 @@ def _(text:str):
 if __name__ == '__main__':
     # 启动语言编辑器
     import tkinter as tk
+    from tkinter.filedialog import askopenfilename as askfilen
+    LANGNAME = _('LANGLOCALNAME')
+
+    def _changeDefaultLang():
+        global _TEXT
+        global DEFAULTLANGUAGE
+
+        fileName = askfilen(title='选择所翻译的语言文件', initialdir=r'./',
+                                                filetypes=[('音·创语言文件', '.lang'),('所有文件', '*')],
+                                                defaultextension='.lang',
+                                                initialfile='.lang')
+        _TEXT = __loadLanguage(fileName)
+        DEFAULTLANGUAGE = _('LANGKEY')
+
+        orignText = ''
+        transText = ''
+        for i,j in _TEXT.items():
+            orignText += i+'\n'
+            transText += j+'\n'
+
+        Origntextbar.insert('end', orignText)
+        Translatetextbar.insert('end', transText)
+        
 
     root = tk.Tk()
 
-    root.geometry('900x600')
+    root.geometry('600x500')
 
-    Orignrame = tk.Frame(root)
-    Translaterame = tk.Frame(root)
+    nowText = ''
+
+    Orignrame = tk.Frame(root,bd=2)
+    Translaterame = tk.Frame(root,bd=2)
 
 
     Orignscrollbar = tk.Scrollbar(Orignrame)
-    Origntextbar = tk.Text(Orignrame)
+    Origntextbar = tk.Text(Orignrame,width=35,height=40)
 
-
-    Translatetextbar = tk.Text(Translaterame)
+    Translatetextbar = tk.Text(Translaterame,width=40,height=37)
     Translatescrollbar = tk.Scrollbar(Translaterame)
+    tk.Button(Translaterame,text='保存',command=None).pack(side='bottom',fill='x')
 
+
+    tk.Label(Orignrame,text='中文原文').pack(side='top')
     Origntextbar.pack(side='left', fill='y')
     Orignscrollbar.pack(side='left', fill='y')
     
+    tk.Button(Translaterame,text=f'对标语言{LANGNAME}',command=_changeDefaultLang).pack(side='top')
     Translatescrollbar.pack(side='right', fill='y')
     Translatetextbar.pack(side='right', fill='y')
 
@@ -124,11 +159,12 @@ if __name__ == '__main__':
     Translatescrollbar.config(command=Translatetextbar.yview)
     Translatetextbar.config(yscrollcommand=Translatescrollbar.set)
 
+    Orignrame.pack(side='left')
+    Translaterame.pack(side='right')
 
 
-    Origntextbar.insert('end', 'TEST')
 
-    tk.mainloop(  )
+    tk.mainloop()
 
 
 
