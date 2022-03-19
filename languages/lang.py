@@ -1,6 +1,29 @@
 # -*- coding:utf-8 -*-
 '''对于音·创的语言支持兼语言文件编辑器'''
 
+
+
+"""
+   Copyright 2022 Team-Ryoun
+
+   Licensed under the Apache License, Version 2.0 (the 'License');
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an 'AS IS' BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+"""
+
+
+
+
+
+
 DEFAULTLANGUAGE = 'zh-CN'
 
 LANGUAGELIST = {
@@ -115,6 +138,7 @@ if __name__ == '__main__':
                                                 initialfile='.lang')
         _TEXT = __loadLanguage(fileName)
         DEFAULTLANGUAGE = _('LANGKEY')
+        LANGNAME = _('LANGLOCALNAME')
 
         orignText = ''
         transText = ''
@@ -124,11 +148,21 @@ if __name__ == '__main__':
 
         Origntextbar.insert('end', orignText)
         Translatetextbar.insert('end', transText)
+
+        global setlangbutton
+        setlangbutton['text'] = f'对标语言{LANGNAME}'
         
+    
+    def _autoSave(event = None):
+        with open('autosave.tmp.txt','w',encoding='utf-8') as f:
+            f.write(Translatetextbar.get(1.0,'end'))
+        print(str(event))
 
     root = tk.Tk()
 
     root.geometry('600x500')
+
+    root.bind_all(func=_autoSave)
 
     nowText = ''
 
@@ -141,14 +175,15 @@ if __name__ == '__main__':
 
     Translatetextbar = tk.Text(Translaterame,width=40,height=37)
     Translatescrollbar = tk.Scrollbar(Translaterame)
-    tk.Button(Translaterame,text='保存',command=None).pack(side='bottom',fill='x')
+    tk.Button(Translaterame,text='保存',command=_autoSave).pack(side='bottom',fill='x')
 
 
     tk.Label(Orignrame,text='中文原文').pack(side='top')
     Origntextbar.pack(side='left', fill='y')
     Orignscrollbar.pack(side='left', fill='y')
     
-    tk.Button(Translaterame,text=f'对标语言{LANGNAME}',command=_changeDefaultLang).pack(side='top')
+    setlangbutton = tk.Button(Translaterame,text=f'对标语言{LANGNAME}',command=_changeDefaultLang)
+    setlangbutton.pack(side='top')
     Translatescrollbar.pack(side='right', fill='y')
     Translatetextbar.pack(side='right', fill='y')
 

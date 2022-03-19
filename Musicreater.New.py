@@ -5,12 +5,17 @@
 # QQ 2647547478
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
-# 版权所有 Team-Ryoun 金羿
+# 版权所有 Team-Ryoun 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
 # 若需转载或借鉴 请附作者
 
 
 """
-   Copyright 2022 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
+音·创 (Musicreater)
+一款免费开源的 《我的世界：基岩版》 音乐制作软件
+Musicreater (音·创)
+A free opensource software which is used for creating all kinds of musics in Minecraft
+
+   Copyright 2022 Team-Ryoun
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
