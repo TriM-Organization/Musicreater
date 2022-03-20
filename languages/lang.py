@@ -1,8 +1,6 @@
 # -*- coding:utf-8 -*-
 '''对于音·创的语言支持兼语言文件编辑器'''
 
-
-
 """
    Copyright 2022 Team-Ryoun
 
@@ -18,11 +16,6 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 """
-
-
-
-
-
 
 DEFAULTLANGUAGE = 'zh-CN'
 
@@ -65,51 +58,44 @@ except:
     pass
 
 
-
-def __loadLanguage(languageFilename : str):
-    with open(languageFilename,'r',encoding='utf-8') as languageFile :
+def __loadLanguage(languageFilename: str):
+    with open(languageFilename, 'r', encoding='utf-8') as languageFile:
         _text = {}
         for line in languageFile:
-            line = line.split(' ',1)
-            _text[line[0]] = line[1].replace('\n','')
+            line = line.split(' ', 1)
+            _text[line[0]] = line[1].replace('\n', '')
     langkeys = _text.keys()
-    with open(languageFilename.replace(languageFilename[-10:-5],'zh-CN'),'r',encoding='utf-8') as defaultLangFile:
+    with open(languageFilename.replace(languageFilename[-10:-5], 'zh-CN'), 'r', encoding='utf-8') as defaultLangFile:
         for line in defaultLangFile:
-            line = line.split(' ',1)
+            line = line.split(' ', 1)
             if not line[0] in langkeys:
-                _text[line[0]] = line[1].replace('\n','')
+                _text[line[0]] = line[1].replace('\n', '')
                 from msctLib.log import log
-                log(f'丢失对于 {line[0]} 的本地化文本','WARRING')
+                log(f'丢失对于 {line[0]} 的本地化文本', 'WARRING')
                 langkeys = _text.keys()
     return _text
 
 
-
-
 if not DEFAULTLANGUAGE == 'zh-CN':
     if DEFAULTLANGUAGE in LANGUAGELIST.keys():
-        _TEXT = __loadLanguage('./languages/'+DEFAULTLANGUAGE+'.lang')
+        _TEXT = __loadLanguage('./languages/' + DEFAULTLANGUAGE + '.lang')
     else:
         raise KeyError(f'无法打开默认语言{DEFAULTLANGUAGE}')
 
 
-
-def wordTranslate(singleWord:str,debug: bool = False):
+def wordTranslate(singleWord: str, debug: bool = False):
     import requests
     try:
-        return requests.post('https://fanyi.baidu.com/sug', data={'kw': f'{singleWord}'}).json()['data'][0]['v'].split('; ')[0]
+        return \
+            requests.post('https://fanyi.baidu.com/sug', data={'kw': f'{singleWord}'}).json()['data'][0]['v'].split(
+                '; ')[0]
     except:
         from msctLib.log import log
-        log(f"无法翻译文本{singleWord}",level='WARRING',isPrinted=debug)
+        log(f"无法翻译文本{singleWord}", level='WARRING', isPrinted=debug)
         return None
 
 
-
-
-
-
-
-def _(text:str,debug:bool = False):
+def _(text: str, debug: bool = False):
     try:
         return _TEXT[text]
     except:
@@ -119,44 +105,44 @@ def _(text:str,debug:bool = False):
             return None
 
 
-
-
-
 if __name__ == '__main__':
     # 启动语言编辑器
     import tkinter as tk
     from tkinter.filedialog import askopenfilename as askfilen
+
     LANGNAME = _('LANGLOCALNAME')
+
 
     def _changeDefaultLang():
         global _TEXT
         global DEFAULTLANGUAGE
 
         fileName = askfilen(title='选择所翻译的语言文件', initialdir=r'./',
-                                                filetypes=[('音·创语言文件', '.lang'),('所有文件', '*')],
-                                                defaultextension='.lang',
-                                                initialfile='.lang')
+                            filetypes=[('音·创语言文件', '.lang'), ('所有文件', '*')],
+                            defaultextension='.lang',
+                            initialfile='.lang')
         _TEXT = __loadLanguage(fileName)
         DEFAULTLANGUAGE = _('LANGKEY')
         LANGNAME = _('LANGLOCALNAME')
 
         orignText = ''
         transText = ''
-        for i,j in _TEXT.items():
-            orignText += i+'\n'
-            transText += j+'\n'
+        for i, j in _TEXT.items():
+            orignText += i + '\n'
+            transText += j + '\n'
 
         Origntextbar.insert('end', orignText)
         Translatetextbar.insert('end', transText)
 
         global setlangbutton
         setlangbutton['text'] = f'对标语言{LANGNAME}'
-        
-    
-    def _autoSave(event = None):
-        with open('autosave.tmp.txt','w',encoding='utf-8') as f:
-            f.write(Translatetextbar.get(1.0,'end'))
+
+
+    def _autoSave(event=None):
+        with open('autosave.tmp.txt', 'w', encoding='utf-8') as f:
+            f.write(Translatetextbar.get(1.0, 'end'))
         print(str(event))
+
 
     root = tk.Tk()
 
@@ -164,25 +150,34 @@ if __name__ == '__main__':
 
     root.bind_all(func=_autoSave)
 
+    root.bind("<Motion>", _autoSave)
+
     nowText = ''
 
-    Orignrame = tk.Frame(root,bd=2)
-    Translaterame = tk.Frame(root,bd=2)
-
+    Orignrame = tk.Frame(root, bd=2)
+    Translaterame = tk.Frame(root, bd=2)
 
     Orignscrollbar = tk.Scrollbar(Orignrame)
-    Origntextbar = tk.Text(Orignrame,width=35,height=40)
+    Origntextbar = tk.Text(Orignrame, width=35, height=40)
 
-    Translatetextbar = tk.Text(Translaterame,width=40,height=37)
+    Translatetextbar = tk.Text(Translaterame, width=40, height=37, undo=True)
     Translatescrollbar = tk.Scrollbar(Translaterame)
-    tk.Button(Translaterame,text='保存',command=_autoSave).pack(side='bottom',fill='x')
 
+    def ctrlZ():
+        Translatetextbar.edit_undo()
+    Translatetextbar.bind("<Control-z>", ctrlZ)
 
-    tk.Label(Orignrame,text='中文原文').pack(side='top')
+    def ctrlY():
+        Translatetextbar.edit_redo()
+    Translatetextbar.bind("<Control-y>", ctrlY)
+
+    tk.Button(Translaterame, text='保存', command=_autoSave).pack(side='bottom', fill='x')
+
+    tk.Label(Orignrame, text='中文原文').pack(side='top')
     Origntextbar.pack(side='left', fill='y')
     Orignscrollbar.pack(side='left', fill='y')
-    
-    setlangbutton = tk.Button(Translaterame,text=f'对标语言{LANGNAME}',command=_changeDefaultLang)
+
+    setlangbutton = tk.Button(Translaterame, text=f'对标语言{LANGNAME}', command=_changeDefaultLang)
     setlangbutton.pack(side='top')
     Translatescrollbar.pack(side='right', fill='y')
     Translatetextbar.pack(side='right', fill='y')
@@ -190,19 +185,10 @@ if __name__ == '__main__':
     Orignscrollbar.config(command=Origntextbar.yview)
     Origntextbar.config(yscrollcommand=Orignscrollbar.set)
 
-    
     Translatescrollbar.config(command=Translatetextbar.yview)
     Translatetextbar.config(yscrollcommand=Translatescrollbar.set)
 
     Orignrame.pack(side='left')
     Translaterame.pack(side='right')
 
-
-
     tk.mainloop()
-
-
-
-
-
-
