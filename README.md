@@ -3,6 +3,8 @@
 [![Licence: Apache (shields.io)](https://img.shields.io/badge/Licence-Apache-blueviolet)](https://choosealicense.com/licenses/apache-2.0/) 
 [![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
 [![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+
 
 
 ### 介绍
@@ -22,7 +24,7 @@ bgArray “诸葛亮与八卦阵”：修复bug，改进代码美观度，增加
 
 支持 Windows7+ 以及各个支持 Python3.8 的 Linux
 
-***各位开发人员注意！！！多语言支持请使用`READABLETEXT`常量输出文字！！！如需补充，请在简体中文的语言文件(zhCN.py)中补充！！！***
+***各位开发人员注意！！！多语言支持请使用函数`_`加载文字！！！如需补充，请在简体中文的语言文件(zh-CN.lang)中补充！！！***
 
 
 ### 安装教程
