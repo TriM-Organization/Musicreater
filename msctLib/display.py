@@ -172,13 +172,13 @@ class disp:
 def authorMenu(authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛亮与八卦阵', '474037765'))):
     '''自定义作者界面'''
     from languages.lang import _
+
     aabw = tk.Tk()
     aabw.title(_('关于'))
     aabw.geometry('550x600')  # 像素
     tk.Label(aabw, text='', font=('', 15)).pack()
-    tk.Label(aabw, text=READABLETEXT[10], font=('', 35)).pack()
-    tk.Label(aabw, text=READABLETEXT[11].format(
-        VER[1] + VER[0]), font=('', 15)).pack()
+    tk.Label(aabw, text=_('F音创'), font=('', 35)).pack()
+    tk.Label(aabw, text='{} {}'.format(VER[1] + VER[0]), font=('', 15)).pack()
     # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
     # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
     # place的 x、y是(x,y)坐标

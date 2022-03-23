@@ -58,15 +58,21 @@ except:
     pass
 
 
+from msctLib.log import log
+
 def __loadLanguage(languageFilename: str):
     with open(languageFilename, 'r', encoding='utf-8') as languageFile:
         _text = {}
         for line in languageFile:
+            if line.startswith('#'):
+                continue
             line = line.split(' ', 1)
             _text[line[0]] = line[1].replace('\n', '')
     langkeys = _text.keys()
     with open(languageFilename.replace(languageFilename[-10:-5], 'zh-CN'), 'r', encoding='utf-8') as defaultLangFile:
         for line in defaultLangFile:
+            if line.startswith('#'):
+                continue
             line = line.split(' ', 1)
             if not line[0] in langkeys:
                 _text[line[0]] = line[1].replace('\n', '')
@@ -90,7 +96,6 @@ def wordTranslate(singleWord: str, debug: bool = False):
             requests.post('https://fanyi.baidu.com/sug', data={'kw': f'{singleWord}'}).json()['data'][0]['v'].split(
                 '; ')[0]
     except:
-        from msctLib.log import log
         log(f"无法翻译文本{singleWord}", level='WARRING', isPrinted=debug)
         return None
 
@@ -102,7 +107,8 @@ def _(text: str, debug: bool = False):
         if debug:
             raise KeyError(f'无法找到翻译文本{text}')
         else:
-            return None
+            log(f'无法找到本地化文本{text}','ERROR')
+            return ''
 
 
 if __name__ == '__main__':
@@ -147,8 +153,6 @@ if __name__ == '__main__':
     root = tk.Tk()
 
     root.geometry('600x500')
-
-    root.bind_all(func=_autoSave)
 
     root.bind("<Motion>", _autoSave)
 

@@ -1,4 +1,12 @@
+# 音·创 本地化语言文件
+# 使用 空格 把键与对应文本隔开
+# 使用 井字符 在每一行的开头编写注释
+# 注意！井字符请开头放，切勿含有空格
+# 或者在正文结尾放！
 LANGKEY zh-CN
 LANGCHINESENAME 简体中文 中国大陆
 LANGENGLIFHNAME Simplified Chinese, Chinese Mainland
 LANGLOCALNAME 简体中文 中国大陆
+MSCT 音·创
+F音创 音·创 Musicreater
+关于 音·创 - 关于
