@@ -34,10 +34,19 @@ fontPattern = ('DengXian Light', 'Fira Code')
 class disp:
     '''音·创 的基本Tk窗口显示库'''
 
-    def __init__(self, root: tk.Tk = tk.Tk(), debug: bool = False, title: str = '音·创',
-                 geometry: str = '0x0', iconbitmap: tuple = ('', ''), menuWidget: dict = {},
-                 wordView: str = '音·创 Musicreater', buttons: list = [], settingBox: list = [],
-                 notemap: list = []) -> None:
+    def __init__(
+        self,
+        root: tk.Tk = tk.Tk(),
+        debug: bool = False,
+        title: str = '音·创',
+        geometry: str = '0x0',
+        iconbitmap: tuple = ('', ''),
+        menuWidget: dict = {},
+        wordView: str = '音·创 Musicreater',
+        buttons: list = [],
+        settingBox: list = [],
+        notemap: list = [],
+    ) -> None:
         '''使用参数建立基本的 音·创 窗口
         :param root 根窗口
         :param debug 是否将日志输出到控制台
@@ -62,6 +71,13 @@ class disp:
         '''
 
         self.root = root
+        self.title = title
+        self.geometry = geometry
+        self.menuWidget = menuWidget
+        self.wordView = wordView
+        self.buttons = buttons
+        self.settingBox = settingBox
+        self.notemap = notemap
 
         self.setTitle(title, debug)
         self.setGeometry(geometry, debug)
@@ -83,7 +99,9 @@ class disp:
         if debug:
             log(f"设置窗口大小{geometry}")
 
-    def setIcon(self, bitmap: str = './musicreater.ico', default: str = '', debug: bool = False) -> None:
+    def setIcon(
+        self, bitmap: str = './musicreater.ico', default: str = '', debug: bool = False
+    ) -> None:
         '''设置窗口图标
         注意，default参数仅在Windows下有效，其意为将所有没有图标的窗口设置默认图标
         如果在非Windows环境使用default参数，一个Error将被升起'''
@@ -103,11 +121,17 @@ class disp:
             self.root.iconbitmap(bitmap, default)
             return
 
-    def setMenu(self, menuWidgets: dict = {}) -> None:
+    def setMenu(self, menuWidgets: dict = {}, debug: bool = False) -> None:
         '''设置根菜单'''
         if not menuWidgets:
             # 如果传入空参数则返回当前菜单
-            return self.RootMenu
+            try:
+                return self.RootMenu
+            except Exception as E:
+                if debug:
+                    raise E
+                else:
+                    log('无法读取菜单信息', 'WARRING')
         # 如果不是空参数则新建菜单
         self.RootMenu = {}
         self.mainMenuBar = tk.Menu(self.root)
@@ -123,20 +147,21 @@ class disp:
             self.RootMenu[menuName] = menu
         self.root.config(menu=self.mainMenuBar)
 
-    def addMenu(self, menuRoot: str = '', menuLabel: str = '', menuCommand: function = None):
+    def addMenu(self, menuRoot: str = '', menuLabel: str = '', menuCommand = None):
         '''增加一个菜单项
         :param menuRoot : str
             菜单的根菜单，即所属的菜单上的文字
         :param menuLabel : str
             所需要增加的项目显示的文字
         :param menuCommand : <function>
-            '''
+        '''
         if menuRoot in self.RootMenu.keys:
             # 如果已经有父菜单
             if menuLabel:
                 # 增加菜单指令
                 self.RootMenu[menuRoot].add_command(
-                    label=menuLabel, command=menuCommand)
+                    label=menuLabel, command=menuCommand
+                )
             else:
                 # 增加分隔栏
                 self.RootMenu[menuRoot].add_separator()
@@ -150,8 +175,13 @@ class disp:
             self.mainMenuBar.add_cascade(label=menuRoot, menu=menu)
             self.RootMenu[menuRoot] = menu
 
-    def initWidget(self, wordView: str = '音·创 Musicreater', buttons: list = [],
-                   settingBox: list = [], notemap: list = []) -> None:
+    def initWidget(
+        self,
+        wordView: str = '音·创 Musicreater',
+        buttons: list = [],
+        settingBox: list = [],
+        notemap: list = [],
+    ) -> None:
         '''设置窗口小部件，分为：
         :言·论 WordView
         :快捷按钮面板 ButtonBar
@@ -160,8 +190,7 @@ class disp:
         :各个音轨的显示框 TrackFrame
         :信息显示版 InfoBar
         '''
-        self._wordviewBar = tk.Label(
-            self.root, bg=frontgroundColor, fg=backgroundColor, text=wordView)
+        self._wordviewBar = tk.Label(self.root, bg='white', fg='black', text=wordView)
 
         self.setWordView(wordView)
 
@@ -169,16 +198,23 @@ class disp:
         self._wordviewBar['text'] = text
 
 
-def authorMenu(authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛亮与八卦阵', '474037765'))):
+def authorMenu(
+    authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛亮与八卦阵', '474037765'))
+):
     '''自定义作者界面'''
     from languages.lang import _
+    from msctLib.buildIN import version
 
     aabw = tk.Tk()
     aabw.title(_('关于'))
     aabw.geometry('550x600')  # 像素
     tk.Label(aabw, text='', font=('', 15)).pack()
     tk.Label(aabw, text=_('F音创'), font=('', 35)).pack()
-    tk.Label(aabw, text='{} {}'.format(VER[1] + VER[0]), font=('', 15)).pack()
+    tk.Label(
+        aabw,
+        text='{} {}'.format(version.version[1] + version.version[0]),
+        font=('', 15),
+    ).pack()
     # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
     # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
     # place的 x、y是(x,y)坐标
@@ -189,14 +225,16 @@ def authorMenu(authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛�
     tk.Label(aabw, text=READABLETEXT[12], font=('', 20)).pack()
     tk.Label(aabw, text='', font=('', 15)).pack()
     for i in READABLETEXT[15]:
-        tk.Label(aabw, text=i[0], font=('', 17 if i[1]
-                 else 15, 'bold' if i[1] else '')).pack()
+        tk.Label(
+            aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')
+        ).pack()
     tk.Label(aabw, text='', font=('', 5)).pack()
     if DEFAULTLANGUAGE != 'zh-CN':
         tk.Label(aabw, text=READABLETEXT[16], font=('', 15)).pack()
         for i in READABLETEXT['Translator']:
-            tk.Label(aabw, text=i[0], font=(
-                '', 17 if i[1] else 15, 'bold' if i[1] else '')).pack()
+            tk.Label(
+                aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')
+            ).pack()
 
     def exitAboutWindow():
         aabw.destroy()
@@ -207,9 +245,14 @@ def authorMenu(authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛�
 
 
 class ProgressBar:
-
-    def __init__(self, root: tk.Tk = tk.Tk(), style: tuple = (DEFAULTBLUE, BLACK, WHITE),
-                 type: bool = False, info: str = '', debug: bool = False) -> None:
+    def __init__(
+        self,
+        root: tk.Tk = tk.Tk(),
+        style: tuple = (DEFAULTBLUE, BLACK, WHITE),
+        type: bool = False,
+        info: str = '',
+        debug: bool = False,
+    ) -> None:
         '''建立一个进度条或者加载等待界面
         :param root : tk.Tk
             建立进度条的根窗口

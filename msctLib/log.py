@@ -52,13 +52,17 @@ def log(info:str = '',level : str = 'INFO', isPrinted:bool = False):
     '''将信息连同当前时间载入日志
     :param info : str
         日志信息
-    :param level : str['INFO','WARRING','ERROR','CRASH']
+    :param level : str['INFO','WARRING','ERROR','CRASH'] 
+                或 int[ 1, 2, 3, 4 ]
         信息等级
     :param isPrinted : bool
         是否在控制台打印
     
     :return bool
         表示是否完成任务'''
+    
+    if type(level) == type(1):
+        level = ['INFO','WARRING','ERROR','CRASH'][level-1]
 
     try:
 
