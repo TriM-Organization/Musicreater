@@ -46,6 +46,7 @@ class disp:
         buttons: list = [],
         settingBox: list = [],
         notemap: list = [],
+        infobar:str = '就绪',
     ) -> None:
         '''使用参数建立基本的 音·创 窗口
         :param root 根窗口
@@ -68,45 +69,67 @@ class disp:
         map: list = [ # 一首曲目的音符数据
             音符数据
         ]
+        :param infobar 显示信息用
         '''
 
+        # 载入参量 注意！图标将不被载入参数
         self.root = root
+        '''窗口根'''
+
         self.title = title
-        self.geometry = geometry
-        self.menuWidget = menuWidget
+        '''窗口标题'''
+
+        self.menuWidgets = menuWidget
+        '''菜单设定项'''
+
         self.wordView = wordView
+        '''言·论'''
+
         self.buttons = buttons
+        '''快捷功能按钮'''
+
         self.settingBox = settingBox
+        '''设置框'''
+
         self.notemap = notemap
+        '''音符列表'''
 
-        self.setTitle(title, debug)
-        self.setGeometry(geometry, debug)
-        self.setIcon(*iconbitmap, debug=debug)
 
-        self.setMenu(menuWidget)
 
-        self.initWidget(wordView, buttons, settingBox, notemap)
+        self.debug = debug
+        '''是否打开调试模式'''
 
+        self.setTitle()
+        self.setGeometry(geometry)
+        self.setIcon(*iconbitmap)
+
+        self.setMenu()
+
+        self.initWidget()
+
+    # =========================================================
     # 设定函数部分
-    def setTitle(self, title: str = '', debug: bool = False) -> None:
-        '''设置窗口标题'''
-        self.root.title = title
-        if debug:
-            log(f"设置窗口标题{title}")
+    # =========================================================
 
-    def setGeometry(self, geometry: str = '0x0', debug: bool = False) -> None:
+    def setTitle(self) -> None:
+        '''设置窗口标题'''
+        self.root.title = self.title
+        if self.debug:
+            log(f"设置窗口标题{self.title}")
+
+    def setGeometry(self,geometry:str = '0x0') -> None:
         '''设置窗口大小'''
         self.root.geometry(geometry)
-        if debug:
+        if self.debug:
             log(f"设置窗口大小{geometry}")
 
     def setIcon(
-        self, bitmap: str = './musicreater.ico', default: str = '', debug: bool = False
+        self, bitmap: str = './musicreater.ico', default: str = ''
     ) -> None:
         '''设置窗口图标
         注意，default参数仅在Windows下有效，其意为将所有没有图标的窗口设置默认图标
         如果在非Windows环境使用default参数，一个Error将被升起'''
-        if not debug:
+        if not self.debug:
             try:
                 if default:
                     self.root.iconbitmap(bitmap, default)
@@ -122,21 +145,21 @@ class disp:
             self.root.iconbitmap(bitmap, default)
             return
 
-    def setMenu(self, menuWidgets: dict = {}, debug: bool = False) -> None:
+    def setMenu(self) -> None:
         '''设置根菜单'''
-        if not menuWidgets:
+        if not self.menuWidgets:
             # 如果传入空参数则返回当前菜单
             try:
                 return self.RootMenu
             except Exception as E:
-                if debug:
+                if self.debug:
                     raise E
                 else:
                     log('无法读取菜单信息', 'WARRING')
         # 如果不是空参数则新建菜单
         self.RootMenu = {}
         self.mainMenuBar = tk.Menu(self.root)
-        for menuName, menuCmd in menuWidgets.items():
+        for menuName, menuCmd in self.menuWidgets.items():
             # 取得一个菜单名和一堆菜单函数及其显示名称
             menu = tk.Menu(self.mainMenuBar, tearoff=0)
             for cmdName, cmdFunc in menuCmd.items():
@@ -176,13 +199,7 @@ class disp:
             self.mainMenuBar.add_cascade(label=menuRoot, menu=menu)
             self.RootMenu[menuRoot] = menu
 
-    def initWidget(
-        self,
-        wordView: str = '音·创 Musicreater',
-        buttons: list = [],
-        settingBox: list = [],
-        notemap: list = [],
-    ) -> None:
+    def initWidget(self,) -> None:
         '''设置窗口小部件，分为：
         :言·论 WordView
         :快捷按钮面板 ButtonBar
@@ -191,33 +208,38 @@ class disp:
         :各个音轨的显示框 TrackFrame
         :信息显示版 InfoBar
         '''
-        self._wordviewBar = tk.Label(self.root, bg='white', fg='black', text=wordView)
+        self._wordviewBar = tk.Label(
+            self.root, bg='white', fg='black', text=self.wordView, font=(fontPattern[0], 30)
+        )
 
-        self.setWordView(wordView)
+        self.setWordView(self.wordView)
 
     def setWordView(self, text: str) -> None:
         self._wordviewBar['text'] = text
 
+
+    # =========================================================
     # 预置函数部分
-    def authorMenu(
+    # =========================================================
+
+    def authorWindowStarter(
         authors: tuple = (
             ('金羿', 'Email EillesWan@outlook.com', 'QQ 2647547478'),
             ('诸葛亮与八卦阵', 'QQ 474037765'),
-        ),
-        translaters: tuple = None,
+        )
     ):
         '''自定义作者界面'''
         from languages.lang import _
         from languages.lang import DEFAULTLANGUAGE
         from msctLib.buildIN import version
 
-        aabw = tk.Tk()
-        aabw.title(_('关于'))
-        aabw.geometry('550x600')  # 像素
-        tk.Label(aabw, text='', font=('', 15)).pack()
-        tk.Label(aabw, text=_('F音创'), font=('', 35)).pack()
+        authorWindow = tk.Tk()
+        authorWindow.title(_('关于'))
+        authorWindow.geometry('550x600')  # 像素
+        tk.Label(authorWindow, text='', font=('', 15)).pack()
+        tk.Label(authorWindow, text=_('F音创'), font=('', 35)).pack()
         tk.Label(
-            aabw,
+            authorWindow,
             text='{} {}'.format(version.version[1] + version.version[0]),
             font=('', 15),
         ).pack()
@@ -225,18 +247,18 @@ class disp:
         # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
         # place的 x、y是(x,y)坐标
         tk.Label(
-            aabw,
+            authorWindow,
             image=tk.PhotoImage(file='./resources/RyounLogo.png'),
             width=200,
             height=200,
         ).pack()
-        tk.Label(aabw, text=_('凌云pairs'), font=('', 20)).pack()
-        tk.Label(aabw, text='', font=('', 15)).pack()
-        tk.Label(aabw, text=_('开发者'), font=('', 15)).pack()
+        tk.Label(authorWindow, text=_('凌云pairs'), font=('', 20)).pack()
+        tk.Label(authorWindow, text='', font=('', 15)).pack()
+        tk.Label(authorWindow, text=_('开发者'), font=('', 15)).pack()
         for i in authors:
             for j in i:
                 tk.Label(
-                    aabw,
+                    authorWindow,
                     text=j,
                     font=(
                         '',
@@ -244,13 +266,13 @@ class disp:
                         'bold' if i.index(j) == 0 else '',
                     ),
                 ).pack()
-        tk.Label(aabw, text='', font=('', 5)).pack()
+        tk.Label(authorWindow, text='', font=('', 5)).pack()
         if DEFAULTLANGUAGE != 'zh-CN':
-            tk.Label(aabw, text=_('译者'), font=('', 15)).pack()
+            tk.Label(authorWindow, text=_('译者'), font=('', 15)).pack()
             for i in _('TRANSLATERS').split(';'):
                 for j in i.split(','):
                     tk.Label(
-                        aabw,
+                        authorWindow,
                         text=j,
                         font=(
                             '',
@@ -260,11 +282,11 @@ class disp:
                     ).pack()
 
         def exitAboutWindow():
-            aabw.destroy()
+            authorWindow.destroy()
 
-        tk.Button(aabw, text=_('确定'), command=exitAboutWindow).pack()
+        tk.Button(authorWindow, text=_('确定'), command=exitAboutWindow).pack()
 
-        aabw.mainloop()
+        authorWindow.mainloop()
 
 
 class ProgressBar:
