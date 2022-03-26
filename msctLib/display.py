@@ -87,6 +87,7 @@ class disp:
 
         self.initWidget(wordView, buttons, settingBox, notemap)
 
+    # 设定函数部分
     def setTitle(self, title: str = '', debug: bool = False) -> None:
         '''设置窗口标题'''
         self.root.title = title
@@ -147,7 +148,7 @@ class disp:
             self.RootMenu[menuName] = menu
         self.root.config(menu=self.mainMenuBar)
 
-    def addMenu(self, menuRoot: str = '', menuLabel: str = '', menuCommand = None):
+    def addMenu(self, menuRoot: str = '', menuLabel: str = '', menuCommand=None):
         '''增加一个菜单项
         :param menuRoot : str
             菜单的根菜单，即所属的菜单上的文字
@@ -197,51 +198,73 @@ class disp:
     def setWordView(self, text: str) -> None:
         self._wordviewBar['text'] = text
 
+    # 预置函数部分
+    def authorMenu(
+        authors: tuple = (
+            ('金羿', 'Email EillesWan@outlook.com', 'QQ 2647547478'),
+            ('诸葛亮与八卦阵', 'QQ 474037765'),
+        ),
+        translaters: tuple = None,
+    ):
+        '''自定义作者界面'''
+        from languages.lang import _
+        from languages.lang import DEFAULTLANGUAGE
+        from msctLib.buildIN import version
 
-def authorMenu(
-    authors: tuple = (('金羿', 'EillesWan@outlook.com'), ('诸葛亮与八卦阵', '474037765'))
-):
-    '''自定义作者界面'''
-    from languages.lang import _
-    from msctLib.buildIN import version
-
-    aabw = tk.Tk()
-    aabw.title(_('关于'))
-    aabw.geometry('550x600')  # 像素
-    tk.Label(aabw, text='', font=('', 15)).pack()
-    tk.Label(aabw, text=_('F音创'), font=('', 35)).pack()
-    tk.Label(
-        aabw,
-        text='{} {}'.format(version.version[1] + version.version[0]),
-        font=('', 15),
-    ).pack()
-    # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
-    # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
-    # place的 x、y是(x,y)坐标
-    # pic = tk.PhotoImage(file='./bin/pics/Ryoun_S.png')
-    # tk.Label(aabw, image=pic, width=200, height=200).pack()
-    # del pic
-    tk.Label(aabw, text='', font=('', 5)).pack()
-    tk.Label(aabw, text=READABLETEXT[12], font=('', 20)).pack()
-    tk.Label(aabw, text='', font=('', 15)).pack()
-    for i in READABLETEXT[15]:
+        aabw = tk.Tk()
+        aabw.title(_('关于'))
+        aabw.geometry('550x600')  # 像素
+        tk.Label(aabw, text='', font=('', 15)).pack()
+        tk.Label(aabw, text=_('F音创'), font=('', 35)).pack()
         tk.Label(
-            aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')
+            aabw,
+            text='{} {}'.format(version.version[1] + version.version[0]),
+            font=('', 15),
         ).pack()
-    tk.Label(aabw, text='', font=('', 5)).pack()
-    if DEFAULTLANGUAGE != 'zh-CN':
-        tk.Label(aabw, text=READABLETEXT[16], font=('', 15)).pack()
-        for i in READABLETEXT['Translator']:
-            tk.Label(
-                aabw, text=i[0], font=('', 17 if i[1] else 15, 'bold' if i[1] else '')
-            ).pack()
+        # pack 的side可以赋值为LEFT  RTGHT  TOP  BOTTOM
+        # grid 的row 是列数、column是行排，注意，这是针对空间控件本身大小来的，即是指向当前控件的第几个。
+        # place的 x、y是(x,y)坐标
+        tk.Label(
+            aabw,
+            image=tk.PhotoImage(file='./resources/RyounLogo.png'),
+            width=200,
+            height=200,
+        ).pack()
+        tk.Label(aabw, text=_('凌云pairs'), font=('', 20)).pack()
+        tk.Label(aabw, text='', font=('', 15)).pack()
+        tk.Label(aabw, text=_('开发者'), font=('', 15)).pack()
+        for i in authors:
+            for j in i:
+                tk.Label(
+                    aabw,
+                    text=j,
+                    font=(
+                        '',
+                        17 if i.index(j) == 0 else 15,
+                        'bold' if i.index(j) == 0 else '',
+                    ),
+                ).pack()
+        tk.Label(aabw, text='', font=('', 5)).pack()
+        if DEFAULTLANGUAGE != 'zh-CN':
+            tk.Label(aabw, text=_('译者'), font=('', 15)).pack()
+            for i in _('TRANSLATERS').split(';'):
+                for j in i.split(','):
+                    tk.Label(
+                        aabw,
+                        text=j,
+                        font=(
+                            '',
+                            17 if i.split(',').index(j) == 0 else 15,
+                            'bold' if i.split(',').index(j) == 0 else '',
+                        ),
+                    ).pack()
 
-    def exitAboutWindow():
-        aabw.destroy()
+        def exitAboutWindow():
+            aabw.destroy()
 
-    tk.Button(aabw, text=READABLETEXT[13], command=exitAboutWindow).pack()
+        tk.Button(aabw, text=_('确定'), command=exitAboutWindow).pack()
 
-    aabw.mainloop()
+        aabw.mainloop()
 
 
 class ProgressBar:
@@ -265,3 +288,10 @@ class ProgressBar:
         :param debug : bool
             是否输出日志到控制台'''
         self.root = root
+
+
+if __name__ == '__mian__':
+    import os
+
+    os.chdir('../')
+    disp.authorMenu()

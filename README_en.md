@@ -3,8 +3,10 @@
 [![Licence: Apache (shields.io)](https://img.shields.io/badge/Licence-Apache-blueviolet)](https://choosealicense.com/licenses/apache-2.0/) 
 [![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
 [![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 ### Introduction
+
 Musicreater(音·创) is an Eilles(*W-YI*)'s app that is used for creating musics in **Minecraft: Bedrock Edition**.
 
 Welcome to join our QQ group: 861684859
@@ -26,7 +28,10 @@ Support Windows7+ && Linux (that supports Python3.8)
 
 ### Installation
 
-Comming soon...
+Download the *[MSCT Auto Installer]()*, put it in a directory that you want to install *Musicreater* into.
+Then run the auto installer and it will help you to install the *Musicreator* 
+
+Tips: You'd better choose the 2GitHub download source
 
 ### Run with Source Code
 

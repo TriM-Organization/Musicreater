@@ -25,29 +25,34 @@ LANGUAGELIST = {
     # 第三个是语言的本地名称和地区
     'zh-CN': (
         "简体中文 中国大陆",
-        "Simplified Chinese, Chinese Mainland",
+        "Simplified Chinese - China Mainland",
         "简体中文 中国大陆",
     ),
     'zh-TW': (
-        "繁体中文 台湾省",
-        "Traditional Chinese, Taiwan Province",
-        "正體中文,台灣省",
+        "繁体中文 中国台湾省",
+        "Traditional Chinese - Taiwan, China",
+        "正體中文,中国台灣省",
     ),
     # 'zh-HK': (
     #     "繁体中文 香港",
-    #     "Traditional Chinese, the Hong Kong Special Administrative Region",
+    #     "Traditional Chinese - the Hong Kong Special Administrative Region",
     #     "繁體中文,香港特別行政區",
     # ),
     # 'zh-MO': (
     #     "繁体中文 澳门",
-    #     "Traditional Chinese, the Macao Special Administrative Region",
+    #     "Traditional Chinese - the Macao Special Administrative Region",
     #     "繁體中文,澳門特別行政區",
     # ),
     'en-GB': (
         "英语 英国",
-        "British English, the United Kingdom",
-        "British English, the United Kingdom",
+        "British English - the United Kingdom",
+        "British English - the United Kingdom",
     ),
+    'zh-ME' : (
+        "喵喵文 中国大陆",
+        "Meow Catsese - China Mainland"
+        "喵喵喵~ 祖国喵~"
+    )
 }
 
 # 对于旧版本音·创的语言支持

@@ -8,13 +8,14 @@
 
 
 ### 介绍
+
 音·创 Musicreater 是由凌天之云创新应用软件开发团队开发的一款免费开源的 **《我的世界：基岩版》** 音乐制作软件
 
 欢迎加群：861684859
 
 ### 作者
 
-金羿 (Eilles)：主要作者，开发了音·创主体，及其前身“函数音乐生成器”、“世界音创”。
+金羿 Eilles：我的世界基岩版指令师，个人开发者，B站不知名UP主，在校高中生。
 
 bgArray “诸葛亮与八卦阵”：修复bug，改进代码美观度，增加新功能，更改数据格式等。
 
@@ -29,14 +30,16 @@ bgArray “诸葛亮与八卦阵”：修复bug，改进代码美观度，增加
 
 ### 安装教程
 
-正在到来。
+下载音·创自动安装器，将其放在你希望安装音·创的位置，运行后将自动安装。
+
+提示：下载源最好选择2GitHub。
 
 ### 从源代码运行教程
 
 #### Windows7+
 
-0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)
-    [Github下载（慢）](https://github.com/EillesWan/Musicreater/archive/refs/heads/master.zip)本程序源代码
+0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater)
+    [Github下载（慢）](https://github.com/EillesWan/Musicreater)本程序源代码
 1.  安装Python 3.8.10 
     [下载64位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
     [下载32位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)

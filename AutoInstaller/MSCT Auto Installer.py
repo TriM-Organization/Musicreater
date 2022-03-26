@@ -47,29 +47,35 @@ from shutil import rmtree, move
 
 if platform == "win32":
 
-    nowpath = __file__[:len(__file__) - __file__[len(__file__)::-1].index('\\')]
+    nowpath = __file__[: len(__file__) - __file__[len(__file__) :: -1].index('\\')]
 
-    print('\033[0{}\033[0m'.format("正在下载python\nDownloading Python"))
+    if srun('python -V'):
 
-    try:
-        urllib.request.urlretrieve(
-            "https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe"
-            if architecture()[0] == "32bit"
-            else "https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe",
-            "./pythonInstaller.exe",
+        print('\033[7m{}\033[0m'.format("正在下载python\nDownloading Python"))
+
+        try:
+            urllib.request.urlretrieve(
+                "https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe"
+                if architecture()[0] == "32bit"
+                else "https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe",
+                "./pythonInstaller.exe",
+            )
+            # urllib.request.urlretrieve("https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe","./pythonInstaller.exe")
+        except Exception as E:
+            input(str(E) + "\n自动下载失败，按下回车取消")
+            exit()
+
+        print('正在安装python\nInstalling Python')
+
+        # open('install.bat','w').write(f'.\\pythonInstaller.exe /passive InstallAllUsers=0 TargetDir="{nowpath}python38" DefaultJustForMeTargetDir="{nowpath}python38" AssociateFiles=0 CompileAll=1 PrependPath=0 Shortcuts=0 Include_doc=0 Include_launcher=0 InstallLauncherAllUsers=0 Include_test=0 Include_tools=0')
+
+        srun(
+            f'.\\pythonInstaller.exe /passive InstallAllUsers=1 AssociateFiles=1 CompileAll=1 PrependPath=1 Shortcuts=1 Include_doc=0 Include_exe=1 Include_pip=1 Include_lib=1 Include_tcltk=1 Include_launcher=1 InstallLauncherAllUsers=1 Include_test=0 Include_tools=0'
         )
-        # urllib.request.urlretrieve("https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe","./pythonInstaller.exe")
-    except Exception as E:
-        input(str(E) + "\n自动下载失败，按下回车取消")
-        exit()
 
-    print('\033[0{}\033[0m'.format('正在安装python\nInstalling Python'+f'\n{nowpath}python38\\'))
+        remove('./pythonInstaller.exe')
 
-    # open('install.bat','w').write(f'.\\pythonInstaller.exe /passive InstallAllUsers=0 TargetDir="{nowpath}python38" DefaultJustForMeTargetDir="{nowpath}python38" AssociateFiles=0 CompileAll=1 PrependPath=0 Shortcuts=0 Include_doc=0 Include_launcher=0 InstallLauncherAllUsers=0 Include_test=0 Include_tools=0')
-
-    srun(f'.\\pythonInstaller.exe /passive InstallAllUsers=0 TargetDir="{nowpath}python38" DefaultJustForMeTargetDir="{nowpath}python38" AssociateFiles=0 CompileAll=1 PrependPath=0 Shortcuts=0 Include_doc=0 Include_launcher=0 InstallLauncherAllUsers=0 Include_test=0 Include_tools=0')
-
-    # print('\033[0{}\033[0m'.format("正在下载pip安装工具\nDownloading get-pip tool"))
+    # print('\033[7m{}\033[0m'.format("正在下载pip安装工具\nDownloading get-pip tool"))
 
     # try:
     #     urllib.request.urlretrieve(
@@ -79,33 +85,41 @@ if platform == "win32":
     #     input(str(E) + "\n自动下载失败，按下回车取消")
     #     exit()
 
-    # print('\033[0{}\033[0m'.format("正在下载pip\nDownloading pip"))
+    # print('\033[7m{}\033[0m'.format("正在下载pip\nDownloading pip"))
 
     # chdir('./python38')
     # srun(r'".\python.exe get-pip.py')
 
-    # print('\033[0{}\033[0m'.format('正在安装pip\nInstalling pip'))
+    # print('\033[7m{}\033[0m'.format('正在安装pip\nInstalling pip'))
 
     # for dire in listdir('./Lib/site-packages/'):
     #     move('./Lib/site-packages/'+dire,'./'+dire)
 
-    # print('\033[0{}\033[0m'.format("完成！"))
+    # print('\033[7m{}\033[0m'.format("完成！"))
 
     # chdir('../')
 
     try:
-        choseurl = int(input('\033[0{}\033[0m'.format("""请选择 音·创 下载源,默认为0
+        choseurl = int(
+            input(
+                '\033[7m{}\033[0m'.format(
+                    """请选择 音·创 下载源,默认为0
 Please choose a download source of Musicreater(default 0)
 [0] 私有服务器<暂无> | Private Server<Haven't been built>
 [1] Gitee
-[2] Github\n:""")))
+[2] Github\n:"""
+                )
+            )
+        )
     except Exception as E:
-        print('\033[0{}\033[0m'.format(str(E) + "\n将使用默认源\nUsing default source"))
+        print('\033[7m{}\033[0m'.format(str(E) + "\n将使用默认源\nUsing default source"))
         choseurl = 0
 
     myurl = ""
     Giteeurl = "https://gitee.com/EillesWan/Musicreater/repository/blazearchive/master.zip?Expires=1647771436&Signature=%2BkqLHwmvzScCd4cPQDP0LHLpqeZUxOrOv17QpRy%2FTzs%3D"
-    Githuburl = "https://codeload.github.com/EillesWan/Musicreater/zip/refs/heads/master"
+    Githuburl = (
+        "https://codeload.github.com/EillesWan/Musicreater/zip/refs/heads/master"
+    )
 
     url = (
         myurl
@@ -117,7 +131,7 @@ Please choose a download source of Musicreater(default 0)
         else myurl
     )
 
-    print('\033[0{}\033[0m'.format("正在下载音·创\nDownloading Musicreater"))
+    print('\033[7m{}\033[0m'.format("正在下载音·创\nDownloading Musicreater"))
 
     try:
         urllib.request.urlretrieve(url, "./master.zip")
@@ -125,12 +139,11 @@ Please choose a download source of Musicreater(default 0)
         input('\033[0{}\033[0m'.format(str(E) + "\n自动下载失败，按下回车取消"))
         exit()
 
-    print('\033[0{}\033[0m'.format("安装音·创\nInstalling Musicreater"))
+    print('\033[7m{}\033[0m'.format("安装音·创\nInstalling Musicreater"))
 
     zipfile.ZipFile("./master.zip", "r").extractall()
 
     remove("./master.zip")
-    remove('./pythonInstaller.exe')
 
     try:
         rmtree("./Musicreater")
@@ -144,10 +157,16 @@ elif platform == 'linux':
     srun("sudo apt-get install python3-pip")
     srun("sudo apt-get install git")
     try:
-        choseurl = int(input('\033[0{}\033[0m'.format("""请选择 音·创 下载源,默认为1
+        choseurl = int(
+            input(
+                '\033[0{}\033[0m'.format(
+                    """请选择 音·创 下载源,默认为1
 Please choose a download source of Musicreater(default 1)
 [1] Gitee
-[2] Github\n:""")))
+[2] Github\n:"""
+                )
+            )
+        )
     except Exception as E:
         print(str(E) + "\n将使用默认源\nUsing default source")
         choseurl = 1
@@ -162,37 +181,41 @@ Please choose a download source of Musicreater(default 1)
     srun(f"sudo git clone {url}")
 
 
-print('\033[0{}\033[0m'.format("编译音·创\nCompiling Musicreater"))
+print('\033[7m{}\033[0m'.format("编译音·创\nCompiling Musicreater"))
 
 if platform == "linux":
     srun("python3 -O -m compileall -b ./Musicreater/")
-    open('./Musicreater.sh','w',encoding='utf-8').write("cd ./Musicreater/\npython3 Musicreater.pyc")
 elif platform == "win32":
-    chdir('./python38/')
-    srun("python.exe -O -m compileall -b ../Musicreater/")
-    chdir('../')
-    open('./Musicreater.bat','w').write('"./python38/python.exe" "./Musicreater/Musicreater.pyc"')
+    srun("python -O -m compileall -b ./Musicreater/")
 
 for parent, dirnames, filenames in walk("./Musicreater"):
     for filename in filenames:
         if filename[-3:] == ".py":
             fn = path.join(parent, filename)
             remove(fn)
-            print('\033[0{}\033[0m'.format(f"删除文件 {fn}"))
+            print(f"删除文件 {fn}")
     for dirname in dirnames:
         if dirname == "__pycache__":
             pn = path.join(parent, dirname)
             rmtree(pn)
-            print('\033[0{}\033[0m'.format(f"删除目录 {pn}"))
+            print(f"删除目录 {pn}")
 
 
-print('\033[0{}\033[0m'.format("您可以开始使用音·创了\n我们将在后台为您安装各项支持库"))
+print(
+    '\033[7m{}\033[0m'.format(
+        """您可以开始使用音·创了
+我们将在后台为您安装各项支持库
+您可以运行Musicreater文件夹中的Musicreater.pyc文件来运行音·创
 
+You can use Musicreater now,
+We will setup the libraries ineed for you in background,
+You can now open Musicreater.PYC in the directory of ./Musicreater to run Musicreater
+"""
+    )
+)
 
 
 if platform == "linux":
     srun("python3 ./Musicreater/补全库.pyc")
 elif platform == "win32":
-    chdir('./python38/')
-    srun(".\\python.exe ../Musicreater/补全库.pyc")
-    chdir('../')
+    srun("python ./Musicreater/补全库.pyc")
