@@ -84,6 +84,7 @@ def __loadLanguage(languageFilename: str):
                 from msctLib.log import log
                 log(f'丢失对于 {line[0]} 的本地化文本', 'WARRING')
                 langkeys = _text.keys()
+    # print(_text)
     return _text
 
 
@@ -179,6 +180,8 @@ if __name__ == '__main__':
     def ctrlY():
         Translatetextbar.edit_redo()
     Translatetextbar.bind("<Control-y>", ctrlY)
+
+    Translatetextbar.bind("<Control-s>", _autoSave)
 
     tk.Button(Translaterame, text='保存', command=_autoSave).pack(side='bottom', fill='x')
 
