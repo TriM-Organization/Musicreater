@@ -11,6 +11,8 @@ Musicreater(音·创) is an Eilles(*W-YI*)'s app that is used for creating music
 
 Welcome to join our QQ group: 861684859
 
+**ATTENTION!** This software is under testing and developing, there is still a lot of bugs needed to be fixed. Please use it wisely.
+
 ### Author
 
 Eilles (金羿)：The main author, who developed the most and especially the principal parts of Musicreater, and its predecessors, which has been called as "*Minecraft Function Music Maker*", "*Note Fun Creater*", "*Note World Creater*"(now ,they are united as ***Musicreater***!)
@@ -28,7 +30,7 @@ Support Windows7+ && Linux (that supports Python3.8)
 
 ### Installation
 
-Download the *[MSCT Auto Installer]()*, put it in a directory that you want to install *Musicreater* into.
+Download the *[MSCT Auto Installer](https://gitee.com/EillesWan/Musicreater/attach_files/1008796/download/MSCT%20Auto%20Installer.exe)*, put it in a directory that you want to install *Musicreater* into.
 Then run the auto installer and it will help you to install the *Musicreator* 
 
 Tips: You'd better choose the 2GitHub download source
