@@ -200,7 +200,7 @@ def __main__():
     else:
         try:
             os.chdir(__file__[:len(__file__) - __file__[len(__file__)::-1].index('/')])
-        except FileNotFoundError:
+        except Exception:
             pass
         log('其他平台：{} 更新执行位置，当前文件位置 {}'.format(sys.platform, __file__))
     print('完成！')
@@ -1470,7 +1470,10 @@ def __main__():
 
     root.title(READABLETEXT[41].format(__version__))
     root.geometry('900x900')  # 像素
-    root.iconbitmap('./resources/musicreater.ico', './resources/musicreater.ico')
+    try:
+        root.iconbitmap(bitmap='./resources/musicreater.ico', default='./resources/musicreater.ico')
+    except Exception:
+        pass
 
     print('完成！')
 
