@@ -1,5 +1,7 @@
 # 音·创 Musicreater
 
+[![音·创可能的logo](resources/msctIcon.png)](https://gitee.com/EillesWan/Musicreater)
+
 [![Licence: Apache (shields.io)](https://img.shields.io/badge/Licence-Apache-blueviolet)](https://choosealicense.com/licenses/apache-2.0/) 
 [![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
 [![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
