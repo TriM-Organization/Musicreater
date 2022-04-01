@@ -1,27 +1,37 @@
-# 音·创 Musicreater
+<h1 align="center">音·创 Musicreater</h1>
 
-[![Licence: Apache (shields.io)](https://img.shields.io/badge/Licence-Apache-blueviolet)](https://choosealicense.com/licenses/apache-2.0/) 
-[![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
-[![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<p align="center">
+<img width="128" height="128" src="https://s1.ax1x.com/2022/04/01/qhfOPA.png" >
+</p>
 
+<p align="center">
+<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+<p>
 
+[![][Bilibili: 凌云金羿]](https://space.bilibili.com/397369002/)
+[![][Bilibili: 诸葛亮与八卦阵]](https://space.bilibili.com/604072474) 
+[![CodeStyle: black]](https://github.com/psf/black)
+![][python]
+[![][license]](LICENSE)
+[![][release]](../../releases)
 
-### 介绍
+简体中文🇨🇳 | [English🇬🇧](README_EN.md)
 
-音·创 Musicreater 是由凌天之云创新应用软件开发团队开发的一款免费开源的 **《我的世界：基岩版》** 音乐制作软件
+## 软件介绍🚀
+
+音·创 Musicreater 是一款免费开源的 **《我的世界：基岩版》** 音乐制作软件
 
 欢迎加群：861684859
 
 **注意注意注意！！！本程序尚在测试与开发阶段，且代码重构未完成，请自行定夺使用。**
 
-### 作者
+## 软件作者✒
 
 金羿 Eilles：我的世界基岩版指令师，个人开发者，B站不知名UP主，南昌在校高中生。
 
 诸葛亮与八卦阵 bgArray：我的世界基岩版玩家，喜欢编程和音乐，深圳初一学生。
 
-### 软件架构
+## 软件架构🏢
 
 软件采用 *Python* 作为第一语言，目前还没有使用其他语言辅助。使用 *Tkinter* 为图形库。
 
@@ -29,6 +39,7 @@
 
 ***各位开发人员注意！！！多语言支持请使用函数`_`加载文字！！！如需补充，请在简体中文的语言文件(zh-CN.lang)中补充！！！***
 
+## 使用教程📕
 
 ### 安装教程
 
@@ -69,15 +80,14 @@ python3 补全库.py
 python3 Musicreater.py
 ```
 
-
-### 使用说明
+### 使用说明📖
 
 1.  直接运行就好
 2.  看得懂简体中文字的不一定全会用
 3.  最好要懂一点点英文
 
 
-### 诸葛亮与八卦阵的说明（不必要）
+## 诸葛亮与八卦阵的说明（不必要）
 
 1. 首先！这里的提示是给想使用多音色资源包的人的，如果你想用就请下载 [神羽资源包（神羽自己的链接）](https://pan.baidu.com/s/11uoq5zwN7c3rX-98DqVpJg)提取码:ek3t
 2. 下载到你自己电脑上某个位置，可以不放置于本项目下。音色资源包较大，可以选取只下载：
@@ -94,7 +104,7 @@ python3 Musicreater.py
 6. 如果你想使用音色资源包来制作函数，那么解析时你应该用 *音创*->编辑->从midi导入音轨且用新方法解析，
     然后再使用 *音创*->函数（包）->下面的四个新函数
 
-### 致谢
+## 致谢🙏
 
 1.  感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
 2.  感谢 昀梦\<QQ1515399885\> 找出指令生成错误bug并指正
@@ -106,7 +116,9 @@ python3 Musicreater.py
 8.  若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
 
 
-### 作者\<*金羿*\>(W-YI)联系方式
+## 联系我们📞
+
+### 作者\<*金羿*\>(Eilles)联系方式
 
 1.  QQ       2647547478
 2.  电邮      EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
@@ -115,3 +127,11 @@ python3 Musicreater.py
 ### 作者\<*诸葛亮与八卦阵*\>(bgArray) 联系方式
 
 1.  QQ       4740437765
+
+
+[Bilibili: 凌云金羿]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
+[Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge
+[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
+[license]: https://img.shields.io/badge/Licence-Apache-00FF21?style=for-the-badge
