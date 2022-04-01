@@ -6,8 +6,8 @@
 [![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
 [![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-![GitHub language count](https://img.shields.io/github/languages/count/badges/shields?label=Python&logo=Python)
-
+[![Language: Python (shields.io)](https://img.shields.io/badge/Language-Python-blue?logo=Python)](https://www.python.org/)
+[![Python: 3.8 (shields.io)](https://img.shields.io/badge/Python-3.8-blue?logo=Python)](https://www.python.org/)
 
 
 
