@@ -136,4 +136,4 @@ Musicreater - > function (package) - > the following four new functions
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-Apache-00FF21?style=for-the-badge
+[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
