@@ -23,7 +23,7 @@
 
 Musicreater(音·创) is an free open source software which is used for making and also creating musics in **Minecraft: Bedrock Edition**.
 
-Welcome to join our QQ group: 861684859
+Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
 **ATTENTION!** This software is under testing and developing, there is still a lot of bugs needed to be fixed. Please use it wisely.
 
