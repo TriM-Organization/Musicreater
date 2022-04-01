@@ -127,6 +127,10 @@ python3 Musicreater.py
 1.  QQ       4740437765
 
 ## 待办事项
+
+* - [x] 可以使用由神羽提供的音乐资源包
+* - [x] 支持多语言
+* - [x] 支持创建可被Fastbuilder导入的.BDX文件支持
 * - [ ] 1.可以导出自定义的结构文件用于存储要导入地图中的结构
 * - [ ] 2.进度条
 * - [ ] 3.可以将音乐写入音符盒（红乐）
@@ -134,7 +138,7 @@ python3 Musicreater.py
 * - [ ] 5.支持自动给音符盒绑定更多的音色
 * - [ ] 6.可以由.schematic文件导入地图，亦可反向处理
 * - [ ] 7.制作软件下载器使用户更直观地操作
-* - [ ] 8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://github.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）
+* - [x] 8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://github.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）
 * - [ ] 9.支持使用红石播放音乐
 * - [ ] 10.支持采用延时的播放器
 * - [ ] 11.支持使用bdx导出结构
