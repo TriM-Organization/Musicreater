@@ -1,43 +1,57 @@
-# Musicreater
+<h1 align="center">音·创 Musicreater</h1>
 
-[![Licence: Apache (shields.io)](https://img.shields.io/badge/Licence-Apache-blueviolet)](https://choosealicense.com/licenses/apache-2.0/) 
-[![Bilibili: 凌云金羿 (shields.io)]( https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-blueviolet)](https://space.bilibili.com/397369002/)
-[![Bilibili: 诸葛亮与八卦阵 (shields.io)](https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-blueviolet)](https://space.bilibili.com/604072474) 
-[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+<p align="center">
+<img width="128" height="128" src="https://s1.ax1x.com/2022/04/01/qhfOPA.png" >
+</p>
 
-### Introduction
+<p align="center">
+<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+<p>
 
-Musicreater(音·创) is an Eilles(*W-YI*)'s app that is used for creating musics in **Minecraft: Bedrock Edition**.
+[![][Bilibili: Eilles]](https://space.bilibili.com/397369002/)
+[![][Bilibili: bgArray]](https://space.bilibili.com/604072474) 
+[![CodeStyle: black]](https://github.com/psf/black)
+![][python]
+[![][license]](LICENSE)
+[![][release]](../../releases)
+
+[简体中文🇨🇳](README.md) | English🇬🇧
+
+**Notice that the language support of *README* may be a little SLOW.**
+
+## Introduction🚀
+
+Musicreater(音·创) is an free open source software which is used for making and also creating musics in **Minecraft: Bedrock Edition**.
 
 Welcome to join our QQ group: 861684859
 
 **ATTENTION!** This software is under testing and developing, there is still a lot of bugs needed to be fixed. Please use it wisely.
 
-### Author
+### Authors✒
 
-Eilles (金羿)：The main author, who developed the most and especially the principal parts of Musicreater, and its predecessors, which has been called as "*Minecraft Function Music Maker*", "*Note Fun Creater*", "*Note World Creater*"(now ,they are united as ***Musicreater***!)
+Eilles (金羿)：A high school student, individual developer, unfamous BilibiliUPer, which knows a little about commands in *Minecraft: Bedrock Edition*
 
 bgArray "诸葛亮与八卦阵": Fix bugs, improve code aesthetics, add new functions, change data format, etc.
 
-### Framework
+### Framework🏢
 
-Using *Python* to develop, using Tkinter as a graphics library.
+Developed under *Python3.8 3.9*. However, theoretically support Python3.6+.
 
-Support Windows7+ && Linux (that supports Python3.8)
+Support Windows7+ && Linux (that supports Python3.6+)
 
-***ATTENTION TO DEVELOPERS!!! TO SUPPORT DIFFERENT LANGUAGES, PLEASE USE CONSTANT `READABLETEXT` TO OUTPUT!!! IF YOU NEED TO SUPPLEMENT, PLEASE ADD THEM IN SIMPLEFIED CHINESE\'S LANGUAGE FILE(zhCN.py), WHEATHER WHAT LANGUAGE YOU USE!!!***
+***ATTENTION TO DEVELOPERS!!! TO SUPPORT DIFFERENT LANGUAGES, PLEASE USE FUNCTION(METHOD) `_` TO LOAD TEXTs!!! IF YOU NEED TO SUPPLEMENT, PLEASE ADD THEM IN SIMPLEFIED CHINESE\'S LANGUAGE FILE(zh-CN.lang), WHEATHER WHAT LANGUAGE YOU USE!!!***
 
+## Instructions📕
 
 ### Installation
 
-Download the *[MSCT Auto Installer](https://gitee.com/EillesWan/Musicreater/attach_files/1008796/download/MSCT%20Auto%20Installer.exe)*, put it in a directory that you want to install *Musicreater* into.
-Then run the auto installer and it will help you to install the *Musicreator* 
+Download the *[MSCT Auto Installer](https://github.com/EillesWan/Musicreater/releases/tag/v0.2.0.0-Delta)*, put it in a directory that you want to install *Musicreater* into. Then run the auto installer and it will help you to install the *Musicreator* as well as Python3.8(if you haven\'t install it)
 
-Tips: You'd better choose the 2GitHub download source
+Tips: You'd better choose the \"2 GitHub\" download source
 
 ### Run with Source Code
 
-#### Windows
+#### Windows7+
 
 0.  First, download the source code pack of Musicreater.
     [Download from Gitee (Need to Login)](https://gitee.com/EillesWan/Musicreater/repository/archive/master.zip)
@@ -69,15 +83,13 @@ python3 补全库.py
 python3 Musicreater.py
 ```
 
+### Instructions of Using
 
-### Instructions
+1.  Just run Musicreater.pyc(or .py) if you have installed well 
+2.  Detailed instructions is coming soon
+3.  If you find a bug, could you please report it to me? My contact info is right below.
 
-1.  Just make u understand the Chinese
-2.  If u dont understand, u can come to the QQ group or email me to ask questions
-3.  The English Edition is comming soon.
-
-
-### Explanation of bgArray 诸葛亮与八卦阵 (unnecessary)
+## Explanation of the use of *PlumeAudioSurrounding Ressourde Pack* by bgArray (unnecessary)📖
 
 1. First! The tips here are for those who want to use the multi tone resource package, [Shenyu resource package (Shenyu's own link)](https://pan.baidu.com/s/11uoq5zwN7c3rX-98DqVpJg) \(Extraction code: `ek3t`\)
 2. Download it to any location on your PC. Note that it does ***not*** need to be placed in the directory where *Musicreater* are. The audio resource package is large, so you can choose to download only:`神羽资源包_乐器、音源的资源包\羽音缭绕-midiout_25.0`.
@@ -92,7 +104,7 @@ python3 Musicreater.py
 6. If you want to use the Miracle Plume Bedrock Edition Audio Resource Pack to make .mcfunction s, you should use Musicreater -> Edit - > Import audio tracks from MIDI and parse them with a new method, and then use it
 Musicreater - > function (package) - > the following four new functions
 
-### Thanks
+## Thanks🙏
 
 1.  Thank [Fuckcraft](https://github.com/fuckcraft) *(“鸣凤鸽子” ,etc)* for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
     -   *!! They have given me the rights to directly copy the lib into Musicreater*
@@ -104,13 +116,24 @@ Musicreater - > function (package) - > the following four new functions
 7.  Thanks for a lot of groupmates who support me and help me to test the program.
 8.  If you have give me some help but u haven't been in the list, please contact me.
 
+## Contact Information📞
 
-### Contact *Eilles(W-YI)*(金羿)
+### Author *Eilles*(金羿)
 
 1.  QQ       2647547478
 2.  E-mail   EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 3.  WeChat   WYI_DoctorYI
 
-### Contact *bgArray*(诸葛亮与八卦阵)
+### Author *bgArray*(诸葛亮与八卦阵)
 
 1.  QQ       4740437765
+
+
+
+
+[Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
+[Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge
+[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
+[license]: https://img.shields.io/badge/Licence-Apache-00FF21?style=for-the-badge
