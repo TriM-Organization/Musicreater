@@ -49,13 +49,39 @@ from msctLib.function import *
 from msctLib.data import uniteIO
 
 
-
+hb = r'''                  __  __                                           
+                 /\ \/\ \                                          
+                 \ \ \_\ \      __     _____    _____    __  __    
+                  \ \  _  \   /'__`\  /\ '__`\ /\ '__`\ /\ \/\ \   
+                   \ \ \ \ \ /\ \L\.\_\ \ \L\ \\ \ \L\ \\ \ \_\ \  
+                    \ \_\ \_\\ \__/.\_\\ \ ,__/ \ \ ,__/ \/`____ \ 
+                     \/_/\/_/ \/__/\/_/ \ \ \/   \ \ \/   `/___/> \
+                                         \ \_\    \ \_\      /\___/
+                                          \/_/     \/_/      \/__/ 
+        ____                  __     __           __                         
+       /\  _`\    __         /\ \__ /\ \         /\ \                        
+       \ \ \L\ \ /\_\   _ __ \ \ ,_\\ \ \___     \_\ \      __     __  __    
+        \ \  _ <'\/\ \ /\`'__\\ \ \/ \ \  _ `\   /'_` \   /'__`\  /\ \/\ \   
+         \ \ \L\ \\ \ \\ \ \/  \ \ \_ \ \ \ \ \ /\ \L\ \ /\ \L\.\_\ \ \_\ \  
+          \ \____/ \ \_\\ \_\   \ \__\ \ \_\ \_\\ \___,_\\ \__/.\_\\/`____ \ 
+           \/___/   \/_/ \/_/    \/__/  \/_/\/_/ \/__,_ / \/__/\/_/ `/___/> \
+                                                                       /\___/
+                                                                       \/__/ '''
 
 
 
 def __main__():
-    
-    disp()
+    import datetime,time,random,os,sys
+    if datetime.date.today().month == 4 and datetime.date.today().day == 3:
+        if sys.platform == 'win32':
+            os.system('color 4e')
+            os.system('cls')
+        for i in range(len(hb)):
+            print(hb[i], end='', flush=True)
+            time.sleep(random.random() * 0.001)
+        input("金羿 生日快乐！")
+    else:
+        disp()
 
 
 

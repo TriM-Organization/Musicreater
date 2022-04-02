@@ -1615,6 +1615,7 @@ def __main__():
         dataset[0]['musics'][NowMusic]['set']['FileName'] = a
         RefreshMusic(NowMusic)
         print(event)  # 保证变量使用（虽然我不清楚金羿这为啥不调用要写个event）
+            # 滚滚滚，这个函数不能无参！ ——金羿
 
     print('标签点击命令加载完成！')
 
@@ -1822,11 +1823,16 @@ def __main__():
     DownFrame = tk.Frame(root, bg='blue')
 
     # 经典名言语录
-    import random
-    texts = open('./resources/myWords.txt', 'r', encoding='utf-8').readlines()
-    tk.Label(DownFrame, text=texts[random.randint(0, len(texts) - 1)].replace('\n', '').replace('\\n', '\n'),
-             fg='white', bg='black', font=('DengXian Light', 20)).pack(fill='x')
-    del texts
+    import datetime
+    
+    if datetime.date.today().month == 4 and datetime.date.today().day == 3:
+        tk.Label(DownFrame, text='金羿生日快乐！！',fg='yellow', bg='red', font=('DengXian', 20, 'bold')).pack(fill='x')
+    else:
+        import random
+        texts = open('./resources/myWords.txt', 'r', encoding='utf-8').readlines()
+        tk.Label(DownFrame, text=texts[random.randint(0, len(texts) - 1)].replace('\n', '').replace('\\n', '\n'),
+                fg='white', bg='black', font=('DengXian Light', 20)).pack(fill='x')
+        del texts
 
     # 音符列表菜单
     NoteList_var = tk.StringVar()
