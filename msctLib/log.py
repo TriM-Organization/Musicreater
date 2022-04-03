@@ -48,7 +48,7 @@ StrStartTime = str(datetime.datetime.now()).replace(':', '_')[:-7]
 '''字符串型的程序开始时间'''
 
 
-def log(info:str = '',level : str = 'INFO', isPrinted:bool = False):
+def log(info:str = '',level : str = 'INFO', isPrinted:bool = True):
     '''将信息连同当前时间载入日志
     :param info : str
         日志信息
@@ -66,12 +66,12 @@ def log(info:str = '',level : str = 'INFO', isPrinted:bool = False):
 
     try:
 
-        if not os.path.exists('./log/'):
-            os.makedirs('./log/')
+        if not os.path.exists('./logs/'):
+            os.makedirs('./logs/')
         
         outputinfo = f'{str(datetime.datetime.now())[11:19]}-[{level}] {info}'
 
-        with open('./log/'+StrStartTime+'.msct.log', 'a',encoding='UTF-8') as f:
+        with open('./logs/'+StrStartTime+'.msct.log', 'a',encoding='UTF-8') as f:
             f.write(outputinfo+'\n')
         
         if isPrinted:

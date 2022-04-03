@@ -12,7 +12,7 @@ import amulet
 from amulet.api.block import Block
 from amulet.utils.world_utils import block_coords_to_chunk_coords as bc2cc
 from amulet_nbt import TAG_String as ts
-from nmcsup.log import log
+from msctLib.log import log
 
 
 def hans2pinyin(hans, style=3):
@@ -33,11 +33,8 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
     commands = []
     length = len(List)
     j = 1
-    print(List)
     for k in range(len(List)):
         i = List[k][0]
-        print(i)
-        print(type(i))
         try:
             commands.append(
                 f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
@@ -54,7 +51,6 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
             pass
             # a += List[i][1]
     # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
-    print(commands)
     return commands
 
 
@@ -268,6 +264,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
     :return 返回一个列表，其中包含了音乐生成的所有的指令方块数据"""
     from msctspt.threadOpera import NewThread
 
+
     allblocks = []
     '''需要放置的方块'''
     baseDire = direction
@@ -279,9 +276,9 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
         if len(cmdList) == 0:
-            return
+            return []
         elif cmdList is []:
-            return
+            return []
         dire = direction
         down = False
         '''当前是否为向下的阶段？'''
@@ -317,7 +314,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
     threads = []
     for track in music['musics']:
         threads.append(NewThread(trackDealing,(direction,track)))
-        threads[threads.__len__()-1].start()
+        threads[-1].start()
         direction[2] += 2
 
     for th in threads:

@@ -186,7 +186,7 @@ def __main__():
     print('音·创 正在启动……')
 
     print('载入日志功能...')
-    from nmcsup.log import log
+    from msctLib.log import log
     from nmcsup.log import end
     print('完成！')
 
@@ -1299,7 +1299,6 @@ def __main__():
                                                         initialfile=dataset[0]['mainset']['PackName'] + '.bdx')
 
         maxHeight = 200
-        print(maxHeight)  # 使用变量
 
         while True:
             maxHeight = tkinter.simpledialog.askinteger(title=READABLETEXT[28],
@@ -1320,7 +1319,7 @@ def __main__():
 
         log('获得文件名：' + fileName)
 
-        res = music2BDX(fileName, dire, dataset[0], )
+        res = music2BDX(fileName, dire, dataset[0], height = maxHeight )
         log('转换结束！\n' + str(res))
         tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
 
