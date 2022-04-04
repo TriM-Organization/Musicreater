@@ -93,11 +93,11 @@ class report:
 class version:
     libraries = (
         'mido', 'amulet', 'amulet-core', 'amulet-nbt', 'piano_transcription_inference', 'pypinyin',
-        'pyinstaller', 'py7zr','websockets', 'torch', 'requests'
+        'pyinstaller', 'py7zr','websockets', 'torch', 'requests', 'zhdate'
         )
     """当前所需库"""
 
-    version = ('0.2.0', 'Delta',)
+    version = ('0.1.6', 'Delta',)
     """当前版本"""
 
     def __init__(self) -> None:

@@ -128,31 +128,6 @@ Musicreater - > function (package) - > the following four new functions
 
 1.  QQ       4740437765
 
-## TO-DO
-
-* - [x] 可以使用由神羽提供的音乐资源包
-* - [x] Language Support
-* - [x] .bdx encode support
-* - [ ] 1.可以导出自定义的结构文件用于存储要导入地图中的结构
-* - [ ] 2.progress bar
-* - [ ] 3.可以将音乐写入音符盒（红乐）
-* - [ ] 4.修改UI界面使之适应当前功能
-* - [ ] 5.支持自动给音符盒绑定更多的音色
-* - [ ] 6.可以由.schematic文件导入地图，亦可反向处理
-* - [ ] 7.制作软件下载器使用户更直观地操作
-* - [x] 8.支持自定义创建websockeet服务器播放音乐（感谢由 Fuckcraft <https://github.com/fuckcraft> “鸣凤鸽子”等 带来的我的世界websocket服务器功能）
-* - [ ] 9.支持使用红石播放音乐
-* - [ ] 10.支持采用延时的播放器
-* - [ ] 11.支持使用bdx导出结构
-* - [ ] 12.支持采用tp的方法播放
-* - [ ] 13.支持识别曲谱（简谱）图片解析音乐
-* - [ ] 14.支持使用瀑布流的方式播放音乐
-* - [ ] 15.支持读入Everyone Piano的曲谱文件（.eop）
-* - [ ] 16.支持读入Musescore的通用曲谱文件，即musicXML（.mscz、.mscx）
-* - [ ] 17.支持自动搜寻地图目录位置（网易&微软）
-* - [ ] 18.支持读入JPword曲谱文件（.jpd）
-* - [ ] 19.新的UI设计，以及UI主题文件
-* - [ ] 20.以小节为单位做音符播放时间对标
 
 
 

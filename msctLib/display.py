@@ -11,8 +11,12 @@ from msctLib.log import log
 
 
 DEFAULTBLUE = (0, 137, 242)
+# 0089F2
+
 WEAKBLUE = (0, 161, 231)
 LIGHTBLUE = (38, 226, 255)
+# 26E2FF
+
 RED = (255, 52, 50)
 PURPLE = (171, 112, 255)
 GREEN = (0, 255, 33)
@@ -73,7 +77,7 @@ class disp:
         '''
 
         # 载入参量 注意！图标将不被载入参数
-        self.root = root
+        self.__root = root
         '''窗口根'''
 
         self.title = title
@@ -94,6 +98,9 @@ class disp:
         self.notemap = notemap
         '''音符列表'''
 
+        self.infoBar = infobar
+        '''信息显示版'''
+
 
 
         self.debug = debug
@@ -113,13 +120,13 @@ class disp:
 
     def setTitle(self) -> None:
         '''设置窗口标题'''
-        self.root.title = self.title
+        self.__root.title = self.title
         if self.debug:
             log(f"设置窗口标题{self.title}")
 
     def setGeometry(self,geometry:str = '0x0') -> None:
         '''设置窗口大小'''
-        self.root.geometry(geometry)
+        self.__root.geometry(geometry)
         if self.debug:
             log(f"设置窗口大小{geometry}")
 
@@ -132,17 +139,17 @@ class disp:
         if not self.debug:
             try:
                 if default:
-                    self.root.iconbitmap(bitmap, default)
+                    self.__root.iconbitmap(bitmap, default)
                     log(f'设置图标为{bitmap}，默认为{default}')
                 else:
-                    self.root.iconbitmap(bitmap)
+                    self.__root.iconbitmap(bitmap)
                     log(f'设置图标为{bitmap}')
                 return True
             except Exception as e:
                 log(str(e), 'ERROR')
                 return False
         else:
-            self.root.iconbitmap(bitmap, default)
+            self.__root.iconbitmap(bitmap, default)
             return
 
     def setMenu(self) -> None:
@@ -158,7 +165,7 @@ class disp:
                     log('无法读取菜单信息', 'WARRING')
         # 如果不是空参数则新建菜单
         self.RootMenu = {}
-        self.mainMenuBar = tk.Menu(self.root)
+        self.mainMenuBar = tk.Menu(self.__root)
         for menuName, menuCmd in self.menuWidgets.items():
             # 取得一个菜单名和一堆菜单函数及其显示名称
             menu = tk.Menu(self.mainMenuBar, tearoff=0)
@@ -169,7 +176,7 @@ class disp:
                     menu.add_separator()
             self.mainMenuBar.add_cascade(label=menuName, menu=menu)
             self.RootMenu[menuName] = menu
-        self.root.config(menu=self.mainMenuBar)
+        self.__root.config(menu=self.mainMenuBar)
 
     def addMenu(self, menuRoot: str = '', menuLabel: str = '', menuCommand=None):
         '''增加一个菜单项
@@ -209,7 +216,7 @@ class disp:
         :信息显示版 InfoBar
         '''
         self._wordviewBar = tk.Label(
-            self.root, bg='white', fg='black', text=self.wordView, font=(fontPattern[0], 30)
+            self.__root, bg='white', fg='black', text=self.wordView, font=(fontPattern[0], 30)
         )
 
         self.setWordView(self.wordView)

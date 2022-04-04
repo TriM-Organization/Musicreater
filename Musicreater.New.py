@@ -71,7 +71,7 @@ hb = r'''                  __  __
 
 
 def __main__():
-    import datetime,time,random,os,sys
+    import datetime,time,random,os,sys,zhdate
     if datetime.date.today().month == 4 and datetime.date.today().day == 3:
         if sys.platform == 'win32':
             os.system('color 4e')
@@ -80,6 +80,9 @@ def __main__():
             print(hb[i], end='', flush=True)
             time.sleep(random.random() * 0.001)
         input("金羿 生日快乐！")
+    elif '三月初五' in zhdate.ZhDate.today().chinese():
+        input('缅怀先祖 祭祀忠勇 勿忘国耻 振兴中华') 
+
     else:
         disp()
 
