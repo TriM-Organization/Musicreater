@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
-# ! python3
 
 
 # W-YI 金羿
 # QQ 2647547478
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
-# 版权所有 Team-Ryoun 金羿
+# 版权所有 Team-Ryoun 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
 # 若需转载或借鉴 请附作者
 
 
 """
-   Copyright 2022 Eilles Wan (金羿)
+音·创 (Musicreater)
+一款免费开源的 《我的世界：基岩版》 音乐制作软件
+Musicreater (音·创)
+A free opensource software which is used for creating all kinds of musics in Minecraft
+
+   Copyright 2022 Team-Ryoun
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
@@ -61,10 +65,8 @@ from msctspt.threadOpera import NewThread
 from nmcsup.vers import VER
 
 __version__ = VER[1] + VER[0]
-__author__ = 'W-YI （金羿）'
-dire = ""
-begp = ""
-endp = ""
+__author__ = '金羿Eilles & 诸葛亮与八卦阵bgArray'
+
 
 print('建立变量，存入内存，载入字典常量函数')
 
@@ -184,7 +186,7 @@ def __main__():
     print('音·创 正在启动……')
 
     print('载入日志功能...')
-    from nmcsup.log import log
+    from msctLib.log import log
     from nmcsup.log import end
     print('完成！')
 
@@ -198,7 +200,7 @@ def __main__():
     else:
         try:
             os.chdir(__file__[:len(__file__) - __file__[len(__file__)::-1].index('/')])
-        except FileNotFoundError:
+        except Exception:
             pass
         log('其他平台：{} 更新执行位置，当前文件位置 {}'.format(sys.platform, __file__))
     print('完成！')
@@ -1297,7 +1299,6 @@ def __main__():
                                                         initialfile=dataset[0]['mainset']['PackName'] + '.bdx')
 
         maxHeight = 200
-        print(maxHeight)  # 使用变量
 
         while True:
             maxHeight = tkinter.simpledialog.askinteger(title=READABLETEXT[28],
@@ -1318,7 +1319,7 @@ def __main__():
 
         log('获得文件名：' + fileName)
 
-        res = music2BDX(fileName, dire, dataset[0], )
+        res = music2BDX(fileName, dire, dataset[0], height = maxHeight )
         log('转换结束！\n' + str(res))
         tkinter.messagebox.showinfo(READABLETEXT[33], READABLETEXT[124].format(str(res)))
 
@@ -1468,7 +1469,10 @@ def __main__():
 
     root.title(READABLETEXT[41].format(__version__))
     root.geometry('900x900')  # 像素
-    root.iconbitmap('./resources/musicreater.ico', './resources/musicreater.ico')
+    try:
+        root.iconbitmap(bitmap='./resources/musicreater.ico', default='./resources/musicreater.ico')
+    except:
+        pass
 
     print('完成！')
 
@@ -1610,6 +1614,7 @@ def __main__():
         dataset[0]['musics'][NowMusic]['set']['FileName'] = a
         RefreshMusic(NowMusic)
         print(event)  # 保证变量使用（虽然我不清楚金羿这为啥不调用要写个event）
+            # 滚滚滚，这个函数不能无参！ ——金羿
 
     print('标签点击命令加载完成！')
 
@@ -1817,11 +1822,16 @@ def __main__():
     DownFrame = tk.Frame(root, bg='blue')
 
     # 经典名言语录
-    import random
-    texts = open('./resources/myWords.txt', 'r', encoding='utf-8').readlines()
-    tk.Label(DownFrame, text=texts[random.randint(0, len(texts) - 1)].replace('\n', '').replace('\\n', '\n'),
-             fg='white', bg='black', font=('DengXian Light', 20)).pack(fill='x')
-    del texts
+    import datetime
+    
+    if datetime.date.today().month == 4 and datetime.date.today().day == 3:
+        tk.Label(DownFrame, text='金羿生日快乐！！',fg='yellow', bg='red', font=('DengXian', 20, 'bold')).pack(fill='x')
+    else:
+        import random
+        texts = open('./resources/myWords.txt', 'r', encoding='utf-8').readlines()
+        tk.Label(DownFrame, text=texts[random.randint(0, len(texts) - 1)].replace('\n', '').replace('\\n', '\n'),
+                fg='white', bg='black', font=('DengXian Light', 20)).pack(fill='x')
+        del texts
 
     # 音符列表菜单
     NoteList_var = tk.StringVar()

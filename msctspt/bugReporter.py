@@ -4,10 +4,10 @@
 # 诸葛亮与八卦阵帮忙修改语法 日期：---2022年1月19日
 # 统计：致命（三级）错误：0个；警告（二级）错误：1个；语法（一级）错误：72个
 import os
-import zipfile
 
 
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
+    import zipfile
     """使用compression指定的算法打包目录为zip文件\n
     默认算法为DEFLATED(8),可用算法如下：\n
     STORED = 0\n
@@ -93,17 +93,17 @@ class report:
 class version:
     libraries = (
         'mido', 'amulet', 'amulet-core', 'amulet-nbt', 'piano_transcription_inference', 'pypinyin',
-        'pyinstaller','py7zr','websockets', 'torch'
+        'pyinstaller', 'py7zr','websockets', 'torch', 'requests', 'zhdate'
         )
-    """当前所需库，有一些是开发用的，用户不需要安装"""
+    """当前所需库"""
 
-    version = ('0.1.5.1', 'Delta',)
+    version = ('0.1.6', 'Delta',)
     """当前版本"""
 
     def __init__(self) -> None:
 
         self.libraries = version.libraries
-        """当前所需库，有一些是开发用的，用户不需要安装"""
+        """当前所需库"""
 
         self.version = version.version
         """当前版本"""

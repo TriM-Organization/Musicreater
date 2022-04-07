@@ -12,7 +12,7 @@ import amulet
 from amulet.api.block import Block
 from amulet.utils.world_utils import block_coords_to_chunk_coords as bc2cc
 from amulet_nbt import TAG_String as ts
-from nmcsup.log import log
+from msctLib.log import log
 
 
 def hans2pinyin(hans, style=3):
@@ -33,11 +33,8 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
     commands = []
     length = len(List)
     j = 1
-    print(List)
     for k in range(len(List)):
         i = List[k][0]
-        print(i)
-        print(type(i))
         try:
             commands.append(
                 f"execute @a{playerSelection} ~ ~ ~ execute @s[scores={{{ScoreboardName}="
@@ -54,7 +51,6 @@ def classList_conversion_SinglePlayer(List: list, ScoreboardName: str, playerSel
             pass
             # a += List[i][1]
     # commands.append("\n\n# 凌云我的世界开发团队 x 凌云软件开发团队  : W-YI（金羿）\n")
-    print(commands)
     return commands
 
 
@@ -222,23 +218,17 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
         height: 生成结构的最高高度
     :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
 
-    # from msctspt.transfer import formCmdBlock
     from nmcsup.trans import Note2Cmd
     from msctspt.bdxOpera_CP import BdxConverter
     cmd = Note2Cmd(Notes, ScoreboardName, Instrument, PlayerSelect, isProsess)
     cdl = []
-    # 此处是处理一下，防止有注释
+    
     for i in cmd:
-        # e = True
-        try:
+        if '#' in i:
             if (i[:i.index('#')].replace(' ', '') != '\n') and (i[:i.index('#')].replace(' ', '') != ''):
                 cdl.append(i[:i.index('#')])
-            # e = False
-        except:  # ValueError
+        else:
             cdl.append(i)
-        # finally:
-        #     if e is True:
-        #         cdl.append(i)
     i = 0
     down = False
     blocks = [formCmdBlock(dire, cdl.pop(0), 1, 1)]
@@ -261,10 +251,7 @@ def note2bdx(filePath: str, dire: list, Notes: list, ScoreboardName: str, Instru
 
 
 
-
-
-
-def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
+def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
               isSquare: bool = False):
     """使用方法同Note2Cmd
     :param 参数说明：
@@ -274,9 +261,9 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         isProsess: 是否显示进度条（会很卡）
         height: 生成结构的最高高度
         isSquare: 生成的结构是否需要遵循生成正方形原则
-    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
-    from msctspt.bdxOpera_CP import BdxConverter
+    :return 返回一个列表，其中包含了音乐生成的所有的指令方块数据"""
     from msctspt.threadOpera import NewThread
+
 
     allblocks = []
     '''需要放置的方块'''
@@ -285,14 +272,15 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
     direction = list(direction)
 
     def trackDealing(direction,track):
+        print('=========DEBUG=========音轨起方块：', direction)
         blocks = []
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
         if len(cmdList) == 0:
-            return
+            return []
         elif cmdList is []:
-            return
-        dire = direction
+            return []
+        dire = direction.copy()
         down = False
         '''当前是否为向下的阶段？'''
         # 开头的指令方块
@@ -310,8 +298,9 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
         # :4	x轴负方向	无条件
         # :5	x轴正方向	无条件
         for cmd in cmdList:
+            print('=========DEBUG=========方块：', dire)
             blocks.append(formCmdBlock(dire, cmd, 5 if (down is False and dire[1] == height + direction[1]) or (
-                    down and dire[1] == direction + 1) else 0 if down else 1, 2, needRedstone=False))
+                    down and dire[1] == direction[1] + 1) else 0 if down else 1, 2, needRedstone=False))
             if down:
                 if dire[1] > direction[1] + 1:
                     dire[1] -= 1
@@ -319,21 +308,46 @@ def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool =
                 if dire[1] < height + direction[1]:
                     dire[1] += 1
 
-            if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction + 1):
+            if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction[1] + 1):
                 down = not down
                 dire[0] += 1
         return blocks
 
     threads = []
     for track in music['musics']:
-        threads.append(NewThread(trackDealing,(direction,track)))
-        threads[threads.__len__()-1].start()
+        threads.append(NewThread(trackDealing,(direction.copy(),track)))
+        threads[-1].start()
         direction[2] += 2
 
     for th in threads:
         allblocks += th.getResult()
 
-    return BdxConverter(filePath, 'Build by Ryoun Musicreater', allblocks)
+    return allblocks
+
+
+
+
+
+
+
+
+
+
+
+def music2BDX(filePath: str, direction: Iterable, music: dict, isProsess: bool = False, height: int = 200,
+              isSquare: bool = False):
+    """使用方法同Note2Cmd
+    :param 参数说明：
+        filePath: 生成.bdx文件的位置
+        dire: 指令方块在地图中生成的起始位置（相对位置）
+        music: 详见 Musicreater.py - dataset[0]
+        isProsess: 是否显示进度条（会很卡）
+        height: 生成结构的最高高度
+        isSquare: 生成的结构是否需要遵循生成正方形原则
+    :return 返回一个BdxConverter类，同时在指定位置生成.bdx文件"""
+    from msctspt.bdxOpera_CP import BdxConverter
+    return BdxConverter(filePath, 'Build by Ryoun Musicreater', music2cmdBlocks(direction,music,isProsess,height,isSquare)
+)
 
 
 def note2webs(Notes: list, Instrument: str, speed: float = 5.0, PlayerSelect: str = '', isProsess: bool = False):

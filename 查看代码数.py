@@ -12,10 +12,9 @@ for path, dir_list, file_list in os.walk(r"./"):
             print("得到文件名：" + str(file))
             for i in open(file, 'r', encoding="utf-8"):
                 code = i.replace(' ', '').replace('\n', '')
-                try:
-                    code -= code[code.index('#'):]
-                except:
-                    pass
+                
+                if code.startswith('#'):
+                    continue
                 if code:
                     print("\t" + code)
                     m += 1
