@@ -272,6 +272,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
     direction = list(direction)
 
     def trackDealing(direction,track):
+        print('=========DEBUG=========音轨起方块：', direction)
         blocks = []
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
@@ -279,7 +280,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
             return []
         elif cmdList is []:
             return []
-        dire = direction
+        dire = direction.copy()
         down = False
         '''当前是否为向下的阶段？'''
         # 开头的指令方块
@@ -297,8 +298,9 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
         # :4	x轴负方向	无条件
         # :5	x轴正方向	无条件
         for cmd in cmdList:
+            print('=========DEBUG=========方块：', dire)
             blocks.append(formCmdBlock(dire, cmd, 5 if (down is False and dire[1] == height + direction[1]) or (
-                    down and dire[1] == direction + 1) else 0 if down else 1, 2, needRedstone=False))
+                    down and dire[1] == direction[1] + 1) else 0 if down else 1, 2, needRedstone=False))
             if down:
                 if dire[1] > direction[1] + 1:
                     dire[1] -= 1
@@ -306,14 +308,14 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
                 if dire[1] < height + direction[1]:
                     dire[1] += 1
 
-            if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction + 1):
+            if (down is False and dire[1] == height + direction[1]) or (down and dire[1] == direction[1] + 1):
                 down = not down
                 dire[0] += 1
         return blocks
 
     threads = []
     for track in music['musics']:
-        threads.append(NewThread(trackDealing,(direction,track)))
+        threads.append(NewThread(trackDealing,(direction.copy(),track)))
         threads[-1].start()
         direction[2] += 2
 
