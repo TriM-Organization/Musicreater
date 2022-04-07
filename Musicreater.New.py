@@ -35,6 +35,7 @@ A free opensource software which is used for creating all kinds of musics in Min
 
 # 下面为正文
 
+# 一定会好起来的
 
 
 from msctspt.bugReporter import version

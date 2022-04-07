@@ -188,6 +188,14 @@ def formCmdBlock(direction: Iterable, command: str, particularValue: int, implus
         "needRedstone": int  #是否需要红石 1 bytes
     }
     '''
+    # for particularValue, is like this
+    # :0	下	无条件
+    # :1	上	无条件
+    # :2	z轴负方向	无条件
+    # :3	z轴正方向	无条件
+    # :4	x轴负方向	无条件
+    # :5	x轴正方向	无条件
+    print(f"==[DEBUG]=={direction}: {command} {'下' if particularValue == 0 else '上' if particularValue ==1 else 'z-' if particularValue ==2 else 'z+' if particularValue==3 else 'x-' if particularValue==4 else 'x+'} {'脉冲' if impluse==0 else '循环' if impluse ==1 else '连锁'} {'有条件' if condition else '无条件'} {'需要红石' if needRedstone else '不需要红石'}")
     return {"direction": direction,
             "block_name": "command_block",
             "particular_value": particularValue,
@@ -272,7 +280,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
     direction = list(direction)
 
     def trackDealing(direction,track):
-        print('=========DEBUG=========音轨起方块：', direction)
+        # print('=========DEBUG=========音轨起方块：', direction)
         blocks = []
         cmdList = classList_conversion_SinglePlayer(track['notes'], track['set']['ScoreboardName'],
                                                     music['mainset']['PlayerSelect'], isProsess)
@@ -298,7 +306,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
         # :4	x轴负方向	无条件
         # :5	x轴正方向	无条件
         for cmd in cmdList:
-            print('=========DEBUG=========方块：', dire)
+            # print('=========DEBUG=========方块：', dire)
             blocks.append(formCmdBlock(dire, cmd, 5 if (down is False and dire[1] == height + direction[1]) or (
                     down and dire[1] == direction[1] + 1) else 0 if down else 1, 2, needRedstone=False))
             if down:
@@ -322,6 +330,7 @@ def music2cmdBlocks(direction: Iterable, music: dict, isProsess: bool = False, h
     for th in threads:
         allblocks += th.getResult()
 
+    print(allblocks)
     return allblocks
 
 

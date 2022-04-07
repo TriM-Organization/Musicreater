@@ -7,7 +7,7 @@ import brotli
 class BdxConverter:
     __header = "BD@"
     __bin_header = b"BDX"
-    __generator_author = b"&Musicreater"
+    __generator_author = b"& Musicreater"
 
     keys = {
         # x--, x++, addSmallX(-128~127), addX(-32768~32767), addBigX(-2147483648~2147483647)
@@ -16,7 +16,7 @@ class BdxConverter:
         "z": [b"\x13", b"\x12", b"\x1e", b"\x18", b"\x19"],
         "end": b"\x58",
         "isSigned": b"\x5a",
-        "placeCommandBlockWithData": b"\x1b",
+        "placeCommandBlockWithData": b"\x1b",#用不上
         "placeBlock": b"\x07"
     }
 
@@ -82,8 +82,6 @@ class BdxConverter:
         :return:
         """
         _types = b""
-
-
         for block in self.blocks:
             # print(f"当前方块：{block['block_name']}, 位置： {block['direction']}]")
             diff = self.move_pointer(self.direction, block["direction"])
@@ -182,7 +180,7 @@ class BdxConverter:
         :return: bytes of command_block
         """
 
-        block_id = b"\x1b" + self.block_type.index(block["block_name"]).to_bytes(2, byteorder="big", signed=False)
+        block_id = b"\x24"
         particular_value = block["particular_value"].to_bytes(2, byteorder="big", signed=False)
         block_header = block_id + particular_value
         for i in [
