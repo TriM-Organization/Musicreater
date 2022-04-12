@@ -1,13 +1,15 @@
-#-*- coding:utf-8 -*-
-'''一个简单的基于音·创的我的世界音频操作工具'''
+# -*- coding:utf-8 -*-
+"""一个简单的基于音·创的我的世界音频操作工具"""
 
-
+import main
+if main.importDebug():
+    print("Debug finished correctly")
+else:
+    print("Debug finished with errors")
 
 __version__ = '0.0.1'
 __all__ = []
-__author__ = (('金羿','Eilles Wan'),('诸葛亮与八卦阵','bgArray'),('鸣凤鸽子','MingFengPigeon'))
-
-
+__author__ = (('金羿', 'Eilles Wan'), ('诸葛亮与八卦阵', 'bgArray'), ('鸣凤鸽子', 'MingFengPigeon'))
 
 """
    Copyright © 2022 Team-Ryoun
@@ -27,5 +29,3 @@ __author__ = (('金羿','Eilles Wan'),('诸葛亮与八卦阵','bgArray'),('鸣�
 
 print('此工具由凌天之云创新团队开发，版权归本团队参与开发的人员共同所有。')
 print('This tool is developed by Team-Ryoun, copyright belongs to the team members who developed the tool.')
-
-from main import *
