@@ -112,8 +112,8 @@ class midiConvert:
                     ticks += msg.time
                     if msg.type == 'note_on' and msg.velocity != 0:
                         singleTrack.append('execute @a[scores={' + scoreboardname + '=' +
-                                           str(round((ticks * tempo)((self.midi.ticks_per_beat * float(speed)) *
-                                                                     50000))) + '}' +
+                                           str(round((ticks * tempo)/((self.midi.ticks_per_beat * float(speed)) *
+                                                                      50000))) + '}' +
                                            f'] ~~~ playsound {self.__Inst2SoundID(instrumentID)} '
                                            f'@s ~~{1 / volume - 1}~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)}'
                                            f' {2 ** ((msg.note - 66) / 12)}')
