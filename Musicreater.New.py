@@ -70,9 +70,9 @@ hb = r'''                  __  __
                                                                        \/__/ '''
 
 
-
 def __main__():
-    import datetime,time,random,os,sys,zhdate
+    import datetime, time, random, os, sys, zhdate
+
     if datetime.date.today().month == 4 and datetime.date.today().day == 3:
         if sys.platform == 'win32':
             os.system('color 4e')
@@ -82,17 +82,38 @@ def __main__():
             time.sleep(random.random() * 0.001)
         input("金羿 生日快乐！")
     elif '三月初五' in zhdate.ZhDate.today().chinese():
-        input('缅怀先祖 祭祀忠勇 勿忘国耻 振兴中华') 
+        input('缅怀先祖 祭祀忠勇 勿忘国耻 振兴中华')
 
     else:
-        disp()
 
+        def test():
+            print('!!!', end=' ')
 
+        def test2():
+            print('???', end=' ')
 
-
-
-
-
+        window = disp(
+            geometry='1200x800',
+            menuWidget={
+                '文件': {'新建': test, '打开': test},
+                '编辑': {'撤销': test, '重做': test},
+                '视图': {'缩放': test},
+                '帮助': {'关于': authorWindowStarter},
+            },
+            title='音·创 0.2 测试中',
+            buttons=[
+                {
+                    '新建': ('', test2), 
+                    '打开': ('', test2)
+                }, 
+                {
+                    '测试': ('', test2)
+                }
+            ],
+            debug=True,
+        )
+        
+        window.start()
 
 
 if __name__ == '__main__':

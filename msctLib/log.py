@@ -75,7 +75,7 @@ def log(info:str = '',level : str = 'INFO', isPrinted:bool = True):
             f.write(outputinfo+'\n')
         
         if isPrinted:
-            print(outputinfo)
+            input(outputinfo)
         
         return True
     except:
