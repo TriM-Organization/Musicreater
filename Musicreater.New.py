@@ -38,12 +38,12 @@ A free opensource software which is used for creating all kinds of musics in Min
 # 一定会好起来的
 
 
-from msctspt.bugReporter import version
+from msctLib.buildIN import version
 
 __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
 
-from msctLib.display import *
+import msctLib.display as disp
 
 from msctLib.function import *
 
@@ -91,17 +91,19 @@ def __main__():
 
         def test2():
             print('???', end=' ')
+        
+        disp.__root = disp.tk.Tk()
 
-        window = disp(
+        disp.initWindow(
             geometry='1200x800',
             menuWidget={
                 '文件': {'新建': test, '打开': test},
                 '编辑': {'撤销': test, '重做': test},
                 '视图': {'缩放': test},
-                '帮助': {'关于': authorWindowStarter},
+                '帮助': {'关于': disp.authorWindowStarter},
             },
-            title='音·创 0.2 测试中',
-            buttons=[
+            title_='音·创 0.2 测试中',
+            button=[
                 {
                     '新建': ('', test2), 
                     '打开': ('', test2)
@@ -110,10 +112,10 @@ def __main__():
                     '测试': ('', test2)
                 }
             ],
-            debug=True,
+            Debug=True,
         )
         
-        window.start()
+        disp.winstart()
 
 
 if __name__ == '__main__':
