@@ -142,7 +142,7 @@ class midiConvert:
                                 )
                             )
                             + '}'
-                            + f'] ~~~ playsound {self.__Inst2SoundID(instrumentID)} @s ~~{1/volume-1}~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'
+                            + f'] ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'
                         )
                         commands += 1
 
@@ -378,10 +378,7 @@ class midiConvert:
             for cmd in track:
                 _bytes += __formCMDblk(
                     cmd,
-                    (1 if yforward else 0)
-                    if ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != maxheight))
-                    else (3 if zforward else 2),
+                    (1 if yforward else 0) if (((nowy != 0) and (not yforward)) or ((yforward) and (nowy != maxheight))) else (3 if zforward else 2) if (((nowz != 0) and (not zforward)) or ((zforward) and (nowz != _sideLength))) else 5,
                     impluse=2,
                     condition=False,
                     needRedstone=False,
