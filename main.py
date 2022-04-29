@@ -18,6 +18,7 @@
 
 import os
 
+
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
     """使用compression指定的算法打包目录为zip文件\n
     默认算法为DEFLATED(8),可用算法如下：\n
