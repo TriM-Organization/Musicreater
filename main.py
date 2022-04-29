@@ -18,7 +18,6 @@
 
 import os
 
-
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
     """使用compression指定的算法打包目录为zip文件\n
     默认算法为DEFLATED(8),可用算法如下：\n
@@ -58,10 +57,13 @@ class midiConvert:
         '''文件名，不含路径且不含后缀'''
 
     def __Inst2SoundID(self, instrumentID, default='note.harp'):
-        '''返回midi的乐器ID对应的我的世界乐器名
+        """返回midi的乐器ID对应的我的世界乐器名
         :param instrumentID: midi的乐器ID
         :param default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
-        :return: 我的世界乐器名 str'''
+        :return: 我的世界乐器名 str"""
+        if self.staticDebug:
+            pass
+
         if instrumentID == 105:
             return 'note.banjo'
         if instrumentID in range(32, 40):
@@ -97,11 +99,13 @@ class midiConvert:
     def _toCmdList_m1(
         self, scoreboardname: str = 'mscplay', volume: float = 1.0, speed: float = 1.0
     ) -> list:
-        '''使用Dislink Sforza的转换算法，将midi转换为我的世界命令列表
+        """
+        使用Dislink Sforza的转换算法，将midi转换为我的世界命令列表
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-        :return: 我的世界命令列表'''
+        :return: 我的世界命令列表
+        """
         tracks = []
         if volume > 1:
             volume = 1
@@ -154,12 +158,14 @@ class midiConvert:
         volume: float = 1.0,
         speed: float = 1.0,
     ) -> bool:
-        '''使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
+        """
+        使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
         :param method: 转换算法
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-        :return 成功与否，成功返回(True,True)，失败返回(False,str失败原因)'''
+        :return 成功与否，成功返回(True,True)，失败返回(False,str失败原因)
+        """
         if method == 1:
             cmdlist, _a = self._toCmdList_m1(scoreboardname, volume, speed)
         else:
@@ -242,12 +248,14 @@ class midiConvert:
         volume: float = 1.0,
         speed: float = 1.0,
     ) -> bool:
-        '''使用method指定的转换算法，将midi转换为BDX结构文件
+        """
+        使用method指定的转换算法，将midi转换为BDX结构文件
         :param method: 转换算法
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-        :return 成功与否，成功返回(True,未经过压缩的源)，失败返回(False,str失败原因)'''
+        :return 成功与否，成功返回(True,未经过压缩的源)，失败返回(False,str失败原因)
+        """
 
         import brotli
 
