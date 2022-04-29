@@ -41,13 +41,10 @@
 
 ## 致谢🙏
 
-- 感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
 - 感谢 昀梦\<QQ1515399885\> 找出指令生成错误bug并指正
-- 感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
-- 感谢由 CMA_2401PT 带来的 BDXWorkShop 供本程序对于bdx操作的指导
-- 感谢由 Miracle Plume “神羽” \<QQshenyu40403\>带来的羽音缭绕基岩版音色资源包
-- 感谢由 Dislink Sforza \<QQ1600515314\>带来的midi转换算法，我们将其加入了我们众多算法之一
-- 感谢 Arthur Morgan 对本程序的排错提出了最大的支持
+- 感谢由 Charlie_Ping “查理平” 带来的bdx文件转换参考
+- 感谢由 CMA_2401PT 为我们的软件开发进行指导
+- 感谢由 Dislink Sforza \<QQ1600515314\>带来的midi音色解析以及转换指令的算法，我们将其加入了我们众多算法之一
 - 感谢广大群友为此程序提供的测试等支持
 - 若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
 
