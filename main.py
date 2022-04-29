@@ -62,8 +62,6 @@ class midiConvert:
         :param instrumentID: midi的乐器ID
         :param default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
         :return: 我的世界乐器名 str"""
-        if self.staticDebug:
-            pass
 
         if instrumentID == 105:
             return 'note.banjo'
@@ -248,14 +246,14 @@ class midiConvert:
         scoreboardname: str = 'mscplay',
         volume: float = 1.0,
         speed: float = 1.0,
-    ) -> bool:
+    ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
         :param method: 转换算法
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-        :return 成功与否，成功返回(True,未经过压缩的源)，失败返回(False,str失败原因)
+        :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
 
         import brotli
@@ -358,14 +356,14 @@ class midiConvert:
                 block += i
             return block
 
-        def __fillSquareSideLength(self, total: int, maxHeight: int):
+        def __fillSquareSideLength(total: int, maxHeight: int):
             '''给定总方块数量和最大高度，返回所构成的图形外切正方形的边长
             :param total: 总方块数量
             :param maxHeight: 最大高度
             :return: 外切正方形的边长 int'''
             import math
 
-            math.ceil(math.sqrt(total / maxHeight))
+            return math.ceil(math.sqrt(total / maxHeight))
 
         _sideLength = __fillSquareSideLength(totalcount, maxheight)
 
@@ -374,13 +372,15 @@ class midiConvert:
 
         nowy = 0
         nowz = 0
+        nowx = 0
 
         for track in cmdlist:
             for cmd in track:
                 _bytes += __formCMDblk(
                     cmd,
                     (1 if yforward else 0)
-                    if (nowy != 0) and (nowy != maxheight)
+                    if ((nowy != 0) and (not yforward))
+                    or ((yforward) and (nowy != maxheight))
                     else (3 if zforward else 2),
                     impluse=2,
                     condition=False,
@@ -390,21 +390,34 @@ class midiConvert:
                     executeOnFirstTick=False,
                     trackOutput=True,
                 )
+
                 nowy += 1 if yforward else -1
-                _bytes += key[y][int(yforward)]
+
                 if ((nowy > maxheight) and (yforward)) or (
                     (nowy < 0) and (not yforward)
                 ):
+                    nowy -= 1 if yforward else -1
+
                     yforward = not yforward
+
                     nowz += 1 if zforward else -1
-                    _bytes += key[z][int(zforward)]
+
                     if ((nowz > _sideLength) and (zforward)) or (
                         (nowz < 0) and (not zforward)
                     ):
+                        nowz -= 1 if zforward else -1
                         zforward = not zforward
                         _bytes += key[x][1]
+                        nowx += 1
+                    else:
+
+                        _bytes += key[z][int(zforward)]
+
+                else:
+
+                    _bytes += key[y][int(yforward)]
 
         with open(f"{self.outputPath}/{self.midFileName}.bdx", "ab+") as f:
             f.write(brotli.compress(_bytes + b'XE'))
 
-        return (True, _bytes)
+        return (True, _bytes, (nowx, maxheight, _sideLength))
