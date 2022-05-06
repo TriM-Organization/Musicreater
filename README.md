@@ -1,8 +1,6 @@
 <h1 align="center">音·创 Musicreater</h1>
 
-<p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/04/01/qhfOPA.png" >
-</p>
+[![Ouhghj.png](https://s1.ax1x.com/2022/05/06/Ouhghj.png)](https://imgtu.com/i/Ouhghj)
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
