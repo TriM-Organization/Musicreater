@@ -275,7 +275,7 @@ class midiConvert:
         self, scoreboardname: str = 'mscplay', volume: float = 1.0, speed: float = 1.0
     ) -> list:
         """
-        使用Dislink Sforza的转换算法，将midi转换为我的世界命令列表
+        使用被金羿修改后的Dislink Sforza的转换算法，将midi转换为我的世界命令列表
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
@@ -316,7 +316,7 @@ class midiConvert:
                             + '='
                             + str(nowscore)
                             + '}'
-                            + f'] ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'
+                            + f'] ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'  # 此处需要修改
                         )
                         commands += 1
             if len(singleTrack) != 0:
