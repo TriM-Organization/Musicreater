@@ -62,7 +62,41 @@ A simple Python package.
 
 ## Instructions📕
 
-> comming soon.
+> 0. Install Python 3.6+
+>    
+>    During installation, be sure to check "add Python 3.X to path", otherwise it needs to be set manually
+>    
+>    At the same time, after the installation, remember to enter in CMD: "Python" to try
+> 
+>    whether the installation is successful,
+> 
+>    Python installation tutorial can be found on the Internet easily.
+> 
+> 1. Install (download this program)
+> Git, you can use the following commands:
+> 
+> `git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
+> 
+> If Git is not installed, you can download the zip package from the website. Then decompress it 
+> and enter the directory.
+> 
+> 2. Run (enter directory)
+> 
+>  Open CMD in the directory, enter the directory, and execute the following commands:
+> 
+> `pip install mido`
+> 
+> `pip install brotli`
+> 
+> 3. Start using!
+> 
+>  Open CMD in the directory, enter the directory, and execute the following commands:
+> 
+> (Choose what you need)
+> 
+> `python example_convert_bdx.py`
+> 
+> `python example_convert_mcpack.py`
 
 ### Instructions for **Customize Progress Bar**
 
