@@ -5,8 +5,8 @@
 
 class version:
     libraries = (
-        'mido', 'amulet', 'amulet-core', 'amulet-nbt', 'piano_transcription_inference', 'pypinyin',
-        'pyinstaller', 'py7zr','websockets', 'zhdate', 'requests'
+        'wxPython', 'mido', 'amulet', 'amulet-core', 'amulet-nbt', 'piano_transcription_inference', 'pypinyin',
+        'pyinstaller', 'py7zr','websockets', 'zhdate', 'requests',
         )
     """当前所需库"""
 
