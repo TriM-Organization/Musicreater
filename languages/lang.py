@@ -88,11 +88,12 @@ def __loadLanguage(languageFilename: str):
     return _text
 
 
-if not DEFAULTLANGUAGE == 'zh-CN':
-    if DEFAULTLANGUAGE in LANGUAGELIST.keys():
-        _TEXT = __loadLanguage('./languages/' + DEFAULTLANGUAGE + '.lang')
-    else:
-        raise KeyError(f'无法打开默认语言{DEFAULTLANGUAGE}')
+
+if DEFAULTLANGUAGE in LANGUAGELIST.keys():
+    _TEXT = __loadLanguage('./languages/' + DEFAULTLANGUAGE + '.lang')
+else:
+    log(f"无法打开当前本地化文本{DEFAULTLANGUAGE}", level='ERROR')
+    raise KeyError(f'无法打开默认语言{DEFAULTLANGUAGE}')
 
 
 def wordTranslate(singleWord: str, debug: bool = False):
@@ -113,7 +114,7 @@ def _(text: str, debug: bool = False):
         if debug:
             raise KeyError(f'无法找到翻译文本{text}')
         else:
-            log(f'无法找到本地化文本{text}','ERROR')
+            log(f'无法找到本地化文本{text}','WARRING')
             return ''
 
 

@@ -1,8 +1,10 @@
 <h1 align="center">音·创 Musicreater</h1>
 
 <p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/04/01/qhfOPA.png" >
+<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
 </p>
+
+<h3 align="center">一个免费开源的《我的世界：基岩版》音乐编辑制作软件</h3>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
@@ -16,6 +18,31 @@
 [![][release]](../../releases)
 
 简体中文🇨🇳 | [English🇬🇧](README_EN.md)
+
+
+> 是谁把科技的领域布满政治的火药
+> 
+> 是谁把纯净的蓝天染上暗淡的沉灰
+> 
+> 中国人民无不热爱自己伟大的祖国
+> 
+> 我们不会忘记屈辱历史留下的惨痛
+> 
+> 我们希望世界和平
+> 
+> 我们希望获得世界的尊重
+> 
+> 愿世上再也没有战争
+> 
+> 无论是热还是冷
+> 
+> 无论是经济还是政治
+> 
+> 让美妙的和平的优雅的音乐响彻世界
+> 
+>           ——金羿
+>             2022 5 7
+
 
 ## 软件介绍🚀
 

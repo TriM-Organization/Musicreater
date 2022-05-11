@@ -91,10 +91,9 @@ def __main__():
 
         def test2():
             print('???', end=' ')
-        
-        disp.__root = disp.tk.Tk()
 
-        disp.initWindow(
+        window = disp.disp(
+            disp.root,
             geometry='1200x800',
             menuWidget={
                 '文件': {'新建': test, '打开': test},
@@ -102,8 +101,8 @@ def __main__():
                 '视图': {'缩放': test},
                 '帮助': {'关于': disp.authorWindowStarter},
             },
-            title_='音·创 0.2 测试中',
-            button=[
+            title='音·创 0.2 测试中',
+            buttons=[
                 {
                     '新建': ('', test2), 
                     '打开': ('', test2)
@@ -112,10 +111,9 @@ def __main__():
                     '测试': ('', test2)
                 }
             ],
-            Debug=True,
+            debug=True,
         )
         
-        disp.winstart()
 
 
 if __name__ == '__main__':

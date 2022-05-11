@@ -1,8 +1,10 @@
 <h1 align="center">音·创 Musicreater</h1>
 
 <p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/04/01/qhfOPA.png" >
+<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
 </p>
+
+<h3 align="center">An open source and free software of making music in Minecraft</h3>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
@@ -16,6 +18,31 @@
 [![][release]](../../releases)
 
 [简体中文🇨🇳](README.md) | English🇬🇧
+
+
+> Who has dropped political gunpowder into the technology
+> 
+> Who has dyed clear blue sky into the dark grey
+> 
+> All Chinese people love our great homeland
+> 
+> We *WILL* remember the remain pain of the humiliating history
+> 
+> We love the whole world but in peace
+> 
+> We love everyone but under respect
+> 
+> It is to be hoped that the war ends forever
+> 
+> Whatever it is cold or hot
+> 
+> Whatever it is economical or political
+> 
+> Just let the wonderful music of peace surround the world
+> 
+>                             ---- Eilles Wan
+>                                  7/5 2022
+
 
 **Notice that the language support of *README* may be a little SLOW.**
 
