@@ -10,6 +10,7 @@
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
 <p>
 
+
 [![][Bilibili: 凌云金羿]](https://space.bilibili.com/397369002/)
 [![][Bilibili: 诸葛亮与八卦阵]](https://space.bilibili.com/604072474) 
 [![CodeStyle: black]](https://github.com/psf/black)
@@ -17,7 +18,8 @@
 [![][license]](LICENSE)
 [![][release]](../../releases)
 
-简体中文🇨🇳 | [English🇬🇧](README_EN.md)
+
+简体中文 | [English](README_EN.md)
 
 
 ## 软件介绍🚀
