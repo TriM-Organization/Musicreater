@@ -17,7 +17,7 @@
 [![][license]](LICENSE)
 [![][release]](../../releases)
 
-[简体中文🇨🇳](README.md) | English🇬🇧
+[简体中文](README.md) | English
 
 
 
