@@ -545,7 +545,7 @@ class midiConvert:
                 scoreboardname, volume, speed
             )
         else:
-            return (False, f'无法找到算法ID{method}对应的转换算法')
+            return (False, f'无法找到算法ID {method} 对应的转换算法')
 
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
