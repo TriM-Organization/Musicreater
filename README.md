@@ -64,7 +64,32 @@
 
 ## 使用教程📕
 
-> 正在到来
+> 0. 安装python3.6+
+>    
+>    在安装时，一定要勾选Add Python 3.X to PATH，不然就要手动设置
+>    
+>    同时，装完之后记得在cmd中输入：python 试试是否安装成功，
+>    python的安装可以去网上随便找一下。
+> 1. 安装（下载本程序）git的话，可以使用以下命令：
+> 
+> `git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
+> 
+> 没有安装git的话，可以下载zip包，解压后进入目录即可。
+> 
+> 2. 运行（进入目录）
+> 在目录下打开cmd，进入到目录下，执行以下命令：
+> 
+> `pip install mido`
+> 
+> `pip install brotli`
+> 
+> 3. 开始使用！
+> 在目录下打开cmd，进入到目录下，执行以下命令：(选择你需要的)
+> 
+> `python example_convert_bdx.py`
+> 
+> `python example_convert_mcpack.py`
+
 
 ### 对于 进度条自定义 功能的说明
 
