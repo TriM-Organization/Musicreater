@@ -1,54 +1,40 @@
 <h1 align="center">音·创 Musicreater</h1>
 
-<p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
-</p>
+
 
 <h3 align="center">一个免费开源的《我的世界：基岩版》音乐编辑制作软件</h3>
 
-<p align="center">
-<img src="https://forthebadge.com/images/badges/built-with-love.svg">
-<p>
 
 
-[![][Bilibili: 凌云金羿]](https://space.bilibili.com/397369002/)
-[![][Bilibili: 诸葛亮与八卦阵]](https://space.bilibili.com/604072474) 
-[![CodeStyle: black]](https://github.com/psf/black)
-[![][python]](https://www.python.org/)
-[![][license]](LICENSE)
-[![][release]](../../releases)
+简体中文 | 
 
 
-简体中文 | [English](README_EN.md)
-
-
-## 软件介绍🚀
+## 软件介绍
 
 音·创 Musicreater 是一款免费开源的 **《我的世界：基岩版》** 音乐制作软件
 
-欢迎加群：[861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
+欢迎加群：
 
 **注意注意注意！！！本程序尚在测试与开发阶段，且代码重构未完成，请自行定夺使用。**
 
-## 软件作者✒
+## 软件作者
 
 金羿 Eilles：我的世界基岩版指令师，个人开发者，B站不知名UP主，南昌在校高中生。
 
 诸葛亮与八卦阵 bgArray：我的世界基岩版玩家，喜欢编程和音乐，深圳初一学生。
 
-## 软件架构🏢
+## 软件架构
 
 软件采用 *Python* 作为第一语言，目前还没有使用其他语言辅助。使用可更换的UI结构库，即开发人员可以通过更换display.py文件随心所欲地切换UI库；后期将支持插件自加载。
 
 支持 Windows7+ 以及各个支持 Python3.6+ 的 Linux
 
 ***各位开发人员注意！！！多语言支持请使用函数`_`加载文字！！！如需补充，请在简体中文的语言文件(zh-CN.lang)中补充！！！***
-
-## 使用教程📕
+## 使用教程
 
 ### 安装教程
 
-下载[音·创自动安装器](https://gitee.com/EillesWan/Musicreater/releases/v0.2.0.0-Delta)，将其放在你希望安装音·创的位置，运行后将自动安装。
+下载[音·创自动安装器]，将其放在你希望安装音·创的位置，运行后将自动安装。
 
 提示：下载源最好选择\"2 GitHub\"。
 
@@ -56,11 +42,9 @@
 
 #### Windows7+
 
-0.  [Gitee下载（需要登陆）](https://gitee.com/EillesWan/Musicreater)
-    [Github下载（慢）](https://github.com/EillesWan/Musicreater)本程序源代码
+0.  [Gitee下载（需要登陆）]
+    [Github下载（慢）]本程序源代码
 1.  安装Python 3.8.10 
-    [下载64位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
-    [下载32位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
 2.  以管理员身份运行 补全库.py :
     -   点击 “开始” 菜单，搜索 `命令提示符`
     -   右键点击 `命令提示符` 左键点击 “以管理员身份运行”
@@ -79,7 +63,7 @@ sudo apt-get install git
 ```
 1.  若你足够自信，该整的都整了，就在你想下载此程序的地方打开终端，敲：
 ```bash
-sudo git clone https://gitee.com/EillesWan/Musicreater.git
+sudo git clone 
 cd Musicreater
 python3 补全库.py
 python3 Musicreater.py
@@ -93,7 +77,7 @@ python3 Musicreater.py
 
 ## 诸葛亮与八卦阵的关于羽音缭绕资源包应用地说明（不必要）📖
 
-1. 首先！这里的提示是给想使用多音色资源包的人的，如果你想用就请下载 [神羽资源包（神羽自己的链接）](https://pan.baidu.com/s/11uoq5zwN7c3rX-98DqVpJg)提取码:ek3t
+1. 首先！这里的提示是给想使用多音色资源包的人的，如果你想用就请下载 [神羽资源包（神羽自己的链接）])提取码:ek3t
 2. 下载到你自己电脑上某个位置，可以不放置于本项目下。音色资源包较大，可以选取只下载：
     `神羽资源包_乐器、音源的资源包\羽音缭绕-midiout_25.0` 这个文件夹，再嫌麻烦的话，也可以只下载其中的：
     `神羽资源包_乐器\音源的资源包\羽音缭绕-midiout_25.0\mcpack(国际版推荐)格式_25.0` 或者：
@@ -110,7 +94,7 @@ python3 Musicreater.py
 
 ## 致谢🙏
 
-1.  感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
+1.  感谢由 [Fuckcraft] “鸣凤鸽子”等 带来的我的世界websocket服务器功能
 2.  感谢 昀梦\<QQ1515399885\> 找出指令生成错误bug并指正
 3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
 4.  感谢由 CMA_2401PT 带来的 BDXWorkShop 供本程序对于bdx操作的指导
@@ -156,12 +140,3 @@ python3 Musicreater.py
 * - [ ] 18.支持读入JPword曲谱文件（.jpd）
 * - [ ] 19.新的UI设计，以及UI主题文件
 * - [ ] 20.以小节为单位做音符播放时间对标
-
-
-
-[Bilibili: 凌云金羿]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
-[Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
-[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
-[python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge
-[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
