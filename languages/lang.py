@@ -2,7 +2,7 @@
 '''对于音·创的语言支持兼语言文件编辑器'''
 
 """
-   Copyright 2022 Team-Ryoun
+   Copyright 2022 all the developers of Musicreater
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
@@ -54,13 +54,6 @@ LANGUAGELIST = {
         "喵喵喵~ 祖国喵~"
     )
 }
-
-# 对于旧版本音·创的语言支持
-# 重构之后将停止使用
-try:
-    from languages.zhCN import READABLETEXT
-except:
-    pass
 
 
 from msctLib.log import log

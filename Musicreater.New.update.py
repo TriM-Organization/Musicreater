@@ -5,8 +5,8 @@
 # QQ 2647547478
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
-# 版权所有 Team-Ryoun 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
-# 若需转载或借鉴 请附作者
+# 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
+# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
 
 
 """
@@ -15,7 +15,7 @@
 Musicreater (音·创)
 A free opensource software which is used for creating all kinds of musics in Minecraft
 
-   Copyright 2022 Team-Ryoun
+   Copyright 2022 all the developers of Musicreater
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ A free opensource software which is used for creating all kinds of musics in Min
 
 
 from msctLib.buildIN import version
+from languages.lang import _
 
 __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
@@ -46,7 +47,14 @@ __author__ = '金羿Eilles'
 
 
 def __main__():
-    pass
+    import wx                           # 引入wxPython库
+    app = wx.App(False) 
+    frame = wx.Frame(None, id=wx.ID_ANY, title=f"{_('F音创')} {__ver__}", size=(1600, 900))
+    # 创建图标
+    icon_obj = wx.Icon(name="./resources/msctIcon.png")
+    frame.SetIcon(icon_obj)            # 设定图标
+    frame.Show(True)                 # 显示该窗口
+    app.MainLoop()                   # 应用程序消息处理
         
 
 
