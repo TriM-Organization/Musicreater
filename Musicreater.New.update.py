@@ -40,21 +40,48 @@ A free opensource software which is used for creating all kinds of musics in Min
 
 from msctLib.buildIN import version
 from languages.lang import _
+import wx                           # 引入wxPython库
 
 __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
 
 
+class MainWindow(wx.Frame):
+    """We simply derive a new class of Frame."""
+    def __init__(self, *args, **kargs):
+        wx.Frame.__init__(self, *args, **kargs)
+        self.control = wx.TextCtrl(self, style = wx.TE_MULTILINE)
+
+        #创建位于窗口的底部的状态栏
+        self.CreateStatusBar()
+
+        # 设置菜单
+        filemenu = wx.Menu()
+
+        #wx.ID_ABOUT和wx.ID_EXIT是wxWidgets提供的标准ID
+        filemenu.Append(wx.ID_ABOUT, _(u"关于"), _(u"h关于"))
+        filemenu.AppendSeparator()
+        filemenu.Append(wx.ID_EXIT, item=_(u"退出"), helpString=_(r'h退出') )
+
+        # 创建菜单栏
+        menuBar = wx.MenuBar()
+        menuBar.Append(filemenu, u"文件")
+        self.SetMenuBar(menuBar)
+        
+        # 创建图标
+        icon = wx.Icon(name="./resources/msctIcon.png")
+        self.SetIcon(icon)
+
+        self.Show(True)
+
+
+
 
 def __main__():
-    import wx                           # 引入wxPython库
     app = wx.App(False) 
-    frame = wx.Frame(None, id=wx.ID_ANY, title=f"{_('F音创')} {__ver__}", size=(1600, 900))
-    # 创建图标
-    icon_obj = wx.Icon(name="./resources/msctIcon.png")
-    frame.SetIcon(icon_obj)            # 设定图标
-    frame.Show(True)                 # 显示该窗口
-    app.MainLoop()                   # 应用程序消息处理
+    frame = MainWindow(None, id=wx.ID_ANY, title=f"{_('F音创')} {__ver__}", size=(1600, 900))
+
+    app.MainLoop()
         
 
 
