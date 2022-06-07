@@ -18,30 +18,6 @@
 [简体中文🇨🇳](README.md) | English🇬🇧
 
 
-> Who has dropped political gunpowder into the technology
-> 
-> Who has dyed clear blue sky into the dark grey
-> 
-> All Chinese people love our great homeland
-> 
-> We *WILL* remember the remain pain of the humiliating history
-> 
-> We love the whole world but in peace
-> 
-> We love everyone but under respect
-> 
-> It is to be hoped that the war ends forever
-> 
-> Whatever it is cold or hot
-> 
-> Whatever it is economical or political
-> 
-> Just let the wonderful music of peace surround the world
-> 
->                             ---- Eilles Wan
->                                  7/5 2022
-
-
 **Notice that the language support of *README* may be a little SLOW.**
 
 ## Introduction🚀

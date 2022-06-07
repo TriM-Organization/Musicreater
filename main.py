@@ -1,20 +1,34 @@
-# -*- coding:utf-8 -*-
+# -*- coding: utf-8 -*-
 
-'''
-   Copyright © 2022 Team-Ryoun 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
 
-   Licensed under the Apache License, Version 2.0 (the "License");
+# 音·创 开发交流群 861684859
+# Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
+# 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
+# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
+
+
+"""
+音·创 (Musicreater)
+一款免费开源的 《我的世界：基岩版》 音乐制作软件
+注意！除了此源文件以外，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
+Musicreater (音·创)
+A free opensource software which is used for creating all kinds of musics in Minecraft
+Note! Except for this source file, all the files in this repository and this project are licensed under Apache License 2.0
+
+   Copyright 2022 all the developers of Musicreater
+
+   Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.
    You may obtain a copy of the License at
 
        http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
+   distributed under the License is distributed on an 'AS IS' BASIS,
    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
    See the License for the specific language governing permissions and
    limitations under the License.
-'''
+"""
 
 import os
 
