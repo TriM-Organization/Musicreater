@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
 
 
-# W-YI 金羿
-# QQ 2647547478
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
-# 版权所有 Team-Ryoun 金羿("Eilles Wan")
-# 若需转载或借鉴 请附作者
+# 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
+# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
 
 
 """
@@ -15,7 +13,7 @@
 Musicreater Auto Installer (音·创自动安装器)
 A software that used for installing Musicreater automatically
 
-   Copyright 2022 Team-Ryoun
+   Copyright 2022 all the developers of Musicreater
 
    Licensed under the Apache License, Version 2.0 (the 'License');
    you may not use this file except in compliance with the License.

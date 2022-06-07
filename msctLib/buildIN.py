@@ -10,7 +10,7 @@ class version:
         )
     """当前所需库"""
 
-    version = ('0.2.0', 'Delta',)
+    version = ('0.3.0', 'Delta',)
     """当前版本"""
 
     def __init__(self) -> None:
@@ -27,11 +27,6 @@ class version:
         from sys import platform
         import os
         if platform == 'win32':
-            import shutil
-            try:
-                shutil.rmtree(os.getenv('APPDATA') + '\\Musicreater\\')
-            except FileNotFoundError:
-                pass
             for i in self.libraries:
                 print("安装库：" + i)
                 os.system(f"python -m pip install {i} -i {index}")
