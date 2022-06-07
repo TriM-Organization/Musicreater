@@ -1,7 +1,7 @@
 # THIS PROGRAM IS ONLY A TEST EXAMPLE
 
 
-from main import *
+from msctPkgver.main import *
 
 convertion = midiConvert()
 convertion.convert(input('请输入midi文件路径：'), input('请输入输出路径：'))

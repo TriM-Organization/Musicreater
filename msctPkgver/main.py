@@ -8,11 +8,11 @@
 
 
 """
-音·创 (Musicreater)
-一款免费开源的 《我的世界：基岩版》 音乐制作软件
+音·创 库版 (Musicreater Package Version)
+是一款免费开源的针对《我的世界：基岩版》的midi音乐转换库
 注意！除了此源文件以外，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
-Musicreater (音·创)
-A free opensource software which is used for creating all kinds of musics in Minecraft
+Musicreater pkgver (Package Version 音·创 库版)
+A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
 Note! Except for this source file, all the files in this repository and this project are licensed under Apache License 2.0
 
    Copyright 2022 all the developers of Musicreater
