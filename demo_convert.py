@@ -14,6 +14,9 @@ while True:
 
 outpath = input('请输入输出路径：')
 
+if not os.path.exists(outpath):
+    os.makedirs(outpath)
+
 while True:
     try:
         outFormat = int(input('请输入输出格式(0:mcpack|1:BDX结构)：'))
@@ -58,6 +61,7 @@ while True:
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.endswith('.mid'):
+            print(f'正在操作{i}')
             convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4] + '.mcpack')
             if outFormat == 0:
                 convertion.tomcpack(
