@@ -40,10 +40,7 @@ Note! Except for this source file, all the files in this repository and this pro
 
 from msctLib.buildIN import version
 from languages.lang import _
-<<<<<<< HEAD
 from msctLib.log import log
-=======
->>>>>>> 9fd32d499fa23eef32bf90e79492ab2be8274239
 import wx                           # 引入wxPython库
 
 __ver__ = f'{version.version[1]} {version.version[0]}'
