@@ -113,10 +113,6 @@ class MainWindow(wx.Frame):
         # 载入参量 注意！图标将不被载入参数
 
 
-        self.__root = tk.Tk()
-        '''窗口根'''
-
-
 
         self.menuWidgets = menuWidget
         '''菜单设定项'''

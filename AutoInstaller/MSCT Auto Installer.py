@@ -214,6 +214,6 @@ You can now open Musicreater.PYC in the directory of ./Musicreater to run Musicr
 
 
 if platform == "linux":
-    srun("python3 ./Musicreater/补全库.pyc")
+    srun("python3 -m pip install -r ./Musicreater/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/")
 elif platform == "win32":
-    srun("python ./Musicreater/补全库.pyc")
+    srun("pip install -r ./Musicreater/requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple/")
