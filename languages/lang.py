@@ -30,17 +30,17 @@ LANGUAGELIST = {
     ),
     'zh-TW': (
         "繁体中文 中国台湾省",
-        "Traditional Chinese - Taiwan, China",
+        "Traditional Chinese - Taiwan Province, China",
         "正體中文,中国台灣省",
     ),
     # 'zh-HK': (
     #     "繁体中文 香港",
-    #     "Traditional Chinese - the Hong Kong Special Administrative Region",
+    #     "Traditional Chinese - Hong Kong SAR",
     #     "繁體中文,香港特別行政區",
     # ),
     # 'zh-MO': (
     #     "繁体中文 澳门",
-    #     "Traditional Chinese - the Macao Special Administrative Region",
+    #     "Traditional Chinese - Macau SAR",
     #     "繁體中文,澳門特別行政區",
     # ),
     'en-GB': (
@@ -50,8 +50,8 @@ LANGUAGELIST = {
     ),
     'zh-ME' : (
         "喵喵文 中国大陆",
-        "Meow Catsese - China Mainland"
-        "喵喵喵~ 祖国喵~"
+        "Meow Catsnese - China Mainland"
+        "喵喵喵~ 种花家~"
     )
 }
 

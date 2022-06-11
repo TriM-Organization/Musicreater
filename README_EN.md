@@ -66,7 +66,7 @@ Tips: You'd better choose the \"2 GitHub\" download source
 2.  After completing installation, we need to install the libraries :
     -   Open "Start Menu" and find `cmd`
     -   Run `cmd` as Administrator
-    -   Drag "补全库.py" into the opened window and press Enter
+    -   Drag "作者的自我修养.py" into the opened window and press Enter
 3.  After completing installation，double click Musicreater.py to run
 
 #### Linux
@@ -83,7 +83,7 @@ sudo apt-get install git
 ```bash
 sudo git clone https://gitee.com/EillesWan/Musicreater.git
 cd Musicreater
-python3 补全库.py
+python3 作者的自我修养.py
 python3 Musicreater.py
 ```
 

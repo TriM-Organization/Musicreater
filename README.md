@@ -61,10 +61,10 @@
 1.  安装Python 3.8.10 
     [下载64位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
     [下载32位Python安装包](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
-2.  以管理员身份运行 补全库.py :
+2.  以管理员身份运行 作者的自我修养.py :
     -   点击 “开始” 菜单，搜索 `命令提示符`
     -   右键点击 `命令提示符` 左键点击 “以管理员身份运行”
-    -   将 “补全库.py” 拖拽入开启的窗口，按下回车
+    -   将 “作者的自我修养.py” 拖拽入开启的窗口，按下回车
 3.  等待安装完成后，双击运行 Musicreater.py
 
 #### Linux
@@ -81,7 +81,7 @@ sudo apt-get install git
 ```bash
 sudo git clone https://gitee.com/EillesWan/Musicreater.git
 cd Musicreater
-python3 补全库.py
+python3 作者的自我修养.py
 python3 Musicreater.py
 ```
 

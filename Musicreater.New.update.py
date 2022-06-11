@@ -47,6 +47,8 @@ __ver__ = f'{version.version[1]} {version.version[0]}'
 __author__ = '金羿Eilles'
 
 
+
+
 class MainWindow(wx.Frame):
     """We simply derive a new class of Frame."""
     def __init__(self, *args, **kargs):
