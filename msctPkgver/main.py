@@ -31,6 +31,8 @@ Note! Except for this source file, all the files in this repository and this pro
 """
 
 import os
+import mido
+import brotli
 
 
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -62,8 +64,6 @@ class midiConvert:
 
     def convert(self, midiFile: str, outputPath: str):
         '''转换前需要先运行此函数来获取基本信息'''
-
-        import mido
 
         self.midiFile = midiFile
         '''midi文件路径'''
@@ -672,8 +672,6 @@ class midiConvert:
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
 
-        import brotli
-
         if method == 1:
             cmdlist, totalcount, maxScore = self._toCmdList_m1(
                 scoreboardname, volume, speed
@@ -808,8 +806,6 @@ class midiConvert:
         :param player: 玩家选择器，默认为`@a`
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
-
-        import brotli
 
         if method == 1:
             cmdlist = self._toCmdList_withDelay_m1(volume, speed, player, progressbar)

@@ -88,7 +88,7 @@ if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.endswith('.mid'):
             print(f'正在操作{i}')
-            convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4] + '.mcpack')
+            convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4] )
             if outFormat == 0:
                 convertion.tomcpack(
                     1,
