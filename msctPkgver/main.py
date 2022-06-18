@@ -481,15 +481,15 @@ class midiConvert:
 
                 nowstr = pgsstyle
                 if ids[r'%%s'] == True:
-                    nowstr = nowstr.replace(r'%%s', str(i + 1))
+                    nowstr = nowstr.replace(r'%%s', str(allticks[i] + 1))
                 if ids[r'%%t'] == True:
-                    nowstr = nowstr.replace(r'%%t', self.__score2time(i + 1))
+                    nowstr = nowstr.replace(r'%%t', self.__score2time(allticks[i] + 1))
                 if ids[r'%%%'] == True:
                     nowstr = nowstr.replace(
-                        r'%%%', str(int((i + 1) / allticks[-1] * 10000) / 100) + '%'
+                        r'%%%', str(int((allticks[i] + 1) / allticks[-1] * 10000) / 100) + '%'
                     )
 
-                countof_s = int((i + 1) / allticks[-1] * pgblength)
+                countof_s = int((allticks[i] + 1) / allticks[-1] * pgblength)
 
                 titlenow = __replace(
                     nowstr,
