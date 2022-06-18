@@ -44,9 +44,9 @@ A simple Python package.
 >    
 >    During installation, be sure to check "add Python 3.X to path", otherwise it needs to be set manually
 >    
->    At the same time, after the installation, remember to enter in CMD: "Python" to try
+>    At the same time, after the installation, remember to enter in CMD: "python" to try
 > 
->    whether the installation is successful,
+>    whether the installation is successful.
 > 
 >    Python installation tutorial can be found on the Internet easily.
 > 

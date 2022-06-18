@@ -84,7 +84,6 @@ while True:
         print('输入错误，请重新输入')
 
 
-
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.endswith('.mid'):
@@ -93,8 +92,12 @@ if os.path.isdir(midipath):
             if outFormat == 0:
                 convertion.tomcpack(
                     1,
-                    isAutoReset if isAutoReset != '' else bool(int(input('是否自动重置计分板(1|0)：'))),
-                    isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+                    isAutoReset
+                    if isAutoReset != ''
+                    else bool(int(input('是否自动重置计分板(1|0)：'))),
+                    isProgress
+                    if isProgress != ''
+                    else bool(int(input('是否开启进度条(1|0)：'))),
                     sbname if sbname != '' else input('请输入计分板名称：'),
                     volume if volume != '' else float(input('请输入音量（0-1）：')),
                     speed if speed != '' else float(input('请输入速度倍率：')),
@@ -103,12 +106,16 @@ if os.path.isdir(midipath):
                 convertion.toBDXfile(
                     1,
                     author if author != '' else input('请输入作者：'),
-                    isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+                    isProgress
+                    if isProgress != ''
+                    else bool(int(input('是否开启进度条(1|0)：'))),
                     maxHeight if maxHeight != '' else int(input('请输入指令结构最大生成高度：')),
                     sbname if sbname != '' else input('请输入计分板名称：'),
                     volume if volume != '' else float(input('请输入音量（0-1）：')),
                     speed if speed != '' else float(input('请输入速度倍率：')),
-                    isAutoReset if isAutoReset != '' else bool(int(input('是否自动重置计分板(1|0)：'))),
+                    isAutoReset
+                    if isAutoReset != ''
+                    else bool(int(input('是否自动重置计分板(1|0)：'))),
                 )
 else:
     convertion.convert(midipath, outpath)
