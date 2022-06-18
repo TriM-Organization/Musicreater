@@ -363,13 +363,18 @@ class midiConvert:
         if volume <= 0:
             volume = 0.001
 
+        if isMixedWithPrograssBar == True:
+            isMixedWithPrograssBar = (
+                r'▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]',
+                ('§e=§r', '§7=§r'),
+            )
+
         for i, track in enumerate(self.midi.tracks):
 
             instrumentID = 0
             ticks = 0
 
             for msg in track:
-                timesnow += msg.time
                 ticks += msg.time
                 if msg.is_meta:
                     if msg.type == 'set_tempo':
@@ -462,7 +467,7 @@ class midiConvert:
         for i in range(len(allticks)):
             if i != 0:
                 for j in range(len(tracks[allticks[i]])):
-                    if i != 0:
+                    if j != 0:
                         results.append((tracks[allticks[i]][j], 0))
                     else:
                         results.append(
@@ -494,7 +499,7 @@ class midiConvert:
                     isMixedWithPrograssBar[1][1],
                 )
 
-                results.append(f'title {player} actionbar {titlenow}', 0)
+                results.append((f'title {player} actionbar {titlenow}', 0,))
 
         return results
 
@@ -841,7 +846,6 @@ class midiConvert:
         nowy = 0
         nowz = 0
         nowx = 0
-
 
         for cmd, delay in cmdlist:
             _bytes += self.__formCMDblk(
