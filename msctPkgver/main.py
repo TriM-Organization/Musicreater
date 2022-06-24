@@ -75,43 +75,50 @@ class midiConvert:
         self.midFileName = os.path.splitext(os.path.basename(self.midiFile))[0]
         '''文件名，不含路径且不含后缀'''
 
-    def __Inst2SoundID(self, instrumentID, default='note.harp'):
-        """返回midi的乐器ID对应的我的世界乐器名
+    def __Inst2soundIDwithX(self, instrumentID):
+        """返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
+            2**( ( msg.note - 60 - X ) / 12 ) 即为MC的音高，其中
+            X的取值随乐器不同而变化：
+            竖琴harp、电钢琴pling、班卓琴banjo、方波bit、颤音琴iron_xylophone 的时候为6
+            吉他的时候为7
+            贝斯bass、迪吉里杜管didgeridoo的时候为8
+            长笛flute、牛铃cou_bell的时候为5
+            钟琴bell、管钟chime、木琴xylophone的时候为4
         :param instrumentID: midi的乐器ID
         :param default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
-        :return: 我的世界乐器名 str"""
+        :return: (str我的世界乐器名, int转换算法中的X)"""
 
         if instrumentID == 105:
-            return 'note.banjo'
+            return 'note.banjo', 6
         if instrumentID in range(32, 40):
-            return 'note.bass'
+            return 'note.bass', 8
         if instrumentID in range(115, 119):
-            return 'note.basedrum'
+            return 'note.basedrum', 7 # 注意，这里是底鼓，打击乐器无音域
         if instrumentID == 9 or instrumentID == 14:
-            return 'note.bell'
+            return 'note.bell', 4
         if instrumentID == 80 or instrumentID == 81:
-            return 'note.bit'
+            return 'note.bit', 6
         if instrumentID == 112:
-            return 'note.cow_bell'
+            return 'note.cow_bell', 5
         if instrumentID == -1:
-            return 'note.didgeridoo'  # 这是什么？我看不懂，但我大受震撼
+            return 'note.didgeridoo', 8
         if instrumentID in range(72, 80):
-            return 'note.flute'
+            return 'note.flute', 5
         if instrumentID in range(24, 32):
-            return 'note.guitar'
+            return 'note.guitar', 7
         if instrumentID == -2:
-            return 'note.hat'
+            return 'note.hat', 7 # 注意，这里是击鼓沿，打击乐器无音域
         if instrumentID == 14:
-            return 'note.chime'
+            return 'note.chime', 4
         if instrumentID == 8 or instrumentID == 11:
-            return 'iron_xylophone'
+            return 'iron_xylophone', 6
         if instrumentID == 2:
-            return 'note.pling'
+            return 'note.pling', 6
         if instrumentID == 114:
-            return 'note.snare'
+            return 'note.snare', 7 # 注意，这里是小军鼓，打击乐器无音域
         if instrumentID == 13:
-            return 'note.xylophone'
-        return default
+            return 'note.xylophone', 4
+        return 'note.pling', 6
 
     def __score2time(self, score: int):
         return str(int(int(score / 20) / 60)) + ':' + str(int(int(score / 20) % 60))
@@ -327,13 +334,14 @@ class midiConvert:
                             / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                         )
                         maxscore = max(maxscore, nowscore)
+                        soundID, _X = self.__Inst2soundIDwithX(instrumentID)
                         singleTrack.append(
                             'execute @a[scores={'
                             + str(scoreboardname)
                             + '='
                             + str(nowscore)
                             + '}'
-                            + f'] ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'  # 此处需要修改
+                            + f'] ~ ~ ~ playsound {soundID} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-60-_X)/12)}'
                         )
                         commands += 1
             if len(singleTrack) != 0:
@@ -387,13 +395,14 @@ class midiConvert:
                             (ticks * tempo)
                             / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                         )
+                        soundID, _X = self.__Inst2soundIDwithX(instrumentID)
                         try:
                             tracks[nowtick].append(
-                                f'execute {player} ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}'
+                                f'execute {player} ~ ~ ~ playsound {soundID} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-60-_X)/12)}'
                             )
                         except:
                             tracks[nowtick] = [
-                                f'execute {player} ~ ~ ~ playsound {self.__Inst2SoundID(instrumentID)} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-66)/12)}',
+                                f'execute {player} ~ ~ ~ playsound {soundID} @s ~ ~{1/volume-1} ~ {msg.velocity*(0.7 if msg.channel == 0 else 0.9)} {2**((msg.note-60-_X)/12)}',
                             ]
 
         allticks = list(tracks.keys())
