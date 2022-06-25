@@ -123,7 +123,8 @@ This is a default definder parameter:
 - Thank [Fuckcraft](https://github.com/fuckcraft) *(“鸣凤鸽子” ,etc)* for the function of Creating the Websocket Server for Minecraft: Bedrock Edition.
     -   *!! They have given me the rights to directly copy the lib into Musicreater*
 - Thank *昀梦*\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* Created.
-- Thank *Charlie_Ping “查理平”* for bdx convert funtion.
+- Thank *Charlie_Ping “查理平”* for bdx convert function, and
+the data label that's used to convert the mid's instruments into minecraft's instruments.
 - Thank *CMA_2401PT* for BDXWorkShop as the .bdx structure's operation guide.
 - Thank *Miracle Plume “神羽”* \<QQshenyu40403\> for the Miracle Plume Bedrock Edition Audio Resource Pack
 - 感谢由 Dislink Sforza \<QQ1600515314\>带来的midi转换算法，我们将其加入了我们众多算法之一
