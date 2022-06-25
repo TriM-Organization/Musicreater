@@ -152,10 +152,15 @@ class MainWindow(wx.Frame):
         log('新建一个菜单')
 
         self._RootMenu = {}
-        self._mainMenuBar = tk.Menu(self.__root)
+        self._mainMenuBar = wx.MenuBar()
+        
+        # 取得一个菜单名和一堆菜单函数及其显示名称
         for menuName, menuCmd in self.menuWidgets.items():
-            # 取得一个菜单名和一堆菜单函数及其显示名称
-            menu = tk.Menu(self._mainMenuBar, tearoff=0)
+
+            # 新建一个菜单
+            menu = wx.Menu()
+
+            # 循环得到菜单下的项目，并载入其中
             for cmdName, cmdFunc in menuCmd.items():
                 if cmdName:
                     menu.add_command(label=cmdName, command=cmdFunc)
