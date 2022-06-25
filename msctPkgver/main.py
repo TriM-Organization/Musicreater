@@ -406,9 +406,9 @@ class midiConvert:
                 if msg.is_meta:
                     if msg.type == 'set_tempo':
                         tempo = msg.tempo
+                else:
                     if msg.type == 'program_change':
                         instrumentID = msg.program
-                else:
                     if msg.type == 'note_on' and msg.velocity != 0:
                         nowtick = round(
                             (ticks * tempo)
