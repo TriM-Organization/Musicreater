@@ -118,7 +118,7 @@ class midiConvert:
             return 'note.snare', 7 # 注意，这里是小军鼓，打击乐器无音域
         if instrumentID == 13:
             return 'note.xylophone', 4
-        return 'note.pling', 6
+        return 'note.harp', 6
 
     def __score2time(self, score: int):
         return str(int(int(score / 20) / 60)) + ':' + str(int(int(score / 20) % 60))
