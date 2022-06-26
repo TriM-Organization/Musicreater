@@ -1,7 +1,6 @@
-from openpyxl import *
-
-
 def get():
+    from openpyxl import *
+    
     wb = load_workbook('program音色表.xlsx')
 
     ws = wb.active
