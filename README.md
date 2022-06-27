@@ -58,6 +58,8 @@
 > 
 > `pip install brotli`
 > 
+> `pip install openpyxl`
+> 
 > 3. 开始使用！
 > 在目录下打开cmd，进入到目录下，执行以下命令：(选择你需要的)
 > 

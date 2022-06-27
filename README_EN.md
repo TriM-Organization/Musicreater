@@ -66,6 +66,8 @@ A simple Python package.
 > 
 > `pip install brotli`
 > 
+> `pip install openpyxl`
+> 
 > 3. Start using!
 > 
 >  Open CMD in the directory, enter the directory, and execute the following commands:
