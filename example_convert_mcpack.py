@@ -13,3 +13,10 @@ convertion.tomcpack(
     float(input('请输入音量（0-1）：')),
     float(input('请输入速度倍率：')),
 )
+
+# for the test
+# if __name__ == '__main__':
+#     convertion = midiConvert()
+#     convertion.convert(r"C:\Users\lc\Documents\MuseScore3\乐谱\乐谱\victory.mid", ".")
+#     convertion.tomcpack(
+#         1, True, True, "scb", 1, 1)
