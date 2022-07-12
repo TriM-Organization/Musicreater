@@ -7,7 +7,6 @@
 # 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
 
 
-
 __version__ = '0.0.1'
 __all__ = []
 __author__ = (('金羿', 'Eilles Wan'), ('诸葛亮与八卦阵', 'bgArray'), ('鸣凤鸽子', 'MingFengPigeon'))

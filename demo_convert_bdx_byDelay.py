@@ -34,7 +34,7 @@ while True:
         if heightmax != '':
             heightmax = int(heightmax)
         break
-        
+
     except:
         print('输入错误，请重新输入')
 
