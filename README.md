@@ -56,10 +56,10 @@
 > <img src=" https://foruda.gitee.com/images/1659972440341216712/下载.png" >
 > 2. 运行（进入目录）
 > 在目录下打开cmd，进入到目录下，执行以下命令：
-> <img src=https://foruda.gitee.com/images/1659973063661675180/输入.png>
-> <img src=https://foruda.gitee.com/images/1659973105896437535/输入c.png>
+> <img src=https://foruda.gitee.com/images/1659974437388532868/输入.png>
+> <img src=https://foruda.gitee.com/images/1659974754378201859/输入c.png>
 > 回车一下，然后：
-> <img src=https://foruda.gitee.com/images/1659973159895180468/pip.png>
+> <img src=https://foruda.gitee.com/images/1659974794561970425/pip.png>
 > 输入下面的三个指令即可！
 > 
 > `pip install mido`
@@ -84,7 +84,7 @@
 > 感谢Mono帮我们发现这个问题
 > 
 > 5. 使用补充说明
-> <img src=https://foruda.gitee.com/images/1659973351132315001/运行.png>
+> <img src=https://foruda.gitee.com/images/1659974810147043475/运行.png>
 > midi路径：含有mid文件路径、文件名、后缀的完整绝对路径
 > 
 > 输出路径：输出文件夹的路径，就写一个英文.(句号)可以表示生成到当前目录下
