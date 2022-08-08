@@ -41,18 +41,26 @@
 
 > 0. 安装python3.6+
 >    
->    在安装时，一定要勾选Add Python 3.X to PATH，不然就要手动设置
+>    在安装时，一定要勾选Add Python 3.X to PATH，不然就要手动设置！！
 >    
 >    同时，装完之后记得在cmd中输入：python 试试是否安装成功，
 >    python的安装可以去网上随便找一下。
+>    成功安装之后，在cmd中输入python会显示：
+>    <img src=https://foruda.gitee.com/images/1659972669907359295/cmd.png>
+>    之类的东西。
 > 1. 安装（下载本程序）git的话，可以使用以下命令：
 > 
 > `git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
 > 
 > 没有安装git的话，可以下载zip包，解压后进入目录即可。
-> 
+<img src=" https://foruda.gitee.com/images/1659972440341216712/下载.png" >
 > 2. 运行（进入目录）
 > 在目录下打开cmd，进入到目录下，执行以下命令：
+> <img src=https://foruda.gitee.com/images/1659973063661675180/输入.png>
+> <img src=https://foruda.gitee.com/images/1659973105896437535/输入c.png>
+> 回车一下，然后：
+> <img src=https://foruda.gitee.com/images/1659973159895180468/pip.png>
+> 输入下面的三个指令即可！
 > 
 > `pip install mido`
 > 
@@ -61,11 +69,32 @@
 > `pip install openpyxl`
 > 
 > 3. 开始使用！
-> 在目录下打开cmd，进入到目录下，执行以下命令：(选择你需要的)
+> 在目录下打开cmd（步骤与上面的图片一致，只是执行的代码换了），进入到目录下，执行以下命令：(选择你需要的)
 > 
 > `python example_convert_bdx.py`
 > 
 > `python example_convert_mcpack.py`
+> 
+> 4. 错误补充说明
+> 如果你遇到了以下这种情况
+> <img src=https://foruda.gitee.com/images/1659972789779764953/bug.jpeg>
+> 那么，请按照这篇文章指引做：
+> https://blog.csdn.net/qq_41179280/article/details/123804948
+> 
+> 感谢Mono帮我们发现这个问题
+> 
+> 5. 使用补充说明
+> <img src=https://foruda.gitee.com/images/1659973351132315001/运行.png>
+> midi路径：含有mid文件路径、文件名、后缀的完整绝对路径
+> 输出路径：输出文件夹的路径，就写一个英文.(句号)可以表示生成到当前目录下
+> (意思就是支持相对路径)
+> 是否重置计分板：1或0（歌曲放完是否重置，推荐1）
+> 是否启用进度条：1或0（看个人需要）
+> 计分板名称：游戏内的计分板名称
+> 音量：0-1之间的小数（含0，1）正常来说推荐1
+> 变速：float数据，一般写1
+> 没有报错且在输出路径下找到mcpack或bdx即为生成成功：
+> <img src=https://foruda.gitee.com/images/1659973655881460036/输出.png>
 
 
 ### 对于 进度条自定义 功能的说明
@@ -118,6 +147,7 @@
 - 感谢由 CMA_2401PT 为我们的软件开发进行指导
 - 感谢由 Dislink Sforza \<QQ1600515314\>带来的midi音色解析以及转换指令的算法，我们将其加入了我们众多算法之一
 - 感谢 Touch \<QQ1793537164\>提供的测试支持
+- 感谢 Mono\<QQ738893087\>反馈安装时的问题
 - 感谢广大群友为此程序提供的测试等支持
 - 若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
 
