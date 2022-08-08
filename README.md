@@ -53,7 +53,7 @@
 > `git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
 > 
 > 没有安装git的话，可以下载zip包，解压后进入目录即可。
-<img src=" https://foruda.gitee.com/images/1659972440341216712/下载.png" >
+> <img src=" https://foruda.gitee.com/images/1659972440341216712/下载.png" >
 > 2. 运行（进入目录）
 > 在目录下打开cmd，进入到目录下，执行以下命令：
 > <img src=https://foruda.gitee.com/images/1659973063661675180/输入.png>
