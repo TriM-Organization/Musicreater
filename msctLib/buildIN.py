@@ -63,8 +63,6 @@ class version:
                 os.system(f"python -m pip install {i} -i {index}")
         elif platform == 'linux':
             os.system("sudo apt-get install python3-pip")
-            os.system("sudo apt-get install python3-tk")
-            os.system("sudo apt-get install python3-tkinter")
             for i in self.libraries:
                 print("安装库：" + i)
                 os.system(f"sudo python3 -m pip install {i} -i {index}")
