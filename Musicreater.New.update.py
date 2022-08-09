@@ -147,7 +147,7 @@ class MainWindow(wx.Frame):
             except Exception as E:
                 if self.debug:
                     raise E
-                log('无法读取菜单信息', 'WARRING')
+                log('无法读取菜单信息', 'ERROR')
         # 如果不是空参数则新建菜单
         log('新建一个菜单')
 

@@ -9,9 +9,9 @@
 
 """
 音·创自动安装器 (Musicreater Auto Installer)
-对音·创的自动安装提供支持的独立软件
+对音·创的自动安装提供支持的工具
 Musicreater Auto Installer (音·创自动安装器)
-A software that used for installing Musicreater automatically
+A tool that used for installing Musicreater automatically
 
    Copyright 2022 all the developers of Musicreater
 
@@ -28,7 +28,6 @@ A software that used for installing Musicreater automatically
    limitations under the License.
 """
 
-# 代码写的并非十分的漂亮，还请大佬多多包涵；本软件源代码依照Apache软件协议公开
 
 
 # 下面为正文

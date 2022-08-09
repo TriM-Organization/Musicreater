@@ -3,18 +3,22 @@
 # 使用 井字符 在每一行的开头编写注释
 # 注意！井字符请开头放，切勿含有空格
 # 也切勿在正文结尾放！
+# 注意其他标注：
+# F 开头 表示其正式(官方场合用上的)名称
+# t 开头 表示其为窗口标题
+# h 开头 表示其为窗口底部状态提示字符
 LANGKEY zh-CN
 LANGCHINESENAME 简体中文 中国大陆
 LANGENGLISHNAME Simplified Chinese, Chinese Mainland
 LANGLOCALNAME 简体中文 中国大陆
 MSCT 音·创
 F音创 音·创 Musicreater
-关于 音·创 - 关于
+t关于 音·创 - 关于
 开发者 - 开发人员 -
 译者 - 翻译人员 -
 确定 确定
 取消 取消
 关于 关于
 退出 退出
-h关于 音·创 和他可爱的作者们
+h关于 音·创 与其作者
 h退出 退出 音·创
