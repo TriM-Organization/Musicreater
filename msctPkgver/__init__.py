@@ -35,9 +35,8 @@ Note! Except for this source file, all the files in this repository and this pro
 """
 
 
-import msctPkgver.main as msctPkgver
 
-from msctPkgver.main import *
+from .main import *
 
 print('此转换功能由音·创开发者开发，版权归参与开发的人员共同所有。')
 print('Copyright © 2022 all the developers of Musicreater')
