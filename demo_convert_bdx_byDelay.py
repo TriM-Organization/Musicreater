@@ -20,9 +20,19 @@ if not os.path.exists(outpath):
 while True:
     try:
         authorname = input('请输入作者：')
-        isProgress = input('是否开启进度条(1|0)：')
-        if isProgress != '':
-            isProgress = bool(int(isProgress))
+        while True:
+            isProgress = input('*进度条[注]：')
+            if isProgress != '' :
+                if isProgress in ('1','True'):
+                    isProgress = True
+                elif isProgress in ('0', 'False'):
+                    isProgress = False
+                else:
+                    isProgress = isProgress
+            else:
+                continue
+            break
+
         volume = input('请输入音量（0-1）：')
         if volume != '':
             volume = float(volume)
@@ -47,7 +57,7 @@ if os.path.isdir(midipath):
             convertion.toBDXfile_withDelay(
                 1,
                 authorname if authorname != '' else input('请输入作者：'),
-                isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+                isProgress,
                 heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
                 volume if volume != '' else float(input('请输入音量(0-1]：')),
                 speed if speed != '' else float(input('请输入速度倍率：')),
@@ -59,7 +69,7 @@ else:
     convertion.toBDXfile_withDelay(
         1,
         authorname if authorname != '' else input('请输入作者：'),
-        isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+        isProgress,
         heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
         volume if volume != '' else float(input('请输入音量(0-1]：')),
         speed if speed != '' else float(input('请输入速度倍率：')),
