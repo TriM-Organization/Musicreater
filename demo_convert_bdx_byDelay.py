@@ -45,9 +45,8 @@ while True:
             heightmax = int(heightmax)
         break
 
-    except:
+    except BaseException:
         print('输入错误，请重新输入')
-
 
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):

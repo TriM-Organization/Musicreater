@@ -90,7 +90,7 @@ class midiConvert:
             钟琴bell、管钟chime、木琴xylophone的时候为4
             而存在一些打击乐器basedrum、hat、snare，没有音域，则没有X，那么我们返回7即可
         :param instrumentID: midi的乐器ID
-        :param default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
+        default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
         :return: (str我的世界乐器名, int转换算法中的X)"""
         try:
             a = {
@@ -385,7 +385,7 @@ class midiConvert:
             执行延时
         :param customName: `str`
             悬浮字
-        :param lastOutput: `str`
+        lastOutput: `str`
             上次输出字符串，注意此处需要留空
         :param executeOnFirstTick: `bool`
             执行第一个已选项(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
@@ -712,7 +712,7 @@ class midiConvert:
             scoreboardname: str = "mscplay",
             volume: float = 1.0,
             speed: float = 1.0,
-    ) -> bool:
+    ) -> bool or tuple:
         """
         使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
         :param method: 转换算法
