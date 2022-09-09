@@ -20,9 +20,19 @@ if not os.path.exists(outpath):
 while True:
     try:
         authorname = input('请输入作者：')
-        isProgress = input('是否开启进度条(1|0)：')
-        if isProgress != '':
-            isProgress = bool(int(isProgress))
+        while True:
+            isProgress = input('*进度条[注]：')
+            if isProgress != '':
+                if isProgress in ('1', 'True'):
+                    isProgress = True
+                elif isProgress in ('0', 'False'):
+                    isProgress = False
+                else:
+                    isProgress = isProgress
+            else:
+                continue
+            break
+
         volume = input('请输入音量（0-1）：')
         if volume != '':
             volume = float(volume)
@@ -35,9 +45,8 @@ while True:
             heightmax = int(heightmax)
         break
 
-    except:
+    except BaseException:
         print('输入错误，请重新输入')
-
 
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
