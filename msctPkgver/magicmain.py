@@ -31,8 +31,10 @@ Note! Except for this source file, all the files in this repository and this pro
 
 
 def _toCmdList_m1(
-    self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
-) -> list:
+        self,
+        scoreboardname: str = "mscplay",
+        volume: float = 1.0,
+        speed: float = 1.0) -> list:
     """
     使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
     :param scoreboardname: 我的世界的计分板名称
@@ -73,16 +75,14 @@ def _toCmdList_m1(
                     maxscore = max(maxscore, nowscore)
                     soundID, _X = self.__Inst2soundIDwithX(instrumentID)
                     singleTrack.append(
-                        "execute @a[scores={"
-                        + str(scoreboardname)
-                        + "="
-                        + str(nowscore)
-                        + "}"
-                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
-                    )
+                        "execute @a[scores={" +
+                        str(scoreboardname) +
+                        "=" +
+                        str(nowscore) +
+                        "}" +
+                        f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}")
                     commands += 1
         if len(singleTrack) != 0:
             tracks.append(singleTrack)
 
-    return tracks, commands, maxscore
-
+    return [tracks, commands, maxscore]
