@@ -39,21 +39,25 @@ while True:
         print('输入错误，请重新输入')
 
 
-if os.path.isdir(midipath):
-    for i in os.listdir(midipath):
-        if i.endswith('.mid'):
-            print(f'正在操作{i}')
-            convertion.convert(midipath + '/' + i, outpath)
-            convertion.toBDXfile_withDelay(
-                1,
-                authorname if authorname != '' else input('请输入作者：'),
-                isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
-                heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
-                volume if volume != '' else float(input('请输入音量(0-1]：')),
-                speed if speed != '' else float(input('请输入速度倍率：')),
-                player if player != '' else input('请输入玩家选择器：'),
-            )
+def operation(i,):
+    print(f'正在操作{i}')
+    convertion.convert(midipath + '/' + i, outpath)
+    convertion.toBDXfile_withDelay(
+        1,
+        authorname if authorname != '' else input('请输入作者：'),
+        isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+        heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
+        volume if volume != '' else float(input('请输入音量(0-1]：')),
+        speed if speed != '' else float(input('请输入速度倍率：')),
+        player if player != '' else input('请输入玩家选择器：'),
+    )
 
+
+if os.path.isdir(midipath):
+    import threading
+    for i in os.listdir(midipath):
+        if i.lower().endswith('.mid'):
+            threading.Thread(target=operation,args=(i,)).start()
 else:
     convertion.convert(midipath, outpath)
     convertion.toBDXfile_withDelay(

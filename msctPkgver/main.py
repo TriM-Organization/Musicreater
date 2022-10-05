@@ -463,7 +463,7 @@ class midiConvert:
         self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
     ) -> list:
         """
-        使用金羿的转换思路，将midi转换为我的世界命令列表
+        使用金羿的转换思路，将midi转换为我的世界命令列表，使用线性方法调整音量
         :param scoreboardname: 我的世界的计分板名称
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
@@ -483,6 +483,7 @@ class midiConvert:
             ticks = 0
             instrumentID = 0
             singleTrack = []
+            noteOn = []
 
             for msg in track:
                 ticks += msg.time
@@ -494,6 +495,33 @@ class midiConvert:
                     if msg.type == "program_change":
                         # print("TT")
                         instrumentID = msg.program
+                    if msg.type == 'note_on' and msg.velocity != 0:
+                        noteOn.append([msg, msg.note, ticks])
+                    elif type_[1] is True:
+                        if msg.type == 'note_on' and msg.velocity == 0:
+                            for u in noteOn:
+                                index = 0
+                                if u[1] == msg.note:
+                                    lastMessage = u[0]
+                                    lastTick = u[2]
+                                    break
+                                index += 1
+                            trackS.append(
+                                NoteMessage(
+                                    msg.channel,
+                                    msg.note,
+                                    lastMessage.velocity,
+                                    lastTick,
+                                    ticks - lastTick,
+                                    mid,
+                                )
+                            )
+                            # print(noteOn)
+                            # print(index)
+                            try:
+                                noteOn.pop(index)
+                            except IndexError:
+                                noteOn.pop(index - 1)
                     if msg.type == "note_on" and msg.velocity != 0:
                         nowscore = round(
                             (ticks * tempo)
