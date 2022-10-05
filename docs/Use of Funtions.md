@@ -5,47 +5,112 @@
 </p>
 
 
-## Instructions📕
+# Instructions for Using Demo(s)
 
-> 0. Install Python 3.6+
->	
->	While installing, be sure to check "add Python 3.X to path", otherwise it needs to be set manually
->    
->    After the installation, remember to enter in CMD: "python" to try
-> 
->    whether the installation is successful.
-> 
->    Python installation tutorial can be found on the Internet easily.
-> 
-> 1. Install (download this program)
-> Git, you can use the following commands:
-> 
-> `git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
-> 
-> If Git is not installed, you can download the zip package from the website. Then decompress it 
-> and enter the directory.
-> 
-> 2. Run (enter directory)
-> 
->  Open CMD in the directory, enter the directory, and execute the following commands:
-> 
-> `pip install mido`
-> 
-> `pip install brotli`
-> 
-> `pip install openpyxl`
-> 
-> 3. Start using!
-> 
->  Open CMD in the directory, enter the directory, and execute the following commands:
-> 
-> (Choose what you need)
-> 
-> `python example_convert_bdx.py`
-> 
-> `python example_convert_mcpack.py`
+*This is a tutorial for using the demo(s) of this library, not the Development Guide. If you want to see so, please read Below*
 
-### Instructions for **Customize Progress Bar**
+## Under Windows
+
+0. Install Python 3.6+
+
+	First of all, you need to install the runtime environment of this library, *Python*. And a Installation Pack maybe the best choice:
+
+	> [Downloading Python 64-bit](https://www.python.org/ftp/python/3.8.10/python-3.8.10-amd64.exe)
+	> [Downloading Python 32-bit](https://www.python.org/ftp/python/3.8.10/python-3.8.10.exe)
+
+	While installing, it's better to check `Add Python 3.X to PATH`(just as the screenshot showed below), otherwise it needs to be set manually which may cause some time wasting
+
+	<img src=https://foruda.gitee.com/images/1662736520757331846/e38efb81_9911226.png>
+
+	If you are new to Python or not very familiar to Computer Programming, and having the disk space in your PC's System Partition (usually C:) of 150 MB, you can directly choose *Install Now*.
+
+	However, if you want to do it like a pro, choosing *Customize Installation*, it's a necessary to be sure to check `pip` and `py launcher` will be installed on your computer(see screenshot below). The two options is required for the next step of installing the requirements.
+
+	<img src=https://foruda.gitee.com/images/1662736621235871190/2ac3d98f_9911226.png>
+
+	After the installation, you can enter in your terminal(CMD/PowerShell/Bash/etc): "python" to ensure whether the installation was successful. If it was, your terminal will show things like below:
+
+	<img src=https://foruda.gitee.com/images/1659972669907359295/cmd.png>
+
+
+1. Installing Requirements
+
+	It's better to open your terminal(CMD/PowerShell/Bash/etc) under Administrator Mode.
+
+	For example, if you want to use CMD in Administrator Mode, you can search `cmd` in the *Start Menu*, right click it and *Run as Administrator*
+
+	<img src="https://foruda.gitee.com/images/1662736878650993886/62487dd8_9911226.png">
+
+	Okay, after that, please enter in your terminal:
+
+	`pip install mido`
+
+	`pip install brotli`
+
+	If successful you will see something like below:
+
+	<img src="https://foruda.gitee.com/images/1662737676719454287/f61a70f7_9911226.png">
+
+
+
+2. Download This Package and Demo(s)
+
+	- If you using Git, you can use the following commands to clone this lib:
+
+	`git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git`
+
+	- If Git is not installed, you can download the zip package from the code page(from [GitHub](https://github.com/EillesWan/Musicreater.git) or [Gitee](https://gitee.com/EillesWan/Musicreater.git)). Or you are a Chinese fan having a QQ account, you can [Join the QQ Group 861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr) and get it from our GroupFiles.
+
+	<img src=" https://foruda.gitee.com/images/1659972440341216712/下载.png" >
+
+
+2. Start Using Demo(s)
+
+	Open your terminal in the directory of this, taking CMD, for example, just enter the directory and enter `cmd` in the path box:
+
+	<img src=https://foruda.gitee.com/images/1659974437388532868/输入.png>
+	<img src=https://foruda.gitee.com/images/1659974754378201859/输入c.png>
+
+	And enter one of the commands below by choosing what you need:
+
+	`python demo_convert.py`
+
+	`python demo_convert_bdx_byDelay.py`
+
+
+### Addition for Error(s) Using or Installing
+
+1. Environment Error of Microsoft Visual C++ Redistributable
+
+	If you meet this condition as the screenshot shows:
+
+	<img src=https://foruda.gitee.com/images/1659972789779764953/bug.jpeg>
+
+	Your MSVC Environment may be not installed, and you can download and install
+	> [Here of 64-Bit VCREDIST](https://aka.ms/vs/17/release/vc_redist.x64.exe)
+	> [Here of 32-Bit VCREDIST](https://aka.ms/vs/17/release/vc_redist.x86.exe)
+
+	Thank our groupmate *Mono* again for helping finding this problem.
+
+2. More Info for Parameters of Our Demo Program(s)
+
+	<img src=https://foruda.gitee.com/images/1659974810147043475/运行.png>
+
+	|Input Prompt|English Translation|Description|
+	|----------------|----------------|-------|
+	|请输入MIDI文件路径|Midi File Path|Path of a .mid file or a directory. While directory entered, our demo will convert all midi(s) in the directory|
+	|请输入输出路径|Output Path|Where files converted in|
+	|是否重置计分板|Whether Reset Scoreboard Automatically|Can only be 1 or 0(Recommanded 1)|
+	|*进度条[注]|Progressbar|Whether to enable Progressbar and customize progressbar style. Type 0 or False to disable, 1 or True to use default style, or type using format taught in follow the Instructions below to customize one you like|
+	|请输入计分板名称|Scoreboard Name|*Only not byDelay* The name of scoreboard that player using|
+	|请输入音量|Volume|Only decimal in [0,1],(Recommanded 1)|
+	|请输入速度倍率|Speed Multiplying Factor|Maybe you want to play it faster(＞1) or slower(＞0 ＜1)?|
+	|请输入玩家选择器|Player Selector|Full Selector including `@x`. E.g: Play for players tagged `Holo`, enter `@a[tag=Holo]` on this parameter|
+
+
+
+
+# Instructions for **Customize Progress Bar**
 
 We have supported the function of making progress bar in *Minecraft*'s music player. And also the method of customize them. So the following instructions are about the parameters of the Progress Bar Customizition.
 

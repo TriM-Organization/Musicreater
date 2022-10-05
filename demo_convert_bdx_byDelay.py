@@ -22,8 +22,8 @@ while True:
         authorname = input('请输入作者：')
         while True:
             isProgress = input('*进度条[注]：')
-            if isProgress != '' :
-                if isProgress in ('1','True'):
+            if isProgress != '':
+                if isProgress in ('1', 'True'):
                     isProgress = True
                 elif isProgress in ('0', 'False'):
                     isProgress = False
@@ -49,7 +49,9 @@ while True:
         print('输入错误，请重新输入')
 
 
-def operation(i,):
+def operation(
+    i,
+):
     print(f'正在操作{i}')
     convertion.convert(midipath + '/' + i, outpath)
     convertion.toBDXfile_withDelay(
@@ -65,9 +67,10 @@ def operation(i,):
 
 if os.path.isdir(midipath):
     import threading
+
     for i in os.listdir(midipath):
         if i.lower().endswith('.mid'):
-            threading.Thread(target=operation,args=(i,)).start()
+            threading.Thread(target=operation, args=(i,)).start()
 else:
     convertion.convert(midipath, outpath)
     convertion.toBDXfile_withDelay(

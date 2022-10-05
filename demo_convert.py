@@ -50,9 +50,18 @@ while True:
             isAutoReset = input('是否自动重置计分板(1|0)：')
             if isAutoReset != '':
                 isAutoReset = bool(int(isAutoReset))
-            isProgress = input('是否开启进度条(1|0)：')
-            if isProgress != '':
-                isProgress = bool(int(isProgress))
+            while True:
+                isProgress = input('*进度条[注]：')
+                if isProgress != '':
+                    if isProgress in ('1', 'True'):
+                        isProgress = True
+                    elif isProgress in ('0', 'False'):
+                        isProgress = False
+                    else:
+                        isProgress = isProgress
+                else:
+                    continue
+                break
             sbname = input('请输入计分板名称：')
             volume = input('请输入音量（0-1）：')
             if volume != '':
@@ -62,9 +71,18 @@ while True:
                 speed = float(speed)
         elif outFormat == 1:
             author = input('请输入作者：')
-            isProgress = input('是否开启进度条(1|0)：')
-            if isProgress != '':
-                isProgress = bool(int(isProgress))
+            while True:
+                isProgress = input('*进度条[注]：')
+                if isProgress != '':
+                    if isProgress in ('1', 'True'):
+                        isProgress = True
+                    elif isProgress in ('0', 'False'):
+                        isProgress = False
+                    else:
+                        isProgress = isProgress
+                else:
+                    continue
+                break
             maxHeight = input('请输入指令结构最大生成高度：')
             if maxHeight != '':
                 maxHeight = int(maxHeight)
@@ -82,6 +100,9 @@ while True:
     except BaseException:
         print('输入错误，请重新输入')
 
+
+
+
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.lower().endswith('.mid'):
@@ -93,9 +114,7 @@ if os.path.isdir(midipath):
                     isAutoReset
                     if isAutoReset != ''
                     else bool(int(input('是否自动重置计分板(1|0)：'))),
-                    isProgress
-                    if isProgress != ''
-                    else bool(int(input('是否开启进度条(1|0)：'))),
+                    isProgress,
                     sbname if sbname != '' else input('请输入计分板名称：'),
                     volume if volume != '' else float(input('请输入音量（0-1）：')),
                     speed if speed != '' else float(input('请输入速度倍率：')),
@@ -104,9 +123,7 @@ if os.path.isdir(midipath):
                 convertion.toBDXfile(
                     1,
                     author if author != '' else input('请输入作者：'),
-                    isProgress
-                    if isProgress != ''
-                    else bool(int(input('是否开启进度条(1|0)：'))),
+                    isProgress,
                     maxHeight if maxHeight != '' else int(input('请输入指令结构最大生成高度：')),
                     sbname if sbname != '' else input('请输入计分板名称：'),
                     volume if volume != '' else float(input('请输入音量（0-1）：')),
@@ -121,7 +138,7 @@ else:
         convertion.tomcpack(
             1,
             isAutoReset if isAutoReset != '' else bool(int(input('是否自动重置计分板(1|0)：'))),
-            isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+            isProgress,
             sbname if sbname != '' else input('请输入计分板名称：'),
             volume if volume != '' else float(input('请输入音量（0-1）：')),
             speed if speed != '' else float(input('请输入速度倍率：')),
@@ -130,7 +147,7 @@ else:
         convertion.toBDXfile(
             1,
             author if author != '' else input('请输入作者：'),
-            isProgress if isProgress != '' else bool(int(input('是否开启进度条(1|0)：'))),
+            isProgress,
             maxHeight if maxHeight != '' else int(input('请输入指令结构最大生成高度：')),
             sbname if sbname != '' else input('请输入计分板名称：'),
             volume if volume != '' else float(input('请输入音量（0-1）：')),
