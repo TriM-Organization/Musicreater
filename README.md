@@ -27,7 +27,7 @@
 
 **此分支为音·创的包版本，即便于其他软件使用的可被import版本**
 
-### **看这看这！看这看这！看这看这！教程：[教程链接](https://gitee.com/EillesWan/Musicreater/blob/pkgver/docs/%E4%BD%BF%E7%94%A8%E6%95%99%E7%A8%8B.md)**
+### **看这看这！看这看这！看这看这！教程：[教程链接](https://gitee.com/EillesWan/Musicreater/blob/pkgver/docs/%E5%8A%9F%E8%83%BD%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)**
 
 ## 软件作者✒
 
@@ -58,6 +58,7 @@
 1.  QQ       2647547478
 2.  电邮      EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 3.  微信      WYI_DoctorYI
+4.  Telegram [@EillesWan](https://t.me/EillesWan)
 
 ### 作者\<*诸葛亮与八卦阵*\>(bgArray)联系方式
 

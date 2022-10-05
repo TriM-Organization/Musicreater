@@ -28,6 +28,8 @@ Musicreater pkgver(Package Version 音·创 库版) is a free open source librar
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
+### **SEEEEEEEEE Tutorials [HERE](https://gitee.com/EillesWan/Musicreater/blob/pkgver/docs/Use%20of%20Funtions.md)**
+
 ### Authors✒
 
 Eilles (金羿)：A high school student, individual developer, unfamous BilibiliUPer, which knows a little about commands in *Minecraft: Bedrock Edition*
