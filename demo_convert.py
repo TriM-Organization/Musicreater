@@ -26,7 +26,6 @@ Musicreater Package Version : Demo for Midi Conversion
    limitations under the License.
 """
 
-
 from msctPkgver.main import *
 import os
 
@@ -80,15 +79,14 @@ while True:
             if isAutoReset != '':
                 isAutoReset = bool(int(isAutoReset))
         break
-    except:
+    except BaseException:
         print('输入错误，请重新输入')
-
 
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.lower().endswith('.mid'):
             print(f'正在操作{i}')
-            convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4] )
+            convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4])
             if outFormat == 0:
                 convertion.tomcpack(
                     1,
