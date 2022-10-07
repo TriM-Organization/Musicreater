@@ -99,40 +99,11 @@ def _toCmdList_m1(
 
 
 
+
 import mido
 
 
-def delete_extra_zero(n: float) -> int or float:
-    """
-    删除多余的0
-    ————————————————
-    版权声明：本文为CSDN博主「XerCis」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-    原文链接：https://blog.csdn.net/lly1122334/article/details/108770141
-    删除小数点后多余的0
-    :param n: input
-    :return:  output
-    """
-    n = '{:g}'.format(n)
-    n = float(n) if '.' in n else int(n)  # 含小数点转float否则int
-    return n
 
-
-def bpm_by_MetaMessage_Set_tempo(tmp: int) -> int or float:
-    """
-    midi文件tempo事件bpm算法。
-    A function that's used to compute the bpm of a midiFile,
-    which algorithm is made up of midiFile's tempo meta message.
-    :param tmp:输入mid的metaMessage中速度tempo值
-    input the tempo value which is in the tempo meta message.
-    :return:bpm
-
-    This algorithm is made by ©bgArray.
-    算法版权归©诸葛亮与八卦阵所有。
-    """
-    second = tmp / 1000000
-    bpm = delete_extra_zero(60 / second)
-    # debug.dp(bpm)
-    return bpm
 
 
 class NoteMessage:
@@ -202,14 +173,9 @@ def load(mid: mido.MidiFile):
             print(ticks)
             if msg.is_meta is True and msg.type == "set_tempo":
                 recent_change_bpm = bpm
-                bpm = bpm_by_MetaMessage_Set_tempo(msg.tempo)
+                bpm =  60000000 / msg.tempo
                 is_change_bpm = True
-            # print((ticks * 92) / (mid.ticks_per_beat * 50000))
-            # MC_tick = delete_extra_zero(round_up(
-            #     (ticks * 92) / (mid.ticks_per_beat * 50000)
-            # ))
-            # print(MC_tick)
-            # print(ticks / mid.ticks_per_beat / 92 * 60)
+
             if msg.type == 'note_on' and msg.velocity != 0:
                 noteOn.append([msg, msg.note, ticks])
             if type_[1] is True:

@@ -103,6 +103,9 @@ while True:
 
 
 
+
+
+
 if os.path.isdir(midipath):
     for i in os.listdir(midipath):
         if i.lower().endswith('.mid'):
