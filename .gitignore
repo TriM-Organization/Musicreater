@@ -1,6 +1,7 @@
 # mystuff
 /.vscode
-
+*.mid
+*.midi
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

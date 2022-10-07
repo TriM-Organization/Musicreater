@@ -62,8 +62,10 @@ class MidiDestroyedError(MSCTBaseException):
     pass
 
 class ChannelOverFlowError(MSCTBaseException):
-    '''一个midi中含有过多的通道（应≤16）'''
+    '''一个midi中含有过多的通道（数量应≤16）'''
     pass
 
-
+class NotDefineProgramError(MSCTBaseException):
+    '''没有Program设定导致没有乐器可以选择的错误'''
+    pass
 

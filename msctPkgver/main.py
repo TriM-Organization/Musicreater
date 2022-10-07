@@ -63,10 +63,87 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
     zipf.close()
 
 
+class SingleNote:
+    def __init__(self, inst: int, pitch: int, velocity, startTime, lastTime):
+        '''用于存储单个音符的类
+        :param inst 乐器编号
+        :param pitch 音符编号
+        :param velocity 力度/响度
+        :param startTime 开始之时(ms)
+            注：此处的时间是用从乐曲开始到当前的毫秒数
+        :param lastTime 音符延续时间(ms)'''
+        self.inst = inst
+        self.note = pitch
+        self.velocity = velocity
+        self.startTime = startTime
+        self.lastTime = lastTime
+    @property
+    def inst(self):
+        return self.inst
+    
+    @property
+    def note(self):
+        return self.note
+    
+    @property
+    def velocity(self):
+        return self.velocity
+
+    @property
+    def startTime(self):
+        return self.startTime
+    
+    @property
+    def lastTime(self):
+        return self.lastTime
+
+    def __str__(self):
+        return f"Note(inst = {self.inst}, pitch = {self.note}, velocity = {self.velocity}, startTime = {self.startTime}, lastTime = {self.lastTime}, )"
+
+    def __tuple__(self):
+        return (self.inst, self.note, self.velocity, self.startTime, self.lastTime)
+
+    def __dict__(self):
+        return {
+            "inst": self.inst,
+            "pitch": self.note,
+            "velocity": self.velocity,
+            "startTime": self.startTime,
+            "lastTime": self.lastTime,
+        }
+
+
+'''
+学习笔记：
+tempo:  microseconds per quarter note 毫秒每四分音符，换句话说就是一拍占多少毫秒
+tick:  midi帧
+ticks_per_beat:  帧每拍，即一拍多少帧
+
+那么：
+
+tick / ticks_per_beat => amount_of_beats 拍数(四分音符数)
+
+tempo * amount_of_beats => 毫秒数
+
+所以：
+
+tempo * tick / ticks_per_beat => 毫秒数
+
+'''
+
+
 class midiConvert:
     def __init__(self, debug: bool = False):
         """简单的midi转换类，将midi文件转换为我的世界结构或者包"""
         self.debugMode = debug
+        self.methods = [
+            self._toCmdList_m1,
+            self._toCmdList_m2,
+            self._toCmdList_m3,
+        ]
+        self.methods_byDelay = [
+            self._toCmdList_withDelay_m1,
+        ]
 
     def convert(self, midiFile: str, outputPath: str):
         """转换前需要先运行此函数来获取基本信息"""
@@ -446,7 +523,7 @@ class midiConvert:
                                 / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                             )
                         except NameError:
-                            raise NotDefineTempoError('计算当前分数时出错 未定义参量')
+                            raise NotDefineTempoError('计算当前分数时出错 未定义参量 Tempo')
                         maxscore = max(maxscore, nowscore)
                         soundID, _X = self.__Inst2soundIDwithX(instrumentID)
                         singleTrack.append(
@@ -463,68 +540,302 @@ class midiConvert:
 
         return [tracks, commands, maxscore]
 
-    # 值得注意的是，我这里没有修改多少
+    # 这与上面的算法几乎没有差别 甚至更慢了一点 但是是为了线性插值做准备
     def _toCmdList_m2(
-        self, scoreboardname: str = "mscplay", MaxVolume: float = 1.0, speed: float = 1.0
+        self,
+        scoreboardname: str = "mscplay",
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
     ) -> list:
         """
-        使用金羿的转换思路，将midi转换为我的世界命令列表，使用线性方法调整音量
+        使用金羿的转换思路，将midi转换为我的世界命令列表
         :param scoreboardname: 我的世界的计分板名称
-        :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        :param MaxVolume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
-        tracks = []
+
         if MaxVolume > 1:
             MaxVolume = 1
         if MaxVolume <= 0:
             MaxVolume = 0.001
 
-        commands = 0
-        maxscore = 0
+        # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
+        channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+
+
+        # 我们来用通道统计音乐信息
+        for i, track in enumerate(self.midi.tracks):
+
+            microseconds = 0
+
+            for msg in track:
+
+                if msg.time != 0:
+                    try:
+                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    except NameError:
+                        raise NotDefineTempoError('计算当前分数时出错 未定义参量 Tempo')
+
+
+                if msg.is_meta:
+                    if msg.type == "set_tempo":
+                        tempo = msg.tempo
+                else:
+
+                    try:
+                        msg.channel
+                        channelMsg = True
+                    except:
+                        channelMsg = False
+                    if channelMsg:
+                        if msg.channel > 15:
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+
+                    if msg.type == "program_change":
+                        channels[msg.channel].append(
+                            ("PgmC", msg.program, microseconds)
+                        )
+
+                    elif msg.type == 'note_on' and msg.velocity != 0:
+                        channels[msg.channel].append(
+                            ("NoteS", msg.note, msg.velocity, microseconds)
+                        )
+
+                    elif (msg.type == 'note_on' and msg.velocity == 0) or (
+                        msg.type == 'note_off'
+                    ):
+                        channels[msg.channel].append(
+                            ("NoteE", msg.note, microseconds)
+                        )
+
+
+        '''整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+
+        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)'''
+
+        tracks = []
+        cmdAmount = 0
+        maxScore = 0
+        CheckFirstChannel = False
+
+        # 此处 我们把通道视为音轨
+        for track in channels:
+            # 如果当前通道为空 则跳过
+            if not track:
+                continue
+            
+
+            if channels.index(track) == 0:
+                CheckFirstChannel = True
+            else:
+                CheckFirstChannel = False
+
+            nowTrack = []
+            
+            for msg in track:
+
+
+                if msg[0] == "PgmC":
+                    InstID = msg[1]
+                
+                elif msg[0] == "NoteS":
+
+                    soundID, _X = self.__Inst2soundIDwithX(InstID)
+                    score_now = round(msg[-1]/ float(speed) / 50000)
+                    maxScore = max(maxScore,score_now)
+
+                    nowTrack.append(
+                        "execute @a[scores={"
+                        + str(scoreboardname)
+                        + "="
+                        + str(score_now)
+                        + "}"
+                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / MaxVolume - 1} ~ {msg[2] * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((msg[1] - 60 - _X) / 12)}"
+                    )
+
+                    cmdAmount += 1
+                
+            tracks.append(nowTrack)
+
+        return [tracks, cmdAmount, maxScore]
+
+    # 这才是加了线性插值的算法
+    def _toCmdList_m3(
+        self,
+        scoreboardname: str = "mscplay",
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
+    ) -> list:
+        """
+        使用金羿的转换思路，将midi转换为我的世界命令列表，并使用线性插值算法优化音量，此处的插值是固定斜率的方法
+        :param scoreboardname: 我的世界的计分板名称
+        :param MaxVolume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        :return: tuple(命令列表, 命令个数, 计分板最大值)
+        """
+
+        if MaxVolume > 1:
+            MaxVolume = 1
+        if MaxVolume <= 0:
+            MaxVolume = 0.001
 
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
         channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 
 
+        # 我们来用通道统计音乐信息
         for i, track in enumerate(self.midi.tracks):
 
-            ticks = 0
-            instrumentID = 0
-            singleTrack = []
-            noteOn = []
+            microseconds = 0
 
             for msg in track:
-                ticks += msg.time
-                # print(msg)
+
+                if msg.time != 0:
+                    try:
+                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    except NameError:
+                        raise NotDefineTempoError('计算当前分数时出错 未定义参量 Tempo')
+
+
                 if msg.is_meta:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
-                    if msg.type == "program_change":
-                        # print("TT")
-                        instrumentID = msg.program
-                    if msg.type == 'note_on' and msg.velocity != 0:
-                        
-                        nowscore = round(
-                            (ticks * tempo)
-                            / ((self.midi.ticks_per_beat * float(speed)) * 50000)
-                        )
-                        maxscore = max(maxscore, nowscore)
-                        soundID, _X = self.__Inst2soundIDwithX(instrumentID)
-                        singleTrack.append(
-                            "execute @a[scores={"
-                            + str(scoreboardname)
-                            + "="
-                            + str(nowscore)
-                            + "}"
-                            + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / MaxVolume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
-                        )
-                        commands += 1
-            if len(singleTrack) != 0:
-                tracks.append(singleTrack)
 
-        return [tracks, commands, maxscore]
+                    try:
+                        msg.channel
+                        channelMsg = True
+                    except:
+                        channelMsg = False
+                    if channelMsg:
+                        if msg.channel > 15:
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+
+                    if msg.type == "program_change":
+                        channels[msg.channel].append(
+                            ("PgmC", msg.program, microseconds)
+                        )
+
+                    elif msg.type == 'note_on' and msg.velocity != 0:
+                        channels[msg.channel].append(
+                            ("NoteS", msg.note, msg.velocity, microseconds)
+                        )
+
+                    elif (msg.type == 'note_on' and msg.velocity == 0) or (
+                        msg.type == 'note_off'
+                    ):
+                        channels[msg.channel].append(
+                            ("NoteE", msg.note, microseconds)
+                        )
+
+
+        '''整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+
+        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)'''
+
+
+        note_channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+
+        # 此处 我们把通道视为音轨
+        for i in range(len(channels)):
+            # 如果当前通道为空 则跳过
+
+            noteMsgs = []
+            
+            for msg in channels[i]:
+
+                if msg[0] == "PgmC":
+                    InstID = msg[1]
+                
+                elif msg[0] == "NoteS":
+                    noteMsgs.append(msg[1:])
+                
+                elif msg[0] == "NoteE":
+                    record_pop_ids = []
+                    for j in range(len(noteMsgs)):
+                        if noteMsgs[j][0] == msg[1]:
+                            note_channels[i].append(SingleNote(InstID, msg[1],noteMsgs[j][1],noteMsgs[j][2],msg[-1]-noteMsgs[j][2]))
+                            record_pop_ids.append(j)
+                    for j in record_pop_ids:
+                        noteMsgs.pop(j)
+
+                tracks = []
+        
+        
+        cmdAmount = 0
+        maxScore = 0
+        CheckFirstChannel = False
+
+        # 此处 我们把通道视为音轨
+        for track in note_channels:
+            # 如果当前通道为空 则跳过
+            if not track:
+                continue
+            
+
+            if channels.index(track) == 0:
+                CheckFirstChannel = True
+            else:
+                CheckFirstChannel = False
+
+            nowTrack = []
+            
+            for note in track:
+
+                for i in range(note.lastTime / 500):
+                    # 实在没时间写了
+                    # 用半秒做一个时间单位
+                    # 然后计算即可
+                    # 我找时间写完
+                    
+
+                soundID, _X = self.__Inst2soundIDwithX(InstID)
+                score_now = round(msg[-1]/ float(speed) / 50000)
+                maxScore = max(maxScore,score_now)
+
+                nowTrack.append(
+                    "execute @a[scores={"
+                    + str(scoreboardname)
+                    + "="
+                    + str(score_now)
+                    + "}"
+                    + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / MaxVolume - 1} ~ {msg[2] * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((msg[1] - 60 - _X) / 12)}"
+                )
+
+                cmdAmount += 1
+
+            tracks.append(nowTrack)
+                
+
+        return [tracks, cmdAmount, maxScore]
+
+
+        return [tracks, cmdAmount, maxScore]
+
+
 
     def _toCmdList_withDelay_m1(
         self,
@@ -722,9 +1033,9 @@ class midiConvert:
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :return 成功与否，成功返回(True,True)，失败返回(False,str失败原因)
         """
-        if method == 1:
-            cmdlist, _a, maxscore = self._toCmdList_m1(scoreboardname, volume, speed)
-        else:
+        try:
+            cmdlist, _a, maxscore = self.methods[method-1](scoreboardname, volume, speed)
+        except:
             return (False, f"无法找到算法ID{method}对应的转换算法")
         del _a
 
@@ -858,13 +1169,12 @@ class midiConvert:
         :param isAutoReset: 是否自动重置计分板
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
+        try:
+            cmdlist, totalcount, maxScore = self.methods[method-1](scoreboardname, volume, speed)
+        except:
+            return (False, f"无法找到算法ID{method}对应的转换算法")
 
-        if method == 1:
-            cmdlist, totalcount, maxScore = self._toCmdList_m1(
-                scoreboardname, volume, speed
-            )
-        else:
-            return (False, f"无法找到算法ID {method} 对应的转换算法")
+
 
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
@@ -995,10 +1305,10 @@ class midiConvert:
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
 
-        if method == 1:
-            cmdlist = self._toCmdList_withDelay_m1(volume, speed, player, progressbar)
-        else:
-            return (False, f"无法找到算法ID {method} 对应的转换算法")
+        try:
+            cmdlist = self.methods_byDelay[method-1](volume, speed, player, progressbar)
+        except:
+            return (False, f"无法找到算法ID{method}对应的转换算法")
 
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
