@@ -811,27 +811,23 @@ class midiConvert:
                     # 然后计算即可
                     # 我找时间写完
                     
+                    soundID, _X = self.__Inst2soundIDwithX(InstID)
+                
+                    score_now = round(msg.startTime+i*(msg.lastTime / 500)/ float(speed) / 50000)
 
-                soundID, _X = self.__Inst2soundIDwithX(InstID)
-                score_now = round(msg[-1]/ float(speed) / 50000)
-                maxScore = max(maxScore,score_now)
+                    maxScore = max(maxScore,score_now)
 
-                nowTrack.append(
+                    nowTrack.append(
                     "execute @a[scores={"
                     + str(scoreboardname)
                     + "="
                     + str(score_now)
                     + "}"
-                    + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / MaxVolume - 1} ~ {msg[2] * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((msg[1] - 60 - _X) / 12)}"
-                )
+                    + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / (MaxVolume)*(1-i*500/msg.lastTime) - 1} ~ {msg[2] * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((msg[1] - 60 - _X) / 12)}"
+                    )
 
-                cmdAmount += 1
-
+                    cmdAmount += 1
             tracks.append(nowTrack)
-                
-
-        return [tracks, cmdAmount, maxScore]
-
 
         return [tracks, cmdAmount, maxScore]
 
