@@ -48,7 +48,7 @@
 
 ### 安装教程
 
-下载[音·创自动安装器](https://gitee.com/EillesWan/Musicreater/releases/v0.2.0.0-Delta)，将其放在你希望安装音·创的位置，运行后将自动安装。
+下载[音·创自动安装器](https://gitee.com/EillesWan/Musicreater/releases/)，将其放在你希望安装音·创的位置，运行后将自动安装。
 
 提示：下载源最好选择\"2 GitHub\"。
 
@@ -111,14 +111,19 @@ python3 Musicreater.py
 
 ## 致谢列表🙏
 
-1.  感谢由 [Fuckcraft](https://github.com/fuckcraft) “鸣凤鸽子”等 带来的我的世界websocket服务器功能
-2.  感谢 昀梦\<QQ1515399885\> 找出指令生成错误bug并指正
-3.  感谢由 Charlie_Ping “查理平” 带来的bdx转换功能
-4.  感谢由 CMA_2401PT 带来的 BDXWorkShop 供本程序对于bdx操作的指导
-5.  感谢由 神羽 (Miracle Plume) \<QQshenyu40403\>带来的羽音缭绕基岩版音色资源包
-6.  感谢 Arthur Morgan 对本程序的排错提出了最大的支持
-7.  感谢广大群友为此程序提供的测试等支持
-8.  若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
+- 感谢由 **[Fuckcraft](https://github.com/fuckcraft)** **鸣凤鸽子**等 带来的我的世界websocket服务器功能
+- 感谢 **昀梦**\<QQ1515399885\> 找出指令生成错误bug并指正
+- 感谢由 **Charlie_Ping** “**查理平**” 带来的bdx转换功能
+- 感谢由 **CMA_2401PT** 带来的 BDXWorkShop 供本程序对于bdx操作的指导
+- 感谢由 **神羽** (**Miracle Plume**)\<QQshenyu40403\>带来的羽音缭绕基岩版音色资源包
+- 感谢 **Arthur Morgan**\<QQ312280061\> 对本程序的排错提出了最大的支持
+- 感谢由 **Dislink Sforza** \<QQ1600515314\>带来的midi音色解析以及转换指令的算法，我们将其改编并应用
+- 感谢 **Touch** “**偷吃**” \<QQ1793537164\>提供的测试支持，并对程序的改进提供了丰富的意见
+- 感谢 **Mono**\<QQ738893087\>反馈安装时的问题
+
+>  感谢广大群友为此程序提供的测试等支持
+>
+>  若您对我们有所贡献但您的名字没有显示在此列表中，请联系我！
 
 ## 联系我们📞
 
