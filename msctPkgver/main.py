@@ -30,6 +30,7 @@ Note! Except for this source file, all the files in this repository and this pro
    limitations under the License.
 """
 
+from operator import index
 import os
 import mido
 import brotli
@@ -673,7 +674,7 @@ class midiConvert:
         """
 
         if MaxVolume > 1:
-            MaxVolume = 1
+            MaxVolume = 1.0
         if MaxVolume <= 0:
             MaxVolume = 0.001
 
@@ -744,6 +745,7 @@ class midiConvert:
             # 如果当前通道为空 则跳过
 
             noteMsgs = []
+            MsgIndex = []
 
             for msg in channels[i]:
 
@@ -752,29 +754,42 @@ class midiConvert:
 
                 elif msg[0] == "NoteS":
                     noteMsgs.append(msg[1:])
+                    MsgIndex.append(msg[1])
 
                 elif msg[0] == "NoteE":
-                    record_pop_ids = []
-                    for j in range(len(noteMsgs)):
-                        if noteMsgs[j][0] == msg[1]:
-                            note_channels[i].append(
-                                SingleNote(
-                                    InstID,
-                                    msg[1],
-                                    noteMsgs[j][1],
-                                    noteMsgs[j][2],
-                                    msg[-1] - noteMsgs[j][2],
-                                )
+                    if msg[1] in MsgIndex:
+                        note_channels[i].append(
+                            SingleNote(
+                                InstID,
+                                msg[1],
+                                noteMsgs[MsgIndex.index(msg[1])][1],
+                                noteMsgs[MsgIndex.index(msg[1])][2],
+                                msg[-1] - noteMsgs[MsgIndex.index(msg[1])][2],
                             )
-                            record_pop_ids.append(j)
-                    for j in record_pop_ids:
-                        noteMsgs.pop(j)
+                        )
+                        noteMsgs.pop(MsgIndex.index(msg[1]))
+                        MsgIndex.pop(MsgIndex.index(msg[1]))
 
-                tracks = []
 
+        tracks = []
         cmdAmount = 0
         maxScore = 0
         CheckFirstChannel = False
+
+        # 临时用的插值计算函数
+        def _linearFun(note: SingleNote) -> list:
+            '''传入音符数据，返回以半秒为分割的插值列表
+            :param note: SingleNote 音符
+            :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]'''
+            
+            result = []
+
+            totalCount = int(note.lastTime / 500000)
+
+            for i in range(totalCount):
+                result.append((note.startTime+i*500000,note.instrument,note.pitch,note.velocity,MaxVolume*((totalCount-i)/totalCount)))
+            
+            return result
 
         # 此处 我们把通道视为音轨
         for track in note_channels:
@@ -791,16 +806,15 @@ class midiConvert:
 
             for note in track:
 
-                for i in range(int(note.lastTime / 500)):
+                for everynote in _linearFun(note):
                     
                     # 应该是计算的时候出了点小问题
                     # 我们应该用一个MC帧作为时间单位而不是半秒
 
-                    soundID, _X = self.__Inst2soundIDwithX(InstID)
+                    soundID, _X = self.__Inst2soundIDwithX(everynote[1])
 
                     score_now = round(
-                        note.startTime
-                        + i * (note.lastTime / 500) / float(speed) / 50000
+                        everynote[0] / speed / 50000
                     )
 
                     maxScore = max(maxScore, score_now)
@@ -811,7 +825,7 @@ class midiConvert:
                         + "="
                         + str(score_now)
                         + "}"
-                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / (MaxVolume)*(1-i*500/note.lastTime) - 1} ~ {note.velocity * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((note.note - 60 - _X) / 12)}"
+                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / everynote[4] - 1} ~ {note.velocity * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((note.pitch - 60 - _X) / 12)}"
                     )
 
                     cmdAmount += 1
