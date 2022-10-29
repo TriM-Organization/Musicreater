@@ -98,21 +98,43 @@ def _(__):
 
 
 from msctPkgver.main import *
+import os
 
-from rich.console import Console
-
+try:
+    from rich.console import Console
+except ModuleNotFoundError as E:
+    if input("您需要安装 Rich 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y','1'):
+        os.system("pip install Rich -i https://mirrors.aliyun.com/pypi/")
+        from rich.console import Console
+    else:
+        raise E
 
 MainConsole = Console()
 
 
-import requests
-import random
+try:
+    import requests
+except ModuleNotFoundError as E:
+    if input("您需要安装 requests 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y','1'):
+        os.system("pip install requests -i https://mirrors.aliyun.com/pypi/")
+        import requests
+    else:
+        raise E
+
+
+MainConsole.print(
+    "[#121110 on #F0F2F4]     ",
+    style="#121110 on #F0F2F4",
+    justify="center",
+)
 
 
 MainConsole.rule(title="[bold #AB70FF]欢迎使用音·创独立转换器", characters="=", style="#26E2FF")
 MainConsole.rule(
     title="[bold #AB70FF]Welcome to Independent Musicreater Convernter", characters="-"
 )
+
+import random
 
 MainConsole.print(
     "[#121110 on #F0F2F4]"
@@ -252,7 +274,7 @@ def ipt(
 
     return MainConsole.input("", password=password, stream=stream)
 
-import os
+
 
 while True:
     midipath = ipt(f"{_('ChoosePath')}{_(':')}").lower()
@@ -260,7 +282,7 @@ while True:
         if os.path.isfile(midipath):
             midis = (midipath,)
         elif os.path.isdir(midipath):
-            midis = (os.path.join(midipath,i) for i in os.listdir(midipath) if i.lower().endswith('.mid') or i.lower().endswith('.midi'))
+            midis = tuple((os.path.join(midipath,i) for i in os.listdir(midipath) if i.lower().endswith('.mid') or i.lower().endswith('.midi')))
         else:
             prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
             continue
