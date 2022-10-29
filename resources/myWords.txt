@@ -123,10 +123,10 @@ A man achieve with challenges.
 只要不失去你的崇高，整个世界都会向你敞开	——原神
 每个人都是一个自己的精神支柱	——GitHub Copliot
 I am a dreamer, but I am not a dreamer.	——GitHub Copliot
-The only thing that makes a dream impossible is the fear of failure.	——GitHub Copliot
-A dream is a wish that you have or something that you have dreamed of in your mind.	——GitHub Copliot
-It is not the strongest of the species that survives, nor the most intelligent, nor the fastest.	——GitHub Copliot
-To be a dreamer is to be a free spirit.	——GitHub Copliot
+The only thing that makes a dream impossible is the fear of failure.	——GitHubCopliot
+A dream is a wish that you have or something that you have dreamed of in your mind.	——GitHubCopliot
+It is not the strongest of the species that survives, nor the most intelligent, nor the fastest.	——GitHubCopliot
+To be a dreamer is to be a free spirit.	——GitHubCopliot
 To be or not to be is a question.	——莎士比亚
 即使身躯残破，也要在战场上拼杀到最后一刻，要战斗到流干最后一滴血为止。	——原神
 朋友之间，也许就是要心知肚明才好	——原神
@@ -161,7 +161,7 @@ Waterrun Timepass
 可怜无定河边骨 犹是春闺梦里人	——陈陶
 世间有七情六欲，却不曾有过迷途知返的觉悟	——原神
 时间不会为他的执着驻足停留	——原神
-天罡坠 严壮殪兮涯角刿。人不寐 愁难浇兮肝肠碎​	——B站BV1Ae4y1b7fA
+天罡坠 严壮殪兮涯角刿。人不寐 愁难浇兮肝肠碎。​	——B站BV1Ae4y1b7fA
 “这是你的机会，你是我们最后的希望”	——原神
 到头来，终究是一场绚丽多彩的梦	——B站BV1BY4y1K7gV
 羽衣常带烟霞色 不惹人间桃李花	——B站BV1BY4y1K7gV
@@ -173,4 +173,8 @@ Waterrun Timepass
 弱小和无知不是生存的障碍，傲慢才是。	——三体
 宇宙就是一座黑暗森林，每个文明都是带枪的猎人，像幽灵般潜行于林间	——三体
 世界上没有奇迹，但是坚定顽强的战士，却可以做出常人认为无法做到的事	——《红岩》
+每个人都有他自己看待世界的方式 ——原神
+艺术为了每一个人而存在
+跳舞是从劳动中诞生的艺术，他并非来自于天上，而是一开始就属于人类    ——原神
+(舞蹈)是基于人的生活诞生的美丽之物，每当有喜悦或值得庆祝的事，人们就会起舞  ——原神
 
