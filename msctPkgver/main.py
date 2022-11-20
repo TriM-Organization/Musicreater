@@ -30,7 +30,6 @@ Note! Except for this source file, all the files in this repository and this pro
    limitations under the License.
 """
 
-from operator import index
 import os
 import mido
 import brotli
@@ -145,7 +144,7 @@ class midiConvert:
             self.midi = mido.MidiFile(self.midiFile)
             """MidiFile对象"""
         except Exception as E:
-            raise MidiDestroyedError(E)
+            raise MidiDestroyedError(f"文件{self.midiFile}损坏：{E}")
         
         self.outputPath = os.path.abspath(outputPath)
         """输出路径"""
@@ -1034,6 +1033,8 @@ class midiConvert:
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :return 成功与否，成功返回(True,True)，失败返回(False,str失败原因)
         """
+
+
         # try:
         cmdlist, maxlen, maxscore = self.methods[method - 1](
             scoreboardname, volume, speed
@@ -1041,15 +1042,15 @@ class midiConvert:
         # except:
         #     return (False, f"无法找到算法ID{method}对应的转换算法")
 
-        # 当文件f夹{self.outputPath}/temp/functions存在时清空其下所有项目，若其不存在则创建
-        if os.path.exists(os.path.join(self.outputPath,"/temp/functions/")):
-            shutil.rmtree(os.path.join(self.outputPath,"/temp/functions/"))
-        os.makedirs(os.path.join(self.outputPath,"/temp/functions/mscplay"))
+        # 当文件f夹{self.outputPath}/temp/functions存在时清空其下所有项目，然后创建
+        if os.path.exists(f"{self.outputPath}/temp/functions/"):
+            shutil.rmtree(f"{self.outputPath}/temp/functions/")
+        os.makedirs(f"{self.outputPath}/temp/functions/mscplay")
 
         # 写入manifest.json
-        if not os.path.exists(os.path.join(self.outputPath,"/temp/manifest.json",)):
+        if not os.path.exists(f"{self.outputPath}/temp/manifest.json"):
             with open(
-                os.path.join(self.outputPath,"/temp/manifest.json",), "w", encoding="utf-8"
+                f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
             ) as f:
                 f.write(
                     '{\n  "format_version": 1,\n  "header": {\n    "description": "'
@@ -1066,7 +1067,7 @@ class midiConvert:
                 )
         else:
             with open(
-                os.path.join(self.outputPath,"/temp/manifest.json",), "r", encoding="utf-8"
+                f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
             ) as manifest:
                 data = json.loads(manifest.read())
                 data["header"][
@@ -1077,20 +1078,20 @@ class midiConvert:
                 data["modules"][0]["description"] = "None"
                 data["modules"][0]["uuid"] = str(uuid.uuid4())
                 manifest.close()
-            open(os.path.join(self.outputPath,"/temp/manifest.json",), "w", encoding="utf-8").write(
+            open(f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8").write(
                 json.dumps(data)
             )
 
         # 将命令列表写入文件
         indexfile = open(
-            os.path.join(self.outputPath,"/temp/functions/index.mcfunction",), "w", encoding="utf-8"
+            f"{self.outputPath}/temp/functions/index.mcfunction", "w", encoding="utf-8"
         )
         for track in cmdlist:
             indexfile.write(
                 "function mscplay/track" + str(cmdlist.index(track) + 1) + "\n"
             )
             with open(
-                os.path.join(self.outputPath,f"/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",),
+                f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
                 "w",
                 encoding="utf-8",
             ) as f:
@@ -1119,7 +1120,7 @@ class midiConvert:
         if progressbar:
             if progressbar:
                 with open(
-                    os.path.join(self.outputPath,"/temp/functions/mscplay/progressShow.mcfunction",),
+                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
                     "w",
                     encoding="utf-8",
                 ) as f:
@@ -1128,7 +1129,7 @@ class midiConvert:
                     )
             else:
                 with open(
-                    os.path.join(self.outputPath,"/temp/functions/mscplay/progressShow.mcfunction",),
+                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
                     "w",
                     encoding="utf-8",
                 ) as f:
@@ -1143,13 +1144,13 @@ class midiConvert:
         indexfile.close()
 
         makeZip(
-            os.path.join(self.outputPath,"/temp/"),
-            os.path.join(self.outputPath,f"/{self.midFileName}.mcpack"),
+            f"{self.outputPath}/temp/", self.outputPath + f"/{self.midFileName}.mcpack"
         )
 
         shutil.rmtree(f"{self.outputPath}/temp/")
 
         return (True, f"转换完成，总长度{maxlen}")
+
 
     def toBDXfile(
         self,
