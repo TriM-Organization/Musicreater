@@ -140,9 +140,14 @@ class midiConvert:
 
         self.midiFile = midiFile
         """midi文件路径"""
-        self.midi = mido.MidiFile(self.midiFile)
-        """MidiFile对象"""
-        self.outputPath = outputPath
+
+        try:
+            self.midi = mido.MidiFile(self.midiFile)
+            """MidiFile对象"""
+        except Exception as E:
+            raise MidiDestroyedError(E)
+        
+        self.outputPath = os.path.abspath(outputPath)
         """输出路径"""
         # 将self.midiFile的文件名，不含路径且不含后缀存入self.midiFileName
         self.midFileName = os.path.splitext(os.path.basename(self.midiFile))[0]
@@ -1037,14 +1042,14 @@ class midiConvert:
         #     return (False, f"无法找到算法ID{method}对应的转换算法")
 
         # 当文件f夹{self.outputPath}/temp/functions存在时清空其下所有项目，若其不存在则创建
-        if os.path.exists(f"{self.outputPath}/temp/functions/"):
-            shutil.rmtree(f"{self.outputPath}/temp/functions/")
-        os.makedirs(f"{self.outputPath}/temp/functions/mscplay")
+        if os.path.exists(os.path.join(self.outputPath,"/temp/functions/")):
+            shutil.rmtree(os.path.join(self.outputPath,"/temp/functions/"))
+        os.makedirs(os.path.join(self.outputPath,"/temp/functions/mscplay"))
 
         # 写入manifest.json
-        if not os.path.exists(f"{self.outputPath}/temp/manifest.json"):
+        if not os.path.exists(os.path.join(self.outputPath,"/temp/manifest.json",)):
             with open(
-                f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
+                os.path.join(self.outputPath,"/temp/manifest.json",), "w", encoding="utf-8"
             ) as f:
                 f.write(
                     '{\n  "format_version": 1,\n  "header": {\n    "description": "'
@@ -1061,7 +1066,7 @@ class midiConvert:
                 )
         else:
             with open(
-                f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
+                os.path.join(self.outputPath,"/temp/manifest.json",), "r", encoding="utf-8"
             ) as manifest:
                 data = json.loads(manifest.read())
                 data["header"][
@@ -1072,20 +1077,20 @@ class midiConvert:
                 data["modules"][0]["description"] = "None"
                 data["modules"][0]["uuid"] = str(uuid.uuid4())
                 manifest.close()
-            open(f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8").write(
+            open(os.path.join(self.outputPath,"/temp/manifest.json",), "w", encoding="utf-8").write(
                 json.dumps(data)
             )
 
         # 将命令列表写入文件
         indexfile = open(
-            f"{self.outputPath}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+            os.path.join(self.outputPath,"/temp/functions/index.mcfunction",), "w", encoding="utf-8"
         )
         for track in cmdlist:
             indexfile.write(
                 "function mscplay/track" + str(cmdlist.index(track) + 1) + "\n"
             )
             with open(
-                f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
+                os.path.join(self.outputPath,f"/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",),
                 "w",
                 encoding="utf-8",
             ) as f:
@@ -1114,7 +1119,7 @@ class midiConvert:
         if progressbar:
             if progressbar:
                 with open(
-                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                    os.path.join(self.outputPath,"/temp/functions/mscplay/progressShow.mcfunction",),
                     "w",
                     encoding="utf-8",
                 ) as f:
@@ -1123,7 +1128,7 @@ class midiConvert:
                     )
             else:
                 with open(
-                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                    os.path.join(self.outputPath,"/temp/functions/mscplay/progressShow.mcfunction",),
                     "w",
                     encoding="utf-8",
                 ) as f:
@@ -1138,7 +1143,8 @@ class midiConvert:
         indexfile.close()
 
         makeZip(
-            f"{self.outputPath}/temp/", self.outputPath + f"/{self.midFileName}.mcpack"
+            os.path.join(self.outputPath,"/temp/"),
+            os.path.join(self.outputPath,f"/{self.midFileName}.mcpack"),
         )
 
         shutil.rmtree(f"{self.outputPath}/temp/")
@@ -1178,7 +1184,7 @@ class midiConvert:
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
 
-        with open(f"{self.outputPath}/{self.midFileName}.bdx", "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
             f.write("BD@")
 
         _bytes = (
@@ -1277,7 +1283,7 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(f"{self.outputPath}/{self.midFileName}.bdx", "ab+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
@@ -1314,7 +1320,7 @@ class midiConvert:
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
 
-        with open(f"{self.outputPath}/{self.midFileName}.bdx", "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
             f.write("BD@")
 
         _bytes = (
@@ -1389,7 +1395,38 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(f"{self.outputPath}/{self.midFileName}.bdx", "ab+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
+
+
+# def isProgressBar(pgbarLike:str):
+#     '''判断所输入数据是否为进度条式样数据
+#     注意，使用本函数时不得直接放在 if 后，正确用法如下：
+    
+#     判断是否是合规进度条样式数据：
+#     ```
+#     if isProgressBar(pgb) == False:
+#         pass # 进度条样式错误
+#     else:
+#         pass # 进度条样式正确
+#     ```
+#     当仅需要判断正确的情况时也最好这样写：
+#     ```
+#     if not isProgressBar(pgb) == False:
+#         pass # 进度条样式正确
+#     ```
+
+#     :param phbarLike:str
+#         所需判断的字符串
+#     :return False | tuple
+#         是否为可读的进度条式样，如果是，则转换为进度条元组
+#     '''
+#     if pgbarLike.lower() in ('true','1'):
+#         return (r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",("§e=§r", "§7=§r"),)
+#     elif pgbarLike.lower() in ('false','0'):
+#         return ()
+    
+    
+    

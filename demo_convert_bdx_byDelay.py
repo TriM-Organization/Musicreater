@@ -21,7 +21,7 @@ while True:
     try:
         authorname = input('请输入作者：')
         while True:
-            isProgress = input('*进度条[注]：')
+            isProgress = input('*进度条[本Demo不支持自定义]：')
             if isProgress != '':
                 if isProgress in ('1', 'True'):
                     isProgress = True
