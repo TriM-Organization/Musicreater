@@ -1283,7 +1283,7 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "ab+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
@@ -1395,7 +1395,7 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "ab+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
