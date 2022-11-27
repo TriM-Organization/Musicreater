@@ -92,6 +92,115 @@
 
 	Thank our groupmate *Mono* again for helping finding this problem.
 
+
+
+## Under Linux OS
+
+
+### Install Runtime Environment
+
+0. Install and Verify Python Runtime
+
+	Common Linux Releases do include a Python Runtime Environment, what we should do only is to check it is a satisfied version to our program. If the version ≥Python3.6, theoretically our program can be run.
+
+	We can type:
+
+	```bash
+	python -V
+	```
+
+	To check the Python version, as the follows
+	
+	<img src=https://foruda.gitee.com/images/1665120915821957090/429561fd_9911226.png>
+
+	- Not Necessary
+
+		If you want to change a Python version just as what I want to do, it is such a great fantastic action! Let do as the follows:
+
+		- pacman Package Manager（In Arch Linux Mostly）
+
+			Let's write python3 into the ingore list of updating. Via `vim` to edit `/etc/pacman.conf`, add `python3` after `IgnorePkg`.
+
+			```bash
+			sudo vim /etc/pacman.conf
+			```
+
+			<img src=https://foruda.gitee.com/images/1665124611490335193/5e99ca26_9911226.png>
+
+			Then we can search for python releases in [Arch Achieve](https://archive.archlinux.org/packages/).（*HERE, under Arch, Python refers to Python3 defaultly, while some other Linux releases using Python2 as default. So dose Arch Achieve.*）What I find here is [Python3.8.6](https://archive.archlinux.org/packages/p/python/python-3.8.6-1-x86_64.pkg.tar.zst), so let's download she via `pacman`:
+
+			```bash
+			sudo pacman -U https://archive.archlinux.org/packages/p/python/python-3.8.6-1-x86_64.pkg.tar.zst
+			```
+
+			<img src=https://foruda.gitee.com/images/1665126362769399903/ea4b9598_9911226.png>
+
+			Perfect!
+
+1. Install and Verify pip Package Manager
+
+	Before installing, it is to be checked, wheather Python's pip is OK:
+
+	```bash
+	python -m pip				# To check is pip installed
+	# If a long tip occured, it is OK
+	
+	# If returned as this, then not.
+	/usr/bin/python: No module named pip
+	# We can install pip via:
+	sudo pacman -S python-pip
+	# Verfy, remember.
+	python -m pip
+
+
+	# If you did but failed, we should use other methods to install pip:
+	wget https://bootstrap.pypa.io/get-pip.py
+	sudo python get-pip.py
+	# Verfy, must.
+	python -m pip
+	```
+
+	Over after checking, lets install the dependences.
+	
+	```bash
+	pip install mido -i https://mirrors.aliyun.com/pypi/simple/
+	pip install brotli -i https://mirrors.aliyun.com/pypi/simple/
+	```
+
+	See the tips below as successfully installed：
+
+	<img src="https://foruda.gitee.com/images/1662737676719454287/f61a70f7_9911226.png">
+
+
+### Download this sources pack and Using its demos.
+
+1. 使用Git下载本库及其示例代码
+
+	```bash
+	git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git MSCTpkgver
+	```
+
+	当上述命令执行成功，你会在执行此命令的所在位置发现一个名为 `MSCTpkgver` 的文件夹，其中包含的正是我们心心念念下载的本程序和示例代码。
+	而我们要运行的也正是示例代码，因此，赶快进入下载到的文件夹：
+
+	```bash
+	cd MSCTpkgver
+	```
+
+1. 开始使用
+
+	在目录下打开终端，执行以下命令：(选择你需要的)
+
+	```bash
+	python demo_convert.py
+	python demo_convert_bdx_byDelay.py
+	```
+
+
+
+
+
+
 2. More Info for Parameters of Our Demo Program(s)
 
 	<img src=https://foruda.gitee.com/images/1659974810147043475/运行.png>
