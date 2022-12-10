@@ -46,7 +46,7 @@
 
 ## 使用教程📕
 
-***请注意！音·创是音乐的 编辑 软件，不是转换软件，若要直接转换midi音乐到我的世界，请见 [音·创 包版本](https://gitee.com/EillesWan/Musicreater/blob/pkgver/)
+***请注意！音·创是音乐的 编辑 软件，不是转换软件，若要直接转换midi音乐到我的世界，请见 [音·创 包版本](https://gitee.com/EillesWan/Musicreater/blob/pkgver/)***
 
 ### 安装教程
 
