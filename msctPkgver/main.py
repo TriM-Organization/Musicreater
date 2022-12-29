@@ -523,23 +523,23 @@ class midiConvert:
                         # /playsound <sound: string> [player: target] [position: x y z]
                         # [volume: float] [pitch: float] [minimumVolume: float]
 
-                        volume_d = 1 / volume - 1
-                        if volume_d == 0.0:
-                            volume_d = ""
-                        command_now = "playsound {0} @a[scores={{{1}}}] ~ ~{2} ~ {3} {4}" \
-                            .format(soundID, "{}={}".format(scoreboardname,
-                                                            nowscore), volume_d,
-                                    msg.velocity, 2 ** ((msg.note - 60 - _X) / 12))
-                        singleTrack.append(command_now)
-                        # singleTrack.append(
-                        #     "execute @a[scores={"
-                        #     + str(scoreboardname)
-                        #     + "="
-                        #     + str(nowscore)
-                        #     + "}"
-                        #     + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ "
-                        #       f"{msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
-                        # )
+                        # volume_d = 1 / volume - 1
+                        # if volume_d == 0.0:
+                        #     volume_d = ""
+                        # command_now = "playsound {0} @a[scores={{{1}}}] ~ ~{2} ~ {3} {4}" \
+                        #     .format(soundID, "{}={}".format(scoreboardname,
+                        #                                     nowscore), volume_d,
+                        #             msg.velocity, 2 ** ((msg.note - 60 - _X) / 12))
+                        # singleTrack.append(command_now)
+                        singleTrack.append(
+                            "execute @a[scores={"
+                            + str(scoreboardname)
+                            + "="
+                            + str(nowscore)
+                            + "}"
+                            + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ "
+                              f"{msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
+                        )
                         commands += 1
             if len(singleTrack) != 0:
                 tracks.append(singleTrack)
