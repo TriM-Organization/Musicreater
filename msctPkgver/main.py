@@ -66,7 +66,7 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
 class SingleNote:
     def __init__(self, instrument: int, pitch: int, velocity, startTime, lastTime):
         """用于存储单个音符的类
-        :param inst 乐器编号
+        :param instrument 乐器编号
         :param pitch 音符编号
         :param velocity 力度/响度
         :param startTime 开始之时(ms)
@@ -145,7 +145,7 @@ class midiConvert:
             """MidiFile对象"""
         except Exception as E:
             raise MidiDestroyedError(f"文件{self.midiFile}损坏：{E}")
-        
+
         self.outputPath = os.path.abspath(outputPath)
         """输出路径"""
         # 将self.midiFile的文件名，不含路径且不含后缀存入self.midiFileName
@@ -304,13 +304,13 @@ class midiConvert:
         return str(int(int(score / 20) / 60)) + ":" + str(int(int(score / 20) % 60))
 
     def __formProgressBar(
-        self,
-        maxscore: int,
-        scoreboardname: str,
-        progressbar: tuple = (
-            r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-            ("§e=§r", "§7=§r"),
-        ),
+            self,
+            maxscore: int,
+            scoreboardname: str,
+            progressbar: tuple = (
+                    r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+                    ("§e=§r", "§7=§r"),
+            ),
     ) -> list:
 
         pgsstyle = progressbar[0]
@@ -329,7 +329,7 @@ class midiConvert:
         """
 
         def __replace(
-            s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
+                s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
         ):
             if times == 0:
                 return s.replace(tobeReplaced, other)
@@ -404,16 +404,16 @@ class midiConvert:
         return finalprgsbar
 
     def __formCMDblk(
-        self,
-        command: str,
-        particularValue: int,
-        impluse: int = 0,
-        condition: bool = False,
-        needRedstone: bool = True,
-        tickDelay: int = 0,
-        customName: str = "",
-        executeOnFirstTick: bool = False,
-        trackOutput: bool = True,
+            self,
+            command: str,
+            particularValue: int,
+            impluse: int = 0,
+            condition: bool = False,
+            needRedstone: bool = True,
+            tickDelay: int = 0,
+            customName: str = "",
+            executeOnFirstTick: bool = False,
+            trackOutput: bool = True,
     ):
         """
         使用指定项目返回指定的指令方块放置指令项
@@ -476,7 +476,7 @@ class midiConvert:
         return block
 
     def _toCmdList_m1(
-        self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
+            self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
@@ -502,14 +502,13 @@ class midiConvert:
 
             for msg in track:
                 ticks += msg.time
-                # print(msg)
                 if msg.is_meta:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
                     if msg.type == "program_change":
-                        # print("TT")
                         instrumentID = msg.program
+
                     if msg.type == "note_on" and msg.velocity != 0:
                         try:
                             nowscore = round(
@@ -520,14 +519,27 @@ class midiConvert:
                             raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
                         maxscore = max(maxscore, nowscore)
                         soundID, _X = self.__Inst2soundIDwithX(instrumentID)
-                        singleTrack.append(
-                            "execute @a[scores={"
-                            + str(scoreboardname)
-                            + "="
-                            + str(nowscore)
-                            + "}"
-                            + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
-                        )
+
+                        # /playsound <sound: string> [player: target] [position: x y z]
+                        # [volume: float] [pitch: float] [minimumVolume: float]
+
+                        volume_d = 1 / volume - 1
+                        if volume_d == 0.0:
+                            volume_d = ""
+                        command_now = "playsound {0} @a[scores={{{1}}}] ~ ~{2} ~ {3} {4}" \
+                            .format(soundID, "{}={}".format(scoreboardname,
+                                                            nowscore), volume_d,
+                                    msg.velocity, 2 ** ((msg.note - 60 - _X) / 12))
+                        singleTrack.append(command_now)
+                        # singleTrack.append(
+                        #     "execute @a[scores={"
+                        #     + str(scoreboardname)
+                        #     + "="
+                        #     + str(nowscore)
+                        #     + "}"
+                        #     + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ "
+                        #       f"{msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
+                        # )
                         commands += 1
             if len(singleTrack) != 0:
                 tracks.append(singleTrack)
@@ -536,10 +548,10 @@ class midiConvert:
 
     # 这与上面的算法几乎没有差别 甚至更慢了一点 但是是为了线性插值做准备
     def _toCmdList_m2(
-        self,
-        scoreboardname: str = "mscplay",
-        MaxVolume: float = 1.0,
-        speed: float = 1.0,
+            self,
+            scoreboardname: str = "mscplay",
+            MaxVolume: float = 1.0,
+            speed: float = 1.0,
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表
@@ -595,7 +607,7 @@ class midiConvert:
                         )
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                            msg.type == "note_off"
                     ):
                         channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
@@ -664,10 +676,10 @@ class midiConvert:
     # 已经经过验证 需要再次修改
     # 等一段时间后我来通知
     def _toCmdList_m3(
-        self,
-        scoreboardname: str = "mscplay",
-        MaxVolume: float = 1.0,
-        speed: float = 1.0,
+            self,
+            scoreboardname: str = "mscplay",
+            MaxVolume: float = 1.0,
+            speed: float = 1.0,
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表，并使用线性插值算法优化音量
@@ -723,7 +735,7 @@ class midiConvert:
                         )
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                            msg.type == "note_off"
                     ):
                         channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
@@ -774,7 +786,6 @@ class midiConvert:
                         noteMsgs.pop(MsgIndex.index(msg[1]))
                         MsgIndex.pop(MsgIndex.index(msg[1]))
 
-
         tracks = []
         cmdAmount = 0
         maxScore = 0
@@ -785,14 +796,15 @@ class midiConvert:
             '''传入音符数据，返回以半秒为分割的插值列表
             :param note: SingleNote 音符
             :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]'''
-            
+
             result = []
 
             totalCount = int(note.lastTime / 500000)
 
             for i in range(totalCount):
-                result.append((note.startTime+i*500000,note.instrument,note.pitch,note.velocity,MaxVolume*((totalCount-i)/totalCount)))
-            
+                result.append((note.startTime + i * 500000, note.instrument, note.pitch, note.velocity,
+                               MaxVolume * ((totalCount - i) / totalCount)))
+
             return result
 
         # 此处 我们把通道视为音轨
@@ -811,7 +823,6 @@ class midiConvert:
             for note in track:
 
                 for everynote in _linearFun(note):
-                    
                     # 应该是计算的时候出了点小问题
                     # 我们应该用一个MC帧作为时间单位而不是半秒
 
@@ -838,11 +849,11 @@ class midiConvert:
         return [tracks, cmdAmount, maxScore]
 
     def _toCmdList_withDelay_m1(
-        self,
-        volume: float = 1.0,
-        speed: float = 1.0,
-        player: str = "@a",
-        isMixedWithPrograssBar=False,
+            self,
+            volume: float = 1.0,
+            speed: float = 1.0,
+            player: str = "@a",
+            isMixedWithPrograssBar=False,
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
@@ -914,7 +925,7 @@ class midiConvert:
             """
 
             def __replace(
-                s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
+                    s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
             ):
                 if times == 0:
                     return s.replace(tobeReplaced, other)
@@ -1015,13 +1026,13 @@ class midiConvert:
         return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
 
     def tomcpack(
-        self,
-        method: int = 1,
-        isAutoReset: bool = False,
-        progressbar=None,
-        scoreboardname: str = "mscplay",
-        volume: float = 1.0,
-        speed: float = 1.0,
+            self,
+            method: int = 1,
+            isAutoReset: bool = False,
+            progressbar=None,
+            scoreboardname: str = "mscplay",
+            volume: float = 1.0,
+            speed: float = 1.0,
     ) -> bool or tuple:
         """
         使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
@@ -1033,7 +1044,6 @@ class midiConvert:
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :return 成功与否，成功返回(True,True)，失败返回(False,str失败原因)
         """
-
 
         # try:
         cmdlist, maxlen, maxscore = self.methods[method - 1](
@@ -1050,7 +1060,7 @@ class midiConvert:
         # 写入manifest.json
         if not os.path.exists(f"{self.outputPath}/temp/manifest.json"):
             with open(
-                f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
+                    f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
             ) as f:
                 f.write(
                     '{\n  "format_version": 1,\n  "header": {\n    "description": "'
@@ -1067,7 +1077,7 @@ class midiConvert:
                 )
         else:
             with open(
-                f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
+                    f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
             ) as manifest:
                 data = json.loads(manifest.read())
                 data["header"][
@@ -1091,9 +1101,9 @@ class midiConvert:
                 "function mscplay/track" + str(cmdlist.index(track) + 1) + "\n"
             )
             with open(
-                f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
-                "w",
-                encoding="utf-8",
+                    f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
+                    "w",
+                    encoding="utf-8",
             ) as f:
                 f.write("\n".join(track))
         indexfile.writelines(
@@ -1104,12 +1114,12 @@ class midiConvert:
                 + scoreboardname
                 + " 1\n",
                 (
-                    "scoreboard players reset @a[scores={"
-                    + scoreboardname
-                    + "="
-                    + str(maxscore + 20)
-                    + "..}]"
-                    + f" {scoreboardname}\n"
+                        "scoreboard players reset @a[scores={"
+                        + scoreboardname
+                        + "="
+                        + str(maxscore + 20)
+                        + "..}]"
+                        + f" {scoreboardname}\n"
                 )
                 if isAutoReset
                 else "",
@@ -1120,18 +1130,18 @@ class midiConvert:
         if progressbar:
             if progressbar:
                 with open(
-                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
-                    "w",
-                    encoding="utf-8",
+                        f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                        "w",
+                        encoding="utf-8",
                 ) as f:
                     f.writelines(
                         "\n".join(self.__formProgressBar(maxscore, scoreboardname))
                     )
             else:
                 with open(
-                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
-                    "w",
-                    encoding="utf-8",
+                        f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                        "w",
+                        encoding="utf-8",
                 ) as f:
                     f.writelines(
                         "\n".join(
@@ -1151,17 +1161,16 @@ class midiConvert:
 
         return (True, f"转换完成，总长度{maxlen}")
 
-
     def toBDXfile(
-        self,
-        method: int = 1,
-        author: str = "Eilles",
-        progressbar=False,
-        maxheight: int = 64,
-        scoreboardname: str = "mscplay",
-        volume: float = 1.0,
-        speed: float = 1.0,
-        isAutoReset: bool = False,
+            self,
+            method: int = 1,
+            author: str = "Eilles",
+            progressbar=False,
+            maxheight: int = 64,
+            scoreboardname: str = "mscplay",
+            volume: float = 1.0,
+            speed: float = 1.0,
+            isAutoReset: bool = False,
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1185,13 +1194,13 @@ class midiConvert:
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")), "w+") as f:
             f.write("BD@")
 
         _bytes = (
-            b"BDX\x00"
-            + author.encode("utf-8")
-            + b" & Musicreater\x00\x01command_block\x00"
+                b"BDX\x00"
+                + author.encode("utf-8")
+                + b" & Musicreater\x00\x01command_block\x00"
         )
 
         key = {
@@ -1220,12 +1229,12 @@ class midiConvert:
 
         if isAutoReset:
             commands += (
-                "scoreboard players reset @a[scores={"
-                + scoreboardname
-                + "="
-                + str(maxScore + 20)
-                + "}] "
-                + scoreboardname
+                    "scoreboard players reset @a[scores={"
+                    + scoreboardname
+                    + "="
+                    + str(maxScore + 20)
+                    + "}] "
+                    + scoreboardname
             )
 
         # 此处是对于仅有 True 的参数和自定义参数的判断
@@ -1242,13 +1251,13 @@ class midiConvert:
                 cmd,
                 (1 if yforward else 0)
                 if (
-                    ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != maxheight))
+                        ((nowy != 0) and (not yforward))
+                        or ((yforward) and (nowy != maxheight))
                 )
                 else (3 if zforward else 2)
                 if (
-                    ((nowz != 0) and (not zforward))
-                    or ((zforward) and (nowz != _sideLength))
+                        ((nowz != 0) and (not zforward))
+                        or ((zforward) and (nowz != _sideLength))
                 )
                 else 5,
                 impluse=2,
@@ -1270,7 +1279,7 @@ class midiConvert:
                 nowz += 1 if zforward else -1
 
                 if ((nowz > _sideLength) and (zforward)) or (
-                    (nowz < 0) and (not zforward)
+                        (nowz < 0) and (not zforward)
                 ):
                     nowz -= 1 if zforward else -1
                     zforward = not zforward
@@ -1284,20 +1293,20 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "ab+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")), "ab+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
 
     def toBDXfile_withDelay(
-        self,
-        method: int = 1,
-        author: str = "Eilles",
-        progressbar=False,
-        maxheight: int = 64,
-        volume: float = 1.0,
-        speed: float = 1.0,
-        player: str = "@a",
+            self,
+            method: int = 1,
+            author: str = "Eilles",
+            progressbar=False,
+            maxheight: int = 64,
+            volume: float = 1.0,
+            speed: float = 1.0,
+            player: str = "@a",
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1321,13 +1330,13 @@ class midiConvert:
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "w+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")), "w+") as f:
             f.write("BD@")
 
         _bytes = (
-            b"BDX\x00"
-            + author.encode("utf-8")
-            + b" & Musicreater\x00\x01command_block\x00"
+                b"BDX\x00"
+                + author.encode("utf-8")
+                + b" & Musicreater\x00\x01command_block\x00"
         )
 
         key = {
@@ -1354,13 +1363,13 @@ class midiConvert:
                 cmd,
                 (1 if yforward else 0)
                 if (
-                    ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != maxheight))
+                        ((nowy != 0) and (not yforward))
+                        or ((yforward) and (nowy != maxheight))
                 )
                 else (3 if zforward else 2)
                 if (
-                    ((nowz != 0) and (not zforward))
-                    or ((zforward) and (nowz != _sideLength))
+                        ((nowz != 0) and (not zforward))
+                        or ((zforward) and (nowz != _sideLength))
                 )
                 else 5,
                 impluse=2,
@@ -1382,7 +1391,7 @@ class midiConvert:
                 nowz += 1 if zforward else -1
 
                 if ((nowz > _sideLength) and (zforward)) or (
-                    (nowz < 0) and (not zforward)
+                        (nowz < 0) and (not zforward)
                 ):
                     nowz -= 1 if zforward else -1
                     zforward = not zforward
@@ -1396,16 +1405,15 @@ class midiConvert:
 
                 _bytes += key[y][int(yforward)]
 
-        with open(os.path.abspath(os.path.join(self.outputPath,f"{self.midFileName}.bdx")), "ab+") as f:
+        with open(os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")), "ab+") as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return (True, _bytes, (nowx, maxheight, _sideLength))
 
-
 # def isProgressBar(pgbarLike:str):
 #     '''判断所输入数据是否为进度条式样数据
 #     注意，使用本函数时不得直接放在 if 后，正确用法如下：
-    
+
 #     判断是否是合规进度条样式数据：
 #     ```
 #     if isProgressBar(pgb) == False:
@@ -1428,6 +1436,3 @@ class midiConvert:
 #         return (r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",("§e=§r", "§7=§r"),)
 #     elif pgbarLike.lower() in ('false','0'):
 #         return ()
-    
-    
-    
