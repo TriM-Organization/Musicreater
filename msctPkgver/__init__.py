@@ -40,3 +40,6 @@ from .main import *
 
 print('此Midi转换功能由音·创开发者开发，版权归参与开发的人员共同所有。')
 print('Copyright © 2022 all the developers of Musicreater')
+print("不妨试试Mid-BDX转换网页：在线的多功能Midi转换器")
+print("https://dislink.github.io/midi2bdx/")
+

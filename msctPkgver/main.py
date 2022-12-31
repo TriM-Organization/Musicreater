@@ -10,10 +10,10 @@
 """
 音·创 库版 (Musicreater Package Version)
 是一款免费开源的针对《我的世界：基岩版》的midi音乐转换库
-注意！除了此源文件以外，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
+注意！包括此源文件，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
 Musicreater pkgver (Package Version 音·创 库版)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
-Note! Except for this source file, all the files in this repository and this project are licensed under Apache License 2.0
+Note! Including this source file, all the files in this repository and this project are licensed under Apache License 2.0
 
    Copyright 2022 all the developers of Musicreater
 
@@ -23,11 +23,6 @@ Note! Except for this source file, all the files in this repository and this pro
 
        http://www.apache.org/licenses/LICENSE-2.0
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an 'AS IS' BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
 """
 
 import os
@@ -118,6 +113,21 @@ tempo * amount_of_beats => 毫秒数
 
 tempo * tick / ticks_per_beat => 毫秒数
 
+###########
+
+seconds per tick:
+(tempo / 1000000.0) / ticks_per_beat
+
+seconds:
+tick * tempo / 1000000.0 / ticks_per_beat
+
+microseconds:
+tick * tempo / 1000.0 / ticks_per_beat
+
+gameticks:
+tick * tempo / 1000000.0 / ticks_per_beat * 一秒多少游戏刻
+
+
 """
 
 
@@ -161,7 +171,7 @@ class midiConvert:
             贝斯bass、迪吉里杜管didgeridoo的时候为8
             长笛flute、牛铃cou_bell的时候为5
             钟琴bell、管钟chime、木琴xylophone的时候为4
-            而存在一些打击乐器basedrum、hat、snare，没有音域，则没有X，那么我们返回7即可
+            而存在一些打击乐器bd(basedrum)、hat、snare，没有音域，则没有X，那么我们返回7即可
         :param instrumentID: midi的乐器ID
         default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
         :return: (str我的世界乐器名, int转换算法中的X)"""
@@ -283,22 +293,28 @@ class midiConvert:
                 113: ("note.bell", 4),
                 114: ("note.harp", 6),
                 115: ("note.cow_bell", 5),
-                116: ("note.basedrum", 7),  # 打击乐器无音域
+                116: ("note.bd", 7),  # 打击乐器无音域
                 117: ("note.bass", 8),
                 118: ("note.bit", 6),
-                119: ("note.basedrum", 7),  # 打击乐器无音域
+                119: ("note.bd", 7),  # 打击乐器无音域
                 120: ("note.guitar", 7),
                 121: ("note.harp", 6),
                 122: ("note.harp", 6),
                 123: ("note.harp", 6),
                 124: ("note.harp", 6),
                 125: ("note.hat", 7),  # 打击乐器无音域
-                126: ("note.basedrum", 7),  # 打击乐器无音域
+                126: ("note.bd", 7),  # 打击乐器无音域
                 127: ("note.snare", 7),  # 打击乐器无音域
             }[instrumentID]
         except BaseException:
-            a = ("note.harp", 6)
+            a = ("note.flute", 5)
         return a
+
+    def __bitInst2IDwithX(self, instrumentID:int):
+        # 感谢Dislink的网页转换页面的代码给我抄
+        return ("note.bd", 7)
+
+
 
     def __score2time(self, score: int):
         return str(int(int(score / 20) / 60)) + ":" + str(int(int(score / 20) % 60))
@@ -534,7 +550,8 @@ class midiConvert:
 
         return [tracks, commands, maxscore]
 
-    # 这与上面的算法几乎没有差别 甚至更慢了一点 但是是为了线性插值做准备
+    # 原本这个算法的转换效果应该和上面的算法相似的
+    # 但不好意思 我增加了泛音功能
     def _toCmdList_m2(
         self,
         scoreboardname: str = "mscplay",
@@ -627,8 +644,11 @@ class midiConvert:
 
             if channels.index(track) == 0:
                 CheckFirstChannel = True
+            elif channels.index(track) == 9:
+                SpecialBits = True
             else:
                 CheckFirstChannel = False
+                SpecialBits = False
 
             nowTrack = []
 
@@ -638,8 +658,11 @@ class midiConvert:
                     InstID = msg[1]
 
                 elif msg[0] == "NoteS":
-
-                    soundID, _X = self.__Inst2soundIDwithX(InstID)
+                    
+                    if SpecialBits:
+                        soundID, _X = self.__bitInst2IDwithX(InstID)
+                    else:
+                        soundID, _X = self.__Inst2soundIDwithX(InstID)
                     score_now = round(msg[-1] / float(speed) / 50000)
                     maxScore = max(maxScore, score_now)
 
