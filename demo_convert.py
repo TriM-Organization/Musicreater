@@ -4,26 +4,17 @@
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
+# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
 
 
 """
 音·创 库版 MIDI转换展示程序
 Musicreater Package Version : Demo for Midi Conversion
 
-   Copyright 2022 all the developers of Musicreater
+Copyright 2023 all the developers of Musicreater
 
-   Licensed under the Apache License, Version 2.0 (the 'License');
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an 'AS IS' BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+开源相关声明请见 ./Lisence.md
+Terms & Conditions: ./Lisence.md
 """
 
 from msctPkgver.main import *
@@ -103,7 +94,8 @@ while True:
 
 
 
-
+m = 1
+'''采用的算法编号'''
 
 
 if os.path.isdir(midipath):
@@ -112,8 +104,8 @@ if os.path.isdir(midipath):
             print(f'正在操作{i}')
             convertion.convert(midipath + '/' + i, outpath + '/' + i[:-4])
             if outFormat == 0:
-                convertion.tomcpack(
-                    1,
+                print(convertion.tomcpack(
+                    m,
                     isAutoReset
                     if isAutoReset != ''
                     else bool(int(input('是否自动重置计分板(1|0)：'))),
@@ -121,10 +113,10 @@ if os.path.isdir(midipath):
                     sbname if sbname != '' else input('请输入计分板名称：'),
                     volume if volume != '' else float(input('请输入音量（0-1）：')),
                     speed if speed != '' else float(input('请输入速度倍率：')),
-                )
+                ))
             elif outFormat == 1:
-                convertion.toBDXfile(
-                    1,
+                print(convertion.toBDXfile(
+                    m,
                     author if author != '' else input('请输入作者：'),
                     isProgress,
                     maxHeight if maxHeight != '' else int(input('请输入指令结构最大生成高度：')),
@@ -134,21 +126,21 @@ if os.path.isdir(midipath):
                     isAutoReset
                     if isAutoReset != ''
                     else bool(int(input('是否自动重置计分板(1|0)：'))),
-                )
+                ))
 else:
     convertion.convert(midipath, outpath)
     if outFormat == 0:
-        convertion.tomcpack(
-            1,
+        print(convertion.tomcpack(
+            m,
             isAutoReset if isAutoReset != '' else bool(int(input('是否自动重置计分板(1|0)：'))),
             isProgress,
             sbname if sbname != '' else input('请输入计分板名称：'),
             volume if volume != '' else float(input('请输入音量（0-1）：')),
             speed if speed != '' else float(input('请输入速度倍率：')),
-        )
+        ))
     elif outFormat == 1:
-        convertion.toBDXfile(
-            1,
+        print(convertion.toBDXfile(
+            m,
             author if author != '' else input('请输入作者：'),
             isProgress,
             maxHeight if maxHeight != '' else int(input('请输入指令结构最大生成高度：')),
@@ -156,4 +148,4 @@ else:
             volume if volume != '' else float(input('请输入音量（0-1）：')),
             speed if speed != '' else float(input('请输入速度倍率：')),
             isAutoReset if isAutoReset != '' else bool(int(input('是否自动重置计分板(1|0)：'))),
-        )
+        ))

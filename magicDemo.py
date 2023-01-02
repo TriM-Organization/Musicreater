@@ -4,26 +4,17 @@
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
+# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
 
 
 """
 音·创 库版 MIDI转换示例程序
 Musicreater Package Version : Demo for Midi Conversion
 
-   Copyright 2022 all the developers of Musicreater
+Copyright 2023 all the developers of Musicreater
 
-   Licensed under the Apache License, Version 2.0 (the 'License');
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an 'AS IS' BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+开源相关声明请见 ./Lisence.md
+Terms & Conditions: ./Lisence.md
 """
 
 languages = {
@@ -42,6 +33,8 @@ languages = {
         "ChoosePlayer": "请选择播放方式[计分板(1) 或 延迟(0)]",
         "ChoosePath": "请输入MIDI路径或所在文件夹",
         "WhetherArgEntering": "是否为文件夹内文件的转换统一参数[是(1) 或 否(0)]",
+        "EnterArgs": "请输入转换参数",
+        "noteofArgs": "注：文件夹内的全部midi将统一以此参数转换",
         "ChooseSbReset": "是否自动重置计分板[是(1) 或 否(0)]",
         "WhetherCstmProgressBar": "是否自定义进度条[是(1) 或 否(0)]",
         "EnterProgressBarStyle": "请输入进度条样式",
@@ -54,7 +47,7 @@ languages = {
         "Re-Enter": "请重新输入",
         "Dealing": "正在处理",
         "FileNotFound": "文件(夹)不存在",
-        "ChooseOutPath": "请输入输出路径",
+        "ChooseOutPath": "请输入结果输出路径",
         "EnterSelecter": "请输入播放者选择器",
         "Saying": "言·论",
     }
@@ -62,7 +55,6 @@ languages = {
 
 
 import sys
-
 
 if sys.argv.__len__() > 0:
     currentLang = sys.argv[0]
@@ -74,53 +66,47 @@ else:
 
 def _(__):
     '''
-    :ChooseFileFormat 请输入输出格式[bdx(1)或mcpack(0)]
-    :ChoosePlayer 请选择播放方式[计分板(1) 或 延迟(0)]
-    :ChoosePath 请输入midi路径或所在文件夹
-    :WhetherArgEntering 是否为文件夹内文件的转换统一参数[是1 或 否0]
-    :ChooseSbReset 是否自动重置计分板[1或0]：
-    :WhetherCstmProgressBar 是否自定义进度条
-    :EnterProgressBarStyle 请输入进度条样式
-    :EnterSbName 请输入计分板名称
-    :EnterVolume 请输入音量大小(0~1)
-    :EnterSpeed 请输入速度倍率
-    :EnterAuthor 请输入作者
-    :EnterMaxHeight 请输入指令结构最大生成高度
-    :ErrEnter 输入错误
-    :Re-Enter 请重新输入
-    :Dealing 正在处理
-    :FileNotFound 文件不存在
-    :ChooseOutPath 请输入输出路径
-    :EnterSelecter 请输入播放者选择器
-    :Saying 箴言
+    `languages`
     '''
     return languages[currentLang][__]
 
 
-from msctPkgver.main import *
 import os
+import random
+import datetime
+
+from msctPkgver.main import *
 
 try:
     from rich.console import Console
 except ModuleNotFoundError as E:
-    if input("您需要安装 Rich 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y','1'):
+    if input("您需要安装 Rich 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
         os.system("pip install Rich -i https://mirrors.aliyun.com/pypi/")
         from rich.console import Console
     else:
         raise E
 
-MainConsole = Console()
+try:
+    import zhdate
+except ModuleNotFoundError as E:
+    if input("您需要安装 zhdate 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
+        os.system("pip install zhdate -i https://mirrors.aliyun.com/pypi/")
+        import zhdate
+    else:
+        raise E
 
 
 try:
     import requests
 except ModuleNotFoundError as E:
-    if input("您需要安装 requests 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y','1'):
+    if input("您需要安装 requests 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
         os.system("pip install requests -i https://mirrors.aliyun.com/pypi/")
         import requests
     else:
         raise E
 
+
+MainConsole = Console()
 
 MainConsole.print(
     "[#121110 on #F0F2F4]     ",
@@ -129,13 +115,14 @@ MainConsole.print(
 )
 
 
+# 显示大标题
 MainConsole.rule(title="[bold #AB70FF]欢迎使用音·创独立转换器", characters="=", style="#26E2FF")
 MainConsole.rule(
     title="[bold #AB70FF]Welcome to Independent Musicreater Convernter", characters="-"
 )
 
-import random
 
+# 显示箴言部分
 MainConsole.print(
     "[#121110 on #F0F2F4]"
     + random.choice(
@@ -150,12 +137,12 @@ MainConsole.print(
 )
 
 
-from typing import Any, Optional, TextIO, Literal
+from typing import Any, Literal, Optional, TextIO
 
 JustifyMethod = Literal["default", "left", "center", "right", "full"]
 OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
-
+# 高级的打印函数
 def prt(
     *objects: Any,
     sep: str = " ",
@@ -211,7 +198,7 @@ def prt(
 
 prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
 
-
+# 高级的输入函数
 def ipt(
     *objects: Any,
     sep: str = " ",
@@ -275,14 +262,37 @@ def ipt(
     return MainConsole.input("", password=password, stream=stream)
 
 
+def formatipt(notice: str, fun, errnote: str = "", *extraArg):
+    '''循环输入，以某种格式
+    notice: 输入时的提示
+    fun: 格式函数
+    errnote: 输入不符格式时的提示
+    *extraArg: 对于函数的其他参数'''
+    while True:
+        result = ipt(notice)
+        try:
+            funresult = fun(result, *extraArg)
+            break
+        except:
+            prt(errnote)
+            continue
+    return result, funresult
 
+
+# 获取midi列表
 while True:
     midipath = ipt(f"{_('ChoosePath')}{_(':')}").lower()
     if os.path.exists(midipath):
         if os.path.isfile(midipath):
             midis = (midipath,)
         elif os.path.isdir(midipath):
-            midis = tuple((os.path.join(midipath,i) for i in os.listdir(midipath) if i.lower().endswith('.mid') or i.lower().endswith('.midi')))
+            midis = tuple(
+                (
+                    os.path.join(midipath, i)
+                    for i in os.listdir(midipath)
+                    if i.lower().endswith('.mid') or i.lower().endswith('.midi')
+                )
+            )
         else:
             prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
             continue
@@ -291,30 +301,30 @@ while True:
         continue
     break
 
+# 获取输出地址
+outpath = formatipt(
+    f"{_('ChooseOutPath')}{_(':')}",
+    os.path.exists,
+    f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
+).lower()
 
 
+# 选择输出格式
 while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
-    if fileFormat in ('0','mcpack'):
+    if fileFormat in ('0', 'mcpack'):
         fileFormat = 0
+        prt(_("EnterArgs"))
         if len(midis) > 1:
-            while True:
-                isFirstArgs = ipt(f"{_('WhetherArgEntering')}{_(':')}").lower()
-                if isFirstArgs in ('0','否'):
-                    isFirstArgs = 0
-                elif isFirstArgs in ('1','是'):
-                    isFirstArgs = 1
-                else:
-                    prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
-                    continue
-                break
-    elif fileFormat in ('1','bdx'):
+            prt(_("noteofArgs"))
+
+    elif fileFormat in ('1', 'bdx'):
         fileFormat = 1
         while True:
             playerFormat = ipt(f"{_('ChoosePlayer')}{_(':')}").lower()
-            if playerFormat in ('0','延迟'):
+            if playerFormat in ('0', '延迟'):
                 playerFormat = 0
-            elif playerFormat in ('1','计分板'):
+            elif playerFormat in ('1', '计分板'):
                 playerFormat = 1
             else:
                 prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
@@ -328,8 +338,6 @@ while True:
 
 if fileFormat == 0:
     pass
-
-
 
 
 MainConsole.input()
