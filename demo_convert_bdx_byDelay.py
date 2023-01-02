@@ -1,5 +1,22 @@
+# -*- coding: utf-8 -*-
+
 # THIS PROGRAM IS ONLY A TEST EXAMPLE
 
+# 音·创 开发交流群 861684859
+# Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
+# 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
+# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
+
+
+"""
+音·创 库版 MIDI转换展示程序
+Musicreater Package Version : Demo for Midi Conversion
+
+Copyright 2023 all the developers of Musicreater
+
+开源相关声明请见 ./Lisence.md
+Terms & Conditions: ./Lisence.md
+"""
 
 from msctPkgver.main import *
 

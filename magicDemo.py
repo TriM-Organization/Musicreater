@@ -4,22 +4,17 @@
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
+# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
 
 
 """
 音·创 库版 MIDI转换示例程序
 Musicreater Package Version : Demo for Midi Conversion
 
-   Copyright 2022 all the developers of Musicreater
+Copyright 2023 all the developers of Musicreater
 
-   Licensed under the Apache License, Version 2.0 (the 'License');
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-
+开源相关声明请见 ./Lisence.md
+Terms & Conditions: ./Lisence.md
 """
 
 languages = {
@@ -52,7 +47,7 @@ languages = {
         "Re-Enter": "请重新输入",
         "Dealing": "正在处理",
         "FileNotFound": "文件(夹)不存在",
-        "ChooseOutPath": "请输入输出路径",
+        "ChooseOutPath": "请输入结果输出路径",
         "EnterSelecter": "请输入播放者选择器",
         "Saying": "言·论",
     }
@@ -267,19 +262,24 @@ def ipt(
     return MainConsole.input("", password=password, stream=stream)
 
 
-def formatipt(notice: str, fun: function, errnote: str):
+def formatipt(notice: str, fun, errnote: str = "", *extraArg):
+    '''循环输入，以某种格式
+    notice: 输入时的提示
+    fun: 格式函数
+    errnote: 输入不符格式时的提示
+    *extraArg: 对于函数的其他参数'''
     while True:
         result = ipt(notice)
         try:
-            result = fun(result)
+            funresult = fun(result, *extraArg)
             break
         except:
             prt(errnote)
             continue
-    return result
+    return result, funresult
 
 
-
+# 获取midi列表
 while True:
     midipath = ipt(f"{_('ChoosePath')}{_(':')}").lower()
     if os.path.exists(midipath):
@@ -301,7 +301,15 @@ while True:
         continue
     break
 
+# 获取输出地址
+outpath = formatipt(
+    f"{_('ChooseOutPath')}{_(':')}",
+    os.path.exists,
+    f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
+).lower()
 
+
+# 选择输出格式
 while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
     if fileFormat in ('0', 'mcpack'):
@@ -309,7 +317,7 @@ while True:
         prt(_("EnterArgs"))
         if len(midis) > 1:
             prt(_("noteofArgs"))
-        
+
     elif fileFormat in ('1', 'bdx'):
         fileFormat = 1
         while True:

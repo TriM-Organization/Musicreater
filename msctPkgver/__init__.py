@@ -4,29 +4,23 @@
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需转载或借鉴 请依照 Apache 2.0 许可证进行许可
+# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
 
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 __all__ = []
 __author__ = (('金羿', 'Eilles Wan'), ('诸葛亮与八卦阵', 'bgArray'), ('鸣凤鸽子', 'MingFengPigeon'))
 
 """
 音·创 库版 (Musicreater Package Version)
 是一款免费开源的针对《我的世界：基岩版》的midi音乐转换库
-注意！除了此源文件以外，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
 Musicreater pkgver (Package Version 音·创 库版)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
-Note! Except for this source file, all the files in this repository and this project are licensed under Apache License 2.0
 
-   Copyright © 2022 all the developers of Musicreater
+Copyright 2023 all the developers of Musicreater
 
-   Licensed under the Apache License, Version 2.0 (the 'License');
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
+开源相关声明请见 ../Lisence.md
+Terms & Conditions: ../Lisence.md
 """
 
 

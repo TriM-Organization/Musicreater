@@ -1,15 +1,17 @@
+# sth. can't open
+/msctPkgver/secrets/*.py
+/msctPkgver/secrets/*.c
+
+
 # mystuff
 /.vscode
 *.mid
 *.midi
 
-# Byte-compiled / optimized / DLL files
+# Byte-compiled / optimized
 __pycache__/
-*.py[cod]
+*.pyc
 *$py.class
-
-# C extensions
-*.so
 
 # Distribution / packaging
 .Python

@@ -1,20 +1,22 @@
-
-
 **注意，以下条款或版权声明应当且必须是高于此项目中任何其他声明的**
 
-1. 音·创的全部开发者享有其完整版权，开发者可以在任一时刻终止以后音·创源代码开放，若经由开发者授予特殊权利，则授权对象可以将源代码进行特定的被特殊授权的操作
-2. 除部分代码特殊声明外，音·创允许对其进行商业化使用，但是需要经过音·创主要开发者（诸葛亮与八卦阵、金羿）的一致授权，同时，授权对象在商业化授权的使用过程中必须依照Apache2.0协议
-3. 若存在对于音·创包含的部分代码的特殊开源声明，则此部分代码依照其特定的开源方式授权，但若此部分代码经由此部分代码的主要开发者一致特殊授权后商用，则授权对象在商用时依照此部分的开发者所准许的方式（或条款）进行商用，或默认依照Apache2.0协议进行商业化使用
-4. Apache2.0 协议的英文原文副本可见下文
+1. 音·创的全部开发者享有其完整版权，其开发者可以在任一时刻终止以后音·创源代码开放，若经由其开发者授予特殊权利，则授权对象可以将源代码进行特定的被特殊授权的操作
+2. 音·创或（及）其代码允许在 Apache2.0 协议的条款与说明下进行非商业使用
+3. 除部分代码特殊声明外，音·创允许对其或（及）其代码进行商业化使用，但是需要经过音·创主要开发者（诸葛亮与八卦阵、金羿）的一致授权，同时，授权对象在商业化授权的使用过程中必须依照 Apache2.0 协议的条款与说明
+4. 若存在对于音·创包含的部分代码的特殊开源声明，则此部分代码依照其特定的开源方式授权，但若此部分代码经由此部分代码的主要开发者一致特殊授权后商用，则授权对象在商用时依照此部分的开发者所准许的方式（或条款）进行商用，或默认依照 Apache2.0 协议进行商业化使用
+5. Apache2.0 协议的英文原文副本可见下文
 
 >  The English Translation of the TERMS AND CONDITIONS above is listed below
+>
 >  This translated version is for reference only and has no legal effect.
+>
 >  The version with legal effect is the Chinese version above.
 
 **Note, The TERMS AND CONDITIONS below should and must be above all others in this project**
 
 1. *Musicreater* is fully copyrighted by all its developers, the developers have the right to make *Musicreater* close sourced at any time. Operations are permitted under specific terms instructed by its developer(s).
-2. Commercial use of *Musicreater* is permitted under Apache License 2.0 with the unanimous permission of the steering developers of *Musicreater* (*bgArray*诸葛亮与八卦阵 and *Eilles*金羿). 
+2. Non-commercial use of *Musicreater* and(or) its source code is permitted under Apache License 2.0.
+3. Commercial use of *Musicreater* is permitted under Apache License 2.0 with the unanimous permission of the steering developers of *Musicreater* (*bgArray*诸葛亮与八卦阵 and *Eilles*金羿). 
 4. *Musicreater* is open sourced under priority given:
    1. License granted by the core developer(s) of a section after negotiation.
    2. Explicitly stated license.
