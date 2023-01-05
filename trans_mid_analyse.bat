@@ -1,0 +1,1 @@
+pyside6-uic mid_analyse.ui -o mid_analyse.py
