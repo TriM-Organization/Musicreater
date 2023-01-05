@@ -7,7 +7,7 @@
 # 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
 
 
-__version__ = '0.1.0'
+__version__ = '0.1.3'
 __all__ = []
 __author__ = (('金羿', 'Eilles Wan'), ('诸葛亮与八卦阵', 'bgArray'), ('鸣凤鸽子', 'MingFengPigeon'))
 

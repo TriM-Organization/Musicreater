@@ -1327,13 +1327,13 @@ class midiConvert:
             commands += track
 
         if isAutoReset:
-            commands += (
+            commands.append(
                 "scoreboard players reset @a[scores={"
                 + scoreboardname
                 + "="
                 + str(maxScore + 20)
                 + "}] "
-                + scoreboardname
+                + scoreboardname,
             )
 
         # 此处是对于仅有 True 的参数和自定义参数的判断
@@ -1351,7 +1351,7 @@ class midiConvert:
                 (1 if yforward else 0)
                 if (
                     ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != maxheight))
+                    or ((yforward) and (nowy != (maxheight - 1)))
                 )
                 else (3 if zforward else 2)
                 if (
@@ -1370,7 +1370,7 @@ class midiConvert:
 
             nowy += 1 if yforward else -1
 
-            if ((nowy > maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
+            if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
                 nowy -= 1 if yforward else -1
 
                 yforward = not yforward
@@ -1398,7 +1398,7 @@ class midiConvert:
         ) as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
-        return (True, totalcount, maxScore, _bytes, (nowx, maxheight, _sideLength))
+        return (True, totalcount, maxScore, (nowx, maxheight, _sideLength))
 
     def toBDXfile_withDelay(
         self,
@@ -1469,7 +1469,7 @@ class midiConvert:
                 (1 if yforward else 0)
                 if (
                     ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != maxheight))
+                    or ((yforward) and (nowy != (maxheight - 1)))
                 )
                 else (3 if zforward else 2)
                 if (
@@ -1488,7 +1488,7 @@ class midiConvert:
 
             nowy += 1 if yforward else -1
 
-            if ((nowy > maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
+            if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
                 nowy -= 1 if yforward else -1
 
                 yforward = not yforward
