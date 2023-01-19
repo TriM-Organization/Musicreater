@@ -636,6 +636,7 @@ class midiConvert:
             if msg.time != 0:
                 try:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    # print(microseconds)
                 except NameError:
                     raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
 
@@ -665,7 +666,7 @@ class midiConvert:
                     msg.type == "note_off"
                 ):
                     channels[msg.channel].append(("NoteE", msg.note, microseconds))
-
+    
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
 
@@ -706,7 +707,7 @@ class midiConvert:
                         soundID, _X = self.__bitInst2IDwithX(InstID)
                     else:
                         soundID, _X = self.__Inst2soundIDwithX(InstID)
-                    score_now = round(msg[-1] / float(speed) / 50000)
+                    score_now = round(msg[-1] / float(speed) / 50)
                     maxScore = max(maxScore, score_now)
 
                     nowTrack.append(
