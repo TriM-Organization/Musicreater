@@ -71,14 +71,16 @@ def operation(
 ):
     print(f'正在操作{i}')
     convertion.convert(midipath + '/' + i, outpath)
-    convertion.toBDXfile_withDelay(
-        1,
-        authorname if authorname != '' else input('请输入作者：'),
-        isProgress,
-        heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
-        volume if volume != '' else float(input('请输入音量(0-1]：')),
-        speed if speed != '' else float(input('请输入速度倍率：')),
-        player if player != '' else input('请输入玩家选择器：'),
+    print(
+        convertion.toBDXfile_withDelay(
+            1,
+            authorname if authorname != '' else input('请输入作者：'),
+            isProgress,
+            heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
+            volume if volume != '' else float(input('请输入音量(0-1]：')),
+            speed if speed != '' else float(input('请输入速度倍率：')),
+            player if player != '' else input('请输入玩家选择器：'),
+        )
     )
 
 
@@ -90,12 +92,14 @@ if os.path.isdir(midipath):
             threading.Thread(target=operation, args=(i,)).start()
 else:
     convertion.convert(midipath, outpath)
-    convertion.toBDXfile_withDelay(
-        1,
-        authorname if authorname != '' else input('请输入作者：'),
-        isProgress,
-        heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
-        volume if volume != '' else float(input('请输入音量(0-1]：')),
-        speed if speed != '' else float(input('请输入速度倍率：')),
-        player if player != '' else input('请输入玩家选择器：'),
+    print(
+        convertion.toBDXfile_withDelay(
+            1,
+            authorname if authorname != '' else input('请输入作者：'),
+            isProgress,
+            heightmax if heightmax != '' else int(input('请输入指令结构最大生成高度：')),
+            volume if volume != '' else float(input('请输入音量(0-1]：')),
+            speed if speed != '' else float(input('请输入速度倍率：')),
+            player if player != '' else input('请输入玩家选择器：'),
+        )
     )

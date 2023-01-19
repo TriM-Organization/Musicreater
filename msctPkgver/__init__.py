@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""一个简单的基于音·创的我的世界音频操作工具"""
+"""一个简单的我的世界音频转换库"""
 
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com

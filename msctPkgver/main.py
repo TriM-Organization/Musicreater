@@ -19,37 +19,14 @@ Copyright 2023 all the developers of Musicreater
 Terms & Conditions: ../Lisence.md
 """
 
-import os
 import mido
 import brotli
 import json
 import uuid
 import shutil
-import math
 
+from .utils import *
 from .exceptions import *
-
-
-def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
-    """使用compression指定的算法打包目录为zip文件\n
-    默认算法为DEFLATED(8),可用算法如下：\n
-    STORED = 0\n
-    DEFLATED = 8\n
-    BZIP2 = 12\n
-    LZMA = 14\n
-    """
-    import zipfile
-
-    zipf = zipfile.ZipFile(outFilename, "w", compression)
-    pre_len = len(os.path.dirname(sourceDir))
-    for parent, dirnames, filenames in os.walk(sourceDir):
-        for filename in filenames:
-            if filename == exceptFile:
-                continue
-            pathfile = os.path.join(parent, filename)
-            arcname = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
-            zipf.write(pathfile, arcname)
-    zipf.close()
 
 
 class SingleNote:
@@ -147,7 +124,7 @@ class midiConvert:
             self._toCmdList_withDelay_m1,
         ]
 
-    def convert(self, midiFile: str, outputPath: str):
+    def convert(self, midiFile: str, outputPath: str, oldExeFormat: bool = True):
         """转换前需要先运行此函数来获取基本信息"""
 
         self.midiFile = midiFile
@@ -164,6 +141,13 @@ class midiConvert:
         # 将self.midiFile的文件名，不含路径且不含后缀存入self.midiFileName
         self.midFileName = os.path.splitext(os.path.basename(self.midiFile))[0]
         """文件名，不含路径且不含后缀"""
+
+        self.exeHead = (
+            "execute {} ~ ~ ~ "
+            if oldExeFormat
+            else "execute as {} at @s positioned ~ ~ ~ run "
+        )
+        """execute指令的应用，两个版本提前决定。"""
 
     def __Inst2soundIDwithX(self, instrumentID):
         """返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
@@ -368,7 +352,7 @@ class midiConvert:
             except:
                 return ("note.bd", 7)
         except:
-            print("WARN", "无法导入打击乐器列表动态链接库，可能是不支持当前及其环境，打击乐器使用Dislink算法代替。")
+            print("WARN", "无法使用打击乐器列表库，可能是不支持当前环境，打击乐器使用Dislink算法代替。")
             if instrumentID == 55:
                 return ("note.cow_bell", 5)
             elif instrumentID in [41, 43, 45]:
@@ -380,6 +364,106 @@ class midiConvert:
 
     def __score2time(self, score: int):
         return str(int(int(score / 20) / 60)) + ":" + str(int(int(score / 20) % 60))
+
+    # def __formProgressBar(
+    #     self,
+    #     maxscore: int,
+    #     scoreboardname: str,
+    #     progressbar: tuple = (
+    #         r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+    #         ("§e=§r", "§7=§r"),
+    #     ),
+    # ) -> list:
+
+    #     pgsstyle = progressbar[0]
+    #     """用于被替换的进度条原始样式"""
+
+    #     """
+    #     | 标识符   | 指定的可变量     |
+    #     |---------|----------------|
+    #     | `%%N`   | 乐曲名(即传入的文件名)|
+    #     | `%%s`   | 当前计分板值     |
+    #     | `%^s`   | 计分板最大值     |
+    #     | `%%t`   | 当前播放时间     |
+    #     | `%^t`   | 曲目总时长       |
+    #     | `%%%`   | 当前进度比率     |
+    #     | `_`     | 用以表示进度条占位|
+    #     """
+
+    #     def __replace(
+    #         s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
+    #     ):
+    #         if times == 0:
+    #             return s.replace(tobeReplaced, other)
+    #         if times == s.count(tobeReplaced):
+    #             return s.replace(tobeReplaced, replaceWith)
+    #         result = ""
+    #         t = 0
+    #         for i in s:
+    #             if i == tobeReplaced:
+    #                 if t < times:
+    #                     result += replaceWith
+    #                     t += 1
+    #                 else:
+    #                     result += other
+    #             else:
+    #                 result += i
+
+    #         return result
+
+    #     idlist = {
+    #         r"%%N": self.midFileName,
+    #         r"%%s": r"%%s",
+    #         r"%^s": str(maxscore),
+    #         r"%%t": r"%%t",
+    #         r"%^t": self.__score2time(maxscore),
+    #         r"%%%": r"%%%",
+    #     }
+
+    #     ids = {}
+
+    #     for i, j in idlist.items():
+    #         if i != j:
+    #             if i in pgsstyle:
+    #                 pgsstyle = pgsstyle.replace(i, j)
+    #         else:
+    #             if i in pgsstyle:
+    #                 ids[i] = True
+    #             else:
+    #                 ids[i] = False
+
+    #     del idlist
+
+    #     pgblength = pgsstyle.count("_")
+    #     """进度条的“条”长度"""
+
+    #     finalprgsbar = []
+
+    #     for i in range(maxscore):
+    #         nowstr = pgsstyle
+    #         if ids[r"%%s"]:
+    #             nowstr = nowstr.replace(r"%%s", str(i + 1))
+    #         if ids[r"%%t"]:
+    #             nowstr = nowstr.replace(r"%%t", self.__score2time(i + 1))
+    #         if ids[r"%%%"]:
+    #             nowstr = nowstr.replace(
+    #                 r"%%%", str(int((i + 1) / maxscore * 10000) / 100) + "%"
+    #             )
+
+    #         countof_s = int((i + 1) / maxscore * pgblength)
+
+    #         finalprgsbar.append(
+    #             "title @a[scores={"
+    #             + scoreboardname
+    #             + "="
+    #             + str(i + 1)
+    #             + "}] actionbar "
+    #             + __replace(
+    #                 nowstr, "_", progressbar[1][0], countof_s, progressbar[1][1]
+    #             )
+    #         )
+
+    #     return finalprgsbar
 
     def __formProgressBar(
         self,
@@ -405,153 +489,158 @@ class midiConvert:
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
         """
+        perEach = maxscore / pgsstyle.count('_')
 
-        def __replace(
-            s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
-        ):
-            if times == 0:
-                return s.replace(tobeReplaced, other)
-            if times == s.count(tobeReplaced):
-                return s.replace(tobeReplaced, replaceWith)
-            result = ""
-            t = 0
-            for i in s:
-                if i == tobeReplaced:
-                    if t < times:
-                        result += replaceWith
-                        t += 1
-                    else:
-                        result += other
-                else:
-                    result += i
+        result = []
 
-            return result
+        if r"%^s" in pgsstyle:
+            pgsstyle = pgsstyle.replace(r"%^s", str(maxscore))
 
-        idlist = {
-            r"%%N": self.midFileName,
-            r"%%s": r"%%s",
-            r"%^s": str(maxscore),
-            r"%%t": r"%%t",
-            r"%^t": self.__score2time(maxscore),
-            r"%%%": r"%%%",
-        }
+        if r"%^t" in pgsstyle:
+            pgsstyle = pgsstyle.replace(r"%^t", self.__score2time(maxscore))
 
-        ids = {}
-
-        for i, j in idlist.items():
-            if i != j:
-                if i in pgsstyle:
-                    pgsstyle = pgsstyle.replace(i, j)
-            else:
-                if i in pgsstyle:
-                    ids[i] = True
-                else:
-                    ids[i] = False
-
-        del idlist
-
-        pgblength = pgsstyle.count("_")
-        """进度条的“条”长度"""
-
-        finalprgsbar = []
-
-        for i in range(maxscore):
-            nowstr = pgsstyle
-            if ids[r"%%s"]:
-                nowstr = nowstr.replace(r"%%s", str(i + 1))
-            if ids[r"%%t"]:
-                nowstr = nowstr.replace(r"%%t", self.__score2time(i + 1))
-            if ids[r"%%%"]:
-                nowstr = nowstr.replace(
-                    r"%%%", str(int((i + 1) / maxscore * 10000) / 100) + "%"
+        def replaceBar(i):
+            try:
+                return pgsstyle.replace('_', progressbar[1][0], i + 1).replace(
+                    '_', progressbar[1][1]
                 )
+            except:
+                return pgsstyle.replace('_', progressbar[1][0], i + 1)
 
-            countof_s = int((i + 1) / maxscore * pgblength)
-
-            finalprgsbar.append(
-                "title @a[scores={"
-                + scoreboardname
-                + "="
-                + str(i + 1)
-                + "}] actionbar "
-                + __replace(
-                    nowstr, "_", progressbar[1][0], countof_s, progressbar[1][1]
+        sbnpc = scoreboardname[:2]
+        if r"%%%" in pgsstyle:
+            result.append(
+                "scoreboard objectives add {}PercT dummy \"百分比计算\"".format(sbnpc)
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players set MaxScore {} {}".format(
+                    scoreboardname, maxscore
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players set MaxScore {} 100".format(scoreboardname)
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} = @s {}".format(
+                    sbnpc + "PercT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} *= n100 {}".format(
+                    sbnpc + "PercT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} /= MaxScore {}".format(
+                    sbnpc + "PercT", scoreboardname
                 )
             )
 
-        return finalprgsbar
+        if r"%%t" in pgsstyle:
+            result.append(
+                "scoreboard objectives add {}TMinT dummy \"时间计算：分\"".format(sbnpc)
+            )
+            result.append(
+                "scoreboard objectives add {}TSecT dummy \"时间计算：秒\"".format(sbnpc)
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players set n20 {} 20".format(scoreboardname)
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players set n60 {} 60".format(scoreboardname)
+            )
 
-    def __formCMDblk(
-        self,
-        command: str,
-        particularValue: int,
-        impluse: int = 0,
-        condition: bool = False,
-        needRedstone: bool = True,
-        tickDelay: int = 0,
-        customName: str = "",
-        executeOnFirstTick: bool = False,
-        trackOutput: bool = True,
-    ):
-        """
-        使用指定项目返回指定的指令方块放置指令项
-        :param command: `str`
-            指令
-        :param particularValue:
-            方块特殊值，即朝向
-                :0	下	无条件
-                :1	上	无条件
-                :2	z轴负方向	无条件
-                :3	z轴正方向	无条件
-                :4	x轴负方向	无条件
-                :5	x轴正方向	无条件
-                :6	下	无条件
-                :7	下	无条件
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} = @s {}".format(
+                    sbnpc + "TMinT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} /= n20 {}".format(
+                    sbnpc + "TMinT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} /= n60 {}".format(
+                    sbnpc + "TMinT", scoreboardname
+                )
+            )
 
-                :8	下	有条件
-                :9	上	有条件
-                :10	z轴负方向	有条件
-                :11	z轴正方向	有条件
-                :12	x轴负方向	有条件
-                :13	x轴正方向	有条件
-                :14	下	有条件
-                :14	下	有条件
-            注意！此处特殊值中的条件会被下面condition参数覆写
-        :param impluse: `int 0|1|2`
-            方块类型
-                0脉冲 1循环 2连锁
-        :param condition: `bool`
-            是否有条件
-        :param needRedstone: `bool`
-            是否需要红石
-        :param tickDelay: `int`
-            执行延时
-        :param customName: `str`
-            悬浮字
-        lastOutput: `str`
-            上次输出字符串，注意此处需要留空
-        :param executeOnFirstTick: `bool`
-            执行第一个已选项(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
-        :param trackOutput: `bool`
-            是否输出
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} = @s {}".format(
+                    sbnpc + "TSecT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} /= n20 {}".format(
+                    sbnpc + "TSecT", scoreboardname
+                )
+            )
+            result.append(
+                self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
+                + "scoreboard players operation @s {} %= n60 {}".format(
+                    sbnpc + "TSecT", scoreboardname
+                )
+            )
 
-        :return:str
-        """
-        block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
+        for i in range(pgsstyle.count('_')):
+            npgstl = (
+                replaceBar(i).replace(r"%%N", self.midFileName)
+                if r"%%N" in pgsstyle
+                else replaceBar(i)
+            )
+            if r"%%s" in npgstl:
+                npgstl = npgstl.replace(
+                    r"%%s",
+                    '"},{"score":{"name":"*","objective":"'
+                    + scoreboardname
+                    + '"}},{"text":"',
+                )
+            if r"%%%" in npgstl:
+                npgstl = npgstl.replace(
+                    r"%%%",
+                    '"},{"score":{"name":"*","objective":"'
+                    + sbnpc
+                    + 'PercT"}},{"text":"%',
+                )
+            if r"%%t" in npgstl:
+                npgstl = npgstl.replace(
+                    r"%%t",
+                    r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
+                        r"{-}", sbnpc
+                    ),
+                )
+            result.append(
+                self.exeHead.format(
+                    "@a[scores={"
+                    + scoreboardname
+                    + f"={int(i * perEach)}..{math.ceil((i + 1) * perEach)}"
+                    + "}]"
+                )
+                + r'titleraw @s actionbar {"rawtext":[{"text":"'
+                + npgstl
+                + r'"}]}'
+            )
 
-        for i in [
-            impluse.to_bytes(4, byteorder="big", signed=False),
-            bytes(command, encoding="utf-8") + b"\x00",
-            bytes(customName, encoding="utf-8") + b"\x00",
-            bytes("", encoding="utf-8") + b"\x00",
-            tickDelay.to_bytes(4, byteorder="big", signed=True),
-            executeOnFirstTick.to_bytes(1, byteorder="big"),
-            trackOutput.to_bytes(1, byteorder="big"),
-            condition.to_bytes(1, byteorder="big"),
-            needRedstone.to_bytes(1, byteorder="big"),
-        ]:
-            block += i
-        return block
+        if r"%%%" in pgsstyle:
+            result.append("scoreboard objectives remove {}PercT".format(sbnpc))
+        if r"%%t" in pgsstyle:
+            result.append("scoreboard objectives remove {}TMinT".format(sbnpc))
+            result.append("scoreboard objectives remove {}TSecT".format(sbnpc))
+
+        return result
 
     def _toCmdList_m1(
         self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
@@ -601,17 +690,6 @@ class midiConvert:
                         else:
                             soundID, _X = self.__Inst2soundIDwithX(instrumentID)
 
-                        # /playsound <sound: string> [player: target] [position: x y z]
-                        # [volume: float] [pitch: float] [minimumVolume: float]
-
-                        # volume_d = 1 / volume - 1
-                        # if volume_d == 0.0:
-                        #     volume_d = ""
-                        # command_now = "playsound {0} @a[scores={{{1}}}] ~ ~{2} ~ {3} {4}" \
-                        #     .format(soundID, "{}={}".format(scoreboardname,
-                        #                                     nowscore), volume_d,
-                        #             msg.velocity, 2 ** ((msg.note - 60 - _X) / 12))
-                        # singleTrack.append(command_now)
                         singleTrack.append(
                             "execute @a[scores={"
                             + str(scoreboardname)
@@ -650,86 +728,74 @@ class midiConvert:
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
         channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 
+        microseconds = 0
+
         # 我们来用通道统计音乐信息
-        for i, track in enumerate(self.midi.tracks):
+        for msg in self.midi:
 
-            microseconds = 0
+            if msg.time != 0:
+                try:
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                except NameError:
+                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
 
-            for msg in track:
+            if msg.is_meta:
+                if msg.type == "set_tempo":
+                    tempo = msg.tempo
+            else:
 
-                if msg.time != 0:
-                    try:
-                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
-                    except NameError:
-                        raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                try:
+                    msg.channel
+                    channelMsg = True
+                except:
+                    channelMsg = False
+                if channelMsg:
+                    if msg.channel > 15:
+                        raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
 
-                if msg.is_meta:
-                    if msg.type == "set_tempo":
-                        tempo = msg.tempo
-                else:
+                if msg.type == "program_change":
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
 
-                    try:
-                        msg.channel
-                        channelMsg = True
-                    except:
-                        channelMsg = False
-                    if channelMsg:
-                        if msg.channel > 15:
-                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    channels[msg.channel].append(
+                        ("NoteS", msg.note, msg.velocity, microseconds)
+                    )
 
-                    if msg.type == "program_change":
-                        channels[msg.channel].append(
-                            ("PgmC", msg.program, microseconds)
-                        )
-
-                    elif msg.type == "note_on" and msg.velocity != 0:
-                        channels[msg.channel].append(
-                            ("NoteS", msg.note, msg.velocity, microseconds)
-                        )
-
-                    elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
-                    ):
-                        channels[msg.channel].append(("NoteE", msg.note, microseconds))
+                elif (msg.type == "note_on" and msg.velocity == 0) or (
+                    msg.type == "note_off"
+                ):
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
 
         1 切换乐器消息
-
         ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
 
         2 音符开始消息
-
         ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
 
         3 音符结束消息
-
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
         tracks = []
         cmdAmount = 0
         maxScore = 0
-        CheckFirstChannel = False
 
         # 此处 我们把通道视为音轨
-        for track in channels:
+        for i in range(len(channels)):
             # 如果当前通道为空 则跳过
-            if not track:
+            if not channels[i]:
                 continue
 
-            if channels.index(track) == 0:
-                CheckFirstChannel = True
-                SpecialBits = False
-            elif channels.index(track) == 9:
+            if i == 9:
                 SpecialBits = True
             else:
-                CheckFirstChannel = False
                 SpecialBits = False
 
             nowTrack = []
 
-            for msg in track:
+            for msg in channels[i]:
 
                 if msg[0] == "PgmC":
                     InstID = msg[1]
@@ -744,12 +810,12 @@ class midiConvert:
                     maxScore = max(maxScore, score_now)
 
                     nowTrack.append(
-                        "execute @a[scores={"
-                        + str(scoreboardname)
-                        + "="
-                        + str(score_now)
-                        + "}"
-                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / MaxVolume - 1} ~ {msg[2] * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((msg[1] - 60 - _X) / 12)}"
+                        self.exeHead.format(
+                            "@a[scores=({}={})]".format(scoreboardname, score_now)
+                            .replace('(', r"{")
+                            .replace(")", r"}")
+                        )
+                        + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2]/128} {2 ** ((msg[1] - 60 - _X) / 12)}"
                     )
 
                     cmdAmount += 1
@@ -949,7 +1015,7 @@ class midiConvert:
         volume: float = 1.0,
         speed: float = 1.0,
         player: str = "@a",
-        isMixedWithPrograssBar=False,
+        # isMixedWithPrograssBar=False,
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
@@ -967,11 +1033,11 @@ class midiConvert:
             volume = 0.001
 
         # 此处是对于仅有 True 的参数和自定义参数的判断
-        if isMixedWithPrograssBar == True:
-            isMixedWithPrograssBar = (
-                r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-                ("§e=§r", "§7=§r"),
-            )
+        # if isMixedWithPrograssBar == True:
+        #     isMixedWithPrograssBar = (
+        #         r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+        #         ("§e=§r", "§7=§r"),
+        #     )
 
         for i, track in enumerate(self.midi.tracks):
 
@@ -1001,73 +1067,11 @@ class midiConvert:
                                 f"execute {player} ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}",
                             ]
 
-        allticks = list(tracks.keys())
-
-        if isMixedWithPrograssBar:
-
-            pgsstyle = isMixedWithPrograssBar[0]
-            """用于被替换的进度条原始样式"""
-
-            """
-            | 标识符   | 指定的可变量     |
-            |---------|----------------|
-            | `%%N`   | 乐曲名(即传入的文件名)|
-            | `%%s`   | 当前计分板值     |
-            | `%^s`   | 计分板最大值     |
-            | `%%t`   | 当前播放时间     |
-            | `%^t`   | 曲目总时长       |
-            | `%%%`   | 当前进度比率     |
-            | `_`     | 用以表示进度条占位|
-            """
-
-            def __replace(
-                s: str, tobeReplaced: str, replaceWith: str, times: int, other: str
-            ):
-                if times == 0:
-                    return s.replace(tobeReplaced, other)
-                if times == s.count(tobeReplaced):
-                    return s.replace(tobeReplaced, replaceWith)
-                result = ""
-                t = 0
-                for i in s:
-                    if i == tobeReplaced:
-                        if t < times:
-                            result += replaceWith
-                            t += 1
-                        else:
-                            result += other
-                    else:
-                        result += i
-
-                return result
-
-            idlist = {
-                r"%%N": self.midFileName,
-                r"%%s": r"%%s",
-                r"%^s": str(allticks[-1]),
-                r"%%t": r"%%t",
-                r"%^t": self.__score2time(allticks[-1]),
-                r"%%%": r"%%%",
-            }
-
-            ids = {}
-
-            for i, j in idlist.items():
-                if i != j:
-                    if i in pgsstyle:
-                        pgsstyle = pgsstyle.replace(i, j)
-                else:
-                    if i in pgsstyle:
-                        ids[i] = True
-                    else:
-                        ids[i] = False
-
-            del idlist
-
-            pgblength = pgsstyle.count("_")
-            """进度条的“条”长度"""
-
         results = []
+
+        allticks = list(tracks.keys())
+        # if isMixedWithPrograssBar:
+        #     results.append("scoreboard objectives add {}")
 
         for i in range(len(allticks)):
             if i != 0:
@@ -1082,54 +1086,17 @@ class midiConvert:
                 for j in range(len(tracks[allticks[i]])):
                     results.append((tracks[allticks[i]][j], allticks[i]))
 
-            if isMixedWithPrograssBar:
-
-                nowstr = pgsstyle
-                if ids[r"%%s"]:
-                    nowstr = nowstr.replace(r"%%s", str(allticks[i] + 1))
-                if ids[r"%%t"]:
-                    nowstr = nowstr.replace(r"%%t", self.__score2time(allticks[i] + 1))
-                if ids[r"%%%"]:
-                    nowstr = nowstr.replace(
-                        r"%%%",
-                        str(int((allticks[i] + 1) / allticks[-1] * 10000) / 100) + "%",
-                    )
-
-                countof_s = int((allticks[i] + 1) / allticks[-1] * pgblength)
-
-                titlenow = __replace(
-                    nowstr,
-                    "_",
-                    isMixedWithPrograssBar[1][0],
-                    countof_s,
-                    isMixedWithPrograssBar[1][1],
-                )
-
-                results.append(
-                    (
-                        f"title {player} actionbar {titlenow}",
-                        0,
-                    )
-                )
-
-        return results
-
-    def __fillSquareSideLength(self, total: int, maxHeight: int):
-        """给定总方块数量和最大高度，返回所构成的图形外切正方形的边长
-        :param total: 总方块数量
-        :param maxHeight: 最大高度
-        :return: 外切正方形的边长 int"""
-        return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
+        return results, max(allticks)
 
     def tomcpack(
         self,
         method: int = 1,
-        isAutoReset: bool = False,
-        progressbar=None,
-        scoreboardname: str = "mscplay",
         volume: float = 1.0,
         speed: float = 1.0,
-    ) -> bool or tuple:
+        progressbar=None,
+        scoreboardname: str = "mscplay",
+        isAutoReset: bool = False,
+    ) -> tuple:
         """
         使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
         :param method: 转换算法
@@ -1255,18 +1222,18 @@ class midiConvert:
 
         shutil.rmtree(f"{self.outputPath}/temp/")
 
-        return (True, f"转换完成，总长度{maxlen}")
+        return (True, maxlen, maxscore)
 
     def toBDXfile(
         self,
         method: int = 1,
-        author: str = "Eilles",
-        progressbar=False,
-        maxheight: int = 64,
-        scoreboardname: str = "mscplay",
         volume: float = 1.0,
         speed: float = 1.0,
+        progressbar=False,
+        scoreboardname: str = "mscplay",
         isAutoReset: bool = False,
+        author: str = "Eilles",
+        maxheight: int = 64,
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1302,25 +1269,6 @@ class midiConvert:
             + b" & Musicreater\x00\x01command_block\x00"
         )
 
-        key = {
-            "x": (b"\x0f", b"\x0e"),
-            "y": (b"\x11", b"\x10"),
-            "z": (b"\x13", b"\x12"),
-        }
-        """key存储了方块移动指令的数据，其中可以用key[x|y|z][0|1]来表示xyz的减或增"""
-        x = "x"
-        y = "y"
-        z = "z"
-
-        _sideLength = self.__fillSquareSideLength(totalcount, maxheight)
-
-        yforward = True
-        zforward = True
-
-        nowy = 0
-        nowz = 0
-        nowx = 0
-
         commands = []
 
         for track in cmdlist:
@@ -1336,61 +1284,32 @@ class midiConvert:
                 + scoreboardname,
             )
 
+        cmdBytes, size, finalPos = toBDXbytes([(i,0)for i in commands], maxheight - 1)
         # 此处是对于仅有 True 的参数和自定义参数的判断
         if progressbar:
-            if progressbar == True:
-                commands += self.__formProgressBar(maxScore, scoreboardname)
-            else:
-                commands += self.__formProgressBar(
-                    maxScore, scoreboardname, progressbar
-                )
-
-        for cmd in commands:
-            _bytes += self.__formCMDblk(
-                cmd,
-                (1 if yforward else 0)
-                if (
-                    ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != (maxheight - 1)))
-                )
-                else (3 if zforward else 2)
-                if (
-                    ((nowz != 0) and (not zforward))
-                    or ((zforward) and (nowz != _sideLength))
-                )
-                else 5,
-                impluse=2,
-                condition=False,
-                needRedstone=False,
-                tickDelay=0,
-                customName="",
-                executeOnFirstTick=False,
-                trackOutput=True,
+            pgbBytes, pgbSize, pgbNowPos = toBDXbytes(
+                [
+                    (i, 0)
+                    for i in (
+                        self.__formProgressBar(maxScore, scoreboardname)
+                        if progressbar == True
+                        else self.__formProgressBar(
+                            maxScore, scoreboardname, progressbar
+                        )
+                    )
+                ],
+                maxheight - 1,
             )
+            _bytes += pgbBytes
+            _bytes += move(y, -pgbNowPos[1])
+            _bytes += move(z, -pgbNowPos[2])
+            _bytes += move(x, 2)
 
-            nowy += 1 if yforward else -1
+            size[0] += 2 + pgbSize[0]
+            size[1] = max(size[1], pgbSize[1])
+            size[2] = max(size[2], pgbSize[2])
 
-            if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
-                nowy -= 1 if yforward else -1
-
-                yforward = not yforward
-
-                nowz += 1 if zforward else -1
-
-                if ((nowz > _sideLength) and (zforward)) or (
-                    (nowz < 0) and (not zforward)
-                ):
-                    nowz -= 1 if zforward else -1
-                    zforward = not zforward
-                    _bytes += key[x][1]
-                    nowx += 1
-                else:
-
-                    _bytes += key[z][int(zforward)]
-
-            else:
-
-                _bytes += key[y][int(yforward)]
+        _bytes += cmdBytes
 
         with open(
             os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
@@ -1398,17 +1317,17 @@ class midiConvert:
         ) as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
-        return (True, totalcount, maxScore, (nowx, maxheight, _sideLength))
+        return (True, totalcount, maxScore, size, finalPos)
 
     def toBDXfile_withDelay(
         self,
         method: int = 1,
-        author: str = "Eilles",
-        progressbar=False,
-        maxheight: int = 64,
         volume: float = 1.0,
         speed: float = 1.0,
+        progressbar=False,
         player: str = "@a",
+        author: str = "Eilles",
+        maxheight: int = 64,
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1422,12 +1341,14 @@ class midiConvert:
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
 
-        try:
-            cmdlist = self.methods_byDelay[method - 1](
-                volume, speed, player, progressbar
-            )
-        except:
-            return (False, f"无法找到算法ID{method}对应的转换算法")
+        # try:
+        cmdlist, maxdelay = self.methods_byDelay[method - 1](
+            volume,
+            speed,
+            player,
+        )
+        # except Exception as E:
+        #     return (False, f"无法找到算法ID{method}对应的转换算法\n{E}")
 
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
@@ -1444,71 +1365,53 @@ class midiConvert:
             + b" & Musicreater\x00\x01command_block\x00"
         )
 
-        key = {
-            "x": (b"\x0f", b"\x0e"),
-            "y": (b"\x11", b"\x10"),
-            "z": (b"\x13", b"\x12"),
-        }
-        """key存储了方块移动指令的数据，其中可以用key[x|y|z][0|1]来表示xyz的减或增"""
-        x = "x"
-        y = "y"
-        z = "z"
-
-        _sideLength = self.__fillSquareSideLength(len(cmdlist), maxheight)
-
-        yforward = True
-        zforward = True
-
-        nowy = 0
-        nowz = 0
-        nowx = 0
-
-        for cmd, delay in cmdlist:
-            _bytes += self.__formCMDblk(
-                cmd,
-                (1 if yforward else 0)
-                if (
-                    ((nowy != 0) and (not yforward))
-                    or ((yforward) and (nowy != (maxheight - 1)))
-                )
-                else (3 if zforward else 2)
-                if (
-                    ((nowz != 0) and (not zforward))
-                    or ((zforward) and (nowz != _sideLength))
-                )
-                else 5,
-                impluse=2,
-                condition=False,
-                needRedstone=False,
-                tickDelay=delay,
-                customName="",
-                executeOnFirstTick=False,
-                trackOutput=True,
+        # 此处是对于仅有 True 的参数和自定义参数的判断
+        if progressbar == True:
+            progressbar = (
+                r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+                ("§e=§r", "§7=§r"),
             )
 
-            nowy += 1 if yforward else -1
+        cmdBytes, size, finalPos = toBDXbytes(cmdlist, maxheight - 1)
 
-            if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
-                nowy -= 1 if yforward else -1
+        if progressbar:
+            scbname = self.midFileName[:5] + "Pgb"
+            _bytes += formCMDblk(
+                r"scoreboard objectives add {} dummy {}播放用".replace(r"{}", scbname),
+                1,
+                customName="初始化进度条",
+            )
+            _bytes += move(z, 2)
+            _bytes += formCMDblk(
+                r"scoreboard players add {} {} 1".format(player, scbname),
+                1,
+                1,
+                customName="显示进度条并加分",
+            )
+            _bytes += move(y, 1)
+            pgbBytes, pgbSize, pgbNowPos = toBDXbytes(
+                [
+                    (i, 0)
+                    for i in self.__formProgressBar(maxdelay, scbname, progressbar)
+                ],
+                maxheight - 1,
+            )
+            _bytes += pgbBytes
+            _bytes += move(y, -1 - pgbNowPos[1])
+            _bytes += move(z, -2 - pgbNowPos[2])
+            _bytes += move(x, 2)
+            _bytes += formCMDblk(
+                r"scoreboard players reset {} {}".format(player, scbname),
+                1,
+                customName="置零进度条",
+            )
+            _bytes += move(y, 1)
+            size[0] += 2 + pgbSize[0]
+            size[1] = max(size[1], pgbSize[1])
+            size[2] = max(size[2], pgbSize[2])
 
-                yforward = not yforward
-
-                nowz += 1 if zforward else -1
-
-                if ((nowz > _sideLength) and (zforward)) or (
-                    (nowz < 0) and (not zforward)
-                ):
-                    nowz -= 1 if zforward else -1
-                    zforward = not zforward
-                    _bytes += key[x][1]
-                    nowx += 1
-                else:
-
-                    _bytes += key[z][int(zforward)]
-
-            else:
-
-                _bytes += key[y][int(yforward)]
+        size[1] += 1
+        _bytes += cmdBytes
 
         with open(
             os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
@@ -1516,7 +1419,7 @@ class midiConvert:
         ) as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
-        return (True, _bytes, (nowx, maxheight, _sideLength))
+        return (True, len(cmdlist), maxdelay, size, finalPos)
 
 
 # def isProgressBar(pgbarLike:str):

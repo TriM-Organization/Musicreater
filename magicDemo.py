@@ -35,12 +35,14 @@ languages = {
         "WhetherArgEntering": "是否为文件夹内文件的转换统一参数[是(1) 或 否(0)]",
         "EnterArgs": "请输入转换参数",
         "noteofArgs": "注：文件夹内的全部midi将统一以此参数转换",
-        "ChooseSbReset": "是否自动重置计分板[是(1) 或 否(0)]",
+        "EnterVolume": "请输入音量大小(0~1)",
+        "EnterSpeed": "请输入速度倍率",
+        "WhetherPgb": "是否自动生成进度条[是(1) 或 否(0)]",
         "WhetherCstmProgressBar": "是否自定义进度条[是(1) 或 否(0)]",
         "EnterProgressBarStyle": "请输入进度条样式",
         "EnterSbName": "请输入计分板名称",
-        "EnterVolume": "请输入音量大小(0~1)",
-        "EnterSpeed": "请输入速度倍率",
+        "EnterSelecter": "请输入播放者选择器",
+        "WhetherSbReset": "是否自动重置计分板[是(1) 或 否(0)]",
         "EnterAuthor": "请输入作者",
         "EnterMaxHeight": "请输入指令结构最大生成高度",
         "ErrEnter": "输入错误",
@@ -48,8 +50,13 @@ languages = {
         "Dealing": "正在处理",
         "FileNotFound": "文件(夹)不存在",
         "ChooseOutPath": "请输入结果输出路径",
-        "EnterSelecter": "请输入播放者选择器",
         "Saying": "言·论",
+        "Failed": "失败",
+        "CmdLength": "指令数量",
+        "MaxDelay": "曲目时间(游戏刻)",
+        "PlaceSize": "结构占用大小",
+        "LastPos": "最末方块坐标",
+        "PressEnterExit": "请按下回车键退出。",
     }
 }
 
@@ -121,20 +128,50 @@ MainConsole.rule(
     title="[bold #AB70FF]Welcome to Independent Musicreater Convernter", characters="-"
 )
 
+nowYang = datetime.datetime.now()
+nowYin = zhdate.ZhDate.from_datetime(nowYang)
 
-# 显示箴言部分
-MainConsole.print(
-    "[#121110 on #F0F2F4]"
-    + random.choice(
-        requests.get(
-            "https://gitee.com/EillesWan/Musicreater/raw/master/resources/myWords.txt"
-        )
-        .text.strip("\r\n")
-        .split("\r\n")
-    ),
-    style="#121110 on #F0F2F4",
-    justify="center",
-)
+if nowYang.month == 8 and nowYang.day == 6:
+    # 诸葛八卦生日
+    MainConsole.print(
+        "[#7DB5F0 on #121110]今天可不是催更的日子！\n诸葛亮与八卦阵{}岁生日快乐！".format(nowYang.year - 2009),
+        style="#7DB5F0 on #121110",
+        justify="center",
+    )
+elif nowYang.month == 4 and nowYang.day == 3:
+    # 金羿生日快乐
+    MainConsole.print(
+        "[#0089F2 on #F0F2F4]今天就不要催更啦！\n金羿{}岁生日快乐！".format(nowYang.year - 2006),
+        style="#0089F2 on #F0F2F4",
+        justify="center",
+    )
+elif nowYin.lunar_month == 12 and nowYin.lunar_day == 30:
+    MainConsole.print(
+        "[#FF3432 on #121110]除夕到了，你是否与家人共处，融融其乐？",
+        style="#FF3432 on #121110",
+        justify="center",
+    )
+elif nowYin.leap_month == 1 and nowYin.lunar_day in range(1, 9):
+    MainConsole.print(
+        "[#FFF642 on #FF3432]春节快乐！\n在你使用音·创的时候，是不是也要去感受一下喜庆的氛围呢？",
+        style="#FFF642 on #FF3432",
+        justify="center",
+    )
+else:
+    # 显示箴言部分
+    MainConsole.print(
+        "[#121110 on #F0F2F4]{}".format(
+            random.choice(
+                requests.get(
+                    'https://gitee.com/EillesWan/Musicreater/raw/master/resources/myWords.txt'
+                )
+                .text.strip('\r\n')
+                .split('\r\n')
+            )
+        ),
+        style="#121110 on #F0F2F4",
+        justify="center",
+    )
 
 
 from typing import Any, Literal, Optional, TextIO
@@ -262,7 +299,12 @@ def ipt(
     return MainConsole.input("", password=password, stream=stream)
 
 
-def formatipt(notice: str, fun, errnote: str = "", *extraArg):
+def formatipt(
+    notice: str,
+    fun,
+    errnote: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
+    *extraArg,
+):
     '''循环输入，以某种格式
     notice: 输入时的提示
     fun: 格式函数
@@ -306,7 +348,7 @@ outpath = formatipt(
     f"{_('ChooseOutPath')}{_(':')}",
     os.path.exists,
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
-).lower()
+)[0].lower()
 
 
 # 选择输出格式
@@ -314,17 +356,16 @@ while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
     if fileFormat in ('0', 'mcpack'):
         fileFormat = 0
-        prt(_("EnterArgs"))
-        if len(midis) > 1:
-            prt(_("noteofArgs"))
+        playerFormat = 1
+        break
 
     elif fileFormat in ('1', 'bdx'):
         fileFormat = 1
         while True:
             playerFormat = ipt(f"{_('ChoosePlayer')}{_(':')}").lower()
-            if playerFormat in ('0', '延迟'):
+            if playerFormat in ('0', '延迟', 'delay'):
                 playerFormat = 0
-            elif playerFormat in ('1', '计分板'):
+            elif playerFormat in ('1', '计分板', 'scoreboard'):
                 playerFormat = 1
             else:
                 prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
@@ -336,8 +377,84 @@ while True:
     break
 
 
-if fileFormat == 0:
-    pass
+# 真假字符串判断
+def boolstr(sth: str) -> bool:
+    try:
+        return bool(int(sth))
+    except:
+        if str(sth).lower() == 'true':
+            return True
+        elif str(sth).lower() == 'false':
+            return False
+        else:
+            raise "布尔字符串啊？"
 
 
-MainConsole.input()
+prompts = []
+# 提示语 检测函数 错误提示语
+for args in [
+    (
+        f'{_("EnterVolume")}{_(":")}',
+        float,
+    ),
+    (
+        f'{_("EnterSpeed")}{_(":")}',
+        float,
+    ),
+    (
+        f'{_("WhetherPgb")}{_(":")}',
+        boolstr,
+    ),
+    (
+        f'{_("EnterSbName")}{_(":")}',
+        str,
+    )
+    if playerFormat == 1
+    else (
+        f'{_("EnterSelecter")}{_(":")}',
+        str,
+    ),
+    (
+        f'{_("WhetherSbReset")}{_(":")}',
+        boolstr,
+    )
+    if playerFormat == 1
+    else (),
+    (
+        f'{_("EnterAuthor")}{_(":")}',
+        str,
+    )
+    if fileFormat == 1
+    else (),
+    (
+        f'{_("EnterMaxHeight")}{_(":")}',
+        int,
+    )
+    if fileFormat == 1
+    else (),
+]:
+    if args:
+        prompts.append(formatipt(*args)[1])
+
+
+newLine = '\n'
+conversion = midiConvert()
+for singleMidi in midis:
+    conversion.convert(singleMidi, outpath)
+    conversion_result = (
+        conversion.tomcpack(2, *prompts)
+        if fileFormat == 0
+        else (
+            conversion.toBDXfile(2, *prompts)
+            if playerFormat == 1
+            else conversion.toBDXfile_withDelay(1, *prompts)
+        )
+    )
+    if conversion_result[0]:
+        prt(
+            f"{newLine}{_('Dealing')} {singleMidi} {_(':')}{newLine}	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
+        )
+    else:
+        prt(f"{_('Failed')}")
+
+ipt(_("PressEnterExit"))
