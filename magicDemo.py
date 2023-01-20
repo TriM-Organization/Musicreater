@@ -94,7 +94,7 @@ except ModuleNotFoundError as E:
 try:
     from msctPkgver.magicBeing import *
     import requests
-    import zhdate
+    # import zhdate
 except ModuleNotFoundError as E:
     if input(
         "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
@@ -126,7 +126,7 @@ MainConsole.rule(
 )
 
 nowYang = datetime.datetime.now()
-nowYin = zhdate.ZhDate.from_datetime(nowYang)
+# nowYin = zhdate.ZhDate.from_datetime(nowYang)
 
 if nowYang.month == 8 and nowYang.day == 6:
     # 诸葛八卦生日
@@ -142,18 +142,18 @@ elif nowYang.month == 4 and nowYang.day == 3:
         style="#0089F2 on #F0F2F4",
         justify="center",
     )
-elif nowYin.lunar_month == 12 and nowYin.lunar_day == 30:
-    MainConsole.print(
-        "[#FF3432 on #121110]除夕到了，你是否与家人共处，融融其乐？",
-        style="#FF3432 on #121110",
-        justify="center",
-    )
-elif nowYin.leap_month == 1 and nowYin.lunar_day in range(1, 9):
-    MainConsole.print(
-        "[#FFF642 on #FF3432]春节快乐！\n在你使用音·创的时候，是不是也要去感受一下喜庆的氛围呢？",
-        style="#FFF642 on #FF3432",
-        justify="center",
-    )
+# elif nowYin.lunar_month == 12 and nowYin.lunar_day == 30:
+#     MainConsole.print(
+#         "[#FF3432 on #121110]除夕到了，你是否与家人共处，融融其乐？",
+#         style="#FF3432 on #121110",
+#         justify="center",
+#     )
+# elif nowYin.leap_month == 1 and nowYin.lunar_day in range(1, 9):
+#     MainConsole.print(
+#         "[#FFF642 on #FF3432]春节快乐！\n在你使用音·创的时候，是不是也要去感受一下喜庆的氛围呢？",
+#         style="#FFF642 on #FF3432",
+#         justify="center",
+#     )
 else:
     # 显示箴言部分
     MainConsole.print(
