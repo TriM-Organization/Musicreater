@@ -249,7 +249,7 @@ while True:
         continue
     break
 
-
+debug = False
 # 真假字符串判断
 def boolstr(sth: str) -> bool:
     try:
@@ -265,6 +265,9 @@ def boolstr(sth: str) -> bool:
 if os.path.exists("./demo_config.json"):
     import json
     prompts = json.load(open("./demo_config.json",'r',encoding="utf-8"))
+    if prompts[-1] == "debug":
+        debug = True
+    prompts = prompts[:-1]
 else:
     prompts = []
     # 提示语 检测函数 错误提示语
@@ -317,10 +320,14 @@ else:
 
 
 
-conversion = msctPkgver.midiConvert()
+conversion = msctPkgver.midiConvert(debug)
 for singleMidi in midis:
     prt("\n"f"{_('Dealing')} {singleMidi} {_(':')}")
     conversion.convert(singleMidi, outpath)
+    if debug:
+        with open("./records.json",'a',encoding="utf-8") as f:
+            json.dump(conversion.toDICT(),f)
+            f.write(5*"\n")
     conversion_result = (
         conversion.tomcpack(2, *prompts)
         if fileFormat == 0
@@ -330,9 +337,6 @@ for singleMidi in midis:
             else conversion.toBDXfile_withDelay(1, *prompts)
         )
     )
-    if prompts[-1] == "debug":
-        with open("./records.json",'a',encoding="utf-8") as f:
-            json.dump(prompts,f)
     
     if conversion_result[0]:
         prt(

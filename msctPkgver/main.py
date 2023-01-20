@@ -628,7 +628,7 @@ class midiConvert:
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
-        channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+        channels = {}
 
         microseconds = 0
 
@@ -640,7 +640,10 @@ class midiConvert:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat
                     # print(microseconds)
                 except NameError:
-                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                    if self.debugMode:
+                        raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                    else:
+                        microseconds += msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
@@ -649,14 +652,12 @@ class midiConvert:
                         self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
             else:
 
-                try:
-                    msg.channel
-                    channelMsg = True
-                except:
-                    channelMsg = False
-                if channelMsg:
-                    if msg.channel > 15:
-                        raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                if self.debugMode:
+                    try:
+                        if msg.channel > 15:
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                    except:
+                        pass
 
                 if msg.type == "program_change":
                     channels[msg.channel].append(("PgmC", msg.program, microseconds))
@@ -684,14 +685,14 @@ class midiConvert:
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
         if self.debugMode:
-            self.prt(dict(enumerate(channels)))
+            self.prt(channels)
 
         tracks = []
         cmdAmount = 0
         maxScore = 0
 
         # 此处 我们把通道视为音轨
-        for i in range(len(channels)):
+        for i in channels.keys():
             # 如果当前通道为空 则跳过
             if not channels[i]:
                 continue
@@ -1343,7 +1344,7 @@ class midiConvert:
         """
 
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
-        channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+        channels = {}
         microseconds = 0
 
         # 我们来用通道统计音乐信息
@@ -1353,22 +1354,13 @@ class midiConvert:
                 try:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat
                     # print(microseconds)
-                except NameError:
-                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                except:
+                    microseconds += msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
                     tempo = msg.tempo
             else:
-
-                try:
-                    msg.channel
-                    channelMsg = True
-                except:
-                    channelMsg = False
-                if channelMsg:
-                    if msg.channel > 15:
-                        raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
 
                 if msg.type == "program_change":
                     channels[msg.channel].append(("PgmC", msg.program, microseconds))
@@ -1395,4 +1387,4 @@ class midiConvert:
         3 音符结束消息
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
-        return dict(enumerate(channels))
+        return channels
