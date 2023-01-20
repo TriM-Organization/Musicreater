@@ -154,11 +154,10 @@ pkg install git
 
 1. 开始使用演示程序
 
-	依照你的需要，执行以下命令之一：
+	依照你的需要，执行以下命令以运行库的演示程序：
 
 	```bash
-	python demo_convert.py	#计分板播放器，支持mcpack与BDX
-	python demo_convert_bdx_byDelay.py	#延迟播放器，仅支持BDX
+	python magicDemo.py
 	```
 
 	运行成功了，哦耶！

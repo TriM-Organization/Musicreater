@@ -95,10 +95,9 @@
 
 1. 开始使用
 
-	在目录下打开终端，执行以下命令：(选择你需要的)
+	在目录下打开终端，执行以下命令以运行演示程序：
 
 	```bash
-	python demo_convert.py	#计分板播放器，支持mcpack与BDX
-	python demo_convert_bdx_byDelay.py	#延迟播放器，仅支持BDX
+	python magicDemo.py
 	```
 

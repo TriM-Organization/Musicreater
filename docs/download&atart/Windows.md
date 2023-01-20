@@ -60,18 +60,17 @@
 
 1. 开始使用
 
+	您可以直接双击 `magicDemo.py` 以运行演示程序，或者按照以下步骤使用终端应用运行。
+
 	在目录下打开终端。
 	
 	例如：打开命令行：请进入到目录下，在文件资源管理器的地址框内输入`cmd`：
 
 	<img src=https://foruda.gitee.com/images/1659974437388532868/输入.png>
 	<img src=https://foruda.gitee.com/images/1659974754378201859/输入c.png>
-	
-	执行以下命令：(选择你需要的)
 
 	```bash
-	python demo_convert.py	#计分板播放器，支持mcpack与BDX
-	python demo_convert_bdx_byDelay.py	#延迟播放器，仅支持BDX
+	python ./magicDemo.py	
 	```
 
 ## 三、安装时错误的补充说明
@@ -86,4 +85,4 @@
 	> [下载64位VCREDIST安装包](https://aka.ms/vs/17/release/vc_redist.x64.exe)
 	> [下载32位VCREDIST安装包](https://aka.ms/vs/17/release/vc_redist.x86.exe)
 
-	感谢群友Mono帮我们发现这个问题。
+	感谢群友*Mono*帮我们发现这个问题。

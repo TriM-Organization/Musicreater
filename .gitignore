@@ -7,6 +7,9 @@
 /.vscode
 *.mid
 *.midi
+*.mcpack
+*.bdx
+demo_config.json
 
 # Byte-compiled / optimized
 __pycache__/

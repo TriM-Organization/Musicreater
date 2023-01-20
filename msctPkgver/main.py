@@ -123,6 +123,10 @@ class midiConvert:
         self.methods_byDelay = [
             self._toCmdList_withDelay_m1,
         ]
+        if self.debugMode:
+            from .magicBeing import prt,ipt
+            self.prt = prt
+            self.ipt = ipt
 
     def convert(self, midiFile: str, outputPath: str, oldExeFormat: bool = True):
         """转换前需要先运行此函数来获取基本信息"""
@@ -561,6 +565,8 @@ class midiConvert:
         commands = 0
         maxscore = 0
 
+        # 分轨的思路其实并不好，但这个算法就是这样
+        # 所以我建议用第二个方法 _toCmdList_m2
         for i, track in enumerate(self.midi.tracks):
 
             ticks = 0
@@ -596,8 +602,7 @@ class midiConvert:
                             + "="
                             + str(nowscore)
                             + "}"
-                            + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ "
-                            f"{msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
+                            + f"] ~ ~ ~ playsound {soundID} @s ^ ^ ^{1 / volume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
                         )
                         commands += 1
             if len(singleTrack) != 0:
@@ -620,10 +625,7 @@ class midiConvert:
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
 
-        if MaxVolume > 1:
-            MaxVolume = 1
-        if MaxVolume <= 0:
-            MaxVolume = 0.001
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
         channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
@@ -643,6 +645,8 @@ class midiConvert:
             if msg.is_meta:
                 if msg.type == "set_tempo":
                     tempo = msg.tempo
+                    if self.debugMode:
+                        self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
             else:
 
                 try:
@@ -679,6 +683,9 @@ class midiConvert:
         3 音符结束消息
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
+        if self.debugMode:
+            self.prt(dict(enumerate(channels)))
+
         tracks = []
         cmdAmount = 0
         maxScore = 0
@@ -702,11 +709,13 @@ class midiConvert:
                     InstID = msg[1]
 
                 elif msg[0] == "NoteS":
-
-                    if SpecialBits:
-                        soundID, _X = self.__bitInst2IDwithX(InstID)
-                    else:
-                        soundID, _X = self.__Inst2soundIDwithX(InstID)
+                    try:
+                        soundID, _X = (self.__bitInst2IDwithX(InstID) if SpecialBits else self.__Inst2soundIDwithX(InstID))
+                    except UnboundLocalError as E:
+                        if self.debugMode:
+                            raise NotDefineProgramError(f"未定义乐器便提前演奏。\n{E}")
+                        else:
+                            soundID, _X = (self.__bitInst2IDwithX(-1) if SpecialBits else self.__Inst2soundIDwithX(-1))
                     score_now = round(msg[-1] / float(speed) / 50)
                     maxScore = max(maxScore, score_now)
 
@@ -1117,8 +1126,10 @@ class midiConvert:
 
         indexfile.close()
 
+        if os.path.exists(f"{self.outputPath}/{self.midFileName}.mcpack"):
+            os.remove(f"{self.outputPath}/{self.midFileName}.mcpack")
         makeZip(
-            f"{self.outputPath}/temp/", self.outputPath + f"/{self.midFileName}.mcpack"
+            f"{self.outputPath}/temp/", f"{self.outputPath}/{self.midFileName}.mcpack"
         )
 
         shutil.rmtree(f"{self.outputPath}/temp/")
@@ -1323,3 +1334,65 @@ class midiConvert:
         return (True, len(cmdlist), maxdelay, size, finalPos)
 
 
+    def toDICT(
+        self,
+    ) -> list:
+        """
+        使用金羿的转换思路，将midi转换为字典
+        :return: dict()
+        """
+
+        # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
+        channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
+        microseconds = 0
+
+        # 我们来用通道统计音乐信息
+        for msg in self.midi:
+
+            if msg.time != 0:
+                try:
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    # print(microseconds)
+                except NameError:
+                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+
+            if msg.is_meta:
+                if msg.type == "set_tempo":
+                    tempo = msg.tempo
+            else:
+
+                try:
+                    msg.channel
+                    channelMsg = True
+                except:
+                    channelMsg = False
+                if channelMsg:
+                    if msg.channel > 15:
+                        raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+
+                if msg.type == "program_change":
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
+
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    channels[msg.channel].append(
+                        ("NoteS", msg.note, msg.velocity, microseconds)
+                    )
+
+                elif (msg.type == "note_on" and msg.velocity == 0) or (
+                    msg.type == "note_off"
+                ):
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
+    
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
+
+        return dict(enumerate(channels))

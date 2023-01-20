@@ -82,38 +82,35 @@ import os
 import random
 import datetime
 
-from msctPkgver.main import *
-
 try:
-    from rich.console import Console
+    import msctPkgver
 except ModuleNotFoundError as E:
-    if input("您需要安装 Rich 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
-        os.system("pip install Rich -i https://mirrors.aliyun.com/pypi/")
-        from rich.console import Console
+    if input("您需要安装 mido、Brotli 模块才能使用这个样例\n请问是否安装？(y/n)：").lower() in ('y', '1'):
+        os.system("pip install -r requirements.txt")
+        import msctPkgver
     else:
         raise E
 
 try:
+    from msctPkgver.magicBeing import *
+    import requests
     import zhdate
 except ModuleNotFoundError as E:
-    if input("您需要安装 zhdate 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
-        os.system("pip install zhdate -i https://mirrors.aliyun.com/pypi/")
+    if input(
+        "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
+    ).lower() in ('y', '1'):
+        open("Demo_Requirements.txt", 'r').write(
+            "requests==2.28.1\nrich==12.6.0\nzhdate==0.1"
+        )
+        os.system("pip install -r Demo_Requirements.txt")
+        os.remove("./Demo_Requirements.txt")
+        from rich.console import Console
+        import requests
         import zhdate
     else:
         raise E
 
 
-try:
-    import requests
-except ModuleNotFoundError as E:
-    if input("您需要安装 requests 模块才能使用这个样例\n请问是否安装？(y/n)").lower() in ('y', '1'):
-        os.system("pip install requests -i https://mirrors.aliyun.com/pypi/")
-        import requests
-    else:
-        raise E
-
-
-MainConsole = Console()
 
 MainConsole.print(
     "[#121110 on #F0F2F4]     ",
@@ -173,131 +170,7 @@ else:
         justify="center",
     )
 
-
-from typing import Any, Literal, Optional, TextIO
-
-JustifyMethod = Literal["default", "left", "center", "right", "full"]
-OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
-
-# 高级的打印函数
-def prt(
-    *objects: Any,
-    sep: str = " ",
-    end: str = "\n",
-    justify: Optional[JustifyMethod] = None,
-    overflow: Optional[OverflowMethod] = None,
-    no_wrap: Optional[bool] = None,
-    emoji: Optional[bool] = None,
-    markup: Optional[bool] = None,
-    highlight: Optional[bool] = None,
-    width: Optional[int] = None,
-    height: Optional[int] = None,
-    crop: bool = True,
-    soft_wrap: Optional[bool] = None,
-    new_line_start: bool = False,
-) -> None:
-    """打印到控制台。
-
-    Args:
-        objects (位置性的args): 要记录到终端的对象。
-        sep (str, 可选): 要在打印数据之间写入的字符串。默认为""。
-        end (str, optio可选nal): 在打印数据结束时写入的字符串。默认值为"\\\\n"。
-        style (Union[str, Style], 可选): 应用于输出的样式。默认为`None`。
-        justify (str, 可选): 校正位置，可为"default", "left", "right", "center" 或 "full". 默认为`None`。
-        overflow (str, 可选): 控制溢出："ignore"忽略, "crop"裁剪, "fold"折叠, "ellipsis"省略号。默认为`None`。
-        no_wrap (Optional[bool], 可选): 禁用文字包装。默认为`None`。
-        emoji (Optional[bool], 可选): 启用表情符号代码，或使用控制台默认的`None`。默认为`None`。
-        markup (Optional[bool], 可选): 启用标记，或`None`使用控制台默认值。默认为`None`。
-        highlight (Optional[bool], 可选): 启用自动高亮，或`None`使用控制台默认值。默认为`None`。
-        width (Optional[int], 可选): 输出的宽度，或`None`自动检测。默认为`None`。
-        crop (Optional[bool], 可选): 裁剪输出到终端的宽度。默认为`True`。
-        soft_wrap (bool, 可选): 启用软包装模式，禁止文字包装和裁剪，或`None``用于 控制台默认值。默认为`None`。
-        new_line_start (bool, False): 如果输出包含多行，在开始时插入一个新行。默认值为`False`。
-    """
-    MainConsole.print(
-        *objects,
-        sep=sep,
-        end=end,
-        style="#F0F2F4 on #121110",
-        justify=justify,
-        overflow=overflow,
-        no_wrap=no_wrap,
-        emoji=emoji,
-        markup=markup,
-        highlight=highlight,
-        width=width,
-        height=height,
-        crop=crop,
-        soft_wrap=soft_wrap,
-        new_line_start=new_line_start,
-    )
-
-
 prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
-
-# 高级的输入函数
-def ipt(
-    *objects: Any,
-    sep: str = " ",
-    justify: Optional[JustifyMethod] = None,
-    overflow: Optional[OverflowMethod] = None,
-    no_wrap: Optional[bool] = None,
-    emoji: Optional[bool] = None,
-    markup: Optional[bool] = None,
-    highlight: Optional[bool] = None,
-    width: Optional[int] = None,
-    height: Optional[int] = None,
-    crop: bool = True,
-    soft_wrap: Optional[bool] = None,
-    new_line_start: bool = False,
-    password: bool = False,
-    stream: Optional[TextIO] = None,
-) -> str:
-    """显示一个提示并等待用户的输入。
-
-    它的工作方式与Python内建的 :func:`input` 函数相同，如果Python内建的 :mod:`readline` 模块先前已经加载，则提供详细的行编辑和历史功能。
-
-    Args:
-        objects (位置性的args): 要记录到终端的对象。
-        sep (str, 可选): 要在打印数据之间写入的字符串。默认为""。
-        end (str, optio可选nal): 在打印数据结束时写入的字符串。默认值为"\\\\n"。
-        style (Union[str, Style], 可选): 应用于输出的样式。默认为`None`。
-        justify (str, 可选): 校正位置，可为"default", "left", "right", "center" 或 "full". 默认为`None`。
-        overflow (str, 可选): 控制溢出："ignore"忽略, "crop"裁剪, "fold"折叠, "ellipsis"省略号。默认为`None`。
-        no_wrap (Optional[bool], 可选): 禁用文字包装。默认为`None`。
-        emoji (Optional[bool], 可选): 启用表情符号代码，或使用控制台默认的`None`。默认为`None`。
-        markup (Optional[bool], 可选): 启用标记，或`None`使用控制台默认值。默认为`None`。
-        highlight (Optional[bool], 可选): 启用自动高亮，或`None`使用控制台默认值。默认为`None`。
-        width (Optional[int], 可选): 输出的宽度，或`None`自动检测。默认为`None`。
-        crop (Optional[bool], 可选): 裁剪输出到终端的宽度。默认为`True`。
-        soft_wrap (bool, 可选): 启用软包装模式，禁止文字包装和裁剪，或`None``用于 控制台默认值。默认为`None`。
-        new_line_start (bool, False): 如果输出包含多行，在开始时插入一个新行。默认值为`False`。
-        password (bool, 可选): 隐藏已经输入的文案，默认值为`False`。
-        stream (TextIO, 可选): 可选从文件中读取（而非控制台），默认为 `None`。
-
-    Returns:
-        str: 从stdin读取的字符串
-    """
-    MainConsole.print(
-        *objects,
-        sep=sep,
-        end="",
-        style="#F0F2F4 on #121110",
-        justify=justify,
-        overflow=overflow,
-        no_wrap=no_wrap,
-        emoji=emoji,
-        markup=markup,
-        highlight=highlight,
-        width=width,
-        height=height,
-        crop=crop,
-        soft_wrap=soft_wrap,
-        new_line_start=new_line_start,
-    )
-
-    return MainConsole.input("", password=password, stream=stream)
-
 
 def formatipt(
     notice: str,
@@ -319,7 +192,7 @@ def formatipt(
             prt(errnote)
             continue
     return result, funresult
-
+    
 
 # 获取midi列表
 while True:
@@ -389,57 +262,64 @@ def boolstr(sth: str) -> bool:
         else:
             raise "布尔字符串啊？"
 
+if os.path.exists("./demo_config.json"):
+    import json
+    prompts = json.load(open("./demo_config.json",'r',encoding="utf-8"))
+else:
+    prompts = []
+    # 提示语 检测函数 错误提示语
+    for args in [
+        (
+            f'{_("EnterVolume")}{_(":")}',
+            float,
+        ),
+        (
+            f'{_("EnterSpeed")}{_(":")}',
+            float,
+        ),
+        (
+            f'{_("WhetherPgb")}{_(":")}',
+            boolstr,
+        ),
+        (
+            f'{_("EnterSbName")}{_(":")}',
+            str,
+        )
+        if playerFormat == 1
+        else (
+            f'{_("EnterSelecter")}{_(":")}',
+            str,
+        ),
+        (
+            f'{_("WhetherSbReset")}{_(":")}',
+            boolstr,
+        )
+        if playerFormat == 1
+        else (),
+        (
+            f'{_("EnterAuthor")}{_(":")}',
+            str,
+        )
+        if fileFormat == 1
+        else (),
+        (
+            f'{_("EnterMaxHeight")}{_(":")}',
+            int,
+        )
+        if fileFormat == 1
+        else (),
+    ]:
+        if args:
+            prompts.append(formatipt(*args)[1])
 
-prompts = []
-# 提示语 检测函数 错误提示语
-for args in [
-    (
-        f'{_("EnterVolume")}{_(":")}',
-        float,
-    ),
-    (
-        f'{_("EnterSpeed")}{_(":")}',
-        float,
-    ),
-    (
-        f'{_("WhetherPgb")}{_(":")}',
-        boolstr,
-    ),
-    (
-        f'{_("EnterSbName")}{_(":")}',
-        str,
-    )
-    if playerFormat == 1
-    else (
-        f'{_("EnterSelecter")}{_(":")}',
-        str,
-    ),
-    (
-        f'{_("WhetherSbReset")}{_(":")}',
-        boolstr,
-    )
-    if playerFormat == 1
-    else (),
-    (
-        f'{_("EnterAuthor")}{_(":")}',
-        str,
-    )
-    if fileFormat == 1
-    else (),
-    (
-        f'{_("EnterMaxHeight")}{_(":")}',
-        int,
-    )
-    if fileFormat == 1
-    else (),
-]:
-    if args:
-        prompts.append(formatipt(*args)[1])
 
 
-newLine = '\n'
-conversion = midiConvert()
+
+
+
+conversion = msctPkgver.midiConvert()
 for singleMidi in midis:
+    prt("\n"f"{_('Dealing')} {singleMidi} {_(':')}")
     conversion.convert(singleMidi, outpath)
     conversion_result = (
         conversion.tomcpack(2, *prompts)
@@ -450,11 +330,18 @@ for singleMidi in midis:
             else conversion.toBDXfile_withDelay(1, *prompts)
         )
     )
+    if prompts[-1] == "debug":
+        with open("./records.json",'a',encoding="utf-8") as f:
+            json.dump(prompts,f)
+    
     if conversion_result[0]:
         prt(
-            f"{newLine}{_('Dealing')} {singleMidi} {_(':')}{newLine}	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
+            f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
         )
     else:
         prt(f"{_('Failed')}")
 
-ipt(_("PressEnterExit"))
+if ipt(_("PressEnterExit")).lower() == "record":
+    import json
+    with open("./demo_config.json",'w',encoding="utf-8") as f:
+        json.dump(prompts,f)
