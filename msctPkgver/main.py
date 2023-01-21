@@ -124,7 +124,8 @@ class midiConvert:
             self._toCmdList_withDelay_m1,
         ]
         if self.debugMode:
-            from .magicBeing import prt,ipt
+            from .magicBeing import prt, ipt
+
             self.prt = prt
             self.ipt = ipt
 
@@ -628,7 +629,25 @@ class midiConvert:
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
-        channels = {}
+        channels = {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            7: [],
+            8: [],
+            9: [],
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+            14: [],
+            15: [],
+            16: [],
+        }
 
         microseconds = 0
 
@@ -643,7 +662,11 @@ class midiConvert:
                     if self.debugMode:
                         raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
                     else:
-                        microseconds += msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat
+                        microseconds += (
+                            msg.time
+                            * mido.midifiles.midifiles.DEFAULT_TEMPO
+                            / self.midi.ticks_per_beat
+                        )
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
@@ -671,7 +694,7 @@ class midiConvert:
                     msg.type == "note_off"
                 ):
                     channels[msg.channel].append(("NoteE", msg.note, microseconds))
-    
+
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
 
@@ -711,12 +734,20 @@ class midiConvert:
 
                 elif msg[0] == "NoteS":
                     try:
-                        soundID, _X = (self.__bitInst2IDwithX(InstID) if SpecialBits else self.__Inst2soundIDwithX(InstID))
+                        soundID, _X = (
+                            self.__bitInst2IDwithX(InstID)
+                            if SpecialBits
+                            else self.__Inst2soundIDwithX(InstID)
+                        )
                     except UnboundLocalError as E:
                         if self.debugMode:
                             raise NotDefineProgramError(f"未定义乐器便提前演奏。\n{E}")
                         else:
-                            soundID, _X = (self.__bitInst2IDwithX(-1) if SpecialBits else self.__Inst2soundIDwithX(-1))
+                            soundID, _X = (
+                                self.__bitInst2IDwithX(-1)
+                                if SpecialBits
+                                else self.__Inst2soundIDwithX(-1)
+                            )
                     score_now = round(msg[-1] / float(speed) / 50)
                     maxScore = max(maxScore, score_now)
 
@@ -1197,7 +1228,7 @@ class midiConvert:
                 + scoreboardname,
             )
 
-        cmdBytes, size, finalPos = toBDXbytes([(i,0)for i in commands], maxheight - 1)
+        cmdBytes, size, finalPos = toBDXbytes([(i, 0) for i in commands], maxheight - 1)
         # 此处是对于仅有 True 的参数和自定义参数的判断
         if progressbar:
             pgbBytes, pgbSize, pgbNowPos = toBDXbytes(
@@ -1334,7 +1365,6 @@ class midiConvert:
 
         return (True, len(cmdlist), maxdelay, size, finalPos)
 
-
     def toDICT(
         self,
     ) -> list:
@@ -1355,7 +1385,11 @@ class midiConvert:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat
                     # print(microseconds)
                 except:
-                    microseconds += msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat
+                    microseconds += (
+                        msg.time
+                        * mido.midifiles.midifiles.DEFAULT_TEMPO
+                        / self.midi.ticks_per_beat
+                    )
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
@@ -1374,7 +1408,7 @@ class midiConvert:
                     msg.type == "note_off"
                 ):
                     channels[msg.channel].append(("NoteE", msg.note, microseconds))
-    
+
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
 
