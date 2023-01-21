@@ -99,7 +99,7 @@ except ModuleNotFoundError as E:
     if input(
         "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
     ).lower() in ('y', '1'):
-        open("Demo_Requirements.txt", 'r').write(
+        open("Demo_Requirements.txt", 'w').write(
             "requests==2.28.1\nrich==12.6.0\nzhdate==0.1"
         )
         os.system("pip install -r Demo_Requirements.txt")
