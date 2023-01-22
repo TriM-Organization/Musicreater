@@ -298,6 +298,10 @@ class midiConvert:
                 126: ("note.bd", 7),  # 打击乐器无音域
                 127: ("note.snare", 7),  # 打击乐器无音域
             }[instrumentID]
+#这里可以用别的写法简化
+#比如写成一个函数
+#类似我的 然后用 instrumentID in range(a,b)
+#(因为乐器基本都是按顺序排起来的 或者你也可以写数组
         except BaseException:
             a = ("note.flute", 5)
         return a
@@ -567,6 +571,10 @@ class midiConvert:
         maxscore = 0
 
         # 分轨的思路其实并不好，但这个算法就是这样
+        
+    #来自Dislink：这里我写错力！！也不知是我看的那篇csdn文档有问题还是我看得太急了
+    #总之program_change事件改的是通道而不是音轨！！
+        
         # 所以我建议用第二个方法 _toCmdList_m2
         for i, track in enumerate(self.midi.tracks):
 
@@ -582,7 +590,11 @@ class midiConvert:
                 else:
                     if msg.type == "program_change":
                         instrumentID = msg.program
-
+                        
+                        
+#来自Dislink：这里你是不是还错了？？？
+                        
+                        
                     if msg.type == "note_on" and msg.velocity != 0:
                         try:
                             nowscore = round(
