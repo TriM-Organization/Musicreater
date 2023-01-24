@@ -49,15 +49,13 @@ This list is not in any order.
 -   Thank *Touch “偷吃”*\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
 -   Thank *Mono*\<QQ738893087\> for reporting problems while installing
 -	Thank *Ammelia “艾米利亚”*\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
--	感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** for supporting and promoting our project
+-	感谢 *[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”* for supporting and promoting our project
 
 > Thanks for a lot of groupmates's support and help
 >
 > If you have given contribution but haven't been in the list, please contact us!
 
 ## Contact Us📞
-
-### Author *Eilles*(金羿)
 
 Meet problems? Welcome to give out your issue [here](https://gitee.com/EillesWan/Musicreater/issues/new)!
 
