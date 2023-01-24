@@ -17,7 +17,7 @@
 
 	<img src=https://foruda.gitee.com/images/1662736621235871190/2ac3d98f_9911226.png>
 
-4.	安装结束之后可以在*终端*(命令行/PowerShell/Bash/etc)中输入：python 试试是否安装成功，成功安装之后，在终端中输入python会显示诸如如下图片的提示：
+4.	安装结束之后可以在*终端*(命令行/PowerShell/Bash/etc)中输入：`python` 试试是否安装成功，成功安装之后，在终端中输入python会显示诸如如下图片的提示：
 
 	<img src=https://foruda.gitee.com/images/1659972669907359295/cmd.png>
 
@@ -48,12 +48,12 @@
 	-	若您使用git，请直接克隆本仓库：
 
 		```bash
-		git clone -b pkgver https://gitee.com/EillesWan/Musicreater.git
+		git clone -b pkgver https://gitee.com/TriM-Organization/Musicreater.git
 		```
 
-	-	若您不使用git，可以在[*码云*(Gitee)](https://gitee.com/EillesWan/Musicreater.git)或[*GitHub*](https://github.com/EillesWan/Musicreater.git)下载zip包，或者[加入QQ群聊861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)，在群文件中获取。
+	-	若您不使用git，可以在[*码云*(Gitee)](https://gitee.com/TriM-Organization/Musicreater.git)或[*GitHub*](https://github.com/TriM-Organization/Musicreater.git)下载zip包，或者[加入QQ群聊861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)，在群文件中获取。
 
-		<img src="https://foruda.gitee.com/images/1669540786443169766/fabf0acd_9911226.png" >
+		<img src="https://foruda.gitee.com/images/1669540786443169766/fabf0acd_9911226.png">
 
 		值得注意的是，这张图上有1、2两个数字，虽然是手写的，但确实是数字，表示着要进行的步骤。希望眼尖得能找出我的口头禅的你们能够发现这两个用鼠标手写的数字并在安装时认真地执行。我认为这并不算十分的难，移动鼠标并单击大约消耗不了多少卡路里，不过我没有进行精确的计算，我也不是十分的清楚这个活动对于一个常人来讲有多难，但我怀疑它不难。
 
@@ -68,6 +68,8 @@
 
 	<img src=https://foruda.gitee.com/images/1659974437388532868/输入.png>
 	<img src=https://foruda.gitee.com/images/1659974754378201859/输入c.png>
+
+	使用以下指令：
 
 	```bash
 	python ./magicDemo.py	

@@ -1,6 +1,6 @@
 rm -rf ./MusictraterPkgver
 
-git clone https://gitee.com/EillesWan/Musicreater.git -b pkgver MusictraterPkgver
+git clone https://gitee.com/TriM-Organization/Musicreater -b pkgver MusictraterPkgver
 
 cd ./MusictraterPkgver
 

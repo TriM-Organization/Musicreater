@@ -18,51 +18,50 @@
 [简体中文🇨🇳](README.md) | English🇬🇧
 
 
-**Notice that the language support of *README* may be a little SLOW.**
+**Notice that the language translation of *Musicreater* may be a little SLOW.**
 
 ## Introduction🚀
 
-Musicreater(音·创) is a free open source software which is used for making and also creating music in **Minecraft: Bedrock Edition**.
+Musicreater(音·创) is a free open source software which is used for making and also creating music in *Minecraft: Bedrock Edition*.
 
-Musicreater pkgver(Package Version 音·创 库版) is a free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
+Musicreater pkgver(Package Version 音·创 库版) is a free open source library used for convert midi file into formats that could be read in *Minecraft: Bedrock Edition*.
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
-### **SEEEEEEEEE Tutorials [HERE](./docs/Use%20of%20Funtions.md)**
+**This branch is the Package Version of Musicreater, that means that the lib can be imported for other softwares**
+
+### **If you want to use the demo to convert MIDI musics directly, SEEEEEEEEE [Tutorials HERE](./docs/Use%20of%20Funtions.md)**
 
 ### Authors✒
 
-Eilles (金羿)：A high school student, individual developer, unfamous BilibiliUPer, which knows a little about commands in *Minecraft: Bedrock Edition*
+Eilles (金羿)：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in *Minecraft: Bedrock Edition*
 
-bgArray "诸葛亮与八卦阵": Fix bugs, improve code aesthetics, add new functions, change data format, etc.
+bgArray "诸葛亮与八卦阵": A junior high school student, player of *Minecraft: Bedrock Edition*, which is a fan of music and programming.
 
 
 ## Thanks🙏
+This list is not in any order.
 
-- Thank *昀梦*\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* Created.
-- Thank *Charlie_Ping “查理平”* for bdx convert function, and
-the data label that's used to convert the mid's instruments into minecraft's instruments.
-- Thank *CMA_2401PT* for BDXWorkShop as the .bdx structure's operation guide.
-- Thank *Dislink Sforza* \<QQ1600515314\> for the algorithm brought to us, his midi analysis algorithm became one of us's best ones
-- Thank *Arthur Morgan*\<QQ312280061\> for his/her biggest support for the debugging of Musicreater
-- Thank *Touch “偷吃”*\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
-- Thank *Mono*\<QQ738893087\> for reporting problems while installing
-- Thanks for a lot of groupmates who support me and help me to test the program.
-- If you have give me some help but u haven't been in the list, please contact me.
+-   Thank *昀梦*\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* generated.
+-   Thank *Charlie_Ping “查理平”* for bdx convert function for reference, and the chart that's used to convert the mid's instruments into Minecraft's instruments.
+-   Thank *[CMA_2401PT](https://github.com/CMA2401PT)* for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
+-   Thank *[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”* \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project. We hope he can get into a good university as he wantted to!
+-   Thank *Touch “偷吃”*\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
+-   Thank *Mono*\<QQ738893087\> for reporting problems while installing
+-	Thank *Ammelia “艾米利亚”*\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
+-	感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** for supporting and promoting our project
 
-## Contact Information📞
+> Thanks for a lot of groupmates's support and help
+>
+> If you have given contribution but haven't been in the list, please contact us!
+
+## Contact Us📞
 
 ### Author *Eilles*(金羿)
 
-1.  QQ       2647547478
-2.  E-mail   EillesWan2006@163.com
-    W-YI_DoctorYI@outlook.com EillesWan@outlook.com
-3.  WeChat   WYI_DoctorYI
-4.  Telegram [@EillesWan](https://t.me/EillesWan)
+Meet problems? Welcome to give out your issue [here](https://gitee.com/EillesWan/Musicreater/issues/new)!
 
-### Author *bgArray*(诸葛亮与八卦阵)
-
-1.  QQ       4740437765
+Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
 
 
 
