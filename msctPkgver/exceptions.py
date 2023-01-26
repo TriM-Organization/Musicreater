@@ -13,7 +13,8 @@
 Musicreater pkgver (Package Version 音·创 库版)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
 
-Copyright 2023 all the developers of Musicreater
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
 
 开源相关声明请见 ../Lisence.md
 Terms & Conditions: ../Lisence.md

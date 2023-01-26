@@ -126,7 +126,6 @@ MainConsole.rule(
 )
 
 nowYang = datetime.datetime.now()
-# nowYin = zhdate.ZhDate.from_datetime(nowYang)
 
 if nowYang.month == 8 and nowYang.day == 6:
     # 诸葛八卦生日
@@ -142,18 +141,6 @@ elif nowYang.month == 4 and nowYang.day == 3:
         style="#0089F2 on #F0F2F4",
         justify="center",
     )
-# elif nowYin.lunar_month == 12 and nowYin.lunar_day == 30:
-#     MainConsole.print(
-#         "[#FF3432 on #121110]除夕到了，你是否与家人共处，融融其乐？",
-#         style="#FF3432 on #121110",
-#         justify="center",
-#     )
-# elif nowYin.leap_month == 1 and nowYin.lunar_day in range(1, 9):
-#     MainConsole.print(
-#         "[#FFF642 on #FF3432]春节快乐！\n在你使用音·创的时候，是不是也要去感受一下喜庆的氛围呢？",
-#         style="#FFF642 on #FF3432",
-#         justify="center",
-#     )
 else:
     # 显示箴言部分
     MainConsole.print(
@@ -334,7 +321,7 @@ for singleMidi in midis:
         else (
             conversion.toBDXfile(2, *prompts)
             if playerFormat == 1
-            else conversion.toBDXfile_withDelay(1, *prompts)
+            else conversion.toBDXfile_withDelay(2, *prompts)
         )
     )
     
@@ -345,7 +332,11 @@ for singleMidi in midis:
     else:
         prt(f"{_('Failed')}")
 
-if ipt(_("PressEnterExit")).lower() == "record":
+
+exitSth = ipt(_("PressEnterExit")).lower()
+if exitSth == "record":
     import json
     with open("./demo_config.json",'w',encoding="utf-8") as f:
         json.dump(prompts,f)
+elif exitSth == "delrec":
+    os.remove("./demo_config.json")

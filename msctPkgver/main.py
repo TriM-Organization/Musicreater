@@ -13,7 +13,8 @@
 Musicreater pkgver (Package Version 音·创 库版)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
 
-Copyright 2023 all the developers of Musicreater
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
 
 开源相关声明请见 ../Lisence.md
 Terms & Conditions: ../Lisence.md
@@ -122,6 +123,7 @@ class midiConvert:
         ]
         self.methods_byDelay = [
             self._toCmdList_withDelay_m1,
+            self._toCmdList_withDelay_m2,
         ]
         if self.debugMode:
             from .magicBeing import prt, ipt
@@ -425,7 +427,7 @@ class midiConvert:
             )
             result.append(
                 self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
-                + "scoreboard players set MaxScore {} 100".format(scoreboardname)
+                + "scoreboard players set n100 {} 100".format(scoreboardname)
             )
             result.append(
                 self.exeHead.format("@a[scores={" + scoreboardname + "=1..}]")
@@ -548,7 +550,7 @@ class midiConvert:
         return result
 
     def _toCmdList_m1(
-        self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
+        self, scoreboardname: str = "mscplay", MaxVolume: float = 1.0, speed: float = 1.0
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
@@ -558,10 +560,7 @@ class midiConvert:
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
         tracks = []
-        if volume > 1:
-            volume = 1
-        if volume <= 0:
-            volume = 0.001
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         commands = 0
         maxscore = 0
@@ -603,7 +602,7 @@ class midiConvert:
                             + "="
                             + str(nowscore)
                             + "}"
-                            + f"] ~ ~ ~ playsound {soundID} @s ^ ^ ^{1 / volume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
+                            + f"] ~ ~ ~ playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
                         )
                         commands += 1
             if len(singleTrack) != 0:
@@ -954,33 +953,21 @@ class midiConvert:
 
     def _toCmdList_withDelay_m1(
         self,
-        volume: float = 1.0,
+        MaxVolume: float = 1.0,
         speed: float = 1.0,
         player: str = "@a",
-        # isMixedWithPrograssBar=False,
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :param player: 玩家选择器，默认为`@a`
-        :param isMixedWithPrograssBar: 进度条，（当此参数为True时使用默认进度条，当此参数为其他值为真的表达式时识别为进度条自定义参数，若为其他值为假的表达式则不生成进度条）
         :return: 全部指令列表[ ( str指令, int距离上一个指令的延迟 ),...]
         """
         tracks = {}
 
-        if volume > 1:
-            volume = 1
-        if volume <= 0:
-            volume = 0.001
-
-        # 此处是对于仅有 True 的参数和自定义参数的判断
-        # if isMixedWithPrograssBar == True:
-        #     isMixedWithPrograssBar = (
-        #         r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-        #         ("§e=§r", "§7=§r"),
-        #     )
-
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
+        
         for i, track in enumerate(self.midi.tracks):
 
             instrumentID = 0
@@ -1002,18 +989,16 @@ class midiConvert:
                         soundID, _X = self.__Inst2soundIDwithX(instrumentID)
                         try:
                             tracks[nowtick].append(
-                                f"execute {player} ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
+                                self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
                             )
                         except BaseException:
-                            tracks[nowtick] = [
-                                f"execute {player} ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}",
+                            tracks[nowtick]= [
+                                self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
                             ]
 
         results = []
 
         allticks = list(tracks.keys())
-        # if isMixedWithPrograssBar:
-        #     results.append("scoreboard objectives add {}")
 
         for i in range(len(allticks)):
             if i != 0:
@@ -1029,6 +1014,170 @@ class midiConvert:
                     results.append((tracks[allticks[i]][j], allticks[i]))
 
         return results, max(allticks)
+
+    def _toCmdList_withDelay_m2(
+        self,
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
+        player: str = "@a",
+    ) -> list:
+        """
+        使用金羿的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+        :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        :param player: 玩家选择器，默认为`@a`
+        :return: 全部指令列表[ ( str指令, int距离上一个指令的延迟 ),...]
+        """
+        tracks = {}
+
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
+
+        # 一个midi中仅有16通道 我们通过通道来识别而不是音轨
+        channels = {
+            0: [],
+            1: [],
+            2: [],
+            3: [],
+            4: [],
+            5: [],
+            6: [],
+            7: [],
+            8: [],
+            9: [],
+            10: [],
+            11: [],
+            12: [],
+            13: [],
+            14: [],
+            15: [],
+            16: [],
+        }
+
+        microseconds = 0
+
+        # 我们来用通道统计音乐信息
+        for msg in self.midi:
+
+            if msg.time != 0:
+                try:
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    # print(microseconds)
+                except NameError:
+                    if self.debugMode:
+                        raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                    else:
+                        microseconds += (
+                            msg.time
+                            * mido.midifiles.midifiles.DEFAULT_TEMPO
+                            / self.midi.ticks_per_beat
+                        )
+
+            if msg.is_meta:
+                if msg.type == "set_tempo":
+                    tempo = msg.tempo
+                    if self.debugMode:
+                        self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
+            else:
+
+                if self.debugMode:
+                    try:
+                        if msg.channel > 15:
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                    except:
+                        pass
+
+                if msg.type == "program_change":
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
+
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    channels[msg.channel].append(
+                        ("NoteS", msg.note, msg.velocity, microseconds)
+                    )
+
+                elif (msg.type == "note_on" and msg.velocity == 0) or (
+                    msg.type == "note_off"
+                ):
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
+
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
+
+
+        results = []
+
+        for i in channels.keys():
+            # 如果当前通道为空 则跳过
+            if not channels[i]:
+                continue
+
+            if i == 9:
+                SpecialBits = True
+            else:
+                SpecialBits = False
+
+            for msg in channels[i]:
+
+                if msg[0] == "PgmC":
+                    InstID = msg[1]
+
+                elif msg[0] == "NoteS":
+                    try:
+                        soundID, _X = (
+                            self.__bitInst2IDwithX(InstID)
+                            if SpecialBits
+                            else self.__Inst2soundIDwithX(InstID)
+                        )
+                    except UnboundLocalError as E:
+                        if self.debugMode:
+                            raise NotDefineProgramError(f"未定义乐器便提前演奏。\n{E}")
+                        else:
+                            soundID, _X = (
+                                self.__bitInst2IDwithX(-1)
+                                if SpecialBits
+                                else self.__Inst2soundIDwithX(-1)
+                            )
+                    score_now = round(msg[-1] / float(speed) / 50)
+
+                    try:
+                        tracks[score_now].append(
+                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
+                        )
+                    except BaseException:
+                        tracks[score_now]= [
+                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
+                        ]
+
+                    cmdAmount += 1
+
+
+
+
+        allticks = list(tracks.keys())
+
+        for i in range(len(allticks)):
+            if i != 0:
+                for j in range(len(tracks[allticks[i]])):
+                    if j != 0:
+                        results.append((tracks[allticks[i]][j], 0))
+                    else:
+                        results.append(
+                            (tracks[allticks[i]][j], allticks[i] - allticks[i - 1])
+                        )
+            else:
+                for j in range(len(tracks[allticks[i]])):
+                    results.append((tracks[allticks[i]][j], allticks[i]))
+
+        return results, max(allticks)
+
 
     def tomcpack(
         self,
