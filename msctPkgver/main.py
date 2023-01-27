@@ -1149,32 +1149,23 @@ class midiConvert:
 
                     try:
                         tracks[score_now].append(
-                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
+                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2]/128} {2 ** ((msg[1] - 60 - _X) / 12)}"
                         )
                     except BaseException:
                         tracks[score_now]= [
-                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity/128} {2 ** ((msg.note - 60 - _X) / 12)}"
+                            self.exeHead.format(player)+f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2]/128} {2 ** ((msg[1] - 60 - _X) / 12)}"
                         ]
-
-                    cmdAmount += 1
-
 
 
 
         allticks = list(tracks.keys())
+        if self.debugMode :
+            self.prt(tracks)
 
         for i in range(len(allticks)):
-            if i != 0:
-                for j in range(len(tracks[allticks[i]])):
-                    if j != 0:
-                        results.append((tracks[allticks[i]][j], 0))
-                    else:
-                        results.append(
-                            (tracks[allticks[i]][j], allticks[i] - allticks[i - 1])
-                        )
-            else:
-                for j in range(len(tracks[allticks[i]])):
-                    results.append((tracks[allticks[i]][j], allticks[i]))
+            for j in range(len(tracks[allticks[i]])):
+                results.append((tracks[allticks[i]][j], (0 if j!=0 else (allticks[i] - allticks[i - 1] if i!=0 else allticks[i]))))
+                
 
         return results, max(allticks)
 
@@ -1468,7 +1459,7 @@ class midiConvert:
         cmdBytes, size, finalPos = toBDXbytes(cmdlist, maxheight - 1)
 
         if progressbar:
-            scbname = self.midFileName[:5] + "Pgb"
+            scbname = self.midFileName[:3] + "Pgb"
             _bytes += formCMDblk(
                 r"scoreboard objectives add {} dummy {}播放用".replace(r"{}", scbname),
                 1,
