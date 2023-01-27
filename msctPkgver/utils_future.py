@@ -1,6 +1,7 @@
 import math
 import os
 import brotli
+from exceptions import *
 
 key = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
@@ -33,7 +34,8 @@ def move(axis: str, value: int):
         ]
     )
 
-    return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), 'big', signed=True)
+    return key[axis][pointer] + \
+        value.to_bytes(2 ** (pointer - 2), 'big', signed=True)
 
 
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -53,21 +55,21 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
             if filename == exceptFile:
                 continue
             pathfile = os.path.join(parent, filename)
-            arcname = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
-            zipf.write(pathfile, arcname)
+            arc_name = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
+            zipf.write(pathfile, arc_name)
     zipf.close()
 
 
-def formCMDblk(
-    command: str,
-    particularValue: int,
-    impluse: int = 0,
-    condition: bool = False,
-    needRedstone: bool = True,
-    tickDelay: int = 0,
-    customName: str = "",
-    executeOnFirstTick: bool = False,
-    trackOutput: bool = True,
+def formCMD_blk(
+        command: str,
+        particularValue: int,
+        impluse: int = 0,
+        condition: bool = False,
+        needRedstone: bool = True,
+        tickDelay: int = 0,
+        customName: str = "",
+        executeOnFirstTick: bool = False,
+        trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块放置指令项
@@ -113,7 +115,8 @@ def formCMDblk(
 
     :return:str
     """
-    block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
+    block = b"\x24" + \
+        particularValue.to_bytes(2, byteorder="big", signed=False)
 
     for i in [
         impluse.to_bytes(4, byteorder="big", signed=False),
@@ -130,12 +133,12 @@ def formCMDblk(
     return block
 
 
-def __fillSquareSideLength(total: int, maxHeight: int):
+def __fillSquareSideLength(total: int, max_height: int):
     """给定总方块数量和最大高度，返回所构成的图形外切正方形的边长
     :param total: 总方块数量
-    :param maxHeight: 最大高度
+    :param max_height: 最大高度
     :return: 外切正方形的边长 int"""
-    return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
+    return math.ceil(math.sqrt(math.ceil(total / max_height)))
 
 
 axisParticularValue = {
@@ -154,112 +157,123 @@ axisParticularValue = {
 }
 
 
-def toLineBDXbytes(
-    commands: list,
-    axis: str,
-    forward: bool,
+def toLineBDX_bytes(
+        commands: list,
+        axis: str,
+        forward: bool,
 ):
     _bytes = b''
+    impluse = 2
+    needRedstone = False
+    customName = ""
+    executeOnFirstTick = False
+    trackOutput = True
     for cmd, condition in commands:
-        _bytes += formCMDblk(
+        _bytes += formCMD_blk(
             cmd,
             axisParticularValue[axis][forward],
-            impluse=2,
+            impluse=impluse,
             condition=condition,
-            needRedstone=False,
-            tickDelay=0,
-            customName="",
-            executeOnFirstTick=False,
-            trackOutput=True,
+            needRedstone=needRedstone,
+            customName=customName,
+            executeOnFirstTick=executeOnFirstTick,
+            trackOutput=trackOutput,
         ) + move(axis, 1 if forward else -1)
     return _bytes
 
 
-def toBDXbytes(
-    commands: list,
-    maxheight: int = 64,
+def toBDX_bytes(
+        commands: list,
+        max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 条件)
-    :param maxheight: 生成结构最大高度
+    :param max_height: 生成结构最大高度
     :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
     """
 
-    _sideLength = __fillSquareSideLength(len(commands), maxheight)
+    _sideLength = __fillSquareSideLength(len(commands), max_height)
     _bytes = b''
 
-    yforward = True
-    zforward = True
+    y_forward = True
+    z_forward = True
 
-    nowy = 0
-    nowz = 0
-    nowx = 0
+    now_y = 0
+    now_z = 0
+    now_x = 0
 
-    for cmd, condition in commands:
-        _bytes += formCMDblk(
+    for cmd, delay in commands:
+        impluse = 2
+        condition = False
+        needRedstone = False
+        tickDelay = delay
+        customName = ""
+        executeOnFirstTick = False
+        trackOutput = True
+        _bytes += formCMD_blk(
             cmd,
-            (1 if yforward else 0)
+            (1 if y_forward else 0)
             if (
-                ((nowy != 0) and (not yforward))
-                or ((yforward) and (nowy != (maxheight - 1)))
+                ((now_y != 0) and (not y_forward))
+                or (y_forward and (now_y != (max_height - 1)))
             )
-            else (3 if zforward else 2)
+            else (3 if z_forward else 2)
             if (
-                ((nowz != 0) and (not zforward))
-                or ((zforward) and (nowz != _sideLength))
+                ((now_z != 0) and (not z_forward))
+                or (z_forward and (now_z != _sideLength))
             )
             else 5,
-            impluse=2,
+            impluse=impluse,
             condition=condition,
-            needRedstone=False,
-            tickDelay=0,
-            customName="",
-            executeOnFirstTick=False,
-            trackOutput=True,
+            needRedstone=needRedstone,
+            tickDelay=tickDelay,
+            customName=customName,
+            executeOnFirstTick=executeOnFirstTick,
+            trackOutput=trackOutput,
         )
 
-        nowy += 1 if yforward else -1
+        now_y += 1 if y_forward else -1
 
-        if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
-            nowy -= 1 if yforward else -1
+        if ((now_y >= max_height) and y_forward) or (
+                (now_y < 0) and (not y_forward)):
+            now_y -= 1 if y_forward else -1
 
-            yforward = not yforward
+            y_forward = not y_forward
 
-            nowz += 1 if zforward else -1
+            now_z += 1 if z_forward else -1
 
-            if ((nowz > _sideLength) and (zforward)) or ((nowz < 0) and (not zforward)):
-                nowz -= 1 if zforward else -1
-                zforward = not zforward
+            if ((now_z > _sideLength) and z_forward) or (
+                    (now_z < 0) and (not z_forward)):
+                now_z -= 1 if z_forward else -1
+                z_forward = not z_forward
                 _bytes += key[x][1]
-                nowx += 1
+                now_x += 1
             else:
 
-                _bytes += key[z][int(zforward)]
+                _bytes += key[z][int(z_forward)]
 
         else:
 
-            _bytes += key[y][int(yforward)]
+            _bytes += key[y][int(y_forward)]
 
     return (
         _bytes,
-        [nowx + 1, maxheight if nowx or nowz else nowy, _sideLength if nowx else nowz],
-        [nowx, nowy, nowz],
+        [now_x + 1, max_height if now_x or now_z else now_y, _sideLength if now_x else now_z],
+        [now_x, now_y, now_z],
     )
 
 
-
-
 def toBDXfile(
-    funcList: list,
-    author: str = "Eilles",
-    maxheight: int = 64,
-    outfile: str = "./test.bdx",
+        funcList: list,
+        author: str = "Eilles",
+        max_height: int = 64,
+        outfile: str = "./test.bdx",
 ):
     """
-    :funcList list: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
+    :param funcList: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
     :param author: 作者名称
-    :param maxheight: 生成结构最大高度
-    :outfile: str 输出文件
+    :param max_height: 生成结构最大高度
+    :param outfile: str 输出文件
     :return 成功与否，指令总长度，指令总延迟，指令结构总大小，画笔最终坐标
     """
 
@@ -267,13 +281,13 @@ def toBDXfile(
         f.write("BD@")
 
     _bytes = (
-        b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
+            b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
     )
     totalSize = {x: 0, y: 0, z: 0}
     totalLen = 0
     for func in funcList:
         totalLen += len(func)
-        cmdBytes, size, finalPos = toBDXbytes(func, maxheight)
+        cmdBytes, size, finalPos = toBDX_bytes(func, max_height)
         _bytes += cmdBytes
         _bytes += move(x, 2)
         _bytes += move(y, -finalPos[1])
@@ -283,27 +297,27 @@ def toBDXfile(
         totalSize[z] = max(totalSize[z], size[2])
 
     with open(
-        os.path.abspath(outfile),
-        "ab+",
+            os.path.abspath(outfile),
+            "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
 
-    return (True, totalLen, 0, list(totalSize.values()), finalPos)
-
+    return True, totalLen, 0, list(totalSize.values()), finalPos
 
 
 def toLineBDXfile(
-    funcList: list,
-    axis_: str,
-    forward_: bool,
-    author: str = "Eilles",
-    outfile: str = "./test.bdx",
+        funcList: list,
+        axis_: str,
+        forward_: bool,
+        author: str = "Eilles",
+        outfile: str = "./test.bdx",
 ):
     """
-    :funcList list: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
+    :param funcList: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
+    :param axis_:
+    :param forward_:
     :param author: 作者名称
-    :param maxheight: 生成结构最大高度
-    :outfile: str 输出文件
+    :param outfile: str 输出文件
     :return 成功与否，指令总长度，指令总延迟，指令结构总大小，画笔最终坐标
     """
 
@@ -311,38 +325,39 @@ def toLineBDXfile(
         f.write("BD@")
 
     _bytes = (
-        b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
+            b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
     )
     totalSize = {x: 0, y: 0, z: 0}
     totalLen = 0
     for func in funcList:
         totalLen += len(func)
-        _bytes += toLineBDXbytes(func, axis_, forward_)
+        _bytes += toLineBDX_bytes(func, axis_, forward_)
         _bytes += move(z if axis_ == x else x, 2)
 
         totalSize[z if axis_ == x else x] += 2
         totalSize[axis_] = max(totalSize[axis_], len(func))
 
     with open(
-        os.path.abspath(outfile),
-        "ab+",
+            os.path.abspath(outfile),
+            "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
 
-    return (True, totalLen, 0, list(totalSize.values()))
+    return True, totalLen, 0, list(totalSize.values())
 
-def formatipt(notice: str, fun, errnote: str = "", *extraArg):
-    '''循环输入，以某种格式
+
+def format_ipt(notice: str, fun, err_note: str = "", *extraArg):
+    """循环输入，以某种格式
     notice: 输入时的提示
     fun: 格式函数
-    errnote: 输入不符格式时的提示
-    *extraArg: 对于函数的其他参数'''
+    err_note: 输入不符格式时的提示
+    *extraArg: 对于函数的其他参数"""
     while True:
         result = input(notice)
         try:
-            funresult = fun(result, *extraArg)
+            fun_result = fun(result, *extraArg)
             break
-        except:
-            print(errnote)
+        except BaseError:
+            print(err_note)
             continue
-    return result, funresult
+    return result, fun_result

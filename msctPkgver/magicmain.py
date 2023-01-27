@@ -73,7 +73,7 @@ def _toCmdList_m1(
                         / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                     )
                     maxscore = max(maxscore, nowscore)
-                    soundID, _X = self.__Inst2soundIDwithX(instrumentID)
+                    soundID, _X = self.__Inst2soundID_withX(instrumentID)
                     singleTrack.append(
                         "execute @a[scores={" +
                         str(scoreboardname) +

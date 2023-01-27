@@ -32,7 +32,8 @@ def move(axis: str, value: int):
         ]
     )
 
-    return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), 'big', signed=True)
+    return key[axis][pointer] + \
+        value.to_bytes(2 ** (pointer - 2), 'big', signed=True)
 
 
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -52,21 +53,21 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
             if filename == exceptFile:
                 continue
             pathfile = os.path.join(parent, filename)
-            arcname = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
-            zipf.write(pathfile, arcname)
+            arc_name = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
+            zipf.write(pathfile, arc_name)
     zipf.close()
 
 
-def formCMDblk(
-    command: str,
-    particularValue: int,
-    impluse: int = 0,
-    condition: bool = False,
-    needRedstone: bool = True,
-    tickDelay: int = 0,
-    customName: str = "",
-    executeOnFirstTick: bool = False,
-    trackOutput: bool = True,
+def formCMD_blk(
+        command: str,
+        particularValue: int,
+        impluse: int = 0,
+        condition: bool = False,
+        needRedstone: bool = True,
+        tickDelay: int = 0,
+        customName: str = "",
+        executeOnFirstTick: bool = False,
+        trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块放置指令项
@@ -112,7 +113,8 @@ def formCMDblk(
 
     :return:str
     """
-    block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
+    block = b"\x24" + \
+        particularValue.to_bytes(2, byteorder="big", signed=False)
 
     for i in [
         impluse.to_bytes(4, byteorder="big", signed=False),
@@ -137,73 +139,82 @@ def __fillSquareSideLength(total: int, maxHeight: int):
     return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
 
 
-def toBDXbytes(
-    commands: list,
-    maxheight: int = 64,
+def toBDX_bytes(
+        commands: list,
+        max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 延迟)
-    :param maxheight: 生成结构最大高度
+    :param max_height: 生成结构最大高度
     :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
     """
 
-    _sideLength = __fillSquareSideLength(len(commands), maxheight)
+    _sideLength = __fillSquareSideLength(len(commands), max_height)
     _bytes = b''
 
-    yforward = True
-    zforward = True
+    y_forward = True
+    z_forward = True
 
-    nowy = 0
-    nowz = 0
-    nowx = 0
+    now_y = 0
+    now_z = 0
+    now_x = 0
 
     for cmd, delay in commands:
-        _bytes += formCMDblk(
+        impluse = 2
+        condition = False
+        needRedstone = False
+        tickDelay = delay
+        customName = ""
+        executeOnFirstTick = False
+        trackOutput = True
+        _bytes += formCMD_blk(
             cmd,
-            (1 if yforward else 0)
+            (1 if y_forward else 0)
             if (
-                ((nowy != 0) and (not yforward))
-                or ((yforward) and (nowy != (maxheight - 1)))
+                ((now_y != 0) and (not y_forward))
+                or (y_forward and (now_y != (max_height - 1)))
             )
-            else (3 if zforward else 2)
+            else (3 if z_forward else 2)
             if (
-                ((nowz != 0) and (not zforward))
-                or ((zforward) and (nowz != _sideLength))
+                ((now_z != 0) and (not z_forward))
+                or (z_forward and (now_z != _sideLength))
             )
             else 5,
-            impluse=2,
-            condition=False,
-            needRedstone=False,
-            tickDelay=delay,
-            customName="",
-            executeOnFirstTick=False,
-            trackOutput=True,
+            impluse=impluse,
+            condition=condition,
+            needRedstone=needRedstone,
+            tickDelay=tickDelay,
+            customName=customName,
+            executeOnFirstTick=executeOnFirstTick,
+            trackOutput=trackOutput,
         )
 
-        nowy += 1 if yforward else -1
+        now_y += 1 if y_forward else -1
 
-        if ((nowy >= maxheight) and (yforward)) or ((nowy < 0) and (not yforward)):
-            nowy -= 1 if yforward else -1
+        if ((now_y >= max_height) and y_forward) or (
+                (now_y < 0) and (not y_forward)):
+            now_y -= 1 if y_forward else -1
 
-            yforward = not yforward
+            y_forward = not y_forward
 
-            nowz += 1 if zforward else -1
+            now_z += 1 if z_forward else -1
 
-            if ((nowz > _sideLength) and (zforward)) or ((nowz < 0) and (not zforward)):
-                nowz -= 1 if zforward else -1
-                zforward = not zforward
+            if ((now_z > _sideLength) and z_forward) or (
+                    (now_z < 0) and (not z_forward)):
+                now_z -= 1 if z_forward else -1
+                z_forward = not z_forward
                 _bytes += key[x][1]
-                nowx += 1
+                now_x += 1
             else:
 
-                _bytes += key[z][int(zforward)]
+                _bytes += key[z][int(z_forward)]
 
         else:
 
-            _bytes += key[y][int(yforward)]
+            _bytes += key[y][int(y_forward)]
 
     return (
         _bytes,
-        [nowx + 1, maxheight if nowx or nowz else nowy, _sideLength if nowx else nowz],
-        [nowx, nowy, nowz],
+        [now_x + 1, max_height if now_x or now_z else now_y, _sideLength if now_x else now_z],
+        [now_x, now_y, now_z],
     )

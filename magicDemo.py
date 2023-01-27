@@ -17,6 +17,10 @@ Copyright 2023 all the developers of Musicreater
 Terms & Conditions: ./Lisence.md
 """
 
+import datetime
+import random
+import os
+import sys
 languages = {
     "ZH_CN": {
         "MSCT": "音·创",
@@ -61,11 +65,9 @@ languages = {
 }
 
 
-import sys
-
 if sys.argv.__len__() > 0:
     currentLang = sys.argv[0]
-    if not currentLang in languages.keys():
+    if currentLang not in languages.keys():
         currentLang = "ZH_CN"
 else:
     currentLang = "ZH_CN"
@@ -77,10 +79,6 @@ def _(__):
     '''
     return languages[currentLang][__]
 
-
-import os
-import random
-import datetime
 
 try:
     import msctPkgver
@@ -97,7 +95,7 @@ try:
     # import zhdate
 except ModuleNotFoundError as E:
     if input(
-        "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
+            "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
     ).lower() in ('y', '1'):
         open("Demo_Requirements.txt", 'w').write(
             "requests==2.28.1\nrich==12.6.0\nzhdate==0.1"
@@ -110,37 +108,31 @@ except ModuleNotFoundError as E:
     else:
         raise E
 
-
-
 MainConsole.print(
     "[#121110 on #F0F2F4]     ",
     style="#121110 on #F0F2F4",
     justify="center",
 )
 
-
 # 显示大标题
-MainConsole.rule(title="[bold #AB70FF]欢迎使用音·创独立转换器", characters="=", style="#26E2FF")
 MainConsole.rule(
-    title="[bold #AB70FF]Welcome to Independent Musicreater Convernter", characters="-"
-)
+    title="[bold #AB70FF]欢迎使用音·创独立转换器",
+    characters="=",
+    style="#26E2FF")
+MainConsole.rule(
+    title="[bold #AB70FF]Welcome to Independent Musicreater Convernter",
+    characters="-")
 
 nowYang = datetime.datetime.now()
 
 if nowYang.month == 8 and nowYang.day == 6:
     # 诸葛八卦生日
-    MainConsole.print(
-        "[#7DB5F0 on #121110]今天可不是催更的日子！\n诸葛亮与八卦阵{}岁生日快乐！".format(nowYang.year - 2009),
-        style="#7DB5F0 on #121110",
-        justify="center",
-    )
+    MainConsole.print("[#7DB5F0 on #121110]今天可不是催更的日子！\n诸葛亮与八卦阵{}岁生日快乐！".format(
+        nowYang.year - 2009), style="#7DB5F0 on #121110", justify="center", )
 elif nowYang.month == 4 and nowYang.day == 3:
     # 金羿生日快乐
-    MainConsole.print(
-        "[#0089F2 on #F0F2F4]今天就不要催更啦！\n金羿{}岁生日快乐！".format(nowYang.year - 2006),
-        style="#0089F2 on #F0F2F4",
-        justify="center",
-    )
+    MainConsole.print("[#0089F2 on #F0F2F4]今天就不要催更啦！\n金羿{}岁生日快乐！".format(
+        nowYang.year - 2006), style="#0089F2 on #F0F2F4", justify="center", )
 else:
     # 显示箴言部分
     MainConsole.print(
@@ -159,11 +151,12 @@ else:
 
 prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
 
+
 def formatipt(
-    notice: str,
-    fun,
-    errnote: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
-    *extraArg,
+        notice: str,
+        fun,
+        errnote: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
+        *extraArg,
 ):
     '''循环输入，以某种格式
     notice: 输入时的提示
@@ -175,11 +168,11 @@ def formatipt(
         try:
             funresult = fun(result, *extraArg)
             break
-        except:
+        except BaseException:
             prt(errnote)
             continue
     return result, funresult
-    
+
 
 # 获取midi列表
 while True:
@@ -210,7 +203,6 @@ outpath = formatipt(
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
 )[0].lower()
 
-
 # 选择输出格式
 while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
@@ -237,11 +229,13 @@ while True:
     break
 
 debug = False
+
+
 # 真假字符串判断
 def boolstr(sth: str) -> bool:
     try:
         return bool(int(sth))
-    except:
+    except BaseException:
         if str(sth).lower() == 'true':
             return True
         elif str(sth).lower() == 'false':
@@ -249,9 +243,11 @@ def boolstr(sth: str) -> bool:
         else:
             raise "布尔字符串啊？"
 
+
 if os.path.exists("./demo_config.json"):
     import json
-    prompts = json.load(open("./demo_config.json",'r',encoding="utf-8"))
+
+    prompts = json.load(open("./demo_config.json", 'r', encoding="utf-8"))
     if prompts[-1] == "debug":
         debug = True
     prompts = prompts[:-1]
@@ -302,21 +298,16 @@ else:
         if args:
             prompts.append(formatipt(*args)[1])
 
-
-
-
-
-
 conversion = msctPkgver.midiConvert(debug)
 for singleMidi in midis:
     prt("\n"f"{_('Dealing')} {singleMidi} {_(':')}")
     conversion.convert(singleMidi, outpath)
     if debug:
-        with open("./records.json",'a',encoding="utf-8") as f:
-            json.dump(conversion.toDICT(),f)
-            f.write(5*"\n")
+        with open("./records.json", 'a', encoding="utf-8") as f:
+            json.dump(conversion.toDICT(), f)
+            f.write(5 * "\n")
     conversion_result = (
-        conversion.tomcpack(2, *prompts)
+        conversion.to_mcpack(2, *prompts)
         if fileFormat == 0
         else (
             conversion.toBDXfile(2, *prompts)
@@ -324,7 +315,7 @@ for singleMidi in midis:
             else conversion.toBDXfile_withDelay(2, *prompts)
         )
     )
-    
+
     if conversion_result[0]:
         prt(
             f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
@@ -332,11 +323,11 @@ for singleMidi in midis:
     else:
         prt(f"{_('Failed')}")
 
-
 exitSth = ipt(_("PressEnterExit")).lower()
 if exitSth == "record":
     import json
-    with open("./demo_config.json",'w',encoding="utf-8") as f:
-        json.dump(prompts,f)
+
+    with open("./demo_config.json", 'w', encoding="utf-8") as f:
+        json.dump(prompts, f)
 elif exitSth == "delrec":
     os.remove("./demo_config.json")
