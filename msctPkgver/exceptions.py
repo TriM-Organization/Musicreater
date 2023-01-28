@@ -27,7 +27,9 @@ class MSCTBaseException(Exception):
     def __init__(self, *args):
         super().__init__(*args)
 
-    def miao(self, ):
+    def miao(
+        self,
+    ):
         for i in self.args:
             print(i + "喵！")
 
@@ -37,29 +39,35 @@ class MSCTBaseException(Exception):
 
 class CrossNoteError(MSCTBaseException):
     """同通道下同音符交叉出现所产生的错误"""
+
     pass
 
 
 class NotDefineTempoError(MSCTBaseException):
     """没有Tempo设定导致时间无法计算的错误"""
+
     pass
 
 
 class MidiDestroyedError(MSCTBaseException):
     """Midi文件损坏"""
+
     pass
 
 
 class ChannelOverFlowError(MSCTBaseException):
     """一个midi中含有过多的通道（数量应≤16）"""
+
     pass
 
 
 class NotDefineProgramError(MSCTBaseException):
     """没有Program设定导致没有乐器可以选择的错误"""
+
     pass
 
 
 class BaseError(BaseException):
     """专门骗过PEP8的错误"""
+
     pass

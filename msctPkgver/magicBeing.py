@@ -10,20 +10,20 @@ OverflowMethod = Literal["fold", "crop", "ellipsis", "ignore"]
 
 # 高级的打印函数
 def prt(
-        *objects: Any,
-        sep: str = " ",
-        end: str = "\n",
-        justify: Optional[JustifyMethod] = None,
-        overflow: Optional[OverflowMethod] = None,
-        no_wrap: Optional[bool] = None,
-        emoji: Optional[bool] = None,
-        markup: Optional[bool] = None,
-        highlight: Optional[bool] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        crop: bool = True,
-        soft_wrap: Optional[bool] = None,
-        new_line_start: bool = False,
+    *objects: Any,
+    sep: str = " ",
+    end: str = "\n",
+    justify: Optional[JustifyMethod] = None,
+    overflow: Optional[OverflowMethod] = None,
+    no_wrap: Optional[bool] = None,
+    emoji: Optional[bool] = None,
+    markup: Optional[bool] = None,
+    highlight: Optional[bool] = None,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    crop: bool = True,
+    soft_wrap: Optional[bool] = None,
+    new_line_start: bool = False,
 ) -> None:
     """打印到控制台。
 
@@ -64,21 +64,21 @@ def prt(
 
 # 高级的输入函数
 def ipt(
-        *objects: Any,
-        sep: str = " ",
-        justify: Optional[JustifyMethod] = None,
-        overflow: Optional[OverflowMethod] = None,
-        no_wrap: Optional[bool] = None,
-        emoji: Optional[bool] = None,
-        markup: Optional[bool] = None,
-        highlight: Optional[bool] = None,
-        width: Optional[int] = None,
-        height: Optional[int] = None,
-        crop: bool = True,
-        soft_wrap: Optional[bool] = None,
-        new_line_start: bool = False,
-        password: bool = False,
-        stream: Optional[TextIO] = None,
+    *objects: Any,
+    sep: str = " ",
+    justify: Optional[JustifyMethod] = None,
+    overflow: Optional[OverflowMethod] = None,
+    no_wrap: Optional[bool] = None,
+    emoji: Optional[bool] = None,
+    markup: Optional[bool] = None,
+    highlight: Optional[bool] = None,
+    width: Optional[int] = None,
+    height: Optional[int] = None,
+    crop: bool = True,
+    soft_wrap: Optional[bool] = None,
+    new_line_start: bool = False,
+    password: bool = False,
+    stream: Optional[TextIO] = None,
 ) -> str:
     """显示一个提示并等待用户的输入。
 
@@ -126,10 +126,10 @@ def ipt(
 
 
 def format_ipt(
-        notice: str,
-        fun,
-        err_note: str = "",
-        *extraArg,
+    notice: str,
+    fun,
+    err_note: str = "",
+    *extraArg,
 ):
     """循环输入，以某种格式
     notice: 输入时的提示

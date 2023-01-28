@@ -4,7 +4,7 @@
 # 音·创 开发交流群 861684859
 # Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需转载或借鉴 许可声明请查看仓库目录下的 Lisence.md
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
 """
@@ -13,14 +13,15 @@ Musicreater Package Version : Demo for Midi Conversion
 
 Copyright 2023 all the developers of Musicreater
 
-开源相关声明请见 ./Lisence.md
-Terms & Conditions: ./Lisence.md
+开源相关声明请见 ./License.md
+Terms & Conditions: ./Lisense.md
 """
 
 import datetime
 import random
 import os
 import sys
+
 languages = {
     "ZH_CN": {
         "MSCT": "音·创",
@@ -64,7 +65,6 @@ languages = {
     }
 }
 
-
 if sys.argv.__len__() > 0:
     currentLang = sys.argv[0]
     if currentLang not in languages.keys():
@@ -74,16 +74,16 @@ else:
 
 
 def _(__):
-    '''
+    """
     `languages`
-    '''
+    """
     return languages[currentLang][__]
 
 
 try:
     import msctPkgver
 except ModuleNotFoundError as E:
-    if input("您需要安装 mido、Brotli 模块才能使用这个样例\n请问是否安装？(y/n)：").lower() in ('y', '1'):
+    if input("您需要安装 mido、Brotli 模块才能使用这个样例\n请问是否安装？(y/n)：").lower() in ("y", "1"):
         os.system("pip install -r requirements.txt")
         import msctPkgver
     else:
@@ -92,12 +92,13 @@ except ModuleNotFoundError as E:
 try:
     from msctPkgver.magicBeing import *
     import requests
+
     # import zhdate
 except ModuleNotFoundError as E:
     if input(
-            "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
-    ).lower() in ('y', '1'):
-        open("Demo_Requirements.txt", 'w').write(
+        "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
+    ).lower() in ("y", "1"):
+        open("Demo_Requirements.txt", "w").write(
             "requests==2.28.1\nrich==12.6.0\nzhdate==0.1"
         )
         os.system("pip install -r Demo_Requirements.txt")
@@ -115,34 +116,37 @@ MainConsole.print(
 )
 
 # 显示大标题
+MainConsole.rule(title="[bold #AB70FF]欢迎使用音·创独立转换器", characters="=", style="#26E2FF")
 MainConsole.rule(
-    title="[bold #AB70FF]欢迎使用音·创独立转换器",
-    characters="=",
-    style="#26E2FF")
-MainConsole.rule(
-    title="[bold #AB70FF]Welcome to Independent Musicreater Convernter",
-    characters="-")
+    title="[bold #AB70FF]Welcome to Independent Musicreater Converter", characters="-"
+)
 
 nowYang = datetime.datetime.now()
 
 if nowYang.month == 8 and nowYang.day == 6:
     # 诸葛八卦生日
-    MainConsole.print("[#7DB5F0 on #121110]今天可不是催更的日子！\n诸葛亮与八卦阵{}岁生日快乐！".format(
-        nowYang.year - 2009), style="#7DB5F0 on #121110", justify="center", )
+    MainConsole.print(
+        "[#7DB5F0 on #121110]今天可不是催更的日子！\n诸葛亮与八卦阵{}岁生日快乐！".format(nowYang.year - 2009),
+        style="#7DB5F0 on #121110",
+        justify="center",
+    )
 elif nowYang.month == 4 and nowYang.day == 3:
     # 金羿生日快乐
-    MainConsole.print("[#0089F2 on #F0F2F4]今天就不要催更啦！\n金羿{}岁生日快乐！".format(
-        nowYang.year - 2006), style="#0089F2 on #F0F2F4", justify="center", )
+    MainConsole.print(
+        "[#0089F2 on #F0F2F4]今天就不要催更啦！\n金羿{}岁生日快乐！".format(nowYang.year - 2006),
+        style="#0089F2 on #F0F2F4",
+        justify="center",
+    )
 else:
     # 显示箴言部分
     MainConsole.print(
         "[#121110 on #F0F2F4]{}".format(
             random.choice(
                 requests.get(
-                    'https://gitee.com/EillesWan/Musicreater/raw/master/resources/myWords.txt'
+                    "https://gitee.com/EillesWan/Musicreater/raw/master/resources/myWords.txt"
                 )
-                .text.strip('\r\n')
-                .split('\r\n')
+                .text.strip("\r\n")
+                .split("\r\n")
             )
         ),
         style="#121110 on #F0F2F4",
@@ -152,40 +156,40 @@ else:
 prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
 
 
-def formatipt(
-        notice: str,
-        fun,
-        errnote: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
-        *extraArg,
+def format_ipt(
+    notice: str,
+    fun,
+    err_note: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
+    *extraArg,
 ):
-    '''循环输入，以某种格式
+    """循环输入，以某种格式
     notice: 输入时的提示
     fun: 格式函数
-    errnote: 输入不符格式时的提示
-    *extraArg: 对于函数的其他参数'''
+    err_note: 输入不符格式时的提示
+    *extraArg: 对于函数的其他参数"""
     while True:
         result = ipt(notice)
         try:
-            funresult = fun(result, *extraArg)
+            fun_result = fun(result, *extraArg)
             break
-        except BaseException:
-            prt(errnote)
+        except BaseError:
+            prt(err_note)
             continue
-    return result, funresult
+    return result, fun_result
 
 
 # 获取midi列表
 while True:
-    midipath = ipt(f"{_('ChoosePath')}{_(':')}").lower()
-    if os.path.exists(midipath):
-        if os.path.isfile(midipath):
-            midis = (midipath,)
-        elif os.path.isdir(midipath):
+    midi_path = ipt(f"{_('ChoosePath')}{_(':')}").lower()
+    if os.path.exists(midi_path):
+        if os.path.isfile(midi_path):
+            midis = (midi_path,)
+        elif os.path.isdir(midi_path):
             midis = tuple(
                 (
-                    os.path.join(midipath, i)
-                    for i in os.listdir(midipath)
-                    if i.lower().endswith('.mid') or i.lower().endswith('.midi')
+                    os.path.join(midi_path, i)
+                    for i in os.listdir(midi_path)
+                    if i.lower().endswith(".mid") or i.lower().endswith(".midi")
                 )
             )
         else:
@@ -197,7 +201,7 @@ while True:
     break
 
 # 获取输出地址
-outpath = formatipt(
+out_path = format_ipt(
     f"{_('ChooseOutPath')}{_(':')}",
     os.path.exists,
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
@@ -206,18 +210,18 @@ outpath = formatipt(
 # 选择输出格式
 while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
-    if fileFormat in ('0', 'mcpack'):
+    if fileFormat in ("0", "mcpack"):
         fileFormat = 0
         playerFormat = 1
         break
 
-    elif fileFormat in ('1', 'bdx'):
+    elif fileFormat in ("1", "bdx"):
         fileFormat = 1
         while True:
             playerFormat = ipt(f"{_('ChoosePlayer')}{_(':')}").lower()
-            if playerFormat in ('0', '延迟', 'delay'):
+            if playerFormat in ("0", "延迟", "delay"):
                 playerFormat = 0
-            elif playerFormat in ('1', '计分板', 'scoreboard'):
+            elif playerFormat in ("1", "计分板", "scoreboard"):
                 playerFormat = 1
             else:
                 prt(f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}")
@@ -232,13 +236,13 @@ debug = False
 
 
 # 真假字符串判断
-def boolstr(sth: str) -> bool:
+def bool_str(sth: str) -> bool:
     try:
         return bool(int(sth))
-    except BaseException:
-        if str(sth).lower() == 'true':
+    except BaseError:
+        if str(sth).lower() == "true":
             return True
-        elif str(sth).lower() == 'false':
+        elif str(sth).lower() == "false":
             return False
         else:
             raise "布尔字符串啊？"
@@ -247,7 +251,7 @@ def boolstr(sth: str) -> bool:
 if os.path.exists("./demo_config.json"):
     import json
 
-    prompts = json.load(open("./demo_config.json", 'r', encoding="utf-8"))
+    prompts = json.load(open("./demo_config.json", "r", encoding="utf-8"))
     if prompts[-1] == "debug":
         debug = True
     prompts = prompts[:-1]
@@ -265,7 +269,7 @@ else:
         ),
         (
             f'{_("WhetherPgb")}{_(":")}',
-            boolstr,
+            bool_str,
         ),
         (
             f'{_("EnterSbName")}{_(":")}',
@@ -278,7 +282,7 @@ else:
         ),
         (
             f'{_("WhetherSbReset")}{_(":")}',
-            boolstr,
+            bool_str,
         )
         if playerFormat == 1
         else (),
@@ -296,14 +300,14 @@ else:
         else (),
     ]:
         if args:
-            prompts.append(formatipt(*args)[1])
+            prompts.append(format_ipt(*args)[1])
 
 conversion = msctPkgver.midiConvert(debug)
 for singleMidi in midis:
-    prt("\n"f"{_('Dealing')} {singleMidi} {_(':')}")
-    conversion.convert(singleMidi, outpath)
+    prt("\n" f"{_('Dealing')} {singleMidi} {_(':')}")
+    conversion.convert(singleMidi, out_path)
     if debug:
-        with open("./records.json", 'a', encoding="utf-8") as f:
+        with open("./records.json", "a", encoding="utf-8") as f:
             json.dump(conversion.toDICT(), f)
             f.write(5 * "\n")
     conversion_result = (
@@ -317,8 +321,13 @@ for singleMidi in midis:
     )
 
     if conversion_result[0]:
+        c3 = conversion_result[3]
+        c4 = conversion_result[4]
+        fF = fileFormat
         prt(
-            f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
+            f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}"
+            f"{conversion_result[2]}"
+            f"{f'''{_(',')}{_('PlaceSize')}{_(':')}{c3}{_(',')}{_('LastPos')}{_(':')}{c4}''' if fF == 1 else ''}"
         )
     else:
         prt(f"{_('Failed')}")
@@ -327,7 +336,7 @@ exitSth = ipt(_("PressEnterExit")).lower()
 if exitSth == "record":
     import json
 
-    with open("./demo_config.json", 'w', encoding="utf-8") as f:
+    with open("./demo_config.json", "w", encoding="utf-8") as f:
         json.dump(prompts, f)
 elif exitSth == "delrec":
     os.remove("./demo_config.json")

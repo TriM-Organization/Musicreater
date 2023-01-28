@@ -18,7 +18,7 @@ z = "z"
 
 def move(axis: str, value: int):
     if value == 0:
-        return b''
+        return b""
     if abs(value) == 1:
         return key[axis][0 if value == -1 else 1]
 
@@ -34,8 +34,7 @@ def move(axis: str, value: int):
         ]
     )
 
-    return key[axis][pointer] + \
-        value.to_bytes(2 ** (pointer - 2), 'big', signed=True)
+    return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), "big", signed=True)
 
 
 def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -61,15 +60,15 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
 
 
 def formCMD_blk(
-        command: str,
-        particularValue: int,
-        impluse: int = 0,
-        condition: bool = False,
-        needRedstone: bool = True,
-        tickDelay: int = 0,
-        customName: str = "",
-        executeOnFirstTick: bool = False,
-        trackOutput: bool = True,
+    command: str,
+    particularValue: int,
+    impluse: int = 0,
+    condition: bool = False,
+    needRedstone: bool = True,
+    tickDelay: int = 0,
+    customName: str = "",
+    executeOnFirstTick: bool = False,
+    trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块放置指令项
@@ -115,8 +114,7 @@ def formCMD_blk(
 
     :return:str
     """
-    block = b"\x24" + \
-        particularValue.to_bytes(2, byteorder="big", signed=False)
+    block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
 
     for i in [
         impluse.to_bytes(4, byteorder="big", signed=False),
@@ -158,11 +156,11 @@ axisParticularValue = {
 
 
 def toLineBDX_bytes(
-        commands: list,
-        axis: str,
-        forward: bool,
+    commands: list,
+    axis: str,
+    forward: bool,
 ):
-    _bytes = b''
+    _bytes = b""
     impluse = 2
     needRedstone = False
     customName = ""
@@ -183,8 +181,8 @@ def toLineBDX_bytes(
 
 
 def toBDX_bytes(
-        commands: list,
-        max_height: int = 64,
+    commands: list,
+    max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 条件)
@@ -193,7 +191,7 @@ def toBDX_bytes(
     """
 
     _sideLength = __fillSquareSideLength(len(commands), max_height)
-    _bytes = b''
+    _bytes = b""
 
     y_forward = True
     z_forward = True
@@ -234,8 +232,7 @@ def toBDX_bytes(
 
         now_y += 1 if y_forward else -1
 
-        if ((now_y >= max_height) and y_forward) or (
-                (now_y < 0) and (not y_forward)):
+        if ((now_y >= max_height) and y_forward) or ((now_y < 0) and (not y_forward)):
             now_y -= 1 if y_forward else -1
 
             y_forward = not y_forward
@@ -243,7 +240,8 @@ def toBDX_bytes(
             now_z += 1 if z_forward else -1
 
             if ((now_z > _sideLength) and z_forward) or (
-                    (now_z < 0) and (not z_forward)):
+                (now_z < 0) and (not z_forward)
+            ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
                 _bytes += key[x][1]
@@ -258,16 +256,20 @@ def toBDX_bytes(
 
     return (
         _bytes,
-        [now_x + 1, max_height if now_x or now_z else now_y, _sideLength if now_x else now_z],
+        [
+            now_x + 1,
+            max_height if now_x or now_z else now_y,
+            _sideLength if now_x else now_z,
+        ],
         [now_x, now_y, now_z],
     )
 
 
 def toBDXfile(
-        funcList: list,
-        author: str = "Eilles",
-        max_height: int = 64,
-        outfile: str = "./test.bdx",
+    funcList: list,
+    author: str = "Eilles",
+    max_height: int = 64,
+    outfile: str = "./test.bdx",
 ):
     """
     :param funcList: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
@@ -281,7 +283,7 @@ def toBDXfile(
         f.write("BD@")
 
     _bytes = (
-            b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
+        b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
     )
     totalSize = {x: 0, y: 0, z: 0}
     totalLen = 0
@@ -297,8 +299,8 @@ def toBDXfile(
         totalSize[z] = max(totalSize[z], size[2])
 
     with open(
-            os.path.abspath(outfile),
-            "ab+",
+        os.path.abspath(outfile),
+        "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
 
@@ -306,11 +308,11 @@ def toBDXfile(
 
 
 def toLineBDXfile(
-        funcList: list,
-        axis_: str,
-        forward_: bool,
-        author: str = "Eilles",
-        outfile: str = "./test.bdx",
+    funcList: list,
+    axis_: str,
+    forward_: bool,
+    author: str = "Eilles",
+    outfile: str = "./test.bdx",
 ):
     """
     :param funcList: 指令集列表： 指令系统[  指令集[  单个指令( str指令, bool条件性 ),  ],  ]
@@ -325,7 +327,7 @@ def toLineBDXfile(
         f.write("BD@")
 
     _bytes = (
-            b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
+        b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
     )
     totalSize = {x: 0, y: 0, z: 0}
     totalLen = 0
@@ -338,8 +340,8 @@ def toLineBDXfile(
         totalSize[axis_] = max(totalSize[axis_], len(func))
 
     with open(
-            os.path.abspath(outfile),
-            "ab+",
+        os.path.abspath(outfile),
+        "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
 

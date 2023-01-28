@@ -30,18 +30,14 @@ from .utils import *
 from .exceptions import *
 from typing import TypeVar, Union
 
-T = TypeVar('T')  # Declare type variable
+T = TypeVar("T")  # Declare type variable
 VM = TypeVar("VM", mido.MidiFile, None)  # void mido
 
 
 class SingleNote:
     def __init__(
-            self,
-            instrument: int,
-            pitch: int,
-            velocity,
-            startTime: int,
-            lastTime: int):
+        self, instrument: int, pitch: int, velocity, startTime: int, lastTime: int
+    ):
         """用于存储单个音符的类
         :param instrument 乐器编号
         :param pitch 音符编号
@@ -50,15 +46,15 @@ class SingleNote:
             注：此处的时间是用从乐曲开始到当前的毫秒数
         :param lastTime 音符延续时间(ms)"""
         self.instrument = instrument
-        '''乐器编号'''
+        """乐器编号"""
         self.note = pitch
-        '''音符编号'''
+        """音符编号"""
         self.velocity = velocity
-        '''力度/响度'''
+        """力度/响度"""
         self.startTime = startTime
-        '''开始之时 ms'''
+        """开始之时 ms"""
         self.lastTime = lastTime
-        '''音符持续时间 ms'''
+        """音符持续时间 ms"""
 
     @property
     def inst(self):
@@ -71,16 +67,13 @@ class SingleNote:
         return self.note
 
     def __str__(self):
-        return f"Note(inst = {self.inst}, pitch = {self.note}, velocity = {self.velocity}, " \
-               f"startTime = {self.startTime}, lastTime = {self.lastTime}, )"
+        return (
+            f"Note(inst = {self.inst}, pitch = {self.note}, velocity = {self.velocity}, "
+            f"startTime = {self.startTime}, lastTime = {self.lastTime}, )"
+        )
 
     def __tuple__(self):
-        return (
-            self.inst,
-            self.note,
-            self.velocity,
-            self.startTime,
-            self.lastTime)
+        return self.inst, self.note, self.velocity, self.startTime, self.lastTime
 
     def __dict__(self):
         return {
@@ -146,11 +139,7 @@ class midiConvert:
         self.midFileName: str = ""
         self.exeHead = ""
         self.methods = MethodList(
-            [
-                self._toCmdList_m1(),
-                self._toCmdList_m2(),
-                self._toCmdList_m3()
-            ]
+            [self._toCmdList_m1(), self._toCmdList_m2(), self._toCmdList_m3()]
         )
 
         self.methods_byDelay = MethodList(
@@ -166,11 +155,7 @@ class midiConvert:
             self.prt = prt
             self.ipt = ipt
 
-    def convert(
-            self,
-            midiFile: str,
-            outputPath: str,
-            oldExeFormat: bool = True):
+    def convert(self, midiFile: str, outputPath: str, oldExeFormat: bool = True):
         """转换前需要先运行此函数来获取基本信息"""
 
         self.midiFile = midiFile
@@ -349,53 +334,53 @@ class midiConvert:
         try:
             try:
                 return {
-                    34: ('note.bd', 7),
-                    35: ('note.bd', 7),
-                    36: ('note.hat', 7),
-                    37: ('note.snare', 7),
-                    38: ('note.snare', 7),
-                    39: ('note.snare', 7),
-                    40: ('note.hat', 7),
-                    41: ('note.snare', 7),
-                    42: ('note.hat', 7),
-                    43: ('note.snare', 7),
-                    44: ('note.snare', 7),
-                    45: ('note.bell', 4),
-                    46: ('note.snare', 7),
-                    47: ('note.snare', 7),
-                    48: ('note.bell', 4),
-                    49: ('note.hat', 7),
-                    50: ('note.bell', 4),
-                    51: ('note.bell', 4),
-                    52: ('note.bell', 4),
-                    53: ('note.bell', 4),
-                    54: ('note.bell', 4),
-                    55: ('note.bell', 4),
-                    56: ('note.snare', 7),
-                    57: ('note.hat', 7),
-                    58: ('note.chime', 4),
-                    59: ('note.iron_xylophone', 6),
-                    60: ('note.bd', 7),
-                    61: ('note.bd', 7),
-                    62: ('note.xylophone', 4),
-                    63: ('note.xylophone', 4),
-                    64: ('note.xylophone', 4),
-                    65: ('note.hat', 7),
-                    66: ('note.bell', 4),
-                    67: ('note.bell', 4),
-                    68: ('note.hat', 7),
-                    69: ('note.hat', 7),
-                    70: ('note.flute', 5),
-                    71: ('note.flute', 5),
-                    72: ('note.hat', 7),
-                    73: ('note.hat', 7),
-                    74: ('note.xylophone', 4),
-                    75: ('note.hat', 7),
-                    76: ('note.hat', 7),
-                    77: ('note.xylophone', 4),
-                    78: ('note.xylophone', 4),
-                    79: ('note.bell', 4),
-                    80: ('note.bell', 4),
+                    34: ("note.bd", 7),
+                    35: ("note.bd", 7),
+                    36: ("note.hat", 7),
+                    37: ("note.snare", 7),
+                    38: ("note.snare", 7),
+                    39: ("note.snare", 7),
+                    40: ("note.hat", 7),
+                    41: ("note.snare", 7),
+                    42: ("note.hat", 7),
+                    43: ("note.snare", 7),
+                    44: ("note.snare", 7),
+                    45: ("note.bell", 4),
+                    46: ("note.snare", 7),
+                    47: ("note.snare", 7),
+                    48: ("note.bell", 4),
+                    49: ("note.hat", 7),
+                    50: ("note.bell", 4),
+                    51: ("note.bell", 4),
+                    52: ("note.bell", 4),
+                    53: ("note.bell", 4),
+                    54: ("note.bell", 4),
+                    55: ("note.bell", 4),
+                    56: ("note.snare", 7),
+                    57: ("note.hat", 7),
+                    58: ("note.chime", 4),
+                    59: ("note.iron_xylophone", 6),
+                    60: ("note.bd", 7),
+                    61: ("note.bd", 7),
+                    62: ("note.xylophone", 4),
+                    63: ("note.xylophone", 4),
+                    64: ("note.xylophone", 4),
+                    65: ("note.hat", 7),
+                    66: ("note.bell", 4),
+                    67: ("note.bell", 4),
+                    68: ("note.hat", 7),
+                    69: ("note.hat", 7),
+                    70: ("note.flute", 5),
+                    71: ("note.flute", 5),
+                    72: ("note.hat", 7),
+                    73: ("note.hat", 7),
+                    74: ("note.xylophone", 4),
+                    75: ("note.hat", 7),
+                    76: ("note.hat", 7),
+                    77: ("note.xylophone", 4),
+                    78: ("note.xylophone", 4),
+                    79: ("note.bell", 4),
+                    80: ("note.bell", 4),
                 }[instrumentID]
             except BaseError:
                 return "note.bd", 7
@@ -412,17 +397,16 @@ class midiConvert:
 
     @staticmethod
     def __score2time(score: int):
-        return str(int(int(score / 20) / 60)) + ":" + \
-            str(int(int(score / 20) % 60))
+        return str(int(int(score / 20) / 60)) + ":" + str(int(int(score / 20) % 60))
 
     def __formProgressBar(
-            self,
-            maxscore: int,
-            scoreboard_name: str,
-            progressbar: tuple = (
-                r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-                ("§e=§r", "§7=§r"),
-            ),
+        self,
+        maxscore: int,
+        scoreboard_name: str,
+        progressbar: tuple = (
+            r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+            ("§e=§r", "§7=§r"),
+        ),
     ) -> list:
 
         pgs_style = progressbar[0]
@@ -439,7 +423,7 @@ class midiConvert:
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
         """
-        perEach = maxscore / pgs_style.count('_')
+        perEach = maxscore / pgs_style.count("_")
 
         result = []
 
@@ -451,20 +435,17 @@ class midiConvert:
 
         def replaceBar(_i):
             try:
-                return pgs_style.replace(
-                    '_',
-                    progressbar[1][0],
-                    _i +
-                    1).replace(
-                    '_',
-                    progressbar[1][1])
+                return pgs_style.replace("_", progressbar[1][0], _i + 1).replace(
+                    "_", progressbar[1][1]
+                )
             except BaseError:
-                return pgs_style.replace('_', progressbar[1][0], _i + 1)
+                return pgs_style.replace("_", progressbar[1][0], _i + 1)
 
         sbn_pc = scoreboard_name[:2]
         if r"%%%" in pgs_style:
             result.append(
-                "scoreboard objectives add {}PercT dummy \"百分比计算\"".format(sbn_pc))
+                'scoreboard objectives add {}PercT dummy "百分比计算"'.format(sbn_pc)
+            )
             result.append(
                 self.exeHead.format("@a[scores={" + scoreboard_name + "=1..}]")
                 + "scoreboard players set MaxScore {} {}".format(
@@ -496,9 +477,11 @@ class midiConvert:
 
         if r"%%t" in pgs_style:
             result.append(
-                "scoreboard objectives add {}TMinT dummy \"时间计算：分\"".format(sbn_pc))
+                'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(sbn_pc)
+            )
             result.append(
-                "scoreboard objectives add {}TSecT dummy \"时间计算：秒\"".format(sbn_pc))
+                'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(sbn_pc)
+            )
             result.append(
                 self.exeHead.format("@a[scores={" + scoreboard_name + "=1..}]")
                 + "scoreboard players set n20 {} 20".format(scoreboard_name)
@@ -546,7 +529,7 @@ class midiConvert:
                 )
             )
 
-        for i in range(pgs_style.count('_')):
+        for i in range(pgs_style.count("_")):
             npg_stl = (
                 replaceBar(i).replace(r"%%N", self.midFileName)
                 if r"%%N" in pgs_style
@@ -568,9 +551,12 @@ class midiConvert:
                 )
             if r"%%t" in npg_stl:
                 npg_stl = npg_stl.replace(
-                    r"%%t", r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
+                    r"%%t",
+                    r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
                     r'{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
-                        r"{-}", sbn_pc), )
+                        r"{-}", sbn_pc
+                    ),
+                )
             result.append(
                 self.exeHead.format(
                     "@a[scores={"
@@ -592,10 +578,11 @@ class midiConvert:
         return result
 
     def _toCmdList_m1(
-            self,
-            scoreboard_name: str = "mscplay",
-            MaxVolume: float = 1.0,
-            speed: float = 1.0) -> list:
+        self,
+        scoreboard_name: str = "mscplay",
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
+    ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
         :param scoreboard_name: 我的世界的计分板名称
@@ -604,8 +591,7 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = []
-        MaxVolume = 1 if MaxVolume > 1 else (
-            0.001 if MaxVolume <= 0 else MaxVolume)
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         commands = 0
         maxscore = 0
@@ -639,17 +625,17 @@ class midiConvert:
                         if msg.channel == 9:
                             soundID, _X = self.__bitInst2ID_withX(instrumentID)
                         else:
-                            soundID, _X = self.__Inst2soundID_withX(
-                                instrumentID)
+                            soundID, _X = self.__Inst2soundID_withX(instrumentID)
 
                         singleTrack.append(
-                            "execute @a[scores={" +
-                            str(scoreboard_name) +
-                            "=" +
-                            str(nowscore) +
-                            "}" +
-                            f"] ~ ~ ~ playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
-                            f"{2 ** ((msg.note - 60 - _X) / 12)}")
+                            "execute @a[scores={"
+                            + str(scoreboard_name)
+                            + "="
+                            + str(nowscore)
+                            + "}"
+                            + f"] ~ ~ ~ playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
+                            f"{2 ** ((msg.note - 60 - _X) / 12)}"
+                        )
                         commands += 1
             if len(singleTrack) != 0:
                 tracks.append(singleTrack)
@@ -658,10 +644,10 @@ class midiConvert:
 
     # 原本这个算法的转换效果应该和上面的算法相似的
     def _toCmdList_m2(
-            self,
-            scoreboard_name: str = "mscplay",
-            MaxVolume: float = 1.0,
-            speed: float = 1.0,
+        self,
+        scoreboard_name: str = "mscplay",
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表
@@ -671,8 +657,7 @@ class midiConvert:
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
 
-        MaxVolume = 1 if MaxVolume > 1 else (
-            0.001 if MaxVolume <= 0 else MaxVolume)
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         channels = {
@@ -724,14 +709,12 @@ class midiConvert:
                 if self.debugMode:
                     try:
                         if msg.channel > 15:
-                            raise ChannelOverFlowError(
-                                f"当前消息 {msg} 的通道超限(≤15)")
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
                     except BaseError:
                         pass
 
                 if msg.type == "program_change":
-                    channels[msg.channel].append(
-                        ("PgmC", msg.program, microseconds))
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
 
                 elif msg.type == "note_on" and msg.velocity != 0:
                     channels[msg.channel].append(
@@ -739,10 +722,9 @@ class midiConvert:
                     )
 
                 elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                    msg.type == "note_off"
                 ):
-                    channels[msg.channel].append(
-                        ("NoteE", msg.note, microseconds))
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -802,15 +784,13 @@ class midiConvert:
 
                     nowTrack.append(
                         self.exeHead.format(
-                            "@a[scores=({}={})]".format(
-                                scoreboard_name,
-                                score_now).replace(
-                                '(',
-                                r"{").replace(
-                                ")",
-                                r"}")) +
-                        f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
-                        f"{2 ** ((msg[1] - 60 - _X) / 12)}")
+                            "@a[scores=({}={})]".format(scoreboard_name, score_now)
+                            .replace("(", r"{")
+                            .replace(")", r"}")
+                        )
+                        + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
+                        f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                    )
 
                     cmdAmount += 1
 
@@ -820,10 +800,10 @@ class midiConvert:
 
     # 简单的单音填充
     def _toCmdList_m3(
-            self,
-            scoreboard_name: str = "mscplay",
-            MaxVolume: float = 1.0,
-            speed: float = 1.0,
+        self,
+        scoreboard_name: str = "mscplay",
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表，并使用完全填充算法优化音感
@@ -839,8 +819,7 @@ class midiConvert:
             MaxVolume = 0.001
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        channels = [[], [], [], [], [], [], [],
-                    [], [], [], [], [], [], [], [], []]
+        channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 
         # 我们来用通道统计音乐信息
         for i, track in enumerate(self.midi.tracks):
@@ -867,8 +846,7 @@ class midiConvert:
                         channelMsg = False
                     if channelMsg:
                         if msg.channel > 15:
-                            raise ChannelOverFlowError(
-                                f"当前消息 {msg} 的通道超限(≤15)")
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
 
                     if msg.type == "program_change":
                         channels[msg.channel].append(
@@ -881,10 +859,9 @@ class midiConvert:
                         )
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
-                            msg.type == "note_off"
+                        msg.type == "note_off"
                     ):
-                        channels[msg.channel].append(
-                            ("NoteE", msg.note, microseconds))
+                        channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -901,8 +878,7 @@ class midiConvert:
 
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
-        note_channels = [[], [], [], [], [], [],
-                         [], [], [], [], [], [], [], [], [], []]
+        note_channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
 
         # 此处 我们把通道视为音轨
         for i in range(len(channels)):
@@ -995,13 +971,14 @@ class midiConvert:
                     maxScore = max(maxScore, score_now)
 
                     nowTrack.append(
-                        "execute @a[scores={" +
-                        str(scoreboard_name) +
-                        "=" +
-                        str(score_now) +
-                        "}" +
-                        f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / every_note[4] - 1} ~ "
-                        f"{note.velocity * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((note.pitch - 60 - _X) / 12)}")
+                        "execute @a[scores={"
+                        + str(scoreboard_name)
+                        + "="
+                        + str(score_now)
+                        + "}"
+                        + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / every_note[4] - 1} ~ "
+                        f"{note.velocity * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((note.pitch - 60 - _X) / 12)}"
+                    )
 
                     cmdAmount += 1
             tracks.append(nowTrack)
@@ -1009,10 +986,10 @@ class midiConvert:
         return [tracks, cmdAmount, maxScore]
 
     def _toCmdList_withDelay_m1(
-            self,
-            MaxVolume: float = 1.0,
-            speed: float = 1.0,
-            player: str = "@a",
+        self,
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
+        player: str = "@a",
     ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
@@ -1023,8 +1000,7 @@ class midiConvert:
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
 
-        MaxVolume = 1 if MaxVolume > 1 else (
-            0.001 if MaxVolume <= 0 else MaxVolume)
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         for i, track in enumerate(self.midi.tracks):
 
@@ -1047,14 +1023,16 @@ class midiConvert:
                         soundID, _X = self.__Inst2soundID_withX(instrumentID)
                         try:
                             tracks[now_tick].append(
-                                self.exeHead.format(player) +
-                                f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
-                                f"{2 ** ((msg.note - 60 - _X) / 12)}")
+                                self.exeHead.format(player)
+                                + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
+                                f"{2 ** ((msg.note - 60 - _X) / 12)}"
+                            )
                         except BaseError:
                             tracks[now_tick] = [
-                                self.exeHead.format(player) +
-                                f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
-                                f"{2 ** ((msg.note - 60 - _X) / 12)}"]
+                                self.exeHead.format(player)
+                                + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
+                                f"{2 ** ((msg.note - 60 - _X) / 12)}"
+                            ]
 
         results = []
 
@@ -1076,10 +1054,10 @@ class midiConvert:
         return [results, max(all_ticks)]
 
     def _toCmdList_withDelay_m2(
-            self,
-            MaxVolume: float = 1.0,
-            speed: float = 1.0,
-            player: str = "@a",
+        self,
+        MaxVolume: float = 1.0,
+        speed: float = 1.0,
+        player: str = "@a",
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
@@ -1090,8 +1068,7 @@ class midiConvert:
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
 
-        MaxVolume = 1 if MaxVolume > 1 else (
-            0.001 if MaxVolume <= 0 else MaxVolume)
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         channels = {
@@ -1143,14 +1120,12 @@ class midiConvert:
                 if self.debugMode:
                     try:
                         if msg.channel > 15:
-                            raise ChannelOverFlowError(
-                                f"当前消息 {msg} 的通道超限(≤15)")
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
                     except BaseError:
                         pass
 
                 if msg.type == "program_change":
-                    channels[msg.channel].append(
-                        ("PgmC", msg.program, microseconds))
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
 
                 elif msg.type == "note_on" and msg.velocity != 0:
                     channels[msg.channel].append(
@@ -1158,10 +1133,9 @@ class midiConvert:
                     )
 
                 elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                    msg.type == "note_off"
                 ):
-                    channels[msg.channel].append(
-                        ("NoteE", msg.note, microseconds))
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -1212,14 +1186,16 @@ class midiConvert:
 
                     try:
                         tracks[score_now].append(
-                            self.exeHead.format(player) +
-                            f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
-                            f"{2 ** ((msg[1] - 60 - _X) / 12)}")
+                            self.exeHead.format(player)
+                            + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
+                            f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                        )
                     except BaseError:
                         tracks[score_now] = [
-                            self.exeHead.format(player) +
-                            f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
-                            f"{2 ** ((msg[1] - 60 - _X) / 12)}"]
+                            self.exeHead.format(player)
+                            + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
+                            f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                        ]
 
         all_ticks = list(tracks.keys())
         if self.debugMode:
@@ -1227,19 +1203,31 @@ class midiConvert:
 
         for i in range(len(all_ticks)):
             for j in range(len(tracks[all_ticks[i]])):
-                results.append((tracks[all_ticks[i]][j], (0 if j != 0 else (
-                    all_ticks[i] - all_ticks[i - 1] if i != 0 else all_ticks[i]))))
+                results.append(
+                    (
+                        tracks[all_ticks[i]][j],
+                        (
+                            0
+                            if j != 0
+                            else (
+                                all_ticks[i] - all_ticks[i - 1]
+                                if i != 0
+                                else all_ticks[i]
+                            )
+                        ),
+                    )
+                )
 
         return [results, max(all_ticks)]
 
     def to_mcpack(
-            self,
-            method: int = 1,
-            volume: float = 1.0,
-            speed: float = 1.0,
-            progressbar=None,
-            scoreboard_name: str = "mscplay",
-            isAutoReset: bool = False,
+        self,
+        method: int = 1,
+        volume: float = 1.0,
+        speed: float = 1.0,
+        progressbar=None,
+        scoreboard_name: str = "mscplay",
+        isAutoReset: bool = False,
     ) -> tuple:
         """
         使用method指定的转换算法，将midi转换为我的世界mcpack格式的包
@@ -1253,8 +1241,9 @@ class midiConvert:
         """
 
         # try:
-        cmdlist, maxlen, maxscore = self.methods[method -
-                                                 1](scoreboard_name, volume, speed)
+        cmdlist, maxlen, maxscore = self.methods[method - 1](
+            scoreboard_name, volume, speed
+        )
         # except:
         #     return (False, f"无法找到算法ID{method}对应的转换算法")
 
@@ -1266,22 +1255,24 @@ class midiConvert:
         # 写入manifest.json
         if not os.path.exists(f"{self.outputPath}/temp/manifest.json"):
             with open(
-                    f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
+                f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8"
             ) as f:
-                f.write('{\n  "format_version": 1,\n  "header": {\n    "description": "' +
-                        self.midFileName +
-                        ' Pack : behavior pack",\n    "version": [ 0, 0, 1 ],\n    "name": "' +
-                        self.midFileName +
-                        'Pack",\n    "uuid": "' +
-                        str(uuid.uuid4()) +
-                        '"\n  },\n  "modules": [\n    {\n      "description": "' +
-                        f"the Player of the Music {self.midFileName}" +
-                        '",\n      "type": "data",\n      "version": [ 0, 0, 1 ],\n      "uuid": "' +
-                        str(uuid.uuid4()) +
-                        '"\n    }\n  ]\n}')
+                f.write(
+                    '{\n  "format_version": 1,\n  "header": {\n    "description": "'
+                    + self.midFileName
+                    + ' Pack : behavior pack",\n    "version": [ 0, 0, 1 ],\n    "name": "'
+                    + self.midFileName
+                    + 'Pack",\n    "uuid": "'
+                    + str(uuid.uuid4())
+                    + '"\n  },\n  "modules": [\n    {\n      "description": "'
+                    + f"the Player of the Music {self.midFileName}"
+                    + '",\n      "type": "data",\n      "version": [ 0, 0, 1 ],\n      "uuid": "'
+                    + str(uuid.uuid4())
+                    + '"\n    }\n  ]\n}'
+                )
         else:
             with open(
-                    f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
+                f"{self.outputPath}/temp/manifest.json", "r", encoding="utf-8"
             ) as manifest:
                 data = json.loads(manifest.read())
                 data["header"][
@@ -1292,22 +1283,22 @@ class midiConvert:
                 data["modules"][0]["description"] = "None"
                 data["modules"][0]["uuid"] = str(uuid.uuid4())
                 manifest.close()
-            open(f"{self.outputPath}/temp/manifest.json", "w",
-                 encoding="utf-8").write(json.dumps(data))
+            open(f"{self.outputPath}/temp/manifest.json", "w", encoding="utf-8").write(
+                json.dumps(data)
+            )
 
         # 将命令列表写入文件
         index_file = open(
-            f"{self.outputPath}/temp/functions/index.mcfunction",
-            "w",
-            encoding="utf-8")
+            f"{self.outputPath}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+        )
         for track in cmdlist:
             index_file.write(
                 "function mscplay/track" + str(cmdlist.index(track) + 1) + "\n"
             )
             with open(
-                    f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
-                    "w",
-                    encoding="utf-8",
+                f"{self.outputPath}/temp/functions/mscplay/track{cmdlist.index(track) + 1}.mcfunction",
+                "w",
+                encoding="utf-8",
             ) as f:
                 f.write("\n".join(track))
         index_file.writelines(
@@ -1334,20 +1325,18 @@ class midiConvert:
         if progressbar:
             if progressbar:
                 with open(
-                        f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
-                        "w",
-                        encoding="utf-8",
+                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                    "w",
+                    encoding="utf-8",
                 ) as f:
                     f.writelines(
-                        "\n".join(
-                            self.__formProgressBar(
-                                maxscore,
-                                scoreboard_name)))
+                        "\n".join(self.__formProgressBar(maxscore, scoreboard_name))
+                    )
             else:
                 with open(
-                        f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
-                        "w",
-                        encoding="utf-8",
+                    f"{self.outputPath}/temp/functions/mscplay/progressShow.mcfunction",
+                    "w",
+                    encoding="utf-8",
                 ) as f:
                     f.writelines(
                         "\n".join(
@@ -1361,23 +1350,24 @@ class midiConvert:
 
         if os.path.exists(f"{self.outputPath}/{self.midFileName}.mcpack"):
             os.remove(f"{self.outputPath}/{self.midFileName}.mcpack")
-        makeZip(f"{self.outputPath}/temp/",
-                f"{self.outputPath}/{self.midFileName}.mcpack")
+        makeZip(
+            f"{self.outputPath}/temp/", f"{self.outputPath}/{self.midFileName}.mcpack"
+        )
 
         shutil.rmtree(f"{self.outputPath}/temp/")
 
         return True, maxlen, maxscore
 
     def toBDXfile(
-            self,
-            method: int = 1,
-            volume: float = 1.0,
-            speed: float = 1.0,
-            progressbar: Union[bool, tuple] = False,
-            scoreboard_name: str = "mscplay",
-            isAutoReset: bool = False,
-            author: str = "Eilles",
-            max_height: int = 64,
+        self,
+        method: int = 1,
+        volume: float = 1.0,
+        speed: float = 1.0,
+        progressbar: Union[bool, tuple] = False,
+        scoreboard_name: str = "mscplay",
+        isAutoReset: bool = False,
+        author: str = "Eilles",
+        max_height: int = 64,
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1402,8 +1392,8 @@ class midiConvert:
             os.makedirs(self.outputPath)
 
         with open(
-                os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
-                "w+",
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
+            "w+",
         ) as f:
             f.write("BD@")
 
@@ -1429,7 +1419,8 @@ class midiConvert:
             )
 
         cmdBytes, size, finalPos = toBDX_bytes(
-            [(i, 0) for i in commands], max_height - 1)
+            [(i, 0) for i in commands], max_height - 1
+        )
         # 此处是对于仅有 True 的参数和自定义参数的判断
         if progressbar:
             pgbBytes, pgbSize, pgbNowPos = toBDX_bytes(
@@ -1457,22 +1448,22 @@ class midiConvert:
         _bytes += cmdBytes
 
         with open(
-                os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
-                "ab+",
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
+            "ab+",
         ) as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return True, total_count, maxScore, size, finalPos
 
     def toBDXfile_withDelay(
-            self,
-            method: int = 1,
-            volume: float = 1.0,
-            speed: float = 1.0,
-            progressbar=False,
-            player: str = "@a",
-            author: str = "Eilles",
-            max_height: int = 64,
+        self,
+        method: int = 1,
+        volume: float = 1.0,
+        speed: float = 1.0,
+        progressbar=False,
+        player: str = "@a",
+        author: str = "Eilles",
+        max_height: int = 64,
     ):
         """
         使用method指定的转换算法，将midi转换为BDX结构文件
@@ -1499,8 +1490,8 @@ class midiConvert:
             os.makedirs(self.outputPath)
 
         with open(
-                os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
-                "w+",
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
+            "w+",
         ) as f:
             f.write("BD@")
 
@@ -1522,8 +1513,10 @@ class midiConvert:
         if progressbar:
             scb_name = self.midFileName[:5] + "Pgb"
             _bytes += formCMD_blk(
-                r"scoreboard objectives add {} dummy {}播放用".replace(
-                    r"{}", scb_name), 1, customName="初始化进度条", )
+                r"scoreboard objectives add {} dummy {}播放用".replace(r"{}", scb_name),
+                1,
+                customName="初始化进度条",
+            )
             _bytes += move(z, 2)
             _bytes += formCMD_blk(
                 r"scoreboard players add {} {} 1".format(player, scb_name),
@@ -1557,15 +1550,15 @@ class midiConvert:
         _bytes += cmdBytes
 
         with open(
-                os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
-                "ab+",
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.bdx")),
+            "ab+",
         ) as f:
             f.write(brotli.compress(_bytes + b"XE"))
 
         return True, len(cmdlist), max_delay, size, finalPos
 
     def toDICT(
-            self,
+        self,
     ) -> dict:
         """
         使用金羿的转换思路，将midi转换为字典
@@ -1596,8 +1589,7 @@ class midiConvert:
             else:
 
                 if msg.type == "program_change":
-                    channels[msg.channel].append(
-                        ("PgmC", msg.program, microseconds))
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
 
                 elif msg.type == "note_on" and msg.velocity != 0:
                     channels[msg.channel].append(
@@ -1605,10 +1597,9 @@ class midiConvert:
                     )
 
                 elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                    msg.type == "note_off"
                 ):
-                    channels[msg.channel].append(
-                        ("NoteE", msg.note, microseconds))
+                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
