@@ -92,20 +92,17 @@ except ModuleNotFoundError as E:
 try:
     from msctPkgver.magicBeing import *
     import requests
-
-    # import zhdate
 except ModuleNotFoundError as E:
     if input(
         "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
     ).lower() in ("y", "1"):
         open("Demo_Requirements.txt", "w").write(
-            "requests==2.28.1\nrich==12.6.0\nzhdate==0.1"
+            "requests==2.28.1\nrich==12.6.0"
         )
         os.system("pip install -r Demo_Requirements.txt")
         os.remove("./Demo_Requirements.txt")
-        from rich.console import Console
+        from msctPkgver.magicBeing import *
         import requests
-        import zhdate
     else:
         raise E
 
@@ -172,7 +169,7 @@ def format_ipt(
         try:
             fun_result = fun(result, *extraArg)
             break
-        except BaseError:
+        except ValueError:
             prt(err_note)
             continue
     return result, fun_result
@@ -239,13 +236,13 @@ debug = False
 def bool_str(sth: str) -> bool:
     try:
         return bool(int(sth))
-    except BaseError:
+    except ValueError:
         if str(sth).lower() == "true":
             return True
         elif str(sth).lower() == "false":
             return False
         else:
-            raise "布尔字符串啊？"
+            raise ValueError("布尔字符串啊？")
 
 
 if os.path.exists("./demo_config.json"):
@@ -314,9 +311,9 @@ for singleMidi in midis:
         conversion.to_mcpack(2, *prompts)
         if fileFormat == 0
         else (
-            conversion.toBDXfile(2, *prompts)
+            conversion.to_BDX_file(2, *prompts)
             if playerFormat == 1
-            else conversion.toBDXfile_withDelay(2, *prompts)
+            else conversion.to_BDX_file_with_delay(2, *prompts)
         )
     )
 

@@ -65,9 +65,3 @@ class NotDefineProgramError(MSCTBaseException):
     """没有Program设定导致没有乐器可以选择的错误"""
 
     pass
-
-
-class BaseError(BaseException):
-    """专门骗过PEP8的错误"""
-
-    pass

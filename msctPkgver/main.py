@@ -139,7 +139,7 @@ class midiConvert:
         self.midFileName: str = ""
         self.exeHead = ""
         self.methods = MethodList(
-            [self._toCmdList_m1(), self._toCmdList_m2(), self._toCmdList_m3()]
+            [self._toCmdList_m1, self._toCmdList_m2, self._toCmdList_m3]
         )
 
         self.methods_byDelay = MethodList(
@@ -325,7 +325,7 @@ class midiConvert:
                 126: ("note.bd", 7),  # 打击乐器无音域
                 127: ("note.snare", 7),  # 打击乐器无音域
             }[instrumentID]
-        except BaseError:
+        except KeyError:
             a = ("note.flute", 5)
         return a
 
@@ -382,9 +382,9 @@ class midiConvert:
                     79: ("note.bell", 4),
                     80: ("note.bell", 4),
                 }[instrumentID]
-            except BaseError:
+            except KeyError:
                 return "note.bd", 7
-        except BaseError:
+        except KeyError:
             print("WARN", "无法使用打击乐器列表库，可能是不支持当前环境，打击乐器使用Dislink算法代替。")
             if instrumentID == 55:
                 return "note.cow_bell", 5
@@ -432,14 +432,6 @@ class midiConvert:
 
         if r"%^t" in pgs_style:
             pgs_style = pgs_style.replace(r"%^t", self.__score2time(maxscore))
-
-        def replaceBar(_i):
-            try:
-                return pgs_style.replace("_", progressbar[1][0], _i + 1).replace(
-                    "_", progressbar[1][1]
-                )
-            except BaseError:
-                return pgs_style.replace("_", progressbar[1][0], _i + 1)
 
         sbn_pc = scoreboard_name[:2]
         if r"%%%" in pgs_style:
@@ -531,9 +523,13 @@ class midiConvert:
 
         for i in range(pgs_style.count("_")):
             npg_stl = (
-                replaceBar(i).replace(r"%%N", self.midFileName)
+                pgs_style.replace("_", progressbar[1][0], i + 1)
+                .replace("_", progressbar[1][1])
+                .replace(r"%%N", self.midFileName)
                 if r"%%N" in pgs_style
-                else replaceBar(i)
+                else pgs_style.replace("_", progressbar[1][0], i + 1).replace(
+                    "_", progressbar[1][1]
+                )
             )
             if r"%%s" in npg_stl:
                 npg_stl = npg_stl.replace(
@@ -545,9 +541,9 @@ class midiConvert:
             if r"%%%" in npg_stl:
                 npg_stl = npg_stl.replace(
                     r"%%%",
-                    '"},{"score":{"name":"*","objective":"'
+                    r'"},{"score":{"name":"*","objective":"'
                     + sbn_pc
-                    + 'PercT"}},{"text":"%',
+                    + r'PercT"}},{"text":"%',
                 )
             if r"%%t" in npg_stl:
                 npg_stl = npg_stl.replace(
@@ -559,10 +555,10 @@ class midiConvert:
                 )
             result.append(
                 self.exeHead.format(
-                    "@a[scores={"
+                    r"@a[scores={"
                     + scoreboard_name
                     + f"={int(i * perEach)}..{math.ceil((i + 1) * perEach)}"
-                    + "}]"
+                    + r"}]"
                 )
                 + r'titleraw @s actionbar {"rawtext":[{"text":"'
                 + npg_stl
@@ -710,7 +706,7 @@ class midiConvert:
                     try:
                         if msg.channel > 15:
                             raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                    except BaseError:
+                    except AttributeError:
                         pass
 
                 if msg.type == "program_change":
@@ -839,14 +835,12 @@ class midiConvert:
                         tempo = msg.tempo
                 else:
 
-                    try:
-                        # msg.channel
-                        channelMsg = True
-                    except BaseError:
-                        channelMsg = False
-                    if channelMsg:
-                        if msg.channel > 15:
-                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                    if self.debugMode:
+                        try:
+                            if msg.channel > 15:
+                                raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                        except AttributeError:
+                            pass
 
                     if msg.type == "program_change":
                         channels[msg.channel].append(
@@ -1027,7 +1021,7 @@ class midiConvert:
                                 + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
                                 f"{2 ** ((msg.note - 60 - _X) / 12)}"
                             )
-                        except BaseError:
+                        except KeyError:
                             tracks[now_tick] = [
                                 self.exeHead.format(player)
                                 + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg.velocity / 128} "
@@ -1121,7 +1115,7 @@ class midiConvert:
                     try:
                         if msg.channel > 15:
                             raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                    except BaseError:
+                    except AttributeError:
                         pass
 
                 if msg.type == "program_change":
@@ -1190,7 +1184,7 @@ class midiConvert:
                             + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
                             f"{2 ** ((msg[1] - 60 - _X) / 12)}"
                         )
-                    except BaseError:
+                    except KeyError:
                         tracks[score_now] = [
                             self.exeHead.format(player)
                             + f"playsound {soundID} @s ^ ^ ^{1 / MaxVolume - 1} {msg[2] / 128} "
@@ -1225,7 +1219,7 @@ class midiConvert:
         method: int = 1,
         volume: float = 1.0,
         speed: float = 1.0,
-        progressbar=None,
+        progressbar: Union[bool, tuple] = None,
         scoreboard_name: str = "mscplay",
         isAutoReset: bool = False,
     ) -> tuple:
@@ -1350,7 +1344,7 @@ class midiConvert:
 
         if os.path.exists(f"{self.outputPath}/{self.midFileName}.mcpack"):
             os.remove(f"{self.outputPath}/{self.midFileName}.mcpack")
-        makeZip(
+        compressZipFile(
             f"{self.outputPath}/temp/", f"{self.outputPath}/{self.midFileName}.mcpack"
         )
 
@@ -1358,7 +1352,7 @@ class midiConvert:
 
         return True, maxlen, maxscore
 
-    def toBDXfile(
+    def to_BDX_file(
         self,
         method: int = 1,
         volume: float = 1.0,
@@ -1418,12 +1412,12 @@ class midiConvert:
                 + scoreboard_name,
             )
 
-        cmdBytes, size, finalPos = toBDX_bytes(
+        cmdBytes, size, finalPos = to_BDX_bytes(
             [(i, 0) for i in commands], max_height - 1
         )
         # 此处是对于仅有 True 的参数和自定义参数的判断
         if progressbar:
-            pgbBytes, pgbSize, pgbNowPos = toBDX_bytes(
+            pgbBytes, pgbSize, pgbNowPos = to_BDX_bytes(
                 [
                     (i, 0)
                     for i in (
@@ -1455,12 +1449,12 @@ class midiConvert:
 
         return True, total_count, maxScore, size, finalPos
 
-    def toBDXfile_withDelay(
+    def to_BDX_file_with_delay(
         self,
         method: int = 1,
         volume: float = 1.0,
         speed: float = 1.0,
-        progressbar=False,
+        progressbar: Union[bool, tuple] = False,
         player: str = "@a",
         author: str = "Eilles",
         max_height: int = 64,
@@ -1508,24 +1502,24 @@ class midiConvert:
                 ("§e=§r", "§7=§r"),
             )
 
-        cmdBytes, size, finalPos = toBDX_bytes(cmdlist, max_height - 1)
+        cmdBytes, size, finalPos = to_BDX_bytes(cmdlist, max_height - 1)
 
         if progressbar:
             scb_name = self.midFileName[:5] + "Pgb"
-            _bytes += formCMD_blk(
+            _bytes += form_command_block_in_BDX_bytes(
                 r"scoreboard objectives add {} dummy {}播放用".replace(r"{}", scb_name),
                 1,
                 customName="初始化进度条",
             )
             _bytes += move(z, 2)
-            _bytes += formCMD_blk(
+            _bytes += form_command_block_in_BDX_bytes(
                 r"scoreboard players add {} {} 1".format(player, scb_name),
                 1,
                 1,
                 customName="显示进度条并加分",
             )
             _bytes += move(y, 1)
-            pgbBytes, pgbSize, pgbNowPos = toBDX_bytes(
+            pgbBytes, pgbSize, pgbNowPos = to_BDX_bytes(
                 [
                     (i, 0)
                     for i in self.__formProgressBar(max_delay, scb_name, progressbar)
@@ -1536,7 +1530,7 @@ class midiConvert:
             _bytes += move(y, -1 - pgbNowPos[1])
             _bytes += move(z, -2 - pgbNowPos[2])
             _bytes += move(x, 2)
-            _bytes += formCMD_blk(
+            _bytes += form_command_block_in_BDX_bytes(
                 r"scoreboard players reset {} {}".format(player, scb_name),
                 1,
                 customName="置零进度条",
@@ -1576,7 +1570,7 @@ class midiConvert:
                 try:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat
                     # print(microseconds)
-                except BaseError:
+                except NameError:
                     microseconds += (
                         msg.time
                         * mido.midifiles.midifiles.DEFAULT_TEMPO

@@ -1,5 +1,5 @@
 from rich.console import Console
-from exceptions import *
+from .exceptions import *
 from typing import Any, Literal, Optional, TextIO
 
 MainConsole = Console()
@@ -138,10 +138,11 @@ def format_ipt(
     *extraArg: 对于函数的其他参数"""
     while True:
         result = ipt(notice)
+        # noinspection PyBroadException
         try:
             fun_result = fun(result, *extraArg)
             break
-        except BaseError:
+        except:
             prt(err_note)
             continue
     return result, fun_result

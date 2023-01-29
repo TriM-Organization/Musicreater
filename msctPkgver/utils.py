@@ -35,7 +35,7 @@ def move(axis: str, value: int):
     return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), "big", signed=True)
 
 
-def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
+def compressZipFile(sourceDir, outFilename, compression=8, exceptFile=None):
     """使用compression指定的算法打包目录为zip文件\n
     默认算法为DEFLATED(8),可用算法如下：\n
     STORED = 0\n
@@ -57,7 +57,7 @@ def makeZip(sourceDir, outFilename, compression=8, exceptFile=None):
     zipf.close()
 
 
-def formCMD_blk(
+def form_command_block_in_BDX_bytes(
     command: str,
     particularValue: int,
     impluse: int = 0,
@@ -137,7 +137,7 @@ def __fillSquareSideLength(total: int, maxHeight: int):
     return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
 
 
-def toBDX_bytes(
+def to_BDX_bytes(
     commands: list,
     max_height: int = 64,
 ):
@@ -165,7 +165,7 @@ def toBDX_bytes(
         customName = ""
         executeOnFirstTick = False
         trackOutput = True
-        _bytes += formCMD_blk(
+        _bytes += form_command_block_in_BDX_bytes(
             cmd,
             (1 if y_forward else 0)
             if (
