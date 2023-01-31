@@ -206,6 +206,9 @@ out_path = format_ipt(
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
 )[0].lower()
 
+
+conversion = msctPkgver.midiConvert()
+
 def isMethodOK(sth: str):
     if int(sth) in range(1,len(conversion.methods)+1):
         return int(sth)
