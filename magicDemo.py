@@ -212,7 +212,7 @@ def isMethodOK(sth: str):
     else:
         raise ValueError
 
-convert_method = format_ipt(f"{_('EnterMethod')}{_(':')}",isMethodOK,f"{_('MethodRangeErr')}")[1]
+convert_method = format_ipt(f"{_('EnterMethod')}{_(':')}",isMethodOK,f"{_('MethodRangeErr').format(1,len(conversion.methods))}")[1]
 
 
 # 选择输出格式
