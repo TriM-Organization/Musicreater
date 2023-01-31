@@ -37,7 +37,7 @@ languages = {
         "ChoosePath": "请输入MIDI路径或所在文件夹",
         "ChooseFileFormat": "请输入输出格式[BDX(1)或MCPACK(0)]",
         "EnterMethod": "请输入转换算法",
-        "MethodRangeErr": "输入的转换算法应为 [{},{}]（首位皆含）之间的一个整数。",
+        "MethodRangeErr": "输入的转换算法应为 [{},{}]（首尾皆含）之间的一个整数。",
         "ChoosePlayer": "请选择播放方式[计分板(1) 或 延迟(0)]",
         "WhetherArgEntering": "是否为文件夹内文件的转换统一参数[是(1) 或 否(0)]",
         "EnterArgs": "请输入转换参数",

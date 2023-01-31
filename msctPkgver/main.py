@@ -92,6 +92,9 @@ class MethodList(list):
 
     def __getitem__(self, item) -> T:
         return self._T[item]
+    
+    def __len__(self) -> int:
+        return self._T.__len__()
 
 
 """
