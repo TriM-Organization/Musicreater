@@ -18,7 +18,7 @@ Terms & Conditions: ../License.md
 
 from .main import *
 
-__version__ = "0.2.2.1"
+__version__ = "0.2.2.2"
 __all__ = []
 __author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"), ("鸣凤鸽子", "MingFengPigeon"))
 

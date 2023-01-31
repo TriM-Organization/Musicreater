@@ -34,9 +34,11 @@ languages = {
         ":": "：",
         ",": "，",
         ".": "。",
-        "ChooseFileFormat": "请输入输出格式[BDX(1)或MCPACK(0)]",
-        "ChoosePlayer": "请选择播放方式[计分板(1) 或 延迟(0)]",
         "ChoosePath": "请输入MIDI路径或所在文件夹",
+        "ChooseFileFormat": "请输入输出格式[BDX(1)或MCPACK(0)]",
+        "EnterMethod": "请输入转换算法",
+        "MethodRangeErr": "输入的转换算法应为 [{},{}]（首位皆含）之间的一个整数。",
+        "ChoosePlayer": "请选择播放方式[计分板(1) 或 延迟(0)]",
         "WhetherArgEntering": "是否为文件夹内文件的转换统一参数[是(1) 或 否(0)]",
         "EnterArgs": "请输入转换参数",
         "noteofArgs": "注：文件夹内的全部midi将统一以此参数转换",
@@ -204,6 +206,15 @@ out_path = format_ipt(
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
 )[0].lower()
 
+def isMethodOK(sth: str):
+    if int(sth) in range(1,len(conversion.methods)+1):
+        return int(sth)
+    else:
+        raise ValueError
+
+convert_method = format_ipt(f"{_('EnterMethod')}{_(':')}",isMethodOK,f"{_('MethodRangeErr')}")[1]
+
+
 # 选择输出格式
 while True:
     fileFormat = ipt(f"{_('ChooseFileFormat')}{_(':')}").lower()
@@ -308,23 +319,18 @@ for singleMidi in midis:
             json.dump(conversion.toDICT(), f)
             f.write(5 * "\n")
     conversion_result = (
-        conversion.to_mcpack(2, *prompts)
+        conversion.to_mcpack(convert_method, *prompts)
         if fileFormat == 0
         else (
-            conversion.to_BDX_file(2, *prompts)
+            conversion.to_BDX_file(convert_method, *prompts)
             if playerFormat == 1
-            else conversion.to_BDX_file_with_delay(2, *prompts)
+            else conversion.to_BDX_file_with_delay(convert_method, *prompts)
         )
     )
 
     if conversion_result[0]:
-        c3 = conversion_result[3]
-        c4 = conversion_result[4]
-        fF = fileFormat
         prt(
-            f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}"
-            f"{conversion_result[2]}"
-            f"{f'''{_(',')}{_('PlaceSize')}{_(':')}{c3}{_(',')}{_('LastPos')}{_(':')}{c4}''' if fF == 1 else ''}"
+            f"	{_('CmdLength')}{_(':')}{conversion_result[1]}{_(',')}{_('MaxDelay')}{_(':')}{conversion_result[2]}{f'''{_(',')}{_('PlaceSize')}{_(':')}{conversion_result[3]}{_(',')}{_('LastPos')}{_(':')}{conversion_result[4]}''' if fileFormat == 1 else ''}"
         )
     else:
         prt(f"{_('Failed')}")
