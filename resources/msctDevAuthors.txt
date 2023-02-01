@@ -19,11 +19,3 @@ zh-ME 诸葛八卦喵
 zh-HK 諸葛亮與八卦陣
 en-GB Bagua Array
 en-US bgArray
-
-启鸣凤鸽子
-zh-CN 鸣凤鸽子
-zh-TW 鳴鳳鴿子
-zh-HK 鳴鳳 鴿子
-# zh-ME 你自己翻译昂===========
-en-GB MingFeng Pigeon
-en-US MingFengPigeon
