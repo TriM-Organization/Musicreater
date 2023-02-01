@@ -96,7 +96,7 @@ try:
     import requests
 except ModuleNotFoundError as E:
     if input(
-        "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
+            "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
     ).lower() in ("y", "1"):
         open("Demo_Requirements.txt", "w").write(
             "requests==2.28.1\nrich==12.6.0"
@@ -156,10 +156,10 @@ prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
 
 
 def format_ipt(
-    notice: str,
-    fun,
-    err_note: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
-    *extraArg,
+        notice: str,
+        fun,
+        err_note: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
+        *extraArg,
 ):
     """循环输入，以某种格式
     notice: 输入时的提示
@@ -206,17 +206,18 @@ out_path = format_ipt(
     f"{_('FileNotFound')}{_(',')}{_('Re-Enter')}{_('.')}",
 )[0].lower()
 
-
 conversion = msctPkgver.midiConvert()
 
+
 def isMethodOK(sth: str):
-    if int(sth) in range(1,len(conversion.methods)+1):
+    if int(sth) in range(1, len(conversion.methods) + 1):
         return int(sth)
     else:
         raise ValueError
 
-convert_method = format_ipt(f"{_('EnterMethod')}{_(':')}",isMethodOK,f"{_('MethodRangeErr').format(1,len(conversion.methods))}")[1]
 
+convert_method = \
+format_ipt(f"{_('EnterMethod')}{_(':')}", isMethodOK, f"{_('MethodRangeErr').format(1, len(conversion.methods))}")[1]
 
 # 选择输出格式
 while True:
@@ -271,41 +272,41 @@ else:
     # 提示语 检测函数 错误提示语
     for args in [
         (
-            f'{_("EnterVolume")}{_(":")}',
-            float,
+                f'{_("EnterVolume")}{_(":")}',
+                float,
         ),
         (
-            f'{_("EnterSpeed")}{_(":")}',
-            float,
+                f'{_("EnterSpeed")}{_(":")}',
+                float,
         ),
         (
-            f'{_("WhetherPgb")}{_(":")}',
-            bool_str,
+                f'{_("WhetherPgb")}{_(":")}',
+                bool_str,
         ),
         (
-            f'{_("EnterSbName")}{_(":")}',
-            str,
+                f'{_("EnterSbName")}{_(":")}',
+                str,
         )
         if playerFormat == 1
         else (
-            f'{_("EnterSelecter")}{_(":")}',
-            str,
+                f'{_("EnterSelecter")}{_(":")}',
+                str,
         ),
         (
-            f'{_("WhetherSbReset")}{_(":")}',
-            bool_str,
+                f'{_("WhetherSbReset")}{_(":")}',
+                bool_str,
         )
         if playerFormat == 1
         else (),
         (
-            f'{_("EnterAuthor")}{_(":")}',
-            str,
+                f'{_("EnterAuthor")}{_(":")}',
+                str,
         )
         if fileFormat == 1
         else (),
         (
-            f'{_("EnterMaxHeight")}{_(":")}',
-            int,
+                f'{_("EnterMaxHeight")}{_(":")}',
+                int,
         )
         if fileFormat == 1
         else (),
