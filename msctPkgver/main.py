@@ -686,16 +686,14 @@ class midiConvert:
 
             if msg.time != 0:
                 try:
-                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                    microseconds += msg.time * 1000
                     # print(microseconds)
                 except NameError:
                     if self.debugMode:
                         raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
                     else:
                         microseconds += (
-                            msg.time
-                            * mido.midifiles.midifiles.DEFAULT_TEMPO
-                            / self.midi.ticks_per_beat
+                            msg.time * 1000
                         )
 
             if msg.is_meta:
@@ -811,6 +809,7 @@ class midiConvert:
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
+        # TODO: 这里的时间转换不知道有没有问题
 
         if MaxVolume > 1:
             MaxVolume = 1.0
