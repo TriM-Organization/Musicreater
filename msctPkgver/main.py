@@ -415,6 +415,10 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = []
+        if speed <= 0:
+            if self.debugMode:
+                raise ZeroSpeedError("播放速度仅可为正实数")
+            speed = 0.00001
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         commands = 0
@@ -481,6 +485,10 @@ class midiConvert:
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
 
+        if speed <= 0:
+            if self.debugMode:
+                raise ZeroSpeedError("播放速度仅可为正实数")
+            speed = 0.00001
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
@@ -635,6 +643,10 @@ class midiConvert:
         """
         # TODO: 这里的时间转换不知道有没有问题
 
+        if speed <= 0:
+            if self.debugMode:
+                raise ZeroSpeedError("播放速度仅可为正实数")
+            speed = 0.00001
         if MaxVolume > 1:
             MaxVolume = 1.0
         if MaxVolume <= 0:
@@ -819,6 +831,10 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
+        if speed <= 0:
+            if self.debugMode:
+                raise ZeroSpeedError("播放速度仅可为正实数")
+            speed = 0.00001
 
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
@@ -887,6 +903,10 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
+        if speed <= 0:
+            if self.debugMode:
+                raise ZeroSpeedError("播放速度仅可为正实数")
+            speed = 0.00001
 
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
@@ -1165,7 +1185,7 @@ class midiConvert:
 
         if os.path.exists(f"{self.outputPath}/{self.midFileName}.mcpack"):
             os.remove(f"{self.outputPath}/{self.midFileName}.mcpack")
-        compressZipFile(
+        compress_zipfile(
             f"{self.outputPath}/temp/", f"{self.outputPath}/{self.midFileName}.mcpack"
         )
 

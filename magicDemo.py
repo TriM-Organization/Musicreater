@@ -35,8 +35,8 @@ languages = {
         ",": "，",
         ".": "。",
         "ChoosePath": "请输入MIDI路径或所在文件夹",
-        "ChooseFileFormat": "请输入输出格式[BDX(1)或MCPACK(0)]",
-        "EnterMethod": "请输入转换算法",
+        "ChooseFileFormat": "请输入输出格式[BDX(1) 或 MCPACK(0)]",
+        "EnterMethod": "请输入转换算法[{}~{}]",
         "MethodRangeErr": "输入的转换算法应为 [{},{}]（首尾皆含）之间的一个整数。",
         "ChoosePlayer": "请选择播放方式[计分板(1) 或 延迟(0)]",
         "WhetherArgEntering": "是否为文件夹内文件的转换统一参数[是(1) 或 否(0)]",
@@ -96,11 +96,9 @@ try:
     import requests
 except ModuleNotFoundError as E:
     if input(
-            "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
+        "您需要安装以下模块才能使用这个样例\nrequests==2.28.1\nrich==12.6.0\nzhdate==0.1\n请问是否安装？(y/n)："
     ).lower() in ("y", "1"):
-        open("Demo_Requirements.txt", "w").write(
-            "requests==2.28.1\nrich==12.6.0"
-        )
+        open("Demo_Requirements.txt", "w").write("requests==2.28.1\nrich==12.6.0")
         os.system("pip install -r Demo_Requirements.txt")
         os.remove("./Demo_Requirements.txt")
         from msctPkgver.magicBeing import *
@@ -144,8 +142,8 @@ else:
                 requests.get(
                     "https://gitee.com/TriM-Organization/LinglunStudio/raw/master/resources/myWords.txt"
                 )
-                .text.strip("\r\n")
-                .split("\r\n")
+                .text.strip("\n")
+                .split("\n")
             )
         ),
         style="#121110 on #F0F2F4",
@@ -156,10 +154,10 @@ prt(f"{_('LangChd')}{_(':')}{_(currentLang)}")
 
 
 def format_ipt(
-        notice: str,
-        fun,
-        err_note: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
-        *extraArg,
+    notice: str,
+    fun,
+    err_note: str = f"{_('ErrEnter')}{_(',')}{_('Re-Enter')}{_('.')}",
+    *extraArg,
 ):
     """循环输入，以某种格式
     notice: 输入时的提示
@@ -216,9 +214,11 @@ def isMethodOK(sth: str):
         raise ValueError
 
 
-convert_method = \
-    format_ipt(f"{_('EnterMethod')}{_(':')}", isMethodOK, f"{_('MethodRangeErr').format(1, len(conversion.methods))}")[
-        1]
+convert_method = format_ipt(
+    f"{_('EnterMethod').format(1, len(conversion.methods))}{_(':')}",
+    isMethodOK,
+    f"{_('MethodRangeErr').format(1, len(conversion.methods))}",
+)[1]
 
 # 选择输出格式
 while True:
@@ -273,41 +273,41 @@ else:
     # 提示语 检测函数 错误提示语
     for args in [
         (
-                f'{_("EnterVolume")}{_(":")}',
-                float,
+            f'{_("EnterVolume")}{_(":")}',
+            float,
         ),
         (
-                f'{_("EnterSpeed")}{_(":")}',
-                float,
+            f'{_("EnterSpeed")}{_(":")}',
+            float,
         ),
         (
-                f'{_("WhetherPgb")}{_(":")}',
-                bool_str,
+            f'{_("WhetherPgb")}{_(":")}',
+            bool_str,
         ),
         (
-                f'{_("EnterSbName")}{_(":")}',
-                str,
+            f'{_("EnterSbName")}{_(":")}',
+            str,
         )
         if playerFormat == 1
         else (
-                f'{_("EnterSelecter")}{_(":")}',
-                str,
+            f'{_("EnterSelecter")}{_(":")}',
+            str,
         ),
         (
-                f'{_("WhetherSbReset")}{_(":")}',
-                bool_str,
+            f'{_("WhetherSbReset")}{_(":")}',
+            bool_str,
         )
         if playerFormat == 1
         else (),
         (
-                f'{_("EnterAuthor")}{_(":")}',
-                str,
+            f'{_("EnterAuthor")}{_(":")}',
+            str,
         )
         if fileFormat == 1
         else (),
         (
-                f'{_("EnterMaxHeight")}{_(":")}',
-                int,
+            f'{_("EnterMaxHeight")}{_(":")}',
+            int,
         )
         if fileFormat == 1
         else (),

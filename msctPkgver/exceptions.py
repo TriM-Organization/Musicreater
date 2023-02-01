@@ -35,7 +35,7 @@ class MSCTBaseException(Exception):
 
     def crash_it(self):
         raise self
-
+    
 
 class CrossNoteError(MSCTBaseException):
     """同通道下同音符交叉出现所产生的错误"""
@@ -63,5 +63,11 @@ class ChannelOverFlowError(MSCTBaseException):
 
 class NotDefineProgramError(MSCTBaseException):
     """没有Program设定导致没有乐器可以选择的错误"""
+
+    pass
+
+
+class ZeroSpeedError(MSCTBaseException):
+    """以0作为播放速度的错误"""
 
     pass

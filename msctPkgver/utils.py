@@ -35,7 +35,7 @@ def move(axis: str, value: int):
     return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), "big", signed=True)
 
 
-def compressZipFile(sourceDir, outFilename, compression=8, exceptFile=None):
+def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
     """使用compression指定的算法打包目录为zip文件\n
     默认算法为DEFLATED(8),可用算法如下：\n
     STORED = 0\n
@@ -129,7 +129,7 @@ def form_command_block_in_BDX_bytes(
     return block
 
 
-def __fillSquareSideLength(total: int, maxHeight: int):
+def bottem_side_length_of_smallest_square_bottom_box(total: int, maxHeight: int):
     """给定总方块数量和最大高度，返回所构成的图形外切正方形的边长
     :param total: 总方块数量
     :param maxHeight: 最大高度
@@ -147,7 +147,7 @@ def to_BDX_bytes(
     :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
     """
 
-    _sideLength = __fillSquareSideLength(len(commands), max_height)
+    _sideLength = bottem_side_length_of_smallest_square_bottom_box(len(commands), max_height)
     _bytes = b""
 
     y_forward = True

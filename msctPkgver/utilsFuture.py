@@ -359,7 +359,7 @@ def format_ipt(notice: str, fun, err_note: str = "", *extraArg):
         try:
             fun_result = fun(result, *extraArg)
             break
-        except BaseError:
+        except ValueError:
             print(err_note)
             continue
     return result, fun_result
