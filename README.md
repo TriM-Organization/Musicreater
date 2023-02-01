@@ -19,7 +19,7 @@
 [![][release]](../../releases)
 
 
-简体中文 | [English](README_EN.md)
+简体中文🇨🇳 | [English🇬🇧](README_EN.md)
 
 
 ## 介绍🚀
@@ -27,6 +27,22 @@
 音·创 是一个免费开源的针对 **《我的世界》** 的midi音乐转换库
 
 欢迎加群：[861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
+
+## 下载安装
+
+-   使用pypi
+    ```bash
+    pip install Musicreater
+    ```
+
+-   克隆仓库
+    ```bash
+    git clone https://gitee.com/TriM-Organization/Musicreater.git
+    cd Musicreater
+    python setup.py install
+    ```
+
+以上命令种 `python`、`pip` 请依照各个环境不同灵活更换，可能为`python3`或`pip3`之类。
 
 ## 文档📄
 
