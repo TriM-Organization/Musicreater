@@ -22,15 +22,17 @@
 
 ## Introduction🚀
 
-Musicreater(音·创) is a free open source software which is used for making and also creating music in *Minecraft: Bedrock Edition*.
-
-Musicreater pkgver(Package Version 音·创 库版) is a free open source library used for convert midi file into formats that could be read in *Minecraft: Bedrock Edition*.
+Musicreater is a free open-source library used for converting midi file into formats that could be read in *Minecraft*.
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
-**This branch is the Package Version of Musicreater, that means that the lib can be imported for other softwares**
+## Documentation📄
 
-### **If you want to use the demo to convert MIDI musics directly, SEEEEEEEEE [Tutorials HERE](./docs/Use%20of%20Funtions.md)**
+(Not in English yet)
+
+[生成文件的使用](./docs/%E7%94%9F%E6%88%90%E6%96%87%E4%BB%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
+
+[仓库API文档](./docs/%E5%BA%93%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD%E6%96%87%E6%A1%A3.md)
 
 ### Authors✒
 

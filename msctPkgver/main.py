@@ -8,10 +8,10 @@
 
 
 """
-音·创 库版 (Musicreater Package Version)
-是一款免费开源的针对《我的世界：基岩版》的midi音乐转换库
-Musicreater pkgver (Package Version 音·创 库版)
-A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
+音·创 (Musicreater)
+是一款免费开源的针对《我的世界》的midi音乐转换库
+Musicreater (音·创)
+A free open source library used for convert midi file into formats that is suitable for **Minecraft**.
 
 版权所有 © 2023 音·创 开发者
 Copyright © 2023 all the developers of Musicreater
@@ -157,12 +157,6 @@ class midiConvert:
                 self._toCmdList_withDelay_m2,
             ]
         )
-
-        if self.debugMode:
-            from .magicBeing import prt, ipt
-
-            self.prt = prt
-            self.ipt = ipt
 
     def convert(self, midiFile: str, outputPath: str, oldExeFormat: bool = True):
         """转换前需要先运行此函数来获取基本信息"""
@@ -415,10 +409,10 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = []
-        if speed <= 0:
+        if speed == 0:
             if self.debugMode:
                 raise ZeroSpeedError("播放速度仅可为正实数")
-            speed = 0.00001
+            speed = 1
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         commands = 0
@@ -485,10 +479,10 @@ class midiConvert:
         :return: tuple(命令列表, 命令个数, 计分板最大值)
         """
 
-        if speed <= 0:
+        if speed == 0:
             if self.debugMode:
                 raise ZeroSpeedError("播放速度仅可为正实数")
-            speed = 0.00001
+            speed = 1
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
@@ -530,8 +524,6 @@ class midiConvert:
             if msg.is_meta:
                 if msg.type == "set_tempo":
                     tempo = msg.tempo
-                    if self.debugMode:
-                        self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
             else:
 
                 if self.debugMode:
@@ -565,9 +557,6 @@ class midiConvert:
 
         3 音符结束消息
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
-
-        if self.debugMode:
-            self.prt(channels)
 
         tracks = []
         cmdAmount = 0
@@ -643,14 +632,11 @@ class midiConvert:
         """
         # TODO: 这里的时间转换不知道有没有问题
 
-        if speed <= 0:
+        if speed == 0:
             if self.debugMode:
                 raise ZeroSpeedError("播放速度仅可为正实数")
-            speed = 0.00001
-        if MaxVolume > 1:
-            MaxVolume = 1.0
-        if MaxVolume <= 0:
-            MaxVolume = 0.001
+            speed = 1
+        MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
@@ -831,10 +817,11 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
-        if speed <= 0:
+
+        if speed == 0:
             if self.debugMode:
                 raise ZeroSpeedError("播放速度仅可为正实数")
-            speed = 0.00001
+            speed = 1
 
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
@@ -903,10 +890,10 @@ class midiConvert:
         """
         # :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         tracks = {}
-        if speed <= 0:
+        if speed == 0:
             if self.debugMode:
                 raise ZeroSpeedError("播放速度仅可为正实数")
-            speed = 0.00001
+            speed = 1
 
         MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
 
@@ -948,8 +935,6 @@ class midiConvert:
             if msg.is_meta:
                 if msg.type == "set_tempo":
                     tempo = msg.tempo
-                    if self.debugMode:
-                        self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
             else:
 
                 if self.debugMode:
@@ -1033,8 +1018,6 @@ class midiConvert:
                         ]
 
         all_ticks = list(tracks.keys())
-        if self.debugMode:
-            self.prt(tracks)
 
         for i in range(len(all_ticks)):
             for j in range(len(tracks[all_ticks[i]])):

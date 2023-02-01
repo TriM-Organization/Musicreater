@@ -1,5 +1,4 @@
 from rich.console import Console
-from .exceptions import *
 from typing import Any, Literal, Optional, TextIO
 
 MainConsole = Console()
