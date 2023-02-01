@@ -142,7 +142,7 @@ else:
         "[#121110 on #F0F2F4]{}".format(
             random.choice(
                 requests.get(
-                    "https://gitee.com/EillesWan/Musicreater/raw/master/resources/myWords.txt"
+                    "https://gitee.com/TriM-Organization/LinglunStudio/raw/master/resources/myWords.txt"
                 )
                 .text.strip("\r\n")
                 .split("\r\n")

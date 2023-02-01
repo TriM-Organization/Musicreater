@@ -28,7 +28,7 @@ import shutil
 
 from .utils import *
 from .exceptions import *
-import instC
+from .instConstants import *
 
 from typing import TypeVar, Union
 
@@ -204,17 +204,14 @@ class midiConvert:
         default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
         :return: (str我的世界乐器名, int转换算法中的X)"""
         try:
-            return instC.with_pitch[instrumentID]
+            return pitched_instrument_list[instrumentID]
         except KeyError:
             return "note.flute", 5
 
     @staticmethod
     def __bitInst2ID_withX(instrumentID):
         try:
-            try:
-                return instC.without_pitch[instrumentID]
-            except KeyError:
-                return "note.bd", 7
+            return percussion_instrument_list[instrumentID]
         except KeyError:
             print("WARN", "无法使用打击乐器列表库，可能是不支持当前环境，打击乐器使用Dislink算法代替。")
             if instrumentID == 55:
