@@ -217,7 +217,8 @@ def isMethodOK(sth: str):
 
 
 convert_method = \
-format_ipt(f"{_('EnterMethod')}{_(':')}", isMethodOK, f"{_('MethodRangeErr').format(1, len(conversion.methods))}")[1]
+    format_ipt(f"{_('EnterMethod')}{_(':')}", isMethodOK, f"{_('MethodRangeErr').format(1, len(conversion.methods))}")[
+        1]
 
 # 选择输出格式
 while True:

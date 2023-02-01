@@ -149,3 +149,9 @@ cython_debug/
 
 # Pycharm
 /.idea
+
+# log
+/.log
+
+# package
+.7z

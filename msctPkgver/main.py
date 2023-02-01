@@ -28,6 +28,8 @@ import shutil
 
 from .utils import *
 from .exceptions import *
+import instC
+
 from typing import TypeVar, Union
 
 T = TypeVar("T")  # Declare type variable
@@ -36,7 +38,7 @@ VM = TypeVar("VM", mido.MidiFile, None)  # void mido
 
 class SingleNote:
     def __init__(
-        self, instrument: int, pitch: int, velocity, startTime: int, lastTime: int
+        self, instrument: int, pitch: int, velocity: int, startTime: int, lastTime: int
     ):
         """用于存储单个音符的类
         :param instrument 乐器编号
@@ -45,21 +47,25 @@ class SingleNote:
         :param startTime 开始之时(ms)
             注：此处的时间是用从乐曲开始到当前的毫秒数
         :param lastTime 音符延续时间(ms)"""
-        self.instrument = instrument
+        self.instrument: int = instrument
         """乐器编号"""
-        self.note = pitch
+        self.note: int = pitch
         """音符编号"""
-        self.velocity = velocity
+        self.velocity: int = velocity
         """力度/响度"""
-        self.startTime = startTime
+        self.startTime: int = startTime
         """开始之时 ms"""
-        self.lastTime = lastTime
+        self.lastTime: int = lastTime
         """音符持续时间 ms"""
 
     @property
     def inst(self):
         """乐器编号"""
         return self.instrument
+
+    @inst.setter
+    def inst(self, inst_):
+        self.instrument = inst_
 
     @property
     def pitch(self):
@@ -198,193 +204,15 @@ class midiConvert:
         default: 如果instrumentID不在范围内，返回的默认我的世界乐器名称
         :return: (str我的世界乐器名, int转换算法中的X)"""
         try:
-            a = {
-                0: ("note.harp", 6),
-                1: ("note.harp", 6),
-                2: ("note.pling", 6),
-                3: ("note.harp", 6),
-                4: ("note.pling", 6),
-                5: ("note.pling", 6),
-                6: ("note.harp", 6),
-                7: ("note.harp", 6),
-                8: ("note.share", 7),  # 打击乐器无音域
-                9: ("note.harp", 6),
-                10: ("note.didgeridoo", 8),
-                11: ("note.harp", 6),
-                12: ("note.xylophone", 4),
-                13: ("note.chime", 4),
-                14: ("note.harp", 6),
-                15: ("note.harp", 6),
-                16: ("note.bass", 8),
-                17: ("note.harp", 6),
-                18: ("note.harp", 6),
-                19: ("note.harp", 6),
-                20: ("note.harp", 6),
-                21: ("note.harp", 6),
-                22: ("note.harp", 6),
-                23: ("note.guitar", 7),
-                24: ("note.guitar", 7),
-                25: ("note.guitar", 7),
-                26: ("note.guitar", 7),
-                27: ("note.guitar", 7),
-                28: ("note.guitar", 7),
-                29: ("note.guitar", 7),
-                30: ("note.guitar", 7),
-                31: ("note.bass", 8),
-                32: ("note.bass", 8),
-                33: ("note.bass", 8),
-                34: ("note.bass", 8),
-                35: ("note.bass", 8),
-                36: ("note.bass", 8),
-                37: ("note.bass", 8),
-                38: ("note.bass", 8),
-                39: ("note.bass", 8),
-                40: ("note.harp", 6),
-                41: ("note.harp", 6),
-                42: ("note.harp", 6),
-                43: ("note.harp", 6),
-                44: ("note.iron_xylophone", 6),
-                45: ("note.guitar", 7),
-                46: ("note.harp", 6),
-                47: ("note.harp", 6),
-                48: ("note.guitar", 7),
-                49: ("note.guitar", 7),
-                50: ("note.bit", 6),
-                51: ("note.bit", 6),
-                52: ("note.harp", 6),
-                53: ("note.harp", 6),
-                54: ("note.bit", 6),
-                55: ("note.flute", 5),
-                56: ("note.flute", 5),
-                57: ("note.flute", 5),
-                58: ("note.flute", 5),
-                59: ("note.flute", 5),
-                60: ("note.flute", 5),
-                61: ("note.flute", 5),
-                62: ("note.flute", 5),
-                63: ("note.flute", 5),
-                64: ("note.bit", 6),
-                65: ("note.bit", 6),
-                66: ("note.bit", 6),
-                67: ("note.bit", 6),
-                68: ("note.flute", 5),
-                69: ("note.harp", 6),
-                70: ("note.harp", 6),
-                71: ("note.flute", 5),
-                72: ("note.flute", 5),
-                73: ("note.flute", 5),
-                74: ("note.harp", 6),
-                75: ("note.flute", 5),
-                76: ("note.harp", 6),
-                77: ("note.harp", 6),
-                78: ("note.harp", 6),
-                79: ("note.harp", 6),
-                80: ("note.bit", 6),
-                81: ("note.bit", 6),
-                82: ("note.bit", 6),
-                83: ("note.bit", 6),
-                84: ("note.bit", 6),
-                85: ("note.bit", 6),
-                86: ("note.bit", 6),
-                87: ("note.bit", 6),
-                88: ("note.bit", 6),
-                89: ("note.bit", 6),
-                90: ("note.bit", 6),
-                91: ("note.bit", 6),
-                92: ("note.bit", 6),
-                93: ("note.bit", 6),
-                94: ("note.bit", 6),
-                95: ("note.bit", 6),
-                96: ("note.bit", 6),
-                97: ("note.bit", 6),
-                98: ("note.bit", 6),
-                99: ("note.bit", 6),
-                100: ("note.bit", 6),
-                101: ("note.bit", 6),
-                102: ("note.bit", 6),
-                103: ("note.bit", 6),
-                104: ("note.harp", 6),
-                105: ("note.banjo", 6),
-                106: ("note.harp", 6),
-                107: ("note.harp", 6),
-                108: ("note.harp", 6),
-                109: ("note.harp", 6),
-                110: ("note.harp", 6),
-                111: ("note.guitar", 7),
-                112: ("note.harp", 6),
-                113: ("note.bell", 4),
-                114: ("note.harp", 6),
-                115: ("note.cow_bell", 5),
-                116: ("note.bd", 7),  # 打击乐器无音域
-                117: ("note.bass", 8),
-                118: ("note.bit", 6),
-                119: ("note.bd", 7),  # 打击乐器无音域
-                120: ("note.guitar", 7),
-                121: ("note.harp", 6),
-                122: ("note.harp", 6),
-                123: ("note.harp", 6),
-                124: ("note.harp", 6),
-                125: ("note.hat", 7),  # 打击乐器无音域
-                126: ("note.bd", 7),  # 打击乐器无音域
-                127: ("note.snare", 7),  # 打击乐器无音域
-            }[instrumentID]
+            return instC.with_pitch[instrumentID]
         except KeyError:
-            a = ("note.flute", 5)
-        return a
+            return "note.flute", 5
 
     @staticmethod
     def __bitInst2ID_withX(instrumentID):
         try:
             try:
-                return {
-                    34: ("note.bd", 7),
-                    35: ("note.bd", 7),
-                    36: ("note.hat", 7),
-                    37: ("note.snare", 7),
-                    38: ("note.snare", 7),
-                    39: ("note.snare", 7),
-                    40: ("note.hat", 7),
-                    41: ("note.snare", 7),
-                    42: ("note.hat", 7),
-                    43: ("note.snare", 7),
-                    44: ("note.snare", 7),
-                    45: ("note.bell", 4),
-                    46: ("note.snare", 7),
-                    47: ("note.snare", 7),
-                    48: ("note.bell", 4),
-                    49: ("note.hat", 7),
-                    50: ("note.bell", 4),
-                    51: ("note.bell", 4),
-                    52: ("note.bell", 4),
-                    53: ("note.bell", 4),
-                    54: ("note.bell", 4),
-                    55: ("note.bell", 4),
-                    56: ("note.snare", 7),
-                    57: ("note.hat", 7),
-                    58: ("note.chime", 4),
-                    59: ("note.iron_xylophone", 6),
-                    60: ("note.bd", 7),
-                    61: ("note.bd", 7),
-                    62: ("note.xylophone", 4),
-                    63: ("note.xylophone", 4),
-                    64: ("note.xylophone", 4),
-                    65: ("note.hat", 7),
-                    66: ("note.bell", 4),
-                    67: ("note.bell", 4),
-                    68: ("note.hat", 7),
-                    69: ("note.hat", 7),
-                    70: ("note.flute", 5),
-                    71: ("note.flute", 5),
-                    72: ("note.hat", 7),
-                    73: ("note.hat", 7),
-                    74: ("note.xylophone", 4),
-                    75: ("note.hat", 7),
-                    76: ("note.hat", 7),
-                    77: ("note.xylophone", 4),
-                    78: ("note.xylophone", 4),
-                    79: ("note.bell", 4),
-                    80: ("note.bell", 4),
-                }[instrumentID]
+                return instC.without_pitch[instrumentID]
             except KeyError:
                 return "note.bd", 7
         except KeyError:
@@ -399,7 +227,7 @@ class midiConvert:
                 return "note.bd", 7
 
     @staticmethod
-    def __score2time(score: int):
+    def score2time(score: int):
         return str(int(int(score / 20) / 60)) + ":" + str(int(int(score / 20) % 60))
 
     def __formProgressBar(
@@ -434,7 +262,7 @@ class midiConvert:
             pgs_style = pgs_style.replace(r"%^s", str(maxscore))
 
         if r"%^t" in pgs_style:
-            pgs_style = pgs_style.replace(r"%^t", self.__score2time(maxscore))
+            pgs_style = pgs_style.replace(r"%^t", self.score2time(maxscore))
 
         sbn_pc = scoreboard_name[:2]
         if r"%%%" in pgs_style:
@@ -683,18 +511,16 @@ class midiConvert:
 
         # 我们来用通道统计音乐信息
         for msg in self.midi:
-
-            if msg.time != 0:
-                try:
-                    microseconds += msg.time * 1000
-                    # print(microseconds)
-                except NameError:
-                    if self.debugMode:
-                        raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-                    else:
-                        microseconds += (
-                            msg.time * 1000
-                        )
+            try:
+                microseconds += msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
+                # print(microseconds)
+            except NameError:
+                if self.debugMode:
+                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                else:
+                    microseconds += (
+                        msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
+                    )
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
@@ -791,7 +617,8 @@ class midiConvert:
 
                     cmdAmount += 1
 
-            tracks.append(nowTrack)
+            if nowTrack:
+                tracks.append(nowTrack)
 
         return [tracks, cmdAmount, maxScore]
 
@@ -1091,20 +918,15 @@ class midiConvert:
 
         # 我们来用通道统计音乐信息
         for msg in self.midi:
+            try:
+                microseconds += msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
 
-            if msg.time != 0:
-                try:
-                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
-                    # print(microseconds)
-                except NameError:
-                    if self.debugMode:
-                        raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-                    else:
-                        microseconds += (
-                            msg.time
-                            * mido.midifiles.midifiles.DEFAULT_TEMPO
-                            / self.midi.ticks_per_beat
-                        )
+                # print(microseconds)
+            except NameError:
+                if self.debugMode:
+                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
+                else:
+                    microseconds += msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
 
             if msg.is_meta:
                 if msg.type == "set_tempo":
