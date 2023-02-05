@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import setuptools
+import Musicreater
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read().replace(
@@ -8,11 +9,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="Musicreater",
-    version="0.2.3",
+    version=Musicreater.__version__,
     author="Eilles Wan, bgArray",
     author_email="TriM-Organization@hotmail.com",
     description="一款免费开源的 《我的世界》 mid音乐转换库。\n"
-    " A free open-source python library used to convert midi into Minecraft.",
+                " A free open-source python library used to convert midi into Minecraft.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TriM-Organization/Musicreater",
@@ -30,5 +31,10 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+    ],
+    # 需要安装的依赖
+    install_requires=[
+        'mido',
+        "brotli"
     ],
 )
