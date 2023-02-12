@@ -510,21 +510,7 @@ class midiConvert:
 
         # 我们来用通道统计音乐信息
         for msg in self.midi:
-            # try:
             microseconds += msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
-                # print(microseconds)
-            # except NameError:
-            #     if self.debugMode:
-            #         raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-            #     else:
-            #         microseconds += (
-            #             msg.time * 1000  # 任何人都tm不要动这里，这里循环方式不是track，所以，这里的计时方式不一样
-            #         )
-
-            # if msg.is_meta:
-            #     if msg.type == "set_tempo":
-            #         tempo = msg.tempo
-            # else:
             if not msg.is_meta:
                 if self.debugMode:
                     try:
@@ -649,13 +635,13 @@ class midiConvert:
 
                 if msg.time != 0:
                     try:
-                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                        microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
                         # print(microseconds)
                     except NameError:
                         if self.debugMode:
                             raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
                         else:
-                            microseconds += (msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat)
+                            microseconds += (msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat) / 1000
 
                 if msg.is_meta:
                     if msg.type == "set_tempo":
@@ -1212,13 +1198,13 @@ class midiConvert:
 
                 if msg.time != 0:
                     try:
-                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                        microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
                         # print(microseconds)
                     except NameError:
                         if self.debugMode:
                             raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
                         else:
-                            microseconds += (msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat)
+                            microseconds += (msg.time * mido.midifiles.midifiles.DEFAULT_TEMPO / self.midi.ticks_per_beat) / 1000
 
                 if msg.is_meta:
                     if msg.type == "set_tempo":
@@ -1463,6 +1449,29 @@ class midiConvert:
         shutil.rmtree(f"{self.outputPath}/temp/")
 
         return True, maxlen, maxscore
+
+    def to_mcstructure_file_with_delay(
+        self,
+        method: int = 1,
+        volume: float = 1.0,
+        speed: float = 1.0,
+        progressbar: Union[bool, tuple] = False,
+        player: str = "@a",
+        author: str = "Eilles",
+        max_height: int = 64,
+    ):
+        """
+        使用method指定的转换算法，将midi转换为BDX结构文件
+        :param method: 转换算法
+        :param author: 作者名称
+        :param progressbar: 进度条，（当此参数为True时使用默认进度条，为其他的值为真的参数时识别为进度条自定义参数，为其他值为假的时候不生成进度条）
+        :param max_height: 生成结构最大高度
+        :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        :param player: 玩家选择器，默认为`@a`
+        :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
+        """
+        pass
 
     def to_BDX_file(
         self,
