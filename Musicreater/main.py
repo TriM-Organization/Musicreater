@@ -207,7 +207,7 @@ class midiConvert:
         try:
             return percussion_instrument_list[instrumentID]
         except KeyError:
-            print("WARN", "无法使用打击乐器列表库，可能是不支持当前环境，打击乐器使用Dislink算法代替。")
+            print("WARN", "无法使用打击乐器列表库，或者使用了不存在的乐器，打击乐器使用Dislink算法代替。{instrumentID}")
             if instrumentID == 55:
                 return "note.cow_bell", 5
             elif instrumentID in [41, 43, 45]:
