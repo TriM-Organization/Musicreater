@@ -37,8 +37,4 @@ setuptools.setup(
         "Brotli>=1.0.9",
         "mido>=1.2.10",
     ],
-    requires=[
-        "Brotli>=1.0.9",
-        "mido>=1.2.10",
-    ],
 )
