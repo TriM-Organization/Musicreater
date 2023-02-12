@@ -4,7 +4,7 @@
 <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
 </p>
 
-<h3 align="center">一个免费开源的《我的世界：基岩版》音乐编辑制作软件</h3>
+<h3 align="center">一款免费开源的 《我的世界》 MIDI音乐转换库。</h3>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
@@ -24,7 +24,7 @@
 
 ## 介绍🚀
 
-音·创 是一个免费开源的针对 **《我的世界》** 的midi音乐转换库
+音·创 是一个免费开源的针对 **《我的世界》** 的MIDI音乐转换库
 
 欢迎加群：[861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
@@ -35,7 +35,7 @@
     pip install Musicreater
     ```
 
-- 如果报错，尝试：
+- 如果出现错误，可以尝试：
     ```bash
     pip install -i https://pypi.python.org/simple Musicreater
     ```
@@ -44,7 +44,7 @@
     pip install -i https://pypi.python.org/simple Musicreater --upgrade
     ```
 
-- 克隆仓库
+- 克隆仓库并安装
     ```bash
     git clone https://gitee.com/TriM-Organization/Musicreater.git
     cd Musicreater
@@ -75,7 +75,7 @@
 - 感谢 **Touch “偷吃”**\<QQ1793537164\> 提供的BDX导入测试支持，并对程序的改进提供了丰富的意见；同时也感谢他的不断尝试新的内容，使我们的排错更进一步
 - 感谢 **Mono**\<QQ738893087\> 反馈安装时的问题，辅助我们找到了视窗操作系统下的兼容性问题
 - 感谢 **Ammelia “艾米利亚”**\<QQ2838334637\> 敦促我们进行新的功能开发，并为新功能提出了非常优秀的大量建议，以及提供的BDX导入测试支持，为我们的新结构生成算法提供了大量的实际理论支持
-- 感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传
+- 感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传，希望他能考的一所优秀的大学！
 - 感谢 **指令师_苦力怕 playjuice123**\<QQ240667197\>为我们的程序找出错误，并提醒我们修复一个一直存在的大bug。
 - 感谢 **雷霆**\<QQ3555268519\>为我们的程序找出错误，并提醒修复bug。
 
@@ -88,6 +88,18 @@
 若遇到库中的问题，欢迎在[此](https://gitee.com/TriM-Organization/Musicreater/issues/new)提出你的issue。
 
 如果需要与开发组进行交流，欢迎加入我们的[开发闲聊Q群](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)。
+
+--------------------------------------------
+
+NOT AN OFFICIAL MINECRAFT PRODUCT.
+
+NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
+
+此项目并非一个官方 《我的世界》（*Minecraft*）项目
+
+此项目不隶属或关联于 Mojang Studios 或 微软
+
+
 
 
 

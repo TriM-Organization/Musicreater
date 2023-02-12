@@ -4,7 +4,7 @@
 <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
 </p>
 
-<h3 align="center">An open source and free software of making music in Minecraft</h3>
+<h3 align="center">a free open-source library of converting midi files into *Minecraft* formats.</h3>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">
@@ -63,6 +63,18 @@ This list is not in any order.
 Meet problems? Welcome to give out your issue [here](https://gitee.com/EillesWan/Musicreater/issues/new)!
 
 Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
+
+
+--------------------------------------------
+
+NOT AN OFFICIAL MINECRAFT PRODUCT.
+
+NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
+
+此项目并非一个官方 《我的世界》（*Minecraft*）项目
+
+此项目不隶属或关联于 Mojang Studios 或 微软
+
 
 
 

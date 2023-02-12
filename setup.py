@@ -13,7 +13,7 @@ setuptools.setup(
     author="Eilles Wan, bgArray",
     author_email="TriM-Organization@hotmail.com",
     description="一款免费开源的 《我的世界》 mid音乐转换库。\n"
-                " A free open-source python library used to convert midi into Minecraft.",
+    "A free open-source python library used to convert midi into Minecraft.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TriM-Organization/Musicreater",
@@ -34,7 +34,11 @@ setuptools.setup(
     ],
     # 需要安装的依赖
     install_requires=[
-        'mido',
-        "brotli"
+        "Brotli>=1.0.9",
+        "mido>=1.2.10",
+    ],
+    requires=[
+        "Brotli>=1.0.9",
+        "mido>=1.2.10",
     ],
 )
