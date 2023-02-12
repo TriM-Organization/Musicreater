@@ -30,12 +30,21 @@
 
 ## 下载安装
 
--   使用pypi
+- 使用pypi
     ```bash
     pip install Musicreater
     ```
 
--   克隆仓库
+- 如果报错，尝试：
+    ```bash
+    pip install -i https://pypi.python.org/simple Musicreater
+    ```
+- （对于开发者来说）升级：
+    ```bash
+    pip install -i https://pypi.python.org/simple Musicreater --upgrade
+    ```
+
+- 克隆仓库
     ```bash
     git clone https://gitee.com/TriM-Organization/Musicreater.git
     cd Musicreater
