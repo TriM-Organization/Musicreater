@@ -14,7 +14,7 @@ y = "y"
 z = "z"
 
 
-def move(axis: str, value: int):
+def bdx_move(axis: str, value: int):
     if value == 0:
         return b""
     if abs(value) == 1:
@@ -149,6 +149,95 @@ def to_BDX_bytes(
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(len(commands), max_height)
     _bytes = b""
+
+    y_forward = True
+    z_forward = True
+
+    now_y = 0
+    now_z = 0
+    now_x = 0
+
+    for cmd, delay in commands:
+        impluse = 2
+        condition = False
+        needRedstone = False
+        tickDelay = delay
+        customName = ""
+        executeOnFirstTick = False
+        trackOutput = True
+        _bytes += form_command_block_in_BDX_bytes(
+            cmd,
+            (1 if y_forward else 0)
+            if (
+                ((now_y != 0) and (not y_forward))
+                or (y_forward and (now_y != (max_height - 1)))
+            )
+            else (3 if z_forward else 2)
+            if (
+                ((now_z != 0) and (not z_forward))
+                or (z_forward and (now_z != _sideLength))
+            )
+            else 5,
+            impluse=impluse,
+            condition=condition,
+            needRedstone=needRedstone,
+            tickDelay=tickDelay,
+            customName=customName,
+            executeOnFirstTick=executeOnFirstTick,
+            trackOutput=trackOutput,
+        )
+
+        now_y += 1 if y_forward else -1
+
+        if ((now_y >= max_height) and y_forward) or ((now_y < 0) and (not y_forward)):
+            now_y -= 1 if y_forward else -1
+
+            y_forward = not y_forward
+
+            now_z += 1 if z_forward else -1
+
+            if ((now_z > _sideLength) and z_forward) or (
+                (now_z < 0) and (not z_forward)
+            ):
+                now_z -= 1 if z_forward else -1
+                z_forward = not z_forward
+                _bytes += key[x][1]
+                now_x += 1
+            else:
+
+                _bytes += key[z][int(z_forward)]
+
+        else:
+
+            _bytes += key[y][int(y_forward)]
+
+    return (
+        _bytes,
+        [
+            now_x + 1,
+            max_height if now_x or now_z else now_y,
+            _sideLength if now_x else now_z,
+        ],
+        [now_x, now_y, now_z],
+    )
+
+def to_structure(
+    commands: list,
+    max_height: int = 64,
+):
+    """
+    :param commands: 指令列表(指令, 延迟)
+    :param max_height: 生成结构最大高度
+    :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
+    """
+    # 导入库
+    from mcstructure import Block, Structure
+
+    _sideLength = bottem_side_length_of_smallest_square_bottom_box(len(commands), max_height)
+
+    struct = Structure(
+        (_sideLength, max_height, _sideLength),  # 声明结构大小
+    )
 
     y_forward = True
     z_forward = True
