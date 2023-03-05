@@ -91,13 +91,19 @@
 
 --------------------------------------------
 
-NOT AN OFFICIAL MINECRAFT PRODUCT.
-
-NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
-
 此项目并非一个官方 《我的世界》（*Minecraft*）项目
 
 此项目不隶属或关联于 Mojang Studios 或 微软
+
+此项目亦不与 网易 相关
+
+“Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为引用性使用
+
+* 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易网络科技发展有限公司
+
+NOT AN OFFICIAL MINECRAFT PRODUCT.
+
+NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
 
 
 
