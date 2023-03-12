@@ -5,13 +5,13 @@
 
 mcstructure 文件是未经压缩的 [NBT 文件](https://wiki.vg/NBT#Specification)，也正如《我的世界：基岩版》的所有 NBT 文件一样，其皆以小端字节序（又称小端序）存储。以下是此类文件的 NBT 标签结构：
 
-<style>img{width: 3%;}</style>
+<!-- <style>img{width: 16px;}</style> -->
 
 [nbt-tag-types]: https://static.wikia.nocookie.net/minecraft_zh_gamepedia/images/d/d0/Nbtsheet.png/revision/latest
-[int]: https://foruda.gitee.com/images/1678607417066876136/a1771588_9911226.png
-[string]: https://foruda.gitee.com/images/1678607425650690164/1a6315b0_9911226.png
-[list]: https://foruda.gitee.com/images/1678607435868247552/890a21c3_9911226.png
-[compound]: https://foruda.gitee.com/images/1678607445511007209/448e8cec_9911226.png
+[int]: https://foruda.gitee.com/images/1678607417066876136/a1771588_9911226.png?width=16
+[string]: https://foruda.gitee.com/images/1678607425650690164/1a6315b0_9911226.png?width=16
+[list]: https://foruda.gitee.com/images/1678607435868247552/890a21c3_9911226.png?width=16
+[compound]: https://foruda.gitee.com/images/1678607445511007209/448e8cec_9911226.png?width=16
 
 ![Integer][int] 整型 `format_version`: 当前总为 `1`
 
