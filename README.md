@@ -1,14 +1,25 @@
-<h1 align="center">音·创 Musicreater</h1>
+
+<h1 align="center">
+    音·创 Musicreater
+</h1>
 
 <p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
+    <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png">
+    </img>
 </p>
 
 <h3 align="center">一款免费开源的 《我的世界》 MIDI音乐转换库。</h3>
 
 <p align="center">
-<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <a href='https://gitee.com/TriM-Organization/Musicreater'>
+        <img align="right" src='https://gitee.com/TriM-Organization/Musicreater/widgets/widget_1.svg' alt='Fork me on Gitee'>
+        </img>
+    </a>
 <p>
+
+
+
 
 
 [![][Bilibili: 金羿ELS]](https://space.bilibili.com/397369002/)
@@ -17,6 +28,11 @@
 [![][python]](https://www.python.org/)
 [![][license]](LICENSE)
 [![][release]](../../releases)
+
+[![GiteeStar](https://gitee.com/TriM-Organization/Musicreater/badge/star.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/stargazers)
+[![GiteeFork](https://gitee.com/TriM-Organization/Musicreater/badge/fork.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/members)
+[![GitHub Repo stars](https://img.shields.io/github/stars/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/stargazers)
+[![GitHub Repo Forks](https://img.shields.io/github/forks/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/forks)
 
 
 简体中文🇨🇳 | [English🇬🇧](README_EN.md)

@@ -221,6 +221,69 @@ def to_BDX_bytes(
         [now_x, now_y, now_z],
     )
 
+
+def form_command_block_in_NBT_struct(
+    command: str,
+    particularValue: int,
+    impluse: int = 0,
+    condition: bool = False,
+    needRedstone: bool = True,
+    tickDelay: int = 0,
+    customName: str = "",
+    executeOnFirstTick: bool = False,
+    trackOutput: bool = True,
+):
+    """
+    使用指定项目返回指定的指令方块结构
+    :param command: `str`
+        指令
+    :param particularValue:
+        方块特殊值，即朝向
+            :0	下	无条件
+            :1	上	无条件
+            :2	z轴负方向	无条件
+            :3	z轴正方向	无条件
+            :4	x轴负方向	无条件
+            :5	x轴正方向	无条件
+            :6	下	无条件
+            :7	下	无条件
+
+            :8	下	有条件
+            :9	上	有条件
+            :10	z轴负方向	有条件
+            :11	z轴正方向	有条件
+            :12	x轴负方向	有条件
+            :13	x轴正方向	有条件
+            :14	下	有条件
+            :14	下	有条件
+        注意！此处特殊值中的条件会被下面condition参数覆写
+    :param impluse: `int 0|1|2`
+        方块类型
+            0脉冲 1循环 2连锁
+    :param condition: `bool`
+        是否有条件
+    :param needRedstone: `bool`
+        是否需要红石
+    :param tickDelay: `int`
+        执行延时
+    :param customName: `str`
+        悬浮字
+    lastOutput: `str`
+        上次输出字符串，注意此处需要留空
+    :param executeOnFirstTick: `bool`
+        执行第一个已选项(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
+    :param trackOutput: `bool`
+        是否输出
+
+    :return:str
+    """
+    from mcstructure import Block
+    block = Block("minecraft:command_block")
+
+    return block
+
+
+
 def to_structure(
     commands: list,
     max_height: int = 64,

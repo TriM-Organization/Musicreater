@@ -1479,6 +1479,8 @@ class midiConvert:
 
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
+        
+        
 
 
                 
