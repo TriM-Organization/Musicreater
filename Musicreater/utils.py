@@ -277,8 +277,8 @@ def form_command_block_in_NBT_struct(
 
     :return:str
     """
-    from mcstructure import Block
-    block = Block("minecraft:command_block")
+    from TrimMCStruct import Block
+    block = Block("minecraft","command_block")
 
     return block
 
@@ -294,7 +294,7 @@ def to_structure(
     :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
     """
     # 导入库
-    from mcstructure import Block, Structure
+    from TrimMCStruct import Block, Structure
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(len(commands), max_height)
 
