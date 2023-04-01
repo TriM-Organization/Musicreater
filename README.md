@@ -2,12 +2,12 @@
 
 ## ***FOR UPDATING FILES IN HERE(GitHub)***  此处编辑请注意
 
-> We have setted a automatic mirror between Gitee(a native Chinese Code Hosting Platform). 
-> That means you should check whether there is another update on Gitee if you want to git file(s) updated on GitHub.
+> We have setted a automatic mirror between Gitee(a Chinese native Code Hosting Platform). 
+> That means you should check whether there is another update on Gitee if you want to get file(s) updated on GitHub.
 > If a update is pushed on Gitee and not been pushed into GitHub yet, 
-> A push will **COVERED** by the another one, which branch will leave is under indeterminacy.
-> So we STRONG suggest not to push in this repo here in GitHub.
-> But if you want, make sure that in 30min, there is NOT ANY pushes on this repo on Gitee.
+> A push will **COVERED** by the another one, which branch to deleted is under indeterminacy, maybe both destoried is possible.
+> So we STRONG suggest not to push updates here in GitHub.
+> But if you want to, make sure that in 30min, there is NOT ANY pushes in this repository on Gitee.
 >
 > 由于我们建立了对于 Gitee 和 GitHub 之间的双向更新镜像，
 > 如果您需要在此处(GitHub处)进行更新之前请三思，我们非常建议你在 Gitee 上更新而不是 GitHub。
@@ -16,7 +16,7 @@
 > 如果需要切换一个主要的代码托管平台，我们会有自己的选择；但正如其名，代码托管平台只是托管一下代码，我认为我有必要自行地决定我的智慧结晶使用如何的服务。
 > 况且，使用的服务是独立于代码托管之外的，并不妨碍你在哪更新，除非你一年四季开着 VPN 而访问不上 Gitee，不过这几乎不可能，因为 Gitee 的服务器是阿里巴巴的。
 > 言归正传，在 GitHub 更新之前，你需要首先检查：在30分钟内是否有其他的更新在 Gitee 上提出，如果有则不要在此时提交更新。
-> 否则会产生非常严重的后果，运气好可以合到一起去，运气不好，完蛋了，有可能两个更新*全都没了*。
+> 否则会产生非常严重的后果，运气好可以合到一起去，运气不好，完蛋了，有可能两个更新**全都没了**。
 
 IF YOU WANT TO TAKE PART IN THE DEVELOPMENT OF THIS PROJECT, PLEASE CONTACT EILLES,
 and [Musicreater on Gitee](https://gitee.com/EillesWan/Musicreater/) is here, if you like to update here on GitHub, you **MUST** check it before.
