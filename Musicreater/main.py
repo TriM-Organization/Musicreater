@@ -155,6 +155,7 @@ class midiConvert:
             [
                 self._toCmdList_withDelay_m1,
                 self._toCmdList_withDelay_m2,
+                self._toCmdList_withDelay_m3,
             ]
         )
 
@@ -1457,7 +1458,6 @@ class midiConvert:
         speed: float = 1.0,
         progressbar: Union[bool, tuple] = False,
         player: str = "@a",
-        author: str = "Eilles",
         max_height: int = 64,
     ):
         """
@@ -1480,8 +1480,13 @@ class midiConvert:
         if not os.path.exists(self.outputPath):
             os.makedirs(self.outputPath)
         
-        
+        struct, size = to_structure(cmdlist,max_height-1)
 
+        with open(
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.mcstructure")),
+            "wb+",
+        ) as f:
+            struct.dump(f)
 
                 
 
