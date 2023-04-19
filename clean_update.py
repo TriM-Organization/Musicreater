@@ -7,9 +7,24 @@ egg_info = [i for i in os.listdir() if i.endswith(".egg-info")][0]
 print(egg_info)
 
 # remove build, dist, logs, TrimLog.egg-info folders
-shutil.rmtree("build")
-shutil.rmtree("dist")
-shutil.rmtree(egg_info)
-shutil.rmtree("logs")
+try:
+    shutil.rmtree("build")
+except FileNotFoundError:
+    pass
+
+try:
+    shutil.rmtree("dist")
+except FileNotFoundError:
+    pass
+
+try:
+    shutil.rmtree(egg_info)
+except FileNotFoundError:
+    pass
+
+try:
+    shutil.rmtree("logs")
+except FileNotFoundError:
+    pass
 
 print("Cleaned up!")
