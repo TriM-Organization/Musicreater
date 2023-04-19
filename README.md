@@ -1,22 +1,38 @@
-<h1 align="center">音·创 Musicreater</h1>
+
+<h1 align="center">
+    音·创 Musicreater
+</h1>
 
 <p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
+    <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png">
+    </img>
 </p>
 
 <h3 align="center">一款免费开源的 《我的世界》 MIDI音乐转换库。</h3>
 
 <p align="center">
-<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <a href='https://gitee.com/TriM-Organization/Musicreater'>
+        <img align="right" src='https://gitee.com/TriM-Organization/Musicreater/widgets/widget_1.svg' alt='Fork me on Gitee'>
+        </img>
+    </a>
 <p>
 
 
-[![][Bilibili: 凌云金羿]](https://space.bilibili.com/397369002/)
+
+
+
+[![][Bilibili: 金羿ELS]](https://space.bilibili.com/397369002/)
 [![][Bilibili: 诸葛亮与八卦阵]](https://space.bilibili.com/604072474) 
 [![CodeStyle: black]](https://github.com/psf/black)
 [![][python]](https://www.python.org/)
 [![][license]](LICENSE)
 [![][release]](../../releases)
+
+[![GiteeStar](https://gitee.com/TriM-Organization/Musicreater/badge/star.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/stargazers)
+[![GiteeFork](https://gitee.com/TriM-Organization/Musicreater/badge/fork.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/members)
+[![GitHub Repo stars](https://img.shields.io/github/stars/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/stargazers)
+[![GitHub Repo Forks](https://img.shields.io/github/forks/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/forks)
 
 
 简体中文🇨🇳 | [English🇬🇧](README_EN.md)
@@ -91,19 +107,25 @@
 
 --------------------------------------------
 
-NOT AN OFFICIAL MINECRAFT PRODUCT.
-
-NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
-
 此项目并非一个官方 《我的世界》（*Minecraft*）项目
 
 此项目不隶属或关联于 Mojang Studios 或 微软
 
+此项目亦不与 网易 相关
+
+“Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为引用性使用
+
+* 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易网络科技发展有限公司
+
+NOT AN OFFICIAL MINECRAFT PRODUCT.
+
+NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
 
 
 
 
-[Bilibili: 凌云金羿]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
+
+[Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
 [Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge

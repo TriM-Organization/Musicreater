@@ -2,7 +2,7 @@
 
 
 # 音·创 开发交流群 861684859
-# Email EillesWan2006@163.com W-YI_DoctorYI@outlook.com EillesWan@outlook.com
+# Email TriM-Organization@hotmail.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
@@ -155,6 +155,7 @@ class midiConvert:
             [
                 self._toCmdList_withDelay_m1,
                 self._toCmdList_withDelay_m2,
+                self._toCmdList_withDelay_m3,
             ]
         )
 
@@ -1457,7 +1458,6 @@ class midiConvert:
         speed: float = 1.0,
         progressbar: Union[bool, tuple] = False,
         player: str = "@a",
-        author: str = "Eilles",
         max_height: int = 64,
     ):
         """
@@ -1471,7 +1471,24 @@ class midiConvert:
         :param player: 玩家选择器，默认为`@a`
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
-        pass
+        cmdlist, max_delay = self.methods_byDelay[method - 1](
+            volume,
+            speed,
+            player,
+        )
+
+        if not os.path.exists(self.outputPath):
+            os.makedirs(self.outputPath)
+        
+        struct, size = to_structure(cmdlist,max_height-1)
+
+        with open(
+            os.path.abspath(os.path.join(self.outputPath, f"{self.midFileName}.mcstructure")),
+            "wb+",
+        ) as f:
+            struct.dump(f)
+
+                
 
     def to_BDX_file(
         self,
@@ -1552,9 +1569,9 @@ class midiConvert:
                 max_height - 1,
             )
             _bytes += pgbBytes
-            _bytes += move(y, -pgbNowPos[1])
-            _bytes += move(z, -pgbNowPos[2])
-            _bytes += move(x, 2)
+            _bytes += bdx_move(y, -pgbNowPos[1])
+            _bytes += bdx_move(z, -pgbNowPos[2])
+            _bytes += bdx_move(x, 2)
 
             size[0] += 2 + pgbSize[0]
             size[1] = max(size[1], pgbSize[1])
@@ -1632,14 +1649,14 @@ class midiConvert:
                 1,
                 customName="初始化进度条",
             )
-            _bytes += move(z, 2)
+            _bytes += bdx_move(z, 2)
             _bytes += form_command_block_in_BDX_bytes(
                 r"scoreboard players add {} {} 1".format(player, scb_name),
                 1,
                 1,
                 customName="显示进度条并加分",
             )
-            _bytes += move(y, 1)
+            _bytes += bdx_move(y, 1)
             pgbBytes, pgbSize, pgbNowPos = to_BDX_bytes(
                 [
                     (i, 0)
@@ -1648,15 +1665,15 @@ class midiConvert:
                 max_height - 1,
             )
             _bytes += pgbBytes
-            _bytes += move(y, -1 - pgbNowPos[1])
-            _bytes += move(z, -2 - pgbNowPos[2])
-            _bytes += move(x, 2)
+            _bytes += bdx_move(y, -1 - pgbNowPos[1])
+            _bytes += bdx_move(z, -2 - pgbNowPos[2])
+            _bytes += bdx_move(x, 2)
             _bytes += form_command_block_in_BDX_bytes(
                 r"scoreboard players reset {} {}".format(player, scb_name),
                 1,
                 customName="置零进度条",
             )
-            _bytes += move(y, 1)
+            _bytes += bdx_move(y, 1)
             size[0] += 2 + pgbSize[0]
             size[1] = max(size[1], pgbSize[1])
             size[2] = max(size[2], pgbSize[2])

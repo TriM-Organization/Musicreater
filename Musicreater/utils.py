@@ -14,7 +14,7 @@ y = "y"
 z = "z"
 
 
-def move(axis: str, value: int):
+def bdx_move(axis: str, value: int):
     if value == 0:
         return b""
     if abs(value) == 1:
@@ -106,13 +106,14 @@ def form_command_block_in_BDX_bytes(
     lastOutput: `str`
         上次输出字符串，注意此处需要留空
     :param executeOnFirstTick: `bool`
-        执行第一个已选项(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
+        首刻执行(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
     :param trackOutput: `bool`
         是否输出
 
     :return:str
     """
-    block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
+    block = b"\x24" + \
+        particularValue.to_bytes(2, byteorder="big", signed=False)
 
     for i in [
         impluse.to_bytes(4, byteorder="big", signed=False),
@@ -147,7 +148,9 @@ def to_BDX_bytes(
     :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
     """
 
-    _sideLength = bottem_side_length_of_smallest_square_bottom_box(len(commands), max_height)
+    _sideLength = bottem_side_length_of_smallest_square_bottom_box(
+        len(commands), max_height
+    )
     _bytes = b""
 
     y_forward = True
@@ -196,7 +199,7 @@ def to_BDX_bytes(
 
             now_z += 1 if z_forward else -1
 
-            if ((now_z > _sideLength) and z_forward) or (
+            if ((now_z >= _sideLength) and z_forward) or (
                 (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
@@ -219,4 +222,174 @@ def to_BDX_bytes(
             _sideLength if now_x else now_z,
         ],
         [now_x, now_y, now_z],
+    )
+
+
+def form_command_block_in_NBT_struct(
+    command: str,
+    coordinate: tuple,
+    particularValue: int,
+    impluse: int = 0,
+    condition: bool = False,
+    alwaysRun: bool = True,
+    tickDelay: int = 0,
+    customName: str = "",
+    executeOnFirstTick: bool = False,
+    trackOutput: bool = True,
+):
+    """
+    使用指定项目返回指定的指令方块结构
+    :param command: `str`
+        指令
+    :param coordinate: `tuple[int,int,int]`
+        此方块所在之相对坐标
+    :param particularValue:
+        方块特殊值，即朝向
+            :0	下	无条件
+            :1	上	无条件
+            :2	z轴负方向	无条件
+            :3	z轴正方向	无条件
+            :4	x轴负方向	无条件
+            :5	x轴正方向	无条件
+            :6	下	无条件
+            :7	下	无条件
+
+            :8	下	有条件
+            :9	上	有条件
+            :10	z轴负方向	有条件
+            :11	z轴正方向	有条件
+            :12	x轴负方向	有条件
+            :13	x轴正方向	有条件
+            :14	下	有条件
+            :14	下	有条件
+        注意！此处特殊值中的条件会被下面condition参数覆写
+    :param impluse: `int 0|1|2`
+        方块类型
+            0脉冲 1循环 2连锁
+    :param condition: `bool`
+        是否有条件
+    :param alwaysRun: `bool`
+        是否始终执行
+    :param tickDelay: `int`
+        执行延时
+    :param customName: `str`
+        悬浮字
+    :param executeOnFirstTick: `bool`
+        首刻执行(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
+    :param trackOutput: `bool`
+        是否输出
+
+    :return:str
+    """
+    from TrimMCStruct import Block, TAG_Long
+    block = Block(
+        "minecraft",
+        "command_block" if impluse == 0 else (
+            "repeating_command_block" if impluse == 1 else "chain_command_block"),
+        states={"conditional_bit": condition,
+                "facing_direction": particularValue},
+        extra_data={
+            'Command': command,
+            'CustomName': customName,
+            'ExecuteOnFirstTick': executeOnFirstTick,
+            'LPCommandMode': 0,
+            'LPCondionalMode': False,
+            'LPRedstoneMode': False,
+            'LastExecution': TAG_Long(0),
+            'LastOutput': '',
+            'LastOutputParams': [],
+            'SuccessCount': 0,
+            'TickDelay': tickDelay,
+            'TrackOutput': trackOutput,
+            'Version': 25,
+            'auto': alwaysRun,
+            'conditionMet': False,  # 是否已经满足条件
+            'conditionalMode': condition,
+            'id': 'CommandBlock',
+            'isMovable': True,
+            'powered': False,  # 是否已激活
+            'x': coordinate[0],
+            'y': coordinate[1],
+            'z': coordinate[2],
+        }
+    )
+    return block
+
+
+def to_structure(
+    commands: list,
+    max_height: int = 64,
+):
+    """
+    :param commands: 指令列表(指令, 延迟)
+    :param max_height: 生成结构最大高度
+    :return 成功与否，成功返回(结构类,结构占用大小)，失败返回(False,str失败原因)
+    """
+    # 导入库
+    from TrimMCStruct import Structure
+
+    _sideLength = bottem_side_length_of_smallest_square_bottom_box(
+        len(commands), max_height
+    )
+
+    struct = Structure(
+        (_sideLength, max_height, _sideLength),  # 声明结构大小
+    )
+
+    y_forward = True
+    z_forward = True
+
+    now_y = 0
+    now_z = 0
+    now_x = 0
+
+    for cmd, delay in commands:
+        coordinate = (now_x, now_y, now_z)
+        struct.set_block(coordinate,
+                         form_command_block_in_NBT_struct(
+                             command=cmd,
+                             coordinate=coordinate,
+                             particularValue=(1 if y_forward else 0)
+                             if (
+                                 ((now_y != 0) and (not y_forward))
+                                 or (y_forward and (now_y != (max_height - 1)))
+                             )
+                             else (3 if z_forward else 2)
+                             if (
+                                 ((now_z != 0) and (not z_forward))
+                                 or (z_forward and (now_z != _sideLength))
+                             )
+                             else 5,
+                             impluse=2,
+                             condition=False,
+                             alwaysRun=True,
+                             tickDelay=delay,
+                             customName="",
+                             executeOnFirstTick=False,
+                             trackOutput=True,
+                         ))
+
+        now_y += 1 if y_forward else -1
+
+        if ((now_y >= max_height) and y_forward) or ((now_y < 0) and (not y_forward)):
+            now_y -= 1 if y_forward else -1
+
+            y_forward = not y_forward
+
+            now_z += 1 if z_forward else -1
+
+            if ((now_z >= _sideLength) and z_forward) or (
+                (now_z < 0) and (not z_forward)
+            ):
+                now_z -= 1 if z_forward else -1
+                z_forward = not z_forward
+                now_x += 1
+
+    return (
+        struct,
+        [
+            now_x + 1,
+            max_height if now_x or now_z else now_y,
+            _sideLength if now_x else now_z,
+        ],
     )
