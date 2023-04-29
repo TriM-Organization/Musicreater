@@ -2,6 +2,9 @@
 import setuptools
 import Musicreater
 
+with open("requirements.txt", "r", encoding="utf-8") as fh:
+    dependences = fh.read().strip().split("\n")
+
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read().replace(
         "./docs/", "https://github.com/TriM-Organization/Musicreater/blob/master/docs/"
@@ -33,8 +36,5 @@ setuptools.setup(
         "Programming Language :: Python :: 3.10",
     ],
     # 需要安装的依赖
-    install_requires=[
-        "Brotli>=1.0.9",
-        "mido>=1.2.10",
-    ],
+    install_requires=dependences,
 )
