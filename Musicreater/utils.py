@@ -1,6 +1,6 @@
 import math
 import os
-from typing import Union
+
 from TrimMCStruct import Structure, Block, TAG_Long, TAG_Byte
 
 bdx_key = {
@@ -26,11 +26,11 @@ def bdx_move(axis: str, value: int):
         [
             1 if i else 0
             for i in (
-                value != -1,
-                value < -1 or value > 1,
-                value < -128 or value > 127,
-                value < -32768 or value > 32767,
-            )
+            value != -1,
+            value < -1 or value > 1,
+            value < -128 or value > 127,
+            value < -32768 or value > 32767,
+        )
         ]
     )
 
@@ -62,15 +62,15 @@ def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
 
 
 def form_command_block_in_BDX_bytes(
-    command: str,
-    particularValue: int,
-    impluse: int = 0,
-    condition: bool = False,
-    needRedstone: bool = True,
-    tickDelay: int = 0,
-    customName: str = "",
-    executeOnFirstTick: bool = False,
-    trackOutput: bool = True,
+        command: str,
+        particularValue: int,
+        impluse: int = 0,
+        condition: bool = False,
+        needRedstone: bool = True,
+        tickDelay: int = 0,
+        customName: str = "",
+        executeOnFirstTick: bool = False,
+        trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块放置指令项
@@ -142,8 +142,8 @@ def bottem_side_length_of_smallest_square_bottom_box(total: int, maxHeight: int)
 
 
 def commands_to_BDX_bytes(
-    commands: list,
-    max_height: int = 64,
+        commands: list,
+        max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 延迟)
@@ -175,13 +175,13 @@ def commands_to_BDX_bytes(
             cmd,
             (1 if y_forward else 0)
             if (
-                ((now_y != 0) and (not y_forward))
-                or (y_forward and (now_y != (max_height - 1)))
+                    ((now_y != 0) and (not y_forward))
+                    or (y_forward and (now_y != (max_height - 1)))
             )
             else (3 if z_forward else 2)
             if (
-                ((now_z != 0) and (not z_forward))
-                or (z_forward and (now_z != _sideLength - 1))
+                    ((now_z != 0) and (not z_forward))
+                    or (z_forward and (now_z != _sideLength - 1))
             )
             else 5,
             impluse=impluse,
@@ -203,7 +203,7 @@ def commands_to_BDX_bytes(
             now_z += 1 if z_forward else -1
 
             if ((now_z >= _sideLength) and z_forward) or (
-                (now_z < 0) and (not z_forward)
+                    (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
@@ -227,7 +227,7 @@ def commands_to_BDX_bytes(
 
 
 def form_note_block_in_NBT_struct(
-    note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
+        note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
 ):
     """生成音符盒方块
     :param note: `int`(0~24)
@@ -262,7 +262,7 @@ def form_note_block_in_NBT_struct(
 
 
 def form_repeater_in_NBT_struct(
-    delay: int, facing: int
+        delay: int, facing: int
 ):
     """生成中继器方块
     :param powered:
@@ -270,7 +270,7 @@ def form_repeater_in_NBT_struct(
     :param facing:
     :param delay: 1~4
     :return Block()"""
-    
+
     return Block(
         "minecraft",
         "unpowered_repeater",
@@ -280,17 +280,18 @@ def form_repeater_in_NBT_struct(
         },
     )
 
+
 def form_command_block_in_NBT_struct(
-    command: str,
-    coordinate: tuple,
-    particularValue: int,
-    impluse: int = 0,
-    condition: bool = False,
-    alwaysRun: bool = True,
-    tickDelay: int = 0,
-    customName: str = "",
-    executeOnFirstTick: bool = False,
-    trackOutput: bool = True,
+        command: str,
+        coordinate: tuple,
+        particularValue: int,
+        impluse: int = 0,
+        condition: bool = False,
+        alwaysRun: bool = True,
+        tickDelay: int = 0,
+        customName: str = "",
+        executeOnFirstTick: bool = False,
+        trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块结构
@@ -372,9 +373,10 @@ def form_command_block_in_NBT_struct(
         compability_version=17959425,
     )
 
+
 def commands_to_structure(
-    commands: list,
-    max_height: int = 64,
+        commands: list,
+        max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 延迟)
@@ -406,14 +408,14 @@ def commands_to_structure(
                 coordinate=coordinate,
                 particularValue=(1 if y_forward else 0)
                 if (
-                    ((now_y != 0) and (not y_forward))
-                    or (y_forward and (now_y != (max_height - 1)))
+                        ((now_y != 0) and (not y_forward))
+                        or (y_forward and (now_y != (max_height - 1)))
                 )
                 else (
                     (3 if z_forward else 2)
                     if (
-                        ((now_z != 0) and (not z_forward))
-                        or (z_forward and (now_z != _sideLength - 1))
+                            ((now_z != 0) and (not z_forward))
+                            or (z_forward and (now_z != _sideLength - 1))
                     )
                     else 5
                 ),
@@ -437,7 +439,7 @@ def commands_to_structure(
             now_z += 1 if z_forward else -1
 
             if ((now_z >= _sideLength) and z_forward) or (
-                (now_z < 0) and (not z_forward)
+                    (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
@@ -452,4 +454,3 @@ def commands_to_structure(
         ),
         (now_x, now_y, now_z),
     )
-

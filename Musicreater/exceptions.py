@@ -29,7 +29,7 @@ class MSCTBaseException(Exception):
         super().__init__(*args)
 
     def miao(
-        self,
+            self,
     ):
         for i in self.args:
             print(i + "喵！")
@@ -81,7 +81,7 @@ class NotDefineTempoError(MidiFormatException):
 class ChannelOverFlowError(MidiFormatException):
     """一个midi中含有过多的通道"""
 
-    def __init__(self, max_channel = 16, *args):
+    def __init__(self, max_channel=16, *args):
         """一个midi中含有过多的通道"""
         super().__init__("含有过多的通道（数量应≤{}）".format(max_channel), *args)
 
