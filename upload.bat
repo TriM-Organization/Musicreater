@@ -1,3 +1,3 @@
-python setup.py sdist bdist_wheel
+python -m build
 python -m twine upload dist/*
 python clean_update.py

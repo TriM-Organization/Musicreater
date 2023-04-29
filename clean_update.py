@@ -1,30 +1,22 @@
 import shutil
 import os
+from rich.console import Console
+from rich.progress import track
+
+console = Console()
 
 
-# find the full path of .egg-info folder
-egg_info = [i for i in os.listdir() if i.endswith(".egg-info")][0]
-print(egg_info)
+def main():
+    with console.status("Find the full path of .egg-info folder"):
+        egg_info: list = []
+        for file in os.listdir():
+            if os.path.isfile(file) and file.endswith(".egg-info"):
+                egg_info.append(file)
+                console.print(file)
+    for file in track(["build", "dist", "logs", *egg_info], description="Deleting files"):
+        if os.path.isdir(file) and os.access(file, os.W_OK):
+            shutil.rmtree(file)
 
-# remove build, dist, logs, TrimLog.egg-info folders
-try:
-    shutil.rmtree("build")
-except FileNotFoundError:
-    pass
 
-try:
-    shutil.rmtree("dist")
-except FileNotFoundError:
-    pass
-
-try:
-    shutil.rmtree(egg_info)
-except FileNotFoundError:
-    pass
-
-try:
-    shutil.rmtree("logs")
-except FileNotFoundError:
-    pass
-
-print("Cleaned up!")
+if __name__ == "__main__":
+    main()
