@@ -4,7 +4,7 @@
 <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
 </p>
 
-<h3 align="center">a free open-source library of converting midi files into *Minecraft* formats.</h3>
+<h3 align="center">a free open-source library of converting midi files into _Minecraft_ formats.</h3>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg">

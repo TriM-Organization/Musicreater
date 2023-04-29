@@ -25,6 +25,7 @@ class MSCTBaseException(Exception):
     """音·创库版本的所有错误均继承于此"""
 
     def __init__(self, *args):
+        """音·创库版本的所有错误均继承于此"""
         super().__init__(*args)
 
     def miao(
@@ -35,39 +36,67 @@ class MSCTBaseException(Exception):
 
     def crash_it(self):
         raise self
-    
-
-class CrossNoteError(MSCTBaseException):
-    """同通道下同音符交叉出现所产生的错误"""
-
-    pass
 
 
-class NotDefineTempoError(MSCTBaseException):
-    """没有Tempo设定导致时间无法计算的错误"""
+class MidiFormatException(MSCTBaseException):
+    """音·创库版本的所有MIDI格式错误均继承于此"""
 
-    pass
+    def __init__(self, *args):
+        """音·创库版本的所有MIDI格式错误均继承于此"""
+        super().__init__("MIDI格式错误", *args)
 
 
 class MidiDestroyedError(MSCTBaseException):
     """Midi文件损坏"""
 
-    pass
+    def __init__(self, *args):
+        """Midi文件损坏"""
+        super().__init__("MIDI文件损坏：无法读取MIDI文件", *args)
 
 
-class ChannelOverFlowError(MSCTBaseException):
-    """一个midi中含有过多的通道（数量应≤16）"""
+class CommandFormatError(RuntimeError):
+    """指令格式与目标格式不匹配而引起的错误"""
 
-    pass
+    def __init__(self, *args):
+        """指令格式与目标格式不匹配而引起的错误"""
+        super().__init__("指令格式不匹配", *args)
 
 
-class NotDefineProgramError(MSCTBaseException):
+class CrossNoteError(MidiFormatException):
+    """同通道下同音符交叉出现所产生的错误"""
+
+    def __init__(self, *args):
+        """同通道下同音符交叉出现所产生的错误"""
+        super().__init__("同通道下同音符交叉", *args)
+
+
+class NotDefineTempoError(MidiFormatException):
+    """没有Tempo设定导致时间无法计算的错误"""
+
+    def __init__(self, *args):
+        """没有Tempo设定导致时间无法计算的错误"""
+        super().__init__("在曲目开始时没有声明Tempo（未指定拍长）", *args)
+
+
+class ChannelOverFlowError(MidiFormatException):
+    """一个midi中含有过多的通道"""
+
+    def __init__(self, max_channel = 16, *args):
+        """一个midi中含有过多的通道"""
+        super().__init__("含有过多的通道（数量应≤{}）".format(max_channel), *args)
+
+
+class NotDefineProgramError(MidiFormatException):
     """没有Program设定导致没有乐器可以选择的错误"""
 
-    pass
+    def __init__(self, *args):
+        """没有Program设定导致没有乐器可以选择的错误"""
+        super().__init__("未指定演奏乐器", *args)
 
 
-class ZeroSpeedError(MSCTBaseException):
+class ZeroSpeedError(MidiFormatException):
     """以0作为播放速度的错误"""
 
-    pass
+    def __init__(self, *args):
+        """以0作为播放速度的错误"""
+        super().__init__("播放速度为0", *args)

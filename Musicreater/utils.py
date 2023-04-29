@@ -1,7 +1,9 @@
 import math
 import os
+from typing import Union
+from TrimMCStruct import Structure, Block, TAG_Long, TAG_Byte
 
-key = {
+bdx_key = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
     "y": [b"\x11", b"\x10", b"\x1d", b"\x16", b"\x17"],
     "z": [b"\x13", b"\x12", b"\x1e", b"\x18", b"\x19"],
@@ -18,7 +20,7 @@ def bdx_move(axis: str, value: int):
     if value == 0:
         return b""
     if abs(value) == 1:
-        return key[axis][0 if value == -1 else 1]
+        return bdx_key[axis][0 if value == -1 else 1]
 
     pointer = sum(
         [
@@ -32,7 +34,9 @@ def bdx_move(axis: str, value: int):
         ]
     )
 
-    return key[axis][pointer] + value.to_bytes(2 ** (pointer - 2), "big", signed=True)
+    return bdx_key[axis][pointer] + value.to_bytes(
+        2 ** (pointer - 2), "big", signed=True
+    )
 
 
 def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -112,8 +116,7 @@ def form_command_block_in_BDX_bytes(
 
     :return:str
     """
-    block = b"\x24" + \
-        particularValue.to_bytes(2, byteorder="big", signed=False)
+    block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
 
     for i in [
         impluse.to_bytes(4, byteorder="big", signed=False),
@@ -138,7 +141,7 @@ def bottem_side_length_of_smallest_square_bottom_box(total: int, maxHeight: int)
     return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
 
 
-def to_BDX_bytes(
+def commands_to_BDX_bytes(
     commands: list,
     max_height: int = 64,
 ):
@@ -178,7 +181,7 @@ def to_BDX_bytes(
             else (3 if z_forward else 2)
             if (
                 ((now_z != 0) and (not z_forward))
-                or (z_forward and (now_z != _sideLength))
+                or (z_forward and (now_z != _sideLength - 1))
             )
             else 5,
             impluse=impluse,
@@ -204,15 +207,13 @@ def to_BDX_bytes(
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
-                _bytes += key[x][1]
+                _bytes += bdx_key[x][1]
                 now_x += 1
             else:
-
-                _bytes += key[z][int(z_forward)]
+                _bytes += bdx_key[z][int(z_forward)]
 
         else:
-
-            _bytes += key[y][int(y_forward)]
+            _bytes += bdx_key[y][int(y_forward)]
 
     return (
         _bytes,
@@ -224,6 +225,60 @@ def to_BDX_bytes(
         [now_x, now_y, now_z],
     )
 
+
+def form_note_block_in_NBT_struct(
+    note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
+):
+    """生成音符盒方块
+    :param note: `int`(0~24)
+        音符的音高
+    :param coordinate: `tuple[int,int,int]`
+        此方块所在之相对坐标
+    :param instrument: `str`
+        音符盒的乐器
+    :param powered: `bool`
+        是否已被激活
+    :return Block
+    """
+
+    return Block(
+        "minecraft",
+        "noteblock",
+        {
+            "instrument": instrument.replace("note.", ""),
+            "note": note,
+            "powered": powered,
+        },
+        {
+            "block_entity_data": {
+                "note": TAG_Byte(note),
+                "id": "noteblock",
+                "x": coordinate[0],
+                "y": coordinate[1],
+                "z": coordinate[2],
+            }
+        },
+    )
+
+
+def form_repeater_in_NBT_struct(
+    delay: int, facing: int
+):
+    """生成中继器方块
+    :param powered:
+    :param locked:
+    :param facing:
+    :param delay: 1~4
+    :return Block()"""
+    
+    return Block(
+        "minecraft",
+        "unpowered_repeater",
+        {
+            "repeater_delay": delay,
+            "direction": facing,
+        },
+    )
 
 def form_command_block_in_NBT_struct(
     command: str,
@@ -281,42 +336,43 @@ def form_command_block_in_NBT_struct(
 
     :return:str
     """
-    from TrimMCStruct import Block, TAG_Long
-    block = Block(
+
+    return Block(
         "minecraft",
-        "command_block" if impluse == 0 else (
-            "repeating_command_block" if impluse == 1 else "chain_command_block"),
-        states={"conditional_bit": condition,
-                "facing_direction": particularValue},
+        "command_block"
+        if impluse == 0
+        else ("repeating_command_block" if impluse == 1 else "chain_command_block"),
+        states={"conditional_bit": condition, "facing_direction": particularValue},
         extra_data={
-            'Command': command,
-            'CustomName': customName,
-            'ExecuteOnFirstTick': executeOnFirstTick,
-            'LPCommandMode': 0,
-            'LPCondionalMode': False,
-            'LPRedstoneMode': False,
-            'LastExecution': TAG_Long(0),
-            'LastOutput': '',
-            'LastOutputParams': [],
-            'SuccessCount': 0,
-            'TickDelay': tickDelay,
-            'TrackOutput': trackOutput,
-            'Version': 25,
-            'auto': alwaysRun,
-            'conditionMet': False,  # 是否已经满足条件
-            'conditionalMode': condition,
-            'id': 'CommandBlock',
-            'isMovable': True,
-            'powered': False,  # 是否已激活
-            'x': coordinate[0],
-            'y': coordinate[1],
-            'z': coordinate[2],
-        }
+            "block_entity_data": {
+                "Command": command,
+                "CustomName": customName,
+                "ExecuteOnFirstTick": executeOnFirstTick,
+                "LPCommandMode": 0,
+                "LPCondionalMode": False,
+                "LPRedstoneMode": False,
+                "LastExecution": TAG_Long(0),
+                "LastOutput": "",
+                "LastOutputParams": [],
+                "SuccessCount": 0,
+                "TickDelay": tickDelay,
+                "TrackOutput": trackOutput,
+                "Version": 25,
+                "auto": alwaysRun,
+                "conditionMet": False,  # 是否已经满足条件
+                "conditionalMode": condition,
+                "id": "CommandBlock",
+                "isMovable": True,
+                "powered": False,  # 是否已激活
+                "x": coordinate[0],
+                "y": coordinate[1],
+                "z": coordinate[2],
+            }
+        },
+        compability_version=17959425,
     )
-    return block
 
-
-def to_structure(
+def commands_to_structure(
     commands: list,
     max_height: int = 64,
 ):
@@ -325,8 +381,6 @@ def to_structure(
     :param max_height: 生成结构最大高度
     :return 成功与否，成功返回(结构类,结构占用大小)，失败返回(False,str失败原因)
     """
-    # 导入库
-    from TrimMCStruct import Structure
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(
         len(commands), max_height
@@ -345,29 +399,33 @@ def to_structure(
 
     for cmd, delay in commands:
         coordinate = (now_x, now_y, now_z)
-        struct.set_block(coordinate,
-                         form_command_block_in_NBT_struct(
-                             command=cmd,
-                             coordinate=coordinate,
-                             particularValue=(1 if y_forward else 0)
-                             if (
-                                 ((now_y != 0) and (not y_forward))
-                                 or (y_forward and (now_y != (max_height - 1)))
-                             )
-                             else (3 if z_forward else 2)
-                             if (
-                                 ((now_z != 0) and (not z_forward))
-                                 or (z_forward and (now_z != _sideLength))
-                             )
-                             else 5,
-                             impluse=2,
-                             condition=False,
-                             alwaysRun=True,
-                             tickDelay=delay,
-                             customName="",
-                             executeOnFirstTick=False,
-                             trackOutput=True,
-                         ))
+        struct.set_block(
+            coordinate,
+            form_command_block_in_NBT_struct(
+                command=cmd,
+                coordinate=coordinate,
+                particularValue=(1 if y_forward else 0)
+                if (
+                    ((now_y != 0) and (not y_forward))
+                    or (y_forward and (now_y != (max_height - 1)))
+                )
+                else (
+                    (3 if z_forward else 2)
+                    if (
+                        ((now_z != 0) and (not z_forward))
+                        or (z_forward and (now_z != _sideLength - 1))
+                    )
+                    else 5
+                ),
+                impluse=2,
+                condition=False,
+                alwaysRun=True,
+                tickDelay=delay,
+                customName="",
+                executeOnFirstTick=False,
+                trackOutput=True,
+            ),
+        )
 
         now_y += 1 if y_forward else -1
 
@@ -387,9 +445,11 @@ def to_structure(
 
     return (
         struct,
-        [
+        (
             now_x + 1,
             max_height if now_x or now_z else now_y,
             _sideLength if now_x else now_z,
-        ],
+        ),
+        (now_x, now_y, now_z),
     )
+

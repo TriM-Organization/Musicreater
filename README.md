@@ -4,7 +4,7 @@
 </h1>
 
 <p align="center">
-    <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png">
+    <img width="128" height="128" src="https://gitee.com/TriM-Organization/Musicreater/raw/master/resources/msctIcon.ico">
     </img>
 </p>
 

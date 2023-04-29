@@ -176,4 +176,25 @@ percussion_instrument_list = {
     77: ("note.xylophone", 4),
     78: ("note.xylophone", 4),
     79: ("note.bell", 4),
-    80: ("note.bell", 4), }
+    80: ("note.bell", 4),
+}
+
+instrument_to_blocks_list = {
+    "note.bass": ("planks",),
+    "note.snare": ("sand",),
+    "note.hat": ("glass",),
+    "note.bd": ("stone",),
+    "note.bell": ("gold_block",),
+    "note.flute": ("clay",),
+    "note.chime": ("packed_ice",),
+    "note.guitar": ("wool",),
+    "note.xylobone": ("bone_block",),
+    "note.iron_xylophone": ("iron_block",),
+    "note.cow_bell": ("soul_sand",),
+    "note.didgeridoo": ("pumpkin",),
+    "note.bit": ("emerald_block",),
+    "note.banjo": ("hay_block",),
+    "note.pling": ("glowstone",),
+    "note.bassattack": ("command_block",),  # 无法找到此音效
+    "note.harp": ("glass",),
+}

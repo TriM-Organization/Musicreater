@@ -20,8 +20,6 @@ import os
 import Musicreater
 
 
-
-
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")
 
@@ -46,9 +44,6 @@ fileFormat = int(input(f"请输入输出格式[BDX(1) 或 MCPACK(0)]：").lower(
 playerFormat = int(input(f"请选择播放方式[计分板(1) 或 延迟(0)]：").lower())
 
 
-
-
-
 # 真假字符串判断
 def bool_str(sth: str) -> bool:
     try:
@@ -60,6 +55,7 @@ def bool_str(sth: str) -> bool:
             return False
         else:
             raise ValueError("布尔字符串啊？")
+
 
 debug = False
 
@@ -75,40 +71,40 @@ else:
     # 提示语 检测函数 错误提示语
     for args in [
         (
-            f'输入音量：',
+            f"输入音量：",
             float,
         ),
         (
-            f'输入播放速度：',
+            f"输入播放速度：",
             float,
         ),
         (
-            f'是否启用进度条：',
+            f"是否启用进度条：",
             bool_str,
         ),
         (
-            f'计分板名称：',
+            f"计分板名称：",
             str,
         )
         if playerFormat == 1
         else (
-            f'玩家选择器：',
+            f"玩家选择器：",
             str,
         ),
         (
-            f'是否自动重置计分板：',
+            f"是否自动重置计分板：",
             bool_str,
         )
         if playerFormat == 1
         else (),
         (
-            f'作者名称：',
+            f"作者名称：",
             str,
         )
         if fileFormat == 1
         else (),
         (
-            f'最大结构高度：',
+            f"最大结构高度：",
             int,
         )
         if fileFormat == 1
@@ -117,7 +113,7 @@ else:
         if args:
             prompts.append(args[1](input(args[0])))
 
-conversion = Musicreater.midiConvert(debug)
+conversion = Musicreater.midiConvert(debug=debug)
 
 
 print(f"正在处理 {midi_path} ：")

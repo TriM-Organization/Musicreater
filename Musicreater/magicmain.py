@@ -1,33 +1,36 @@
 # -*- coding: utf-8 -*-
-
+"""
+功能测试 若非已知 请勿更改
+此文件仅供功能测试，并非实际调用的文件
+请注意，此处的文件均为测试使用
+不要更改 不要更改 不要更改
+请注意这里的一切均需要其原作者更改
+这里用于放置一些新奇的点子
+用于测试
+不要更改 不要更改 不要更改！
+"""
 
 # 音·创 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
 # 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
-# 若需使用或借鉴 请依照 Apache 2.0 许可证进行许可
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
 """
-音·创 库版 (Musicreater Package Version)
-是一款免费开源的针对《我的世界：基岩版》的midi音乐转换库
-注意！除了此源文件以外，任何属于此仓库以及此项目的文件均依照Apache许可证进行许可
-Musicreater pkgver (Package Version 音·创 库版)
-A free open source library used for convert midi file into formats that is suitable for **Minecraft: Bedrock Edition**.
-Note! Except for this source file, all the files in this repository and this project are licensed under Apache License 2.0
+音·创 (Musicreater)
+是一款免费开源的针对《我的世界》的midi音乐转换库
+Musicreater (音·创)
+A free open source library used for convert midi file into formats that is suitable for **Minecraft**.
 
-   Copyright 2022 all the developers of Musicreater
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
 
-   Licensed under the Apache License, Version 2.0 (the 'License');
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
-
-       http://www.apache.org/licenses/LICENSE-2.0
-
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an 'AS IS' BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+开源相关声明请见 ../License.md
+Terms & Conditions: ../License.md
 """
+
+
+
 
 
 def _toCmdList_m1(
@@ -91,20 +94,12 @@ def _toCmdList_m1(
 
 
 
-
-
-
-
 # ============================
 
 
 
 
 import mido
-
-
-
-
 
 class NoteMessage:
     def __init__(self, channel, pitch, velocity, startT, lastT, midi, now_bpm, change_bpm=None):
@@ -213,5 +208,98 @@ if __name__ == '__main__':
 
 
 
+# ============================
+
+
+from typing import Union
+from .utils import x,y,z,bottem_side_length_of_smallest_square_bottom_box,form_note_block_in_NBT_struct,form_repeater_in_NBT_struct
+
+# 不要用 没写完
+def delay_to_note_blocks(
+    baseblock: str = "stone", 
+    position_forward: Union(x, y, z) = z,
+    max_height: int = 64,
+):
+    """传入音符，生成以音符盒存储的红石音乐
+    :param:
+        baseblock: 中继器的下垫方块
+        position_forward: 结构延长方向
+    :return 是否生成成功
+    """
+
+    from TrimMCStruct import Structure, Block
+
+    _sideLength = bottem_side_length_of_smallest_square_bottom_box(
+        len(commands), max_height
+    )
+
+    struct = Structure(
+        (_sideLength, max_height, _sideLength),  # 声明结构大小
+    )
+
+    log = print
+
+    startpos = [0,0,0]
+
+
+    # 1拍 x 2.5 rt
+    def placeNoteBlock():
+        for i in notes:
+            error = True
+            try:
+                struct.set_block(
+                    [startpos[0], startpos[1] + 1, startpos[2]],
+                    form_note_block_in_NBT_struct(height2note[i[0]], instrument),
+                )
+                struct.set_block(startpos, Block("universal_minecraft", instuments[i[0]][1]),)
+                error = False
+            except ValueError:
+                log("无法放置音符：" + str(i) + "于" + str(startpos))
+                struct.set_block(Block("universal_minecraft", baseblock), startpos)
+                struct.set_block(
+                    Block("universal_minecraft", baseblock),
+                    [startpos[0], startpos[1] + 1, startpos[2]],
+                )
+            finally:
+                if error is True:
+                    log("无法放置音符：" + str(i) + "于" + str(startpos))
+                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
+                    struct.set_block(
+                        Block("universal_minecraft", baseblock),
+                        [startpos[0], startpos[1] + 1, startpos[2]],
+                    )
+            delay = int(i[1] * speed + 0.5)
+            if delay <= 4:
+                startpos[0] += 1
+                struct.set_block(
+                    form_repeater_in_NBT_struct(delay, "west"),
+                    [startpos[0], startpos[1] + 1, startpos[2]],
+                )
+                struct.set_block(Block("universal_minecraft", baseblock), startpos)
+            else:
+                for j in range(int(delay / 4)):
+                    startpos[0] += 1
+                    struct.set_block(
+                        form_repeater_in_NBT_struct(4, "west"),
+                        [startpos[0], startpos[1] + 1, startpos[2]],
+                    )
+                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
+                if delay % 4 != 0:
+                    startpos[0] += 1
+                    struct.set_block(
+                        form_repeater_in_NBT_struct(delay % 4, "west"),
+                        [startpos[0], startpos[1] + 1, startpos[2]],
+                    )
+                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
+            startpos[0] += posadder[0]
+            startpos[1] += posadder[1]
+            startpos[2] += posadder[2]
+
+    # e = True
+    try:
+        placeNoteBlock()
+        # e = False
+    except:  # ValueError
+        log("无法放置方块了，可能是因为区块未加载叭")
 
 
