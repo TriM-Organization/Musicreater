@@ -1,7 +1,6 @@
 import math
 import os
 
-
 bdx_key = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
     "y": [b"\x11", b"\x10", b"\x1d", b"\x16", b"\x17"],
@@ -265,12 +264,10 @@ def form_repeater_in_NBT_struct(
         delay: int, facing: int
 ):
     """生成中继器方块
-    :param powered:
-    :param locked:
     :param facing:
     :param delay: 1~4
     :return Block()"""
-    
+
     from TrimMCStruct import Block
 
     return Block(
@@ -340,7 +337,6 @@ def form_command_block_in_NBT_struct(
     :return:str
     """
 
-    
     from TrimMCStruct import Block, TAG_Long
 
     return Block(
@@ -389,7 +385,6 @@ def commands_to_structure(
     :return 成功与否，成功返回(结构类,结构占用大小)，失败返回(False,str失败原因)
     """
 
-    
     from TrimMCStruct import Structure
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(

@@ -10,7 +10,7 @@ def main():
     with console.status("Find the full path of .egg-info folder"):
         egg_info: list = []
         for file in os.listdir():
-            if os.path.isfile(file) and file.endswith(".egg-info"):
+            if file.endswith(".egg-info"):
                 egg_info.append(file)
                 console.print(file)
     for file in track(["build", "dist", "logs", *egg_info], description="Deleting files"):
