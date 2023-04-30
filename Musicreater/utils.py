@@ -1,7 +1,6 @@
 import math
 import os
 
-from TrimMCStruct import Structure, Block, TAG_Long, TAG_Byte
 
 bdx_key = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
@@ -241,6 +240,7 @@ def form_note_block_in_NBT_struct(
     :return Block
     """
 
+    from TrimMCStruct import Block, TAG_Byte
     return Block(
         "minecraft",
         "noteblock",
@@ -270,6 +270,8 @@ def form_repeater_in_NBT_struct(
     :param facing:
     :param delay: 1~4
     :return Block()"""
+    
+    from TrimMCStruct import Block
 
     return Block(
         "minecraft",
@@ -338,6 +340,9 @@ def form_command_block_in_NBT_struct(
     :return:str
     """
 
+    
+    from TrimMCStruct import Block, TAG_Long
+
     return Block(
         "minecraft",
         "command_block"
@@ -383,6 +388,9 @@ def commands_to_structure(
     :param max_height: 生成结构最大高度
     :return 成功与否，成功返回(结构类,结构占用大小)，失败返回(False,str失败原因)
     """
+
+    
+    from TrimMCStruct import Structure
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(
         len(commands), max_height

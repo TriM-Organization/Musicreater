@@ -1592,6 +1592,8 @@ class midiConvert:
         :param player: 玩家选择器，默认为`@a`
         :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
         """
+        
+        from TrimMCStruct import Structure
 
         if self.enable_old_exe_format:
             raise CommandFormatError("使用mcstructure结构文件导出时不支持旧版本的指令格式。")
