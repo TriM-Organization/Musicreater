@@ -113,7 +113,7 @@ else:
         if args:
             prompts.append(args[1](input(args[0])))
 
-conversion = Musicreater.midiConvert(debug=debug)
+conversion = Musicreater.midiConvert(debug=debug, enable_old_exe_format=False)
 
 
 print(f"正在处理 {midi_path} ：")
@@ -123,7 +123,11 @@ if debug:
         json.dump(conversion.toDICT(), f)
         f.write(5 * "\n")
 conversion_result = (
-    conversion.to_mcpack(convert_method, *prompts)
+    (
+        conversion.to_mcpack(convert_method, *prompts)
+        if playerFormat == 1
+        else conversion.to_mcpack_with_delay(convert_method, *prompts)
+    )
     if fileFormat == 0
     else (
         conversion.to_BDX_file(convert_method, *prompts)
