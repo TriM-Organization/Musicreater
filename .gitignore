@@ -11,6 +11,11 @@
 *.bdx
 *.json
 *.mcstructure
+/logs
+/languages
+/llc_cli.py
+/utils
+test.py
 
 # Byte-compiled / optimized
 __pycache__/
