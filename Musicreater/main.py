@@ -1263,10 +1263,19 @@ class midiConvert:
     ) -> list:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
-        :param MaxVolume: 最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
-        :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-        :param player: 玩家选择器，默认为`@a`
-        :return: 全部指令列表[ ( str指令, int距离上一个指令的延迟 ),...]
+
+        Parameters
+        ----------
+        MaxVolume: float
+            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        speed: float
+            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        player: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[tuple(str指令, int距离上一个指令的延迟 ),...], int音乐时长游戏刻 )
         """
 
         if speed == 0:
@@ -2062,7 +2071,9 @@ class midiConvert:
             for msg in track:
                 if msg.time != 0:
                     try:
-                        microseconds += msg.time * tempo / self.midi.ticks_per_beat
+                        microseconds += (
+                            msg.time * tempo / self.midi.ticks_per_beat / 1000
+                        )
                         # print(microseconds)
                     except NameError:
                         if self.debug_mode:
@@ -2072,7 +2083,7 @@ class midiConvert:
                                 msg.time
                                 * mido.midifiles.midifiles.DEFAULT_TEMPO
                                 / self.midi.ticks_per_beat
-                            )
+                            ) / 1000
 
                 if msg.is_meta:
                     if msg.type == "set_tempo":
@@ -2080,15 +2091,14 @@ class midiConvert:
                         if self.debug_mode:
                             self.prt(f"TEMPO更改：{tempo}（毫秒每拍）")
                 else:
-                    if self.debug_mode:
-                        try:
-                            if msg.channel > 15:
-                                raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                        except AttributeError:
-                            pass
+                    try:
+                        if msg.channel > 15 and self.debug_mode:
+                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                        if not track_no in channels[msg.channel].keys():
+                            channels[msg.channel][track_no] = []
+                    except AttributeError:
+                        pass
 
-                    if not track_no in channels[msg.channel].keys():
-                        channels[msg.channel][track_no] = []
                     if msg.type == "program_change":
                         channels[msg.channel][track_no].append(
                             ("PgmC", msg.program, microseconds)
@@ -2117,5 +2127,3 @@ class midiConvert:
 
         3 音符结束消息
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
-
-        return channels
