@@ -198,3 +198,22 @@ instrument_to_blocks_list = {
     "note.bassattack": ("command_block",),  # 无法找到此音效
     "note.harp": ("glass",),
 }
+
+nbs_instrument_to_name = {
+    0: "Piano",  # (air)
+    1: "Double Bass",  # (Wood)
+    2: "Bass Drum",  # (Stone)
+    3: "Snare Drum",  # (Sand)
+    4: "Click",  # (Glass)
+    5: "Guitar",  # (Wool)
+    6: "Flute",  # (Clay)
+    7: "Bell",  # (Block of Gold)
+    8: "Chime",  # (Packed Ice)
+    9: "Xylophone",  # (Bone Block)
+    10: "Iron Xylophone",  # (Iron Block)
+    11: "Cow Bell",  # (Soul Sand)
+    12: "Didgeridoo",  # (Pumpkin)
+    13: "Bit",  # (Block of Emerald)
+    14: "Banjo",  # (Hay)
+    15: "Pling",  # (Glowstone)
+}

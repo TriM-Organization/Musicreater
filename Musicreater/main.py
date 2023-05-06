@@ -27,6 +27,7 @@ from typing import TypeVar, Union
 
 import brotli
 import mido
+# import pathlib
 
 from .exceptions import *
 from .instConstants import *
@@ -34,6 +35,7 @@ from .utils import *
 
 T = TypeVar("T")  # Declare type variable
 VM = TypeVar("VM", mido.MidiFile, None)  # void mido
+# PATH = TypeVar("PATH", str, pathlib.Path)  # path
 
 DEFAULT_PROGRESSBAR_STYLE = (
     r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
@@ -288,8 +290,6 @@ class midiConvert:
 
         Parameters
         ----------
-        maxscore: int
-            midi的乐器ID
 
         scoreboard_name: str
             所使用的计分板名称
@@ -746,7 +746,7 @@ class midiConvert:
                         except AttributeError:
                             pass
 
-                    if not track_no in channels[msg.channel].keys():
+                    if track_no not in channels[msg.channel].keys():
                         channels[msg.channel][track_no] = []
                     if msg.type == "program_change":
                         channels[msg.channel][track_no].append(
@@ -1327,7 +1327,7 @@ class midiConvert:
                     try:
                         if msg.channel > 15 and self.debug_mode:
                             raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                        if not track_no in channels[msg.channel].keys():
+                        if track_no not in channels[msg.channel].keys():
                             channels[msg.channel][track_no] = []
                     except AttributeError:
                         pass
@@ -1587,7 +1587,6 @@ class midiConvert:
         """
         使用method指定的转换算法，将midi转换为mcstructure结构文件后打包成mcpack文件
         :param method: 转换算法
-        :param author: 作者名称
         :param progressbar: 进度条，（当此参数为True时使用默认进度条，为其他的值为真的参数时识别为进度条自定义参数，为其他值为假的时候不生成进度条）
         :param max_height: 生成结构最大高度
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
@@ -1730,7 +1729,7 @@ class midiConvert:
                     r"scoreboard players reset {} {}".format(player, scb_name),
                     (0, 0, 0),
                     1,
-                    0,
+                    0 + 0,  # 不要问为什么这样写，因为要避免
                     alwaysRun=False,
                     customName="重置进度条计分板",
                 ),
@@ -1785,8 +1784,6 @@ class midiConvert:
         """
         使用method指定的转换算法，将midi转换为mcstructure结构文件
         :param method: 转换算法
-        :param author: 作者名称
-        :param progressbar: 进度条，（当此参数为True时使用默认进度条，为其他的值为真的参数时识别为进度条自定义参数，为其他值为假的时候不生成进度条）
         :param max_height: 生成结构最大高度
         :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
         :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
@@ -2087,7 +2084,7 @@ class midiConvert:
                         except AttributeError:
                             pass
 
-                    if not track_no in channels[msg.channel].keys():
+                    if track_no not in channels[msg.channel].keys():
                         channels[msg.channel][track_no] = []
                     if msg.type == "program_change":
                         channels[msg.channel][track_no].append(
@@ -2119,3 +2116,30 @@ class midiConvert:
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
         return channels
+
+    @staticmethod
+    def prt(anything):
+        print(anything)
+
+
+class nbsConvert:
+    def __init__(self, file_path: str = ""):
+        self.file_path = file_path
+
+    def load(self):
+        import pynbs
+        demo_song = pynbs.read(self.file_path)
+        first_custom_instrument = demo_song.instruments
+        print(first_custom_instrument)
+        for tick, chord in pynbs.read(self.file_path):
+            print(tick, chord)
+            print(tick, [note.key for note in chord])
+            # 乐器id 可以查instC里的表
+            # key解析规则： 0-87, where 0 is A0 and 87 is C8
+            # mid: AO 21 C8 108
+            # 所以 pitch_id = key - 21
+
+            # velocity解析规则： 0-100
+            # panning: The stereo panning of the note. (between -100 and 100)
+            # note.pitch: 	The detune of the note, in cents. (between -1200 and 1200)
+            # 也就是说这个pitch是半音的偏移量
