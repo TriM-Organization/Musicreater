@@ -1,2 +1,2 @@
-Brotli>=1.0.9
+LyricLib>=0.0.3
 mido>=1.2.10

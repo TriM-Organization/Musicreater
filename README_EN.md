@@ -1,31 +1,69 @@
-<h1 align="center">音·创 Musicreater</h1>
+<h1 align="center">
+    音·创 Musicreater
+</h1>
 
 <p align="center">
-<img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
+    <img width="128" height="128" src="https://s1.ax1x.com/2022/05/06/Ouhghj.md.png" >
+    </img>
 </p>
 
-<h3 align="center">a free open-source library of converting midi files into _Minecraft_ formats.</h3>
+<h3 align="center">A free open-source library of converting digital music files into <i>Minecraft</i> formats.</h3>
 
 <p align="center">
-<img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    </img>
 <p>
 
 [![][Bilibili: Eilles]](https://space.bilibili.com/397369002/)
-[![][Bilibili: bgArray]](https://space.bilibili.com/604072474) 
+[![][Bilibili: bgArray]](https://space.bilibili.com/604072474)
 [![CodeStyle: black]](https://github.com/psf/black)
-![][python]
+[![][python]](https://www.python.org/)
 [![][license]](LICENSE)
 [![][release]](../../releases)
 
-[简体中文🇨🇳](README.md) | English🇬🇧
+[![GiteeStar](https://gitee.com/TriM-Organization/Musicreater/badge/star.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/stargazers)
+[![GiteeFork](https://gitee.com/TriM-Organization/Musicreater/badge/fork.svg?theme=gray)](https://gitee.com/TriM-Organization/Musicreater/members)
+[![GitHub Repo stars](https://img.shields.io/github/stars/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/stargazers)
+[![GitHub Repo Forks](https://img.shields.io/github/forks/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/forks)
 
-**Notice that the language translation of *Musicreater* may be a little SLOW.**
+[简体中文 🇨🇳](README.md) | English🇬🇧
+
+**Notice that the language translation of _Musicreater_ may be a little SLOW.**
 
 ## Introduction🚀
 
-Musicreater is a free open-source library used for converting midi file into formats that could be read in *Minecraft*.
+Musicreater is a free open-source library used for converting digital music files into formats that could be read in _Minecraft_.
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
+
+## Installation 🔳
+
+- Via pypi
+
+  ```bash
+  pip install Musicreater
+  ```
+
+- If not work, also try:
+  ```bash
+  pip install -i https://pypi.python.org/simple Musicreater
+  ```
+
+- Update:
+
+  ```bash
+  pip install -i https://pypi.python.org/simple Musicreater --upgrade
+  ```
+
+- Clone repo and Install:
+  ```bash
+  git clone https://github.com/TriM-Organization/Musicreater.git
+  cd Musicreater
+  python setup.py install
+  ```
+
+Commands such as `python`、`pip` could be changed to some like `python3` or `pip3` according to the difference of platforms.
+
 
 ## Documentation📄
 
@@ -33,54 +71,61 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
 
 [生成文件的使用](./docs/%E7%94%9F%E6%88%90%E6%96%87%E4%BB%B6%E7%9A%84%E4%BD%BF%E7%94%A8%E8%AF%B4%E6%98%8E.md)
 
-[仓库API文档](./docs/%E5%BA%93%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD%E6%96%87%E6%A1%A3.md)
+[仓库 API 文档](./docs/%E5%BA%93%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD%E6%96%87%E6%A1%A3.md)
 
 ### Authors✒
 
-Eilles (金羿)：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in *Minecraft: Bedrock Edition*
+Eilles (金羿)：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
 
-bgArray "诸葛亮与八卦阵": A junior high school student, player of *Minecraft: Bedrock Edition*, which is a fan of music and programming.
-
+bgArray "诸葛亮与八卦阵": A junior high school student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
 
 ## Thanks🙏
+
 This list is not in any order.
 
--   Thank *昀梦*\<QQ1515399885\> for finding and correcting the bugs in the commands that *Musicreater* generated.
--   Thank *Charlie_Ping “查理平”* for bdx convert function for reference, and the chart that's used to convert the mid's instruments into Minecraft's instruments.
--   Thank *[CMA_2401PT](https://github.com/CMA2401PT)* for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
--   Thank *[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”* \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project. We hope he can get into a good university as he wantted to!
--   Thank *Touch “偷吃”*\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
--   Thank *Mono*\<QQ738893087\> for reporting problems while installing
--	Thank *Ammelia “艾米利亚”*\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
--	感谢 *[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”* for supporting and promoting our project
+- Thank _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
+- Thank _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
+- Thank _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
+- Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project. We hope he can get into a good university as he wantted to!
+- Thank _Touch “偷吃”_\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
+- Thank _Mono_\<QQ738893087\> for reporting problems while installing
+- Thank _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
+- Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project. Hope he could get into a good university!
+- Thank **指令师\_苦力怕 playjuice123**\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
+- Thank **雷霆**\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
 
-> Thanks for a lot of groupmates's support and help
+> Thanks for a lot of groupmates' support and help
 >
 > If you have given contribution but haven't been in the list, please contact us!
 
 ## Contact Us📞
 
-Meet problems? Welcome to give out your issue [here](https://gitee.com/EillesWan/Musicreater/issues/new)!
+Meet problems? Welcome to give out your issue [here](https://github.com/EillesWan/Musicreater/issues/new)!
 
 Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
 
-
---------------------------------------------
+---
 
 NOT AN OFFICIAL MINECRAFT PRODUCT.
 
 NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
 
-此项目并非一个官方 《我的世界》（*Minecraft*）项目
+NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
+
+此项目并非一个官方 《我的世界》（_Minecraft_）项目
 
 此项目不隶属或关联于 Mojang Studios 或 微软
 
+此项目亦不隶属或关联于 网易 相关
 
+“Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为引用性使用
+
+- 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易网络科技发展有限公司
 
 
 [Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
 [Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
-[python]: https://img.shields.io/badge/python-3.6-AB70FF?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
 [license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge

@@ -1,4 +1,32 @@
-pitched_instrument_list = {
+"""
+存放常量与数值性内容
+"""
+
+
+x = "x"
+"""
+x
+"""
+
+y = "y"
+"""
+y
+"""
+
+z = "z"
+"""
+z
+"""
+
+DEFAULT_PROGRESSBAR_STYLE = (
+    r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+    ("§e=§r", "§7=§r"),
+)
+"""
+默认的进度条样式组
+"""
+
+PITCHED_INSTRUMENT_LIST = {
     0: ("note.harp", 6),
     1: ("note.harp", 6),
     2: ("note.pling", 6),
@@ -129,7 +157,7 @@ pitched_instrument_list = {
     127: ("note.snare", 7),  # 打击乐器无音域
 }
 
-percussion_instrument_list = {
+PERCUSSION_INSTRUMENT_LIST = {
     34: ("note.bd", 7),
     35: ("note.bd", 7),
     36: ("note.hat", 7),
@@ -179,7 +207,7 @@ percussion_instrument_list = {
     80: ("note.bell", 4),
 }
 
-instrument_to_blocks_list = {
+INSTRUMENT_BLOCKS_LIST = {
     "note.bass": ("planks",),
     "note.snare": ("sand",),
     "note.hat": ("glass",),
@@ -198,3 +226,35 @@ instrument_to_blocks_list = {
     "note.bassattack": ("command_block",),  # 无法找到此音效
     "note.harp": ("glass",),
 }
+
+
+# 即将启用
+height2note = {
+    0.5: 0,
+    0.53: 1,
+    0.56: 2,
+    0.6: 3,
+    0.63: 4,
+    0.67: 5,
+    0.7: 6,
+    0.75: 7,
+    0.8: 8,
+    0.84: 9,
+    0.9: 10,
+    0.94: 11,
+    1.0: 12,
+    1.05: 13,
+    1.12: 14,
+    1.2: 15,
+    1.25: 16,
+    1.33: 17,
+    1.4: 18,
+    1.5: 19,
+    1.6: 20,
+    1.7: 21,
+    1.8: 22,
+    1.9: 23,
+    2.0: 24,
+}
+"""音高对照表\n
+MC音高:音符盒音调"""

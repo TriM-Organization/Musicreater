@@ -212,7 +212,7 @@ if __name__ == '__main__':
 
 
 from typing import Union
-from .utils import x,y,z,bottem_side_length_of_smallest_square_bottom_box,form_note_block_in_NBT_struct,form_repeater_in_NBT_struct
+from .plugin import x,y,z,bottem_side_length_of_smallest_square_bottom_box,form_note_block_in_NBT_struct,form_repeater_in_NBT_struct
 
 # 不要用 没写完
 def delay_to_note_blocks(
@@ -243,63 +243,54 @@ def delay_to_note_blocks(
 
 
     # 1拍 x 2.5 rt
-    def placeNoteBlock():
-        for i in notes:
-            error = True
-            try:
-                struct.set_block(
-                    [startpos[0], startpos[1] + 1, startpos[2]],
-                    form_note_block_in_NBT_struct(height2note[i[0]], instrument),
-                )
-                struct.set_block(startpos, Block("universal_minecraft", instuments[i[0]][1]),)
-                error = False
-            except ValueError:
+    for i in notes:
+        error = True
+        try:
+            struct.set_block(
+                [startpos[0], startpos[1] + 1, startpos[2]],
+                form_note_block_in_NBT_struct(height2note[i[0]], instrument),
+            )
+            struct.set_block(startpos, Block("universal_minecraft", instuments[i[0]][1]),)
+            error = False
+        except ValueError:
+            log("无法放置音符：" + str(i) + "于" + str(startpos))
+            struct.set_block(Block("universal_minecraft", baseblock), startpos)
+            struct.set_block(
+                Block("universal_minecraft", baseblock),
+                [startpos[0], startpos[1] + 1, startpos[2]],
+            )
+        finally:
+            if error is True:
                 log("无法放置音符：" + str(i) + "于" + str(startpos))
                 struct.set_block(Block("universal_minecraft", baseblock), startpos)
                 struct.set_block(
                     Block("universal_minecraft", baseblock),
                     [startpos[0], startpos[1] + 1, startpos[2]],
                 )
-            finally:
-                if error is True:
-                    log("无法放置音符：" + str(i) + "于" + str(startpos))
-                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
-                    struct.set_block(
-                        Block("universal_minecraft", baseblock),
-                        [startpos[0], startpos[1] + 1, startpos[2]],
-                    )
-            delay = int(i[1] * speed + 0.5)
-            if delay <= 4:
+        delay = int(i[1] * speed + 0.5)
+        if delay <= 4:
+            startpos[0] += 1
+            struct.set_block(
+                form_repeater_in_NBT_struct(delay, "west"),
+                [startpos[0], startpos[1] + 1, startpos[2]],
+            )
+            struct.set_block(Block("universal_minecraft", baseblock), startpos)
+        else:
+            for j in range(int(delay / 4)):
                 startpos[0] += 1
                 struct.set_block(
-                    form_repeater_in_NBT_struct(delay, "west"),
+                    form_repeater_in_NBT_struct(4, "west"),
                     [startpos[0], startpos[1] + 1, startpos[2]],
                 )
                 struct.set_block(Block("universal_minecraft", baseblock), startpos)
-            else:
-                for j in range(int(delay / 4)):
-                    startpos[0] += 1
-                    struct.set_block(
-                        form_repeater_in_NBT_struct(4, "west"),
-                        [startpos[0], startpos[1] + 1, startpos[2]],
-                    )
-                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
-                if delay % 4 != 0:
-                    startpos[0] += 1
-                    struct.set_block(
-                        form_repeater_in_NBT_struct(delay % 4, "west"),
-                        [startpos[0], startpos[1] + 1, startpos[2]],
-                    )
-                    struct.set_block(Block("universal_minecraft", baseblock), startpos)
-            startpos[0] += posadder[0]
-            startpos[1] += posadder[1]
-            startpos[2] += posadder[2]
-
-    # e = True
-    try:
-        placeNoteBlock()
-        # e = False
-    except:  # ValueError
-        log("无法放置方块了，可能是因为区块未加载叭")
-
+            if delay % 4 != 0:
+                startpos[0] += 1
+                struct.set_block(
+                    form_repeater_in_NBT_struct(delay % 4, "west"),
+                    [startpos[0], startpos[1] + 1, startpos[2]],
+                )
+                struct.set_block(Block("universal_minecraft", baseblock), startpos)
+        startpos[0] += posadder[0]
+        startpos[1] += posadder[1]
+        startpos[2] += posadder[2]
 
