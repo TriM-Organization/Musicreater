@@ -17,8 +17,12 @@ Terms & Conditions: ./License.md
 """
 
 import os
-import Musicreater
 
+import Musicreater
+from Musicreater.plugin import ConvertConfig
+from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
+from Musicreater.plugin.funcpack import to_function_addon_in_score
+from Musicreater.plugin.mcstructpack import to_mcstructure_addon_in_delay
 
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")
@@ -27,17 +31,6 @@ midi_path = input(f"请输入MIDI路径：")
 # 获取输出地址
 out_path = input(f"请输入输出路径：")
 
-conversion = Musicreater.midiConvert()
-
-
-def isMethodOK(sth: str):
-    if int(sth) in range(1, len(conversion.methods) + 1):
-        return int(sth)
-    else:
-        raise ValueError
-
-
-convert_method = int(input(f"请输入转换算法[1~{len(conversion.methods)}]："))
 
 # 选择输出格式
 fileFormat = int(input(f"请输入输出格式[BDX(1) 或 MCPACK(0)]：").lower())
@@ -57,14 +50,10 @@ def bool_str(sth: str) -> bool:
             raise ValueError("布尔字符串啊？")
 
 
-debug = False
-
 if os.path.exists("./demo_config.json"):
     import json
 
     prompts = json.load(open("./demo_config.json", "r", encoding="utf-8"))
-    if prompts[-1] == "debug":
-        debug = True
     prompts = prompts[:-1]
 else:
     prompts = []
@@ -103,45 +92,39 @@ else:
         )
         if fileFormat == 1
         else (),
-        (
+        ()
+        if playerFormat == 1
+        else (
             f"最大结构高度：",
             int,
-        )
-        if fileFormat == 1
-        else (),
+        ),
     ]:
         if args:
             prompts.append(args[1](input(args[0])))
 
-conversion = Musicreater.midiConvert(debug=debug, enable_old_exe_format=False)
-
 
 print(f"正在处理 {midi_path} ：")
-conversion.convert(midi_path, out_path)
-if debug:
-    with open("./records.json", "a", encoding="utf-8") as f:
-        json.dump(conversion.toDICT(), f)
-        f.write(5 * "\n")
-conversion_result = (
-    (
-        conversion.to_mcpack(convert_method, *prompts)
-        if playerFormat == 1
-        else conversion.to_mcpack_with_delay(convert_method, *prompts)
+cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=False)
+cvt_cfg = ConvertConfig(out_path, *prompts[:3])
+
+print(
+    "	指令总长：{}，最高延迟：{}".format(
+        *(
+            to_function_addon_in_score(cvt_mid, cvt_cfg, *prompts[3:])
+            if playerFormat == 1
+            else to_mcstructure_addon_in_delay(cvt_mid, cvt_cfg, *prompts[3:])
+        )
     )
-    if fileFormat == 0
-    else (
-        conversion.to_BDX_file(convert_method, *prompts)
-        if playerFormat == 1
-        else conversion.to_BDX_file_with_delay(convert_method, *prompts)
+) if fileFormat == 0 else print(
+    "	指令总长：{}，最高延迟：{}，结构大小{}，终点坐标{}".format(
+        *(
+            to_BDX_file_in_score(cvt_mid, cvt_cfg, *prompts[3:])
+            if playerFormat == 1
+            else to_BDX_file_in_delay(cvt_mid, cvt_cfg, *prompts[3:])
+        )
     )
 )
 
-if conversion_result[0]:
-    print(
-        f"	指令总长：{conversion_result[1]}，最高延迟：{conversion_result[2]}{f'''，结构大小{conversion_result[3]}，最末坐标{conversion_result[4]}''' if fileFormat == 1 else ''}"
-    )
-else:
-    print(f"失败：{conversion_result}")
 
 exitSth = input("回车退出").lower()
 if exitSth == "record":

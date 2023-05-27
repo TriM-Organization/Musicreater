@@ -1,18 +1,32 @@
-'''
-新版本功能以及即将启用的函数
-'''
+# -*- coding: utf-8 -*-
 
+"""
+新版本功能以及即将启用的函数
+"""
+
+
+"""
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
+
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿穆组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
 from .exceptions import *
+from .main import MidiConvert, mido
 from .subclass import *
 from .utils import *
-from .main import midiConvert, mido
 
 
 # 简单的单音填充
 def _toCmdList_m4(
-    self: midiConvert,
+    self: MidiConvert,
     scoreboard_name: str = "mscplay",
     MaxVolume: float = 1.0,
     speed: float = 1.0,
@@ -58,9 +72,7 @@ def _toCmdList_m4(
                         pass
 
                 if msg.type == "program_change":
-                    channels[msg.channel].append(
-                        ("PgmC", msg.program, microseconds)
-                    )
+                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
 
                 elif msg.type == "note_on" and msg.velocity != 0:
                     channels[msg.channel].append(
@@ -193,7 +205,6 @@ def _toCmdList_m4(
     return [tracks, cmdAmount, maxScore]
 
 
-
 def to_note_list(
     self,
     speed: float = 1.0,
@@ -227,9 +238,7 @@ def to_note_list(
         for msg in track:
             if msg.time != 0:
                 try:
-                    microseconds += (
-                        msg.time * tempo / self.midi.ticks_per_beat / 1000
-                    )
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
                     # print(microseconds)
                 except NameError:
                     if self.debug_mode:
@@ -347,9 +356,7 @@ def to_note_list(
                         0
                         if j != 0
                         else (
-                            all_ticks[i] - all_ticks[i - 1]
-                            if i != 0
-                            else all_ticks[i]
+                            all_ticks[i] - all_ticks[i - 1] if i != 0 else all_ticks[i]
                         )
                     ),
                 )

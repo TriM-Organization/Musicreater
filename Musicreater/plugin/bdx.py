@@ -1,11 +1,25 @@
-'''
+# -*- coding: utf-8 -*-
+"""
 存放有关BDX结构操作的内容
-'''
+"""
 
+"""
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
 
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿穆组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
+
+from typing import List
+
+from ..constants import x, y, z
+from ..subclass import SingleCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
-from ..constants import x,y,z
-
 
 bdx_key = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
@@ -26,11 +40,11 @@ def bdx_move(axis: str, value: int):
         [
             1 if i else 0
             for i in (
-            value != -1,
-            value < -1 or value > 1,
-            value < -128 or value > 127,
-            value < -32768 or value > 32767,
-        )
+                value != -1,
+                value < -1 or value > 1,
+                value < -128 or value > 127,
+                value < -32768 or value > 32767,
+            )
         ]
     )
 
@@ -39,17 +53,16 @@ def bdx_move(axis: str, value: int):
     )
 
 
-
 def form_command_block_in_BDX_bytes(
-        command: str,
-        particularValue: int,
-        impluse: int = 0,
-        condition: bool = False,
-        needRedstone: bool = True,
-        tickDelay: int = 0,
-        customName: str = "",
-        executeOnFirstTick: bool = False,
-        trackOutput: bool = True,
+    command: str,
+    particularValue: int,
+    impluse: int = 0,
+    condition: bool = False,
+    needRedstone: bool = True,
+    tickDelay: int = 0,
+    customName: str = "",
+    executeOnFirstTick: bool = False,
+    trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块放置指令项
@@ -113,8 +126,8 @@ def form_command_block_in_BDX_bytes(
 
 
 def commands_to_BDX_bytes(
-        commands: list,
-        max_height: int = 64,
+    commands_list: List[SingleCommand],
+    max_height: int = 64,
 ):
     """
     :param commands: 指令列表(指令, 延迟)
@@ -123,7 +136,7 @@ def commands_to_BDX_bytes(
     """
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(
-        len(commands), max_height
+        len(commands_list), max_height
     )
     _bytes = b""
 
@@ -134,34 +147,28 @@ def commands_to_BDX_bytes(
     now_z = 0
     now_x = 0
 
-    for cmd, delay in commands:
-        impluse = 2
-        condition = False
-        needRedstone = False
-        tickDelay = delay
-        customName = ""
-        executeOnFirstTick = False
-        trackOutput = True
+    for command in commands_list:
+
         _bytes += form_command_block_in_BDX_bytes(
-            cmd,
+            command.command_text,
             (1 if y_forward else 0)
             if (
-                    ((now_y != 0) and (not y_forward))
-                    or (y_forward and (now_y != (max_height - 1)))
+                ((now_y != 0) and (not y_forward))
+                or (y_forward and (now_y != (max_height - 1)))
             )
             else (3 if z_forward else 2)
             if (
-                    ((now_z != 0) and (not z_forward))
-                    or (z_forward and (now_z != _sideLength - 1))
+                ((now_z != 0) and (not z_forward))
+                or (z_forward and (now_z != _sideLength - 1))
             )
             else 5,
-            impluse=impluse,
-            condition=condition,
-            needRedstone=needRedstone,
-            tickDelay=tickDelay,
-            customName=customName,
-            executeOnFirstTick=executeOnFirstTick,
-            trackOutput=trackOutput,
+            impluse=2,
+            condition=command.conditional,
+            needRedstone=False,
+            tickDelay=command.delay,
+            customName=command.annotation_text,
+            executeOnFirstTick=False,
+            trackOutput=True,
         )
 
         now_y += 1 if y_forward else -1
@@ -174,7 +181,7 @@ def commands_to_BDX_bytes(
             now_z += 1 if z_forward else -1
 
             if ((now_z >= _sideLength) and z_forward) or (
-                    (now_z < 0) and (not z_forward)
+                (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
@@ -195,5 +202,3 @@ def commands_to_BDX_bytes(
         ],
         [now_x, now_y, now_z],
     )
-
-

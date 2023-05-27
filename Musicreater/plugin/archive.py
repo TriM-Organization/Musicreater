@@ -1,8 +1,26 @@
+# -*- coding: utf-8 -*-
+"""
+存放关于文件打包的内容
+"""
 
+
+"""
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
+
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿穆组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
 import os
+import uuid
 import zipfile
+from typing import List
 
 
 def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -24,3 +42,34 @@ def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
             arc_name = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
             zipf.write(pathfile, arc_name)
     zipf.close()
+
+
+def behavior_mcpack_manifest(
+    pack_description: str = "",
+    pack_version: List[int] = [0, 0, 1],
+    pack_name: str = "",
+    pack_uuid: str = None,
+    modules_description: str = "",
+    modules_version: List[int] = [0, 0, 1],
+    modules_uuid: str = None,
+):
+    """
+    生成一个我的世界行为包组件的定义清单文件
+    """
+    return {
+        "format_version": 1,
+        "header": {
+            "description": pack_description,
+            "version": pack_version,
+            "name": pack_name,
+            "uuid": str(uuid.uuid4()) if not pack_uuid else pack_uuid,
+        },
+        "modules": [
+            {
+                "description": modules_description,
+                "type": "data",
+                "version": modules_version,
+                "uuid": str(uuid.uuid4()) if not modules_uuid else modules_uuid,
+            }
+        ],
+    }

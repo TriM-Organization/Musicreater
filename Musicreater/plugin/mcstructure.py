@@ -1,12 +1,31 @@
-'''
+# -*- coding: utf-8 -*-
+"""
 存放有关MCSTRUCTURE结构操作的内容
-'''
+"""
 
+"""
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
+
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿穆组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
+
+
+from typing import List
+
+from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
+
+from ..subclass import SingleCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
-from TrimMCStruct import Structure, Block, TAG_Long, TAG_Byte
+
 
 def form_note_block_in_NBT_struct(
-        note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
+    note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
 ):
     """生成音符盒方块
     :param note: `int`(0~24)
@@ -40,14 +59,11 @@ def form_note_block_in_NBT_struct(
     )
 
 
-def form_repeater_in_NBT_struct(
-        delay: int, facing: int
-):
+def form_repeater_in_NBT_struct(delay: int, facing: int):
     """生成中继器方块
     :param facing:
     :param delay: 1~4
     :return Block()"""
-
 
     return Block(
         "minecraft",
@@ -60,16 +76,16 @@ def form_repeater_in_NBT_struct(
 
 
 def form_command_block_in_NBT_struct(
-        command: str,
-        coordinate: tuple,
-        particularValue: int,
-        impluse: int = 0,
-        condition: bool = False,
-        alwaysRun: bool = True,
-        tickDelay: int = 0,
-        customName: str = "",
-        executeOnFirstTick: bool = False,
-        trackOutput: bool = True,
+    command: str,
+    coordinate: tuple,
+    particularValue: int,
+    impluse: int = 0,
+    condition: bool = False,
+    alwaysRun: bool = True,
+    tickDelay: int = 0,
+    customName: str = "",
+    executeOnFirstTick: bool = False,
+    trackOutput: bool = True,
 ):
     """
     使用指定项目返回指定的指令方块结构
@@ -116,7 +132,6 @@ def form_command_block_in_NBT_struct(
     :return:str
     """
 
-
     return Block(
         "minecraft",
         "command_block"
@@ -154,15 +169,14 @@ def form_command_block_in_NBT_struct(
 
 
 def commands_to_structure(
-        commands: list,
-        max_height: int = 64,
+    commands: List[SingleCommand],
+    max_height: int = 64,
 ):
     """
-    :param commands: 指令列表(指令, 延迟)
+    :param commands: 指令列表
     :param max_height: 生成结构最大高度
-    :return 成功与否，成功返回(结构类,结构占用大小)，失败返回(False,str失败原因)
+    :return 结构类,结构占用大小,终点坐标
     """
-
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(
         len(commands), max_height
@@ -179,31 +193,31 @@ def commands_to_structure(
     now_z = 0
     now_x = 0
 
-    for cmd, delay in commands:
+    for command in commands:
         coordinate = (now_x, now_y, now_z)
         struct.set_block(
             coordinate,
             form_command_block_in_NBT_struct(
-                command=cmd,
+                command=command.command_text,
                 coordinate=coordinate,
                 particularValue=(1 if y_forward else 0)
                 if (
-                        ((now_y != 0) and (not y_forward))
-                        or (y_forward and (now_y != (max_height - 1)))
+                    ((now_y != 0) and (not y_forward))
+                    or (y_forward and (now_y != (max_height - 1)))
                 )
                 else (
                     (3 if z_forward else 2)
                     if (
-                            ((now_z != 0) and (not z_forward))
-                            or (z_forward and (now_z != _sideLength - 1))
+                        ((now_z != 0) and (not z_forward))
+                        or (z_forward and (now_z != _sideLength - 1))
                     )
                     else 5
                 ),
                 impluse=2,
                 condition=False,
                 alwaysRun=True,
-                tickDelay=delay,
-                customName="",
+                tickDelay=command.delay,
+                customName=command.annotation_text,
                 executeOnFirstTick=False,
                 trackOutput=True,
             ),
@@ -219,7 +233,7 @@ def commands_to_structure(
             now_z += 1 if z_forward else -1
 
             if ((now_z >= _sideLength) and z_forward) or (
-                    (now_z < 0) and (not z_forward)
+                (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
@@ -234,4 +248,3 @@ def commands_to_structure(
         ),
         (now_x, now_y, now_z),
     )
-

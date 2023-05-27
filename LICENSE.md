@@ -3,7 +3,7 @@
 1. 音·创的全部开发者享有其完整版权，其开发者可以在任一时刻终止以后音·创源代码开放，若经由其开发者授予特殊权利，则授权对象可以将源代码进行特定的被特殊授权的操作
 2. 音·创或（及）其代码允许在 Apache2.0 协议的条款与说明下进行非商业使用
 3. 除部分代码特殊声明外，音·创允许对其或（及）其代码进行商业化使用，但是需要经过音·创主要开发者（诸葛亮与八卦阵、金羿）的一致授权，同时，授权对象在商业化授权的使用过程中必须依照 Apache2.0 协议的条款与说明
-4. 若存在对于音·创包含的部分代码的特殊开源声明，则此部分代码依照其特定的开源方式授权，但若此部分代码经由此部分代码的主要开发者一致特殊授权后商用，则授权对象在商用时依照此部分的开发者所准许的方式（或条款）进行商用，或默认依照 Apache2.0 协议进行商业化使用
+4. 若存在对于音·创包含的部分代码的特殊开源声明，则此部分代码依照其特定的开源方式授权，但若此部分代码经由此部分代码的主要开发者一致特殊授权后商用，则授权对象在商用时依照此部分的开发者所准许的方式（或条款）进行商用
 5. Apache2.0 协议的英文原文副本可见下文
 
 >  The English Translation of the TERMS AND CONDITIONS above is listed below
@@ -203,7 +203,7 @@
    END OF TERMS AND CONDITIONS
 
 
-   Copyright 2022 Team-Ryoun 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray")
+   Copyright 2022 TriM-Organization 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & all the developers of Musicreater
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.

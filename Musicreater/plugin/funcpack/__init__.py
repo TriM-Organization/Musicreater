@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-存放非音·创本体的附加内容（插件？）
+用以生成函数附加包的附加功能
 
 版权所有 © 2023 音·创 开发者
 Copyright © 2023 all the developers of Musicreater
@@ -15,6 +15,7 @@ Terms & Conditions: License.md in the root directory
 
 
 __all__ = []
-__author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"))
+__author__ = (("金羿", "Eilles Wan"),)
 
 from .main import *
+

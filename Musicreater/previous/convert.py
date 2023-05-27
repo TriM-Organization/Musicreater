@@ -1,13 +1,27 @@
-'''
-旧版本功能以及已经弃用的函数
-'''
+# -*- coding: utf-8 -*-
+"""
+旧版本转换功能以及已经弃用的函数
+"""
 
-from .exceptions import *
-from .main import midiConvert
+"""
+版权所有 © 2023 音·创 开发者
+Copyright © 2023 all the developers of Musicreater
+
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿穆组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
+
+
+from ..exceptions import *
+from ..main import MidiConvert
 
 
 def to_command_list_method1(
-    self: midiConvert,
+    self: MidiConvert,
     scoreboard_name: str = "mscplay",
     MaxVolume: float = 1.0,
     speed: float = 1.0,
@@ -77,7 +91,7 @@ def to_command_list_method1(
 
 # 原本这个算法的转换效果应该和上面的算法相似的
 def _toCmdList_m2(
-    self: midiConvert,
+    self: MidiConvert,
     scoreboard_name: str = "mscplay",
     MaxVolume: float = 1.0,
     speed: float = 1.0,
@@ -214,7 +228,7 @@ def _toCmdList_m2(
 
 
 def _toCmdList_withDelay_m1(
-    self: midiConvert,
+    self: MidiConvert,
     MaxVolume: float = 1.0,
     speed: float = 1.0,
     player: str = "@a",
@@ -288,7 +302,7 @@ def _toCmdList_withDelay_m1(
 
 
 def _toCmdList_withDelay_m2(
-    self: midiConvert,
+    self: MidiConvert,
     MaxVolume: float = 1.0,
     speed: float = 1.0,
     player: str = "@a",
