@@ -54,7 +54,6 @@ if os.path.exists("./demo_config.json"):
     import json
 
     prompts = json.load(open("./demo_config.json", "r", encoding="utf-8"))
-    prompts = prompts[:-1]
 else:
     prompts = []
     # 提示语 检测函数 错误提示语
@@ -115,8 +114,8 @@ print(
             else to_mcstructure_addon_in_delay(cvt_mid, cvt_cfg, *prompts[3:])
         )
     )
-) if fileFormat == 0 else print(
-    "	指令总长：{}，最高延迟：{}，结构大小{}，终点坐标{}".format(
+    if fileFormat == 0
+    else "	指令总长：{}，最高延迟：{}，结构大小{}，终点坐标{}".format(
         *(
             to_BDX_file_in_score(cvt_mid, cvt_cfg, *prompts[3:])
             if playerFormat == 1

@@ -21,7 +21,7 @@ Terms & Conditions: License.md in the root directory
 
 import os
 import math
-from typing import Tuple, List
+from typing import Tuple, List, Union
 
 import mido
 
@@ -87,6 +87,9 @@ class MidiConvert:
     execute_cmd_head: str
     """execute指令头部"""
 
+    channels: Dict[int, Dict[int, List[Tuple[str, int, int, Union[None, int]]]]]
+    """频道信息字典"""
+
     music_command_list: List[SingleCommand]
     """音乐指令列表"""
 
@@ -128,6 +131,7 @@ class MidiConvert:
         )
 
         self.progress_bar_command = self.music_command_list = []
+        self.channels = {}
         self.music_tick_num = 0
 
     @classmethod
@@ -147,7 +151,7 @@ class MidiConvert:
             是否启用旧版(≤1.19)指令格式，默认为否
         """
 
-        midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0]
+        midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(' ','_')
         """文件名，不含路径且不含后缀"""
 
         try:
@@ -485,35 +489,19 @@ class MidiConvert:
         self.progress_bar_command = result
         return result
 
-    def to_command_list_in_score(
+    def to_music_channels(
         self,
-        scoreboard_name: str = "mscplay",
-        max_volume: float = 1.0,
-        speed: float = 1.0,
-    ) -> Tuple[List[List[SingleCommand]], int, int]:
+    ) -> Dict[int, Dict[int, List[Tuple[str, int, int, Union[None, int]]]]]:
         """
-        使用金羿的转换思路，将midi转换为我的世界命令列表
-
-        Parameters
-        ----------
-        scoreboard_name: str
-            我的世界的计分板名称
-        max_volume: float
-            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放
-        speed: float
-            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        使用金羿的转换思路，将midi解析并转换为频道信息
 
         Returns
         -------
-        tuple( list[list[SingleCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        Dict[int, Dict[int, List[Tuple[str,int,int,Union[None,int]]]]]
         """
 
-        if speed == 0:
-            raise ZeroSpeedError("播放速度仅可为正实数")
-        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
-
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        channels = empty_midi_channels()
+        midi_channels = empty_midi_channels()
 
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
@@ -546,22 +534,22 @@ class MidiConvert:
                     #     except AttributeError:
                     #         pass
 
-                    if not track_no in channels[msg.channel].keys():
-                        channels[msg.channel][track_no] = []
+                    if not track_no in midi_channels[msg.channel].keys():
+                        midi_channels[msg.channel][track_no] = []
                     if msg.type == "program_change":
-                        channels[msg.channel][track_no].append(
+                        midi_channels[msg.channel][track_no].append(
                             ("PgmC", msg.program, microseconds)
                         )
 
                     elif msg.type == "note_on" and msg.velocity != 0:
-                        channels[msg.channel][track_no].append(
+                        midi_channels[msg.channel][track_no].append(
                             ("NoteS", msg.note, msg.velocity, microseconds)
                         )
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
                         msg.type == "note_off"
                     ):
-                        channels[msg.channel][track_no].append(
+                        midi_channels[msg.channel][track_no].append(
                             ("NoteE", msg.note, microseconds)
                         )
 
@@ -577,14 +565,46 @@ class MidiConvert:
         3 音符结束消息
         ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
 
+        self.channels = midi_channels
+        return self.channels
+
+    def to_command_list_in_score(
+        self,
+        scoreboard_name: str = "mscplay",
+        max_volume: float = 1.0,
+        speed: float = 1.0,
+    ) -> Tuple[List[List[SingleCommand]], int, int]:
+        """
+        使用金羿的转换思路，将midi转换为我的世界命令列表
+
+        Parameters
+        ----------
+        scoreboard_name: str
+            我的世界的计分板名称
+        max_volume: float
+            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放
+        speed: float
+            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+
+        Returns
+        -------
+        tuple( list[list[SingleCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        """
+
+        if speed == 0:
+            raise ZeroSpeedError("播放速度仅可为正实数")
+        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
+
         tracks = []
         cmdAmount = 0
         maxScore = 0
 
+        self.to_music_channels()
+
         # 此处 我们把通道视为音轨
-        for i in channels.keys():
+        for i in self.channels.keys():
             # 如果当前通道为空 则跳过
-            if not channels[i]:
+            if not self.channels[i]:
                 continue
 
             # 第十通道是打击乐通道
@@ -592,7 +612,7 @@ class MidiConvert:
 
             # nowChannel = []
 
-            for track_no, track in channels[i].items():
+            for track_no, track in self.channels[i].items():
                 nowTrack = []
 
                 for msg in track:
@@ -669,77 +689,14 @@ class MidiConvert:
             raise ZeroSpeedError("播放速度仅可为正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
-        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        channels = empty_midi_channels()
-
-        # 我们来用通道统计音乐信息
-        # 但是是用分轨的思路的
-        for track_no, track in enumerate(self.midi.tracks):
-            microseconds = 0
-
-            for msg in track:
-                if msg.time != 0:
-                    try:
-                        microseconds += (
-                            msg.time * tempo / self.midi.ticks_per_beat / 1000
-                        )
-                        # print(microseconds)
-                    except NameError:
-                        # raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-                        microseconds += (
-                            msg.time
-                            * mido.midifiles.midifiles.DEFAULT_TEMPO
-                            / self.midi.ticks_per_beat
-                        ) / 1000
-
-                if msg.is_meta:
-                    if msg.type == "set_tempo":
-                        tempo = msg.tempo
-                else:
-                    try:
-                        # 曾用于调试模式
-                        # if msg.channel > 15:
-                            # raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                        if not track_no in channels[msg.channel].keys():
-                            channels[msg.channel][track_no] = []
-                    except AttributeError:
-                        pass
-
-                    if msg.type == "program_change":
-                        channels[msg.channel][track_no].append(
-                            ("PgmC", msg.program, microseconds)
-                        )
-
-                    elif msg.type == "note_on" and msg.velocity != 0:
-                        channels[msg.channel][track_no].append(
-                            ("NoteS", msg.note, msg.velocity, microseconds)
-                        )
-
-                    elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
-                    ):
-                        channels[msg.channel][track_no].append(
-                            ("NoteE", msg.note, microseconds)
-                        )
-
-        """整合后的音乐通道格式
-        每个通道包括若干消息元素其中逃不过这三种：
-
-        1 切换乐器消息
-        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
-
-        2 音符开始消息
-        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
-
-        3 音符结束消息
-        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
+        self.to_music_channels()
 
         tracks = {}
 
         # 此处 我们把通道视为音轨
-        for i in channels.keys():
+        for i in self.channels.keys():
             # 如果当前通道为空 则跳过
-            if not channels[i]:
+            if not self.channels[i]:
                 continue
 
             # 第十通道是打击乐通道
@@ -747,7 +704,7 @@ class MidiConvert:
 
             # nowChannel = []
 
-            for track_no, track in channels[i].items():
+            for track_no, track in self.channels[i].items():
                 for msg in track:
                     if msg[0] == "PgmC":
                         InstID = msg[1]
@@ -755,7 +712,7 @@ class MidiConvert:
                     elif msg[0] == "NoteS":
                         try:
                             soundID, _X = (
-                                self.perc_inst_to_soundID_withX(InstID)
+                                self.perc_inst_to_soundID_withX(msg[1])
                                 if SpecialBits
                                 else self.inst_to_souldID_withX(InstID)
                             )
@@ -772,14 +729,22 @@ class MidiConvert:
                         try:
                             tracks[score_now].append(
                                 self.execute_cmd_head.format(player_selector)
-                                + f"playsound {soundID} @s ^ ^ ^{1 / max_volume - 1} {msg[2] / 128} "
-                                f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
+                                + (
+                                    ""
+                                    if SpecialBits
+                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                )
                             )
                         except KeyError:
                             tracks[score_now] = [
                                 self.execute_cmd_head.format(player_selector)
-                                + f"playsound {soundID} @s ^ ^ ^{1 / max_volume - 1} {msg[2] / 128} "
-                                f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
+                                + (
+                                    ""
+                                    if SpecialBits
+                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                )
                             ]
 
         all_ticks = list(tracks.keys())
@@ -819,7 +784,6 @@ class MidiConvert:
         :return: dict()
         """
 
-        
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         channels = empty_midi_channels()
 
@@ -850,7 +814,7 @@ class MidiConvert:
                     try:
                         # 曾用于调试模式
                         # if msg.channel > 15:
-                            # raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
+                        # raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
                         if not track_no in channels[msg.channel].keys():
                             channels[msg.channel][track_no] = []
                     except AttributeError:
@@ -887,7 +851,6 @@ class MidiConvert:
 
         return channels
 
-
     def copy_important(self):
         dst = MidiConvert(
             midi_obj=None,
@@ -898,4 +861,3 @@ class MidiConvert:
         dst.progress_bar_command = [i.copy() for i in self.progress_bar_command]
         dst.music_tick_num = self.music_tick_num
         return dst
-
