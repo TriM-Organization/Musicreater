@@ -71,5 +71,6 @@ def to_mcstructure_file_in_delay(
 
 def to_mcstructure_file_in_redstone(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,):
+    data_cfg: ConvertConfig,
+):
     pass

@@ -15,7 +15,8 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import Dict
+from typing import Any, Dict
+
 
 def mctick2timestr(mc_tick: int) -> str:
     """
@@ -24,8 +25,15 @@ def mctick2timestr(mc_tick: int) -> str:
     return str(int(int(mc_tick / 20) / 60)) + ":" + str(int(int(mc_tick / 20) % 60))
 
 
-def empty_midi_channels(channel_count: int = 17) -> Dict[int, Dict]:
+def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, Any]:
     """
     空MIDI通道字典
     """
-    return dict((i, {}) for i in range(channel_count))
+
+    return dict(
+        (
+            i,
+            (staff.copy() if isinstance(staff, (dict, list)) else staff),
+        )  # 这告诉我们，你不能忽略任何一个复制的序列，因为它真的，我哭死，折磨我一整天，全在这个bug上了
+        for i in range(channel_count)
+    )

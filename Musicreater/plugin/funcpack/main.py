@@ -56,13 +56,12 @@ def to_function_addon_in_score(
         shutil.rmtree(f"{data_cfg.dist_path}/temp/functions/")
     os.makedirs(f"{data_cfg.dist_path}/temp/functions/mscplay")
 
-
     # 写入manifest.json
     with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
                 pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCFUNCTION(MCPACK) 计分播放器 - 由 音·创 生成",
-                pack_name=midi_cvt.midi_music_name+"播放",
+                pack_name=midi_cvt.midi_music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
             ),
             fp=f,

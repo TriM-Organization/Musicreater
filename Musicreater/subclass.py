@@ -18,9 +18,6 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import TypeVar
-
-T = TypeVar("T")  # Declare type variable
 
 
 @dataclass(init=False)
@@ -36,14 +33,17 @@ class SingleNote:
     velocity: int
     """力度/响度"""
 
-    startTime: int
+    start_time: int
     """开始之时 ms"""
 
-    lastTime: int
+    duration: int
     """音符持续时间 ms"""
 
+    track_no: int
+    """音符所处的音轨"""
+
     def __init__(
-        self, instrument: int, pitch: int, velocity: int, startTime: int, lastTime: int
+        self, instrument: int, pitch: int, velocity: int, startTime: int, lastTime: int, track_number:int = 0
     ):
         """用于存储单个音符的类
         :param instrument 乐器编号
@@ -58,10 +58,12 @@ class SingleNote:
         """音符编号"""
         self.velocity: int = velocity
         """力度/响度"""
-        self.startTime: int = startTime
+        self.start_time: int = startTime
         """开始之时 ms"""
-        self.lastTime: int = lastTime
+        self.duration: int = lastTime
         """音符持续时间 ms"""
+        self.track_no: int = track_number
+        """音符所处的音轨"""
 
     @property
     def inst(self):
@@ -80,19 +82,19 @@ class SingleNote:
     def __str__(self):
         return (
             f"Note(inst = {self.inst}, pitch = {self.note}, velocity = {self.velocity}, "
-            f"startTime = {self.startTime}, lastTime = {self.lastTime}, )"
+            f"startTime = {self.start_time}, lastTime = {self.duration}, )"
         )
 
     def __tuple__(self):
-        return self.inst, self.note, self.velocity, self.startTime, self.lastTime
+        return self.inst, self.note, self.velocity, self.start_time, self.duration
 
     def __dict__(self):
         return {
             "inst": self.inst,
             "pitch": self.note,
             "velocity": self.velocity,
-            "startTime": self.startTime,
-            "lastTime": self.lastTime,
+            "startTime": self.start_time,
+            "lastTime": self.duration,
         }
 
 
@@ -168,18 +170,3 @@ class SingleCommand:
         if not isinstance(other, self.__class__):
             return False
         return self.__str__() == other.__str__()
-
-
-class MethodList(list):
-    """函数列表，列表中的所有元素均为函数"""
-
-    def __init__(self, in_=()):
-        """函数列表，列表中的所有元素均为函数"""
-        super().__init__()
-        self._T = [_x for _x in in_]
-
-    def __getitem__(self, item) -> T:
-        return self._T[item]
-
-    def __len__(self) -> int:
-        return self._T.__len__()

@@ -16,6 +16,7 @@
 /llc_cli.py
 /utils
 test.py
+RES.txt
 
 # Byte-compiled / optimized
 __pycache__/

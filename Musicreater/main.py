@@ -19,20 +19,46 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库根目录下的 License.md
 
 
-import os
+# BUG退散！BUG退散！                    BUG退散！BUG退散！
+# 异常、错误作乱之时                     異常、誤りが、困った時は
+# 二六字组！万国码合！二六字组！万国码合！   グループ！コード＃！グループ！コード＃！
+# 赶快呼叫 程序员！Let's Go！            直ぐに呼びましょプログラマ レッツゴー！
+
+
+
 import math
-from typing import Tuple, List, Union
+import os
+from typing import List, Literal, Tuple, Union
 
 import mido
 
-from .exceptions import *
 from .constants import *
-from .utils import *
+from .exceptions import *
 from .subclass import *
+from .utils import *
 
-VM = TypeVar("VM", mido.MidiFile, None)  # void mido
+VoidMido = Union[mido.MidiFile, None]  # void mido
 """
 空Midi类类型
+"""
+
+ChannelType = Dict[
+    int,
+    Dict[
+        int,
+        List[
+            Union[
+                Tuple[Literal["PgmC"], int, int],
+                Tuple[Literal["NoteS"], int, int, int],
+                Tuple[Literal["NoteE"], int, int],
+            ]
+        ],
+    ],
+]
+"""
+以字典所标记的频道信息类型
+
+Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
 """
 
 """
@@ -75,7 +101,7 @@ class MidiConvert:
     将Midi文件转换为我的世界内容
     """
 
-    midi: VM
+    midi: VoidMido
     """MidiFile对象"""
 
     midi_music_name: str
@@ -87,7 +113,7 @@ class MidiConvert:
     execute_cmd_head: str
     """execute指令头部"""
 
-    channels: Dict[int, Dict[int, List[Tuple[str, int, int, Union[None, int]]]]]
+    channels: ChannelType
     """频道信息字典"""
 
     music_command_list: List[SingleCommand]
@@ -101,7 +127,7 @@ class MidiConvert:
 
     def __init__(
         self,
-        midi_obj: VM,
+        midi_obj: VoidMido,
         midi_name: str,
         enable_old_exe_format: bool = False,
     ):
@@ -118,7 +144,7 @@ class MidiConvert:
             是否启用旧版(≤1.19)指令格式，默认为否
         """
 
-        self.midi: VM = midi_obj
+        self.midi: VoidMido = midi_obj
 
         self.midi_music_name: str = midi_name
 
@@ -151,7 +177,9 @@ class MidiConvert:
             是否启用旧版(≤1.19)指令格式，默认为否
         """
 
-        midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(' ','_')
+        midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(
+            " ", "_"
+        )
         """文件名，不含路径且不含后缀"""
 
         try:
@@ -491,48 +519,43 @@ class MidiConvert:
 
     def to_music_channels(
         self,
-    ) -> Dict[int, Dict[int, List[Tuple[str, int, int, Union[None, int]]]]]:
+    ) -> ChannelType:
         """
-        使用金羿的转换思路，将midi解析并转换为频道信息
+        使用金羿的转换思路，将midi解析并转换为频道信息字典
 
         Returns
         -------
-        Dict[int, Dict[int, List[Tuple[str,int,int,Union[None,int]]]]]
+        以频道作为分割的Midi信息字典:
+        Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
         """
+        if self.midi is None:
+            raise MidiUnboundError(
+                "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
+            )
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels = empty_midi_channels()
+        midi_channels: ChannelType = empty_midi_channels()
+        tempo = mido.midifiles.midifiles.DEFAULT_TEMPO
 
+        # a = 0
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
         for track_no, track in enumerate(self.midi.tracks):
+            # print(track_no,track)
             microseconds = 0
+            if not track:
+                continue
 
+            # print(track_no,"="*20)
             for msg in track:
+                # print("+++",msg)
                 if msg.time != 0:
-                    try:
-                        microseconds += (
-                            msg.time * tempo / self.midi.ticks_per_beat / 1000
-                        )
-                        # print(microseconds)
-                    except NameError:
-                        # raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-                        microseconds += (
-                            msg.time
-                            * mido.midifiles.midifiles.DEFAULT_TEMPO
-                            / self.midi.ticks_per_beat
-                        ) / 1000
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
 
                 if msg.is_meta:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
-                    # 曾用于调试模式
-                    #     try:
-                    #         if msg.channel > 15:
-                    #             raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                    #     except AttributeError:
-                    #         pass
 
                     if not track_no in midi_channels[msg.channel].keys():
                         midi_channels[msg.channel][track_no] = []
@@ -545,6 +568,7 @@ class MidiConvert:
                         midi_channels[msg.channel][track_no].append(
                             ("NoteS", msg.note, msg.velocity, microseconds)
                         )
+                        # a+=1
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
                         msg.type == "note_off"
@@ -552,6 +576,8 @@ class MidiConvert:
                         midi_channels[msg.channel][track_no].append(
                             ("NoteE", msg.note, microseconds)
                         )
+
+        # print(a)
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -563,10 +589,11 @@ class MidiConvert:
         ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
 
         3 音符结束消息
-        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
-
+        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+        del tempo, self.channels
         self.channels = midi_channels
-        return self.channels
+        # [print([print(no,tno,sum([True if i[0] == 'NoteS' else False for i in track])) for tno,track in cna.items()]) if cna else False for no,cna in midi_channels.items()]
+        return midi_channels
 
     def to_command_list_in_score(
         self,
@@ -598,6 +625,7 @@ class MidiConvert:
         tracks = []
         cmdAmount = 0
         maxScore = 0
+        InstID = -1
 
         self.to_music_channels()
 
@@ -620,21 +648,14 @@ class MidiConvert:
                         InstID = msg[1]
 
                     elif msg[0] == "NoteS":
-                        try:
-                            soundID, _X = (
-                                self.perc_inst_to_soundID_withX(InstID)
-                                if SpecialBits
-                                else self.inst_to_souldID_withX(InstID)
-                            )
-                        except UnboundLocalError as E:
-                            # raise NotDefineProgramError(f"未定义乐器便提前演奏。\n{E}")
-                            soundID, _X = (
-                                self.perc_inst_to_soundID_withX(-1)
-                                if SpecialBits
-                                else self.inst_to_souldID_withX(-1)
-                            )
+                        soundID, _X = (
+                            self.perc_inst_to_soundID_withX(msg[1])
+                            if SpecialBits
+                            else self.inst_to_souldID_withX(InstID)
+                        )
                         score_now = round(msg[-1] / float(speed) / 50)
                         maxScore = max(maxScore, score_now)
+                        mc_pitch = "" if SpecialBits else 2 ** ((msg[1] - 60 - _X) / 12)
 
                         nowTrack.append(
                             SingleCommand(
@@ -645,10 +666,13 @@ class MidiConvert:
                                     .replace("(", r"{")
                                     .replace(")", r"}")
                                 )
-                                + f"playsound {soundID} @s ^ ^ ^{1 / max_volume - 1} {msg[2] / 128} "
-                                f"{2 ** ((msg[1] - 60 - _X) / 12)}",
+                                + "playsound {} @s ^ ^ ^{} {} {}".format(
+                                    soundID, 1 / max_volume - 1, msg[2] / 128, mc_pitch
+                                ),
                                 annotation="在{}播放{}%的{}音".format(
-                                    mctick2timestr(score_now), max_volume * 100, ""
+                                    mctick2timestr(score_now),
+                                    max_volume * 100,
+                                    "{}:{}".format(soundID, mc_pitch),
                                 ),
                             ),
                         )
@@ -659,6 +683,8 @@ class MidiConvert:
                     self.music_command_list.extend(nowTrack)
                     tracks.append(nowTrack)
 
+        # print(cmdAmount)
+        del InstID
         self.music_tick_num = maxScore
         return (tracks, cmdAmount, maxScore)
 
@@ -692,6 +718,8 @@ class MidiConvert:
         self.to_music_channels()
 
         tracks = {}
+        InstID = -1
+        # cmd_amount = 0
 
         # 此处 我们把通道视为音轨
         for i in self.channels.keys():
@@ -710,21 +738,13 @@ class MidiConvert:
                         InstID = msg[1]
 
                     elif msg[0] == "NoteS":
-                        try:
-                            soundID, _X = (
-                                self.perc_inst_to_soundID_withX(msg[1])
-                                if SpecialBits
-                                else self.inst_to_souldID_withX(InstID)
-                            )
-                        except UnboundLocalError as E:
-                            # raise NotDefineProgramError(f"未定义乐器便提前演奏。\n{E}")
-                            soundID, _X = (
-                                self.perc_inst_to_soundID_withX(-1)
-                                if SpecialBits
-                                else self.inst_to_souldID_withX(-1)
-                            )
+                        soundID, _X = (
+                            self.perc_inst_to_soundID_withX(msg[1])
+                            if SpecialBits
+                            else self.inst_to_souldID_withX(InstID)
+                        )
+
                         score_now = round(msg[-1] / float(speed) / 50)
-                        # print(score_now)
 
                         try:
                             tracks[score_now].append(
@@ -747,6 +767,11 @@ class MidiConvert:
                                 )
                             ]
 
+                        # cmd_amount += 1
+
+        # print(cmd_amount)
+
+        del InstID
         all_ticks = list(tracks.keys())
         all_ticks.sort()
         results = []
@@ -773,83 +798,7 @@ class MidiConvert:
 
         self.music_command_list = results
         self.music_tick_num = max(all_ticks)
-        return [results, self.music_tick_num]
-
-
-    def to_dict(
-        self,
-    ) -> dict:
-        """
-        使用金羿的转换思路，将midi转换为字典
-        :return: dict()
-        """
-
-        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        channels = empty_midi_channels()
-
-        # 我们来用通道统计音乐信息
-        # 但是是用分轨的思路的
-        for track_no, track in enumerate(self.midi.tracks):
-            microseconds = 0
-
-            for msg in track:
-                if msg.time != 0:
-                    try:
-                        microseconds += (
-                            msg.time * tempo / self.midi.ticks_per_beat / 1000
-                        )
-                        # print(microseconds)
-                    except NameError:
-                        # raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-                        microseconds += (
-                            msg.time
-                            * mido.midifiles.midifiles.DEFAULT_TEMPO
-                            / self.midi.ticks_per_beat
-                        ) / 1000
-
-                if msg.is_meta:
-                    if msg.type == "set_tempo":
-                        tempo = msg.tempo
-                else:
-                    try:
-                        # 曾用于调试模式
-                        # if msg.channel > 15:
-                        # raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                        if not track_no in channels[msg.channel].keys():
-                            channels[msg.channel][track_no] = []
-                    except AttributeError:
-                        pass
-
-                    if msg.type == "program_change":
-                        channels[msg.channel][track_no].append(
-                            ("PgmC", msg.program, microseconds)
-                        )
-
-                    elif msg.type == "note_on" and msg.velocity != 0:
-                        channels[msg.channel][track_no].append(
-                            ("NoteS", msg.note, msg.velocity, microseconds)
-                        )
-
-                    elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
-                    ):
-                        channels[msg.channel][track_no].append(
-                            ("NoteE", msg.note, microseconds)
-                        )
-
-        """整合后的音乐通道格式
-        每个通道包括若干消息元素其中逃不过这三种：
-
-        1 切换乐器消息
-        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
-
-        2 音符开始消息
-        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
-
-        3 音符结束消息
-        ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
-
-        return channels
+        return results, self.music_tick_num
 
     def copy_important(self):
         dst = MidiConvert(

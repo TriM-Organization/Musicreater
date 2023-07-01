@@ -17,7 +17,7 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import Tuple, Union
+from typing import Tuple, Union, Literal
 
 from ..constants import DEFAULT_PROGRESSBAR_STYLE
 
@@ -34,7 +34,7 @@ class ConvertConfig:
     speed_multiplier: float
     """速度倍率"""
 
-    progressbar_style: Tuple[str, Tuple[str, str]]
+    progressbar_style: Union[Tuple[str, Tuple[str, str]], Literal[None]]
     """进度条样式组"""
 
     dist_path: str

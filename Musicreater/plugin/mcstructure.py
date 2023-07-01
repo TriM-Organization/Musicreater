@@ -16,7 +16,7 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-from typing import List
+from typing import List, Tuple
 
 from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
 
@@ -25,7 +25,10 @@ from .common import bottem_side_length_of_smallest_square_bottom_box
 
 
 def form_note_block_in_NBT_struct(
-    note: int, coordinate: tuple, instrument: str = "note.harp", powered: bool = False
+    note: int,
+    coordinate: Tuple[int, int, int],
+    instrument: str = "note.harp",
+    powered: bool = False,
 ):
     """生成音符盒方块
     :param note: `int`(0~24)
@@ -54,7 +57,7 @@ def form_note_block_in_NBT_struct(
                 "x": coordinate[0],
                 "y": coordinate[1],
                 "z": coordinate[2],
-            }
+            }  # type: ignore
         },
     )
 
@@ -162,7 +165,7 @@ def form_command_block_in_NBT_struct(
                 "x": coordinate[0],
                 "y": coordinate[1],
                 "z": coordinate[2],
-            }
+            } # type: ignore
         },
         compability_version=17959425,
     )

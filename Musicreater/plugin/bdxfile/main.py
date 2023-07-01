@@ -13,12 +13,14 @@ Terms & Conditions: License.md in the root directory
 
 
 import os
+
 import brotli
 
 from ...main import MidiConvert
-from ..bdx import commands_to_BDX_bytes, bdx_move, x, y, z, form_command_block_in_BDX_bytes
-from ..main import ConvertConfig
 from ...subclass import SingleCommand
+from ..bdx import (bdx_move, commands_to_BDX_bytes,
+                   form_command_block_in_BDX_bytes, x, y, z)
+from ..main import ConvertConfig
 
 
 def to_BDX_file_in_score(
@@ -142,7 +144,7 @@ def to_BDX_file_in_delay(
         作者名称
     max_height: int
         生成结构最大高度
-    
+
     Returns
     -------
     tuple[int指令数量, int音乐总延迟, tuple[int,]结构大小, tuple[int,]终点坐标]
@@ -168,7 +170,6 @@ def to_BDX_file_in_delay(
     _bytes = (
         b"BDX\x00" + author.encode("utf-8") + b" & Musicreater\x00\x01command_block\x00"
     )
-
 
     cmdBytes, size, finalPos = commands_to_BDX_bytes(cmdlist, max_height - 1)
 

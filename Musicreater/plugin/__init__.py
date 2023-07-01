@@ -14,7 +14,9 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__all__ = []
+__all__ = [
+    "ConvertConfig",
+]
 __author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"))
 
 from .main import *

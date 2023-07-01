@@ -5,7 +5,7 @@ import Musicreater
 with open("requirements.txt", "r", encoding="utf-8") as fh:
     dependences = fh.read().strip().split("\n")
 
-with open("README.md", "r", encoding="utf-8") as fh:
+with open("README_EN.md", "r", encoding="utf-8") as fh:
     long_description = fh.read().replace(
         "./docs/", "https://github.com/TriM-Organization/Musicreater/blob/master/docs/"
     )

@@ -20,7 +20,8 @@ Terms & Conditions: License.md in the root directory
 import os
 import uuid
 import zipfile
-from typing import List
+import datetime
+from typing import List, Union, Literal
 
 
 def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
@@ -46,16 +47,23 @@ def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
 
 def behavior_mcpack_manifest(
     pack_description: str = "",
-    pack_version: List[int] = [0, 0, 1],
+    pack_version: Union[List[int], Literal[None]] = None,
     pack_name: str = "",
-    pack_uuid: str = None,
+    pack_uuid: Union[str, Literal[None]] = None,
     modules_description: str = "",
     modules_version: List[int] = [0, 0, 1],
-    modules_uuid: str = None,
+    modules_uuid: Union[str, Literal[None]] = None,
 ):
     """
     生成一个我的世界行为包组件的定义清单文件
     """
+    if not pack_version:
+        now_date = datetime.datetime.now()
+        pack_version = [
+            now_date.year,
+            now_date.month * 100 + now_date.day,
+            now_date.hour * 100 + now_date.minute,
+        ]
     return {
         "format_version": 1,
         "header": {

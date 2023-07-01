@@ -17,8 +17,6 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-
-
 class MSCTBaseException(Exception):
     """音·创库版本的所有错误均继承于此"""
 
@@ -27,7 +25,7 @@ class MSCTBaseException(Exception):
         super().__init__(*args)
 
     def miao(
-            self,
+        self,
     ):
         for i in self.args:
             print(i + "喵！")
@@ -50,6 +48,14 @@ class MidiDestroyedError(MSCTBaseException):
     def __init__(self, *args):
         """Midi文件损坏"""
         super().__init__("MIDI文件损坏：无法读取MIDI文件", *args)
+
+
+class MidiUnboundError(MSCTBaseException):
+    """未定义Midi对象"""
+
+    def __init__(self, *args):
+        """未绑定Midi对象"""
+        super().__init__("未定义MidiFile对象：你甚至没有对象就想要生孩子？", *args)
 
 
 class CommandFormatError(RuntimeError):

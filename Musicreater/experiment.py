@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-
 """
 新版本功能以及即将启用的函数
 """
@@ -17,190 +16,478 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+from typing import Dict, List, Tuple, Union
 
 from .exceptions import *
-from .main import MidiConvert, mido
+from .main import MidiConvert
 from .subclass import *
 from .utils import *
 
 
-# 简单的单音填充
-def _toCmdList_m4(
-    self: MidiConvert,
-    scoreboard_name: str = "mscplay",
-    MaxVolume: float = 1.0,
-    speed: float = 1.0,
-) -> list:
+class FutureMidiConvertM4(MidiConvert):
     """
-    使用金羿的转换思路，将midi转换为我的世界命令列表，并使用完全填充算法优化音感
-    :param scoreboard_name: 我的世界的计分板名称
-    :param MaxVolume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
-    :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-    :return: tuple(命令列表, 命令个数, 计分板最大值)
+    加入插值算法优化音感
+    : 经测试，生成效果已经达到，感觉良好
     """
-    # TODO: 这里的时间转换不知道有没有问题
-
-    if speed == 0:
-        if self.debug_mode:
-            raise ZeroSpeedError("播放速度仅可为正实数")
-        speed = 1
-    MaxVolume = 1 if MaxVolume > 1 else (0.001 if MaxVolume <= 0 else MaxVolume)
-
-    # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-    channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-
-    # 我们来用通道统计音乐信息
-    for i, track in enumerate(self.midi.tracks):
-        microseconds = 0
-
-        for msg in track:
-            if msg.time != 0:
-                try:
-                    microseconds += msg.time * tempo / self.midi.ticks_per_beat
-                except NameError:
-                    raise NotDefineTempoError("计算当前分数时出错 未定义参量 Tempo")
-
-            if msg.is_meta:
-                if msg.type == "set_tempo":
-                    tempo = msg.tempo
-            else:
-                if self.debug_mode:
-                    try:
-                        if msg.channel > 15:
-                            raise ChannelOverFlowError(f"当前消息 {msg} 的通道超限(≤15)")
-                    except AttributeError:
-                        pass
-
-                if msg.type == "program_change":
-                    channels[msg.channel].append(("PgmC", msg.program, microseconds))
-
-                elif msg.type == "note_on" and msg.velocity != 0:
-                    channels[msg.channel].append(
-                        ("NoteS", msg.note, msg.velocity, microseconds)
-                    )
-
-                elif (msg.type == "note_on" and msg.velocity == 0) or (
-                    msg.type == "note_off"
-                ):
-                    channels[msg.channel].append(("NoteE", msg.note, microseconds))
-
-    """整合后的音乐通道格式
-    每个通道包括若干消息元素其中逃不过这三种：
-
-    1 切换乐器消息
-
-    ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
-
-    2 音符开始消息
-
-    ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
-
-    3 音符结束消息
-
-    ("NoteS", 结束的音符ID, 距离演奏开始的毫秒)"""
-
-    note_channels = [[], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []]
-
-    # 此处 我们把通道视为音轨
-    for i in range(len(channels)):
-        # 如果当前通道为空 则跳过
-
-        noteMsgs = []
-        MsgIndex = []
-
-        for msg in channels[i]:
-            if msg[0] == "PgmC":
-                InstID = msg[1]
-
-            elif msg[0] == "NoteS":
-                noteMsgs.append(msg[1:])
-                MsgIndex.append(msg[1])
-
-            elif msg[0] == "NoteE":
-                if msg[1] in MsgIndex:
-                    note_channels[i].append(
-                        SingleNote(
-                            InstID,
-                            msg[1],
-                            noteMsgs[MsgIndex.index(msg[1])][1],
-                            noteMsgs[MsgIndex.index(msg[1])][2],
-                            msg[-1] - noteMsgs[MsgIndex.index(msg[1])][2],
-                        )
-                    )
-                    noteMsgs.pop(MsgIndex.index(msg[1]))
-                    MsgIndex.pop(MsgIndex.index(msg[1]))
-
-    tracks = []
-    cmdAmount = 0
-    maxScore = 0
-    CheckFirstChannel = False
 
     # 临时用的插值计算函数
-    def _linearFun(_note: SingleNote) -> list:
+    @staticmethod
+    def _linear_note(
+        _note: SingleNote,
+        _apply_time_division: int = 100,
+    ) -> List[Tuple[int, int, int, int, float],]:
         """传入音符数据，返回以半秒为分割的插值列表
         :param _note: SingleNote 音符
         :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]"""
 
-        result = []
+        totalCount = int(_note.duration / _apply_time_division)
+        if totalCount == 0:
+            return [
+                (_note.start_time, _note.inst, _note.pitch, _note.velocity, 1),
+            ]
+        # print(totalCount)
 
-        totalCount = int(_note.lastTime / 500)
+        result: List[
+            Tuple[int, int, int, int, float],
+        ] = []
 
         for _i in range(totalCount):
             result.append(
                 (
-                    _note.startTime + _i * 500,
+                    _note.start_time + _i * _apply_time_division,
                     _note.instrument,
                     _note.pitch,
                     _note.velocity,
-                    MaxVolume * ((totalCount - _i) / totalCount),
+                    ((totalCount - _i) / totalCount),
                 )
             )
 
         return result
 
-    # 此处 我们把通道视为音轨
-    for track in note_channels:
-        # 如果当前通道为空 则跳过
-        if not track:
-            continue
+    # 简单的单音填充
+    def to_command_list_in_score(
+        self,
+        scoreboard_name: str = "mscplay",
+        max_volume: float = 1.0,
+        speed: float = 1.0,
+    ) -> Tuple[List[List[SingleCommand]], int, int]:
+        """
+        使用金羿的转换思路，使用完全填充算法优化音感后，将midi转换为我的世界命令列表
 
-        if note_channels.index(track) == 0:
-            CheckFirstChannel = True
-            SpecialBits = False
-        elif note_channels.index(track) == 9:
-            SpecialBits = True
-        else:
-            CheckFirstChannel = False
-            SpecialBits = False
+        Parameters
+        ----------
+        scoreboard_name: str
+            我的世界的计分板名称
+        max_volume: float
+            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放
+        speed: float
+            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
 
-        nowTrack = []
+        Returns
+        -------
+        tuple( list[list[SingleCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        """
 
-        for note in track:
-            for every_note in _linearFun(note):
-                # 应该是计算的时候出了点小问题
-                # 我们应该用一个MC帧作为时间单位而不是半秒
+        if speed == 0:
+            raise ZeroSpeedError("播放速度仅可为正实数")
+        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
-                if SpecialBits:
-                    soundID, _X = self.perc_inst_to_soundID_withX(InstID)
-                else:
-                    soundID, _X = self.inst_to_souldID_withX(InstID)
+        self.to_music_channels()
 
-                score_now = round(every_note[0] / speed / 50000)
+        note_channels: Dict[int, List[SingleNote]] = empty_midi_channels(staff=[])
+        InstID = -1
 
-                maxScore = max(maxScore, score_now)
+        # 此处 我们把通道视为音轨
+        for i in self.channels.keys():
+            # 如果当前通道为空 则跳过
+            if not self.channels[i]:
+                continue
 
-                nowTrack.append(
-                    "execute @a[scores={"
-                    + str(scoreboard_name)
-                    + "="
-                    + str(score_now)
-                    + "}"
-                    + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / every_note[4] - 1} ~ "
-                    f"{note.velocity * (0.7 if CheckFirstChannel else 0.9)} {2 ** ((note.pitch - 60 - _X) / 12)}"
+            # nowChannel = []
+            for track_no, track in self.channels[i].items():
+
+                noteMsgs = []
+                MsgIndex = []
+
+                for msg in track:
+                    if msg[0] == "PgmC":
+                        InstID = msg[1]
+
+                    elif msg[0] == "NoteS":
+                        noteMsgs.append(msg[1:])
+                        MsgIndex.append(msg[1])
+
+                    elif msg[0] == "NoteE":
+                        if msg[1] in MsgIndex:
+                            note_channels[i].append(
+                                SingleNote(
+                                    InstID,
+                                    msg[1],
+                                    noteMsgs[MsgIndex.index(msg[1])][1],
+                                    noteMsgs[MsgIndex.index(msg[1])][2],
+                                    msg[-1] - noteMsgs[MsgIndex.index(msg[1])][2],
+                                    track_number=track_no,
+                                )
+                            )
+                            noteMsgs.pop(MsgIndex.index(msg[1]))
+                            MsgIndex.pop(MsgIndex.index(msg[1]))
+
+        del InstID
+
+        tracks = []
+        cmd_amount = 0
+        max_score = 0
+
+        # 此处 我们把通道视为音轨
+        for no, track in note_channels.items():
+            # 如果当前通道为空 则跳过
+            if not track:
+                continue
+
+            SpecialBits = True if no == 9 else False
+
+            track_now = []
+
+            for note in track:
+                for every_note in self._linear_note(
+                    note, 50 if note.track_no == 0 else 500
+                ):
+
+                    soundID, _X = (
+                        self.perc_inst_to_soundID_withX(note.pitch)
+                        if SpecialBits
+                        else self.inst_to_souldID_withX(note.inst)
+                    )
+
+                    score_now = round(every_note[0] / speed / 50)
+
+                    max_score = max(max_score, score_now)
+                    mc_pitch = 2 ** ((note.pitch - 60 - _X) / 12)
+                    blockmeter = 1 / (1 if note.track_no == 0 else 0.9) / max_volume / every_note[4] - 1
+
+                    track_now.append(
+                        SingleCommand(
+                            self.execute_cmd_head.format(
+                                "@a[scores=({}={})]".format(scoreboard_name, score_now)
+                                .replace("(", r"{")
+                                .replace(")", r"}")
+                            )
+                            + "playsound {} @s ^ ^ ^{} {} {}".format(
+                                soundID,
+                                blockmeter,
+                                note.velocity / 128,
+                                "" if SpecialBits else mc_pitch,
+                            ),
+                            annotation="在{}播放{}%({}BM)的{}音".format(
+                                mctick2timestr(score_now),
+                                max_volume * 100,
+                                blockmeter,
+                                "{}:{}".format(soundID, note.pitch),
+                            ),
+                        ),
+                    )
+
+                    cmd_amount += 1
+
+            if track_now:
+                self.music_command_list.extend(track_now)
+                tracks.append(track_now)
+
+        self.music_tick_num = max_score
+        return (tracks, cmd_amount, max_score)
+
+    # 简单的单音填充的延迟应用
+    def to_command_list_in_delay(
+        self,
+        max_volume: float = 1.0,
+        speed: float = 1.0,
+        player_selector: str = "@a",
+    ) -> Tuple[List[SingleCommand], int]:
+        """
+        使用金羿的转换思路，使用完全填充算法优化音感后，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        max_volume: float
+            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        speed: float
+            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[SingleCommand,...], int音乐时长游戏刻 )
+        """
+
+        if speed == 0:
+            raise ZeroSpeedError("播放速度仅可为正实数")
+        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
+
+        self.to_music_channels()
+
+        note_channels: Dict[int, List[SingleNote]] = empty_midi_channels(staff=[])
+        InstID = -1
+
+        # 此处 我们把通道视为音轨
+        for i in self.channels.keys():
+            # 如果当前通道为空 则跳过
+            if not self.channels[i]:
+                continue
+
+            # nowChannel = []
+            for track_no, track in self.channels[i].items():
+
+                noteMsgs = []
+                MsgIndex = []
+
+                for msg in track:
+                    if msg[0] == "PgmC":
+                        InstID = msg[1]
+
+                    elif msg[0] == "NoteS":
+                        noteMsgs.append(msg[1:])
+                        MsgIndex.append(msg[1])
+
+                    elif msg[0] == "NoteE":
+                        if msg[1] in MsgIndex:
+                            note_channels[i].append(
+                                SingleNote(
+                                    InstID,
+                                    msg[1],
+                                    noteMsgs[MsgIndex.index(msg[1])][1],
+                                    noteMsgs[MsgIndex.index(msg[1])][2],
+                                    msg[-1] - noteMsgs[MsgIndex.index(msg[1])][2],
+                                    track_number=track_no,
+                                )
+                            )
+                            noteMsgs.pop(MsgIndex.index(msg[1]))
+                            MsgIndex.pop(MsgIndex.index(msg[1]))
+
+        del InstID
+
+        tracks = {}
+        InstID = -1
+        # open("RES.TXT", "w", encoding="utf-8").write(str(note_channels))
+
+        # 此处 我们把通道视为音轨
+        for no, track in note_channels.items():
+            # 如果当前通道为空 则跳过
+            if not track:
+                continue
+
+            SpecialBits = True if no == 9 else False
+
+            for note in track:
+                for every_note in self._linear_note(
+                    note, 50 if note.track_no == 0 else 500
+                ):
+
+                    soundID, _X = (
+                        self.perc_inst_to_soundID_withX(note.pitch)
+                        if SpecialBits
+                        else self.inst_to_souldID_withX(note.inst)
+                    )
+
+                    score_now = round(every_note[0] / speed / 50)
+
+                    try:
+                        tracks[score_now].append(
+                            self.execute_cmd_head.format(player_selector)
+                            + f"playsound {soundID} @s ^ ^ ^{1 / (1 if note.track_no == 0 else 0.9) / max_volume / every_note[4] - 1} {note.velocity / 128} "
+                            + (
+                                ""
+                                if SpecialBits
+                                else f"{2 ** ((note.pitch - 60 - _X) / 12)}"
+                            )
+                        )
+                    except KeyError:
+                        tracks[score_now] = [
+                            self.execute_cmd_head.format(player_selector)
+                            + f"playsound {soundID} @s ^ ^ ^{1 / (1 if note.track_no == 0 else 0.9) / max_volume / every_note[4] - 1} {note.velocity / 128} "
+                            + (
+                                ""
+                                if SpecialBits
+                                else f"{2 ** ((note.pitch - 60 - _X) / 12)}"
+                            )
+                        ]
+
+        all_ticks = list(tracks.keys())
+        all_ticks.sort()
+        results = []
+
+        for i in range(len(all_ticks)):
+            for j in range(len(tracks[all_ticks[i]])):
+                results.append(
+                    SingleCommand(
+                        tracks[all_ticks[i]][j],
+                        tick_delay=(
+                            0
+                            if j != 0
+                            else (
+                                all_ticks[i] - all_ticks[i - 1]
+                                if i != 0
+                                else all_ticks[i]
+                            )
+                        ),
+                        annotation="在{}播放{}%的{}音".format(
+                            mctick2timestr(i), max_volume * 100, ""
+                        ),
+                    )
                 )
 
-                cmdAmount += 1
-        tracks.append(nowTrack)
+        self.music_command_list = results
+        self.music_tick_num = max(all_ticks)
+        return results, self.music_tick_num
 
-    return [tracks, cmdAmount, maxScore]
 
+class FutureMidiConvertM5(MidiConvert):
+    """
+    加入同刻偏移算法优化音感
+    """
+
+    # 神奇的偏移音
+    def to_command_list_in_delay(
+        self,
+        max_volume: float = 1.0,
+        speed: float = 1.0,
+        player_selector: str = "@a",
+    ) -> Tuple[List[SingleCommand], int]:
+        """
+        使用金羿的转换思路，使用同刻偏移算法优化音感后，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        max_volume: float
+            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
+        speed: float
+            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[SingleCommand,...], int音乐时长游戏刻 )
+        """
+
+        if speed == 0:
+            raise ZeroSpeedError("播放速度仅可为正实数")
+        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
+
+        self.to_music_channels()
+
+        tracks = {}
+        InstID = -1
+
+        # 此处 我们把通道视为音轨
+        for i in self.channels.keys():
+            # 如果当前通道为空 则跳过
+            if not self.channels[i]:
+                continue
+
+            # 第十通道是打击乐通道
+            SpecialBits = True if i == 9 else False
+
+            # nowChannel = []
+
+            for track_no, track in self.channels[i].items():
+                for msg in track:
+                    if msg[0] == "PgmC":
+                        InstID = msg[1]
+
+                    elif msg[0] == "NoteS":
+                        soundID, _X = (
+                            self.perc_inst_to_soundID_withX(msg[1])
+                            if SpecialBits
+                            else self.inst_to_souldID_withX(InstID)
+                        )
+
+                        score_now = round(msg[-1] / float(speed) / 50)
+                        # print(score_now)
+
+                        try:
+                            tracks[score_now].append(
+                                self.execute_cmd_head.format(player_selector)
+                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
+                                + (
+                                    ""
+                                    if SpecialBits
+                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                )
+                            )
+                        except KeyError:
+                            tracks[score_now] = [
+                                self.execute_cmd_head.format(player_selector)
+                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
+                                + (
+                                    ""
+                                    if SpecialBits
+                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                )
+                            ]
+
+        all_ticks = list(tracks.keys())
+        all_ticks.sort()
+        results = []
+
+        for i in range(len(all_ticks)):
+            for j in range(len(tracks[all_ticks[i]])):
+                results.append(
+                    SingleCommand(
+                        tracks[all_ticks[i]][j],
+                        tick_delay=(
+                            (
+                                0
+                                if (
+                                    (all_ticks[i + 1] - all_ticks[i])
+                                    / len(tracks[all_ticks[i]])
+                                    < 1
+                                )
+                                else 1
+                            )
+                            if j != 0
+                            else (
+                                (
+                                    all_ticks[i]
+                                    - all_ticks[i - 1]
+                                    - (
+                                        0
+                                        if (
+                                            (all_ticks[i] - all_ticks[i - 1])
+                                            / len(tracks[all_ticks[i - 1]])
+                                            < 1
+                                        )
+                                        else (len(tracks[all_ticks[i - 1]]) - 1)
+                                    )
+                                )
+                                if i != 0
+                                else all_ticks[i]
+                            )
+                        ),
+                        annotation="在{}播放{}%的{}音".format(
+                            mctick2timestr(
+                                i + 0
+                                if (
+                                    (all_ticks[i + 1] - all_ticks[i])
+                                    / len(tracks[all_ticks[i]])
+                                    < 1
+                                )
+                                else j
+                            ),
+                            max_volume * 100,
+                            "",
+                        ),
+                    )
+                )
+
+        self.music_command_list = results
+        self.music_tick_num = max(all_ticks)
+        return results, self.music_tick_num
+
+
+class FutureMidiConvertM6(MidiConvert):
+    """
+    加入插值算法优化音感，但仅用于第一音轨
+    """
+
+    # TODO 没写完的！！！！
