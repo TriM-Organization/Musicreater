@@ -1,2 +1,2 @@
 LyricLib>=0.0.3
-mido>=1.2.10
+mido>=1.3
