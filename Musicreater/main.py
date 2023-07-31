@@ -183,7 +183,7 @@ class MidiConvert:
         """文件名，不含路径且不含后缀"""
 
         try:
-            return cls(mido.MidiFile(midi_file_path), midi_music_name, old_exe_format)
+            return cls(mido.MidiFile(midi_file_path,clip=True), midi_music_name, old_exe_format)
         except (ValueError, TypeError) as E:
             raise MidiDestroyedError(f"文件{midi_file_path}损坏：{E}")
         except FileNotFoundError as E:
@@ -537,18 +537,14 @@ class MidiConvert:
         midi_channels: ChannelType = empty_midi_channels()
         tempo = mido.midifiles.midifiles.DEFAULT_TEMPO
 
-        # a = 0
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
         for track_no, track in enumerate(self.midi.tracks):
-            # print(track_no,track)
             microseconds = 0
             if not track:
                 continue
 
-            # print(track_no,"="*20)
             for msg in track:
-                # print("+++",msg)
                 if msg.time != 0:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
 
@@ -556,9 +552,13 @@ class MidiConvert:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
-
-                    if not track_no in midi_channels[msg.channel].keys():
-                        midi_channels[msg.channel][track_no] = []
+                    
+                    try:
+                        if not track_no in midi_channels[msg.channel].keys():
+                            midi_channels[msg.channel][track_no] = []
+                    except AttributeError as E:
+                        print(msg,E)
+                    
                     if msg.type == "program_change":
                         midi_channels[msg.channel][track_no].append(
                             ("PgmC", msg.program, microseconds)
@@ -568,7 +568,6 @@ class MidiConvert:
                         midi_channels[msg.channel][track_no].append(
                             ("NoteS", msg.note, msg.velocity, microseconds)
                         )
-                        # a+=1
 
                     elif (msg.type == "note_on" and msg.velocity == 0) or (
                         msg.type == "note_off"
@@ -577,7 +576,6 @@ class MidiConvert:
                             ("NoteE", msg.note, microseconds)
                         )
 
-        # print(a)
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -637,8 +635,6 @@ class MidiConvert:
 
             # 第十通道是打击乐通道
             SpecialBits = True if i == 9 else False
-
-            # nowChannel = []
 
             for track_no, track in self.channels[i].items():
                 nowTrack = []
