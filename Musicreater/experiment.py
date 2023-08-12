@@ -16,12 +16,142 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+import random
 from typing import Dict, List, Tuple, Union
 
+from .constants import INSTRUMENT_BLOCKS_TABLE
 from .exceptions import *
 from .main import MidiConvert
 from .subclass import *
 from .utils import *
+
+
+class FutureMidiConvertRSNB(MidiConvert):
+    """
+    加入红石音乐适配
+    """
+
+    music_command_list: Dict[int, SingleNoteBox]
+    """音乐指令列表"""
+
+    @staticmethod
+    def soundID_to_block(sound_id: str, random_select: bool = False) -> str:
+        """
+        将我的世界乐器名改作音符盒所需的对应方块名称
+
+        Parameters
+        ----------
+        sound_id: str
+            将我的世界乐器名
+        random_select: bool
+            是否随机选取对应方块
+
+        Returns
+        -------
+        str方块名称
+        """
+        try:
+            if random_select:
+                return random.choice(INSTRUMENT_BLOCKS_TABLE[sound_id])
+            else:
+                return INSTRUMENT_BLOCKS_TABLE[sound_id][0]
+        except KeyError:
+            return "air"
+
+    def to_note_list_in_delay(
+        self,
+    ) -> Tuple[Dict[int, SingleNoteBox], int]:
+        """
+        使用金羿的转换思路，将midi转换为我的世界音符盒音高、乐器及延迟列表，并输出每个音符之后的延迟
+
+        Returns
+        -------
+        tuple( Dict[int, SingleNoteBox], int音乐时长游戏刻 )
+        """
+
+        self.to_music_channels()
+
+        tracks = {}
+        note_range = {}
+        InstID = -1
+        # cmd_amount = 0
+
+        # 此处 我们把通道视为音轨
+        for i in self.channels.keys():
+            # 如果当前通道为空 则跳过
+            if not self.channels[i]:
+                continue
+
+            # 第十通道是打击乐通道
+            SpecialBits = True if i == 9 else False
+
+            for track_no, track in self.channels[i].items():
+                for msg in track:
+                    if msg[0] == "PgmC":
+                        InstID = msg[1]
+
+                    elif msg[0] == "NoteS":
+                        # block_id = self.soundID_to_block((
+                        #     self.perc_inst_to_soundID_withX(msg[1])
+                        #     if SpecialBits
+                        #     else self.inst_to_souldID_withX(InstID)
+                        # )[0])
+
+                        # delaytime_now = round(msg[-1] / 50)
+
+                        note_ = 2 ** ((msg[1] - 60) / 12)
+
+                        try:
+                            tracks[msg[-1]].append(
+                                (
+                                    InstID,
+                                    note_,
+                                )
+                            )
+                        except KeyError:
+                            tracks[msg[-1]] = [(InstID, note_)]
+
+                        try:
+                            note_range[InstID]["max"] = max(
+                                note_range[InstID]["max"], note_
+                            )
+                            note_range[InstID]["min"] = min(
+                                note_range[InstID]["min"], note_
+                            )
+                        except KeyError:
+                            note_range[InstID] = {"max": note_, "min": note_}
+
+        del InstID
+        all_ticks = list(tracks.keys())
+        all_ticks.sort()
+        results = []
+        print(note_range)
+
+        exit()
+
+        for i in range(len(all_ticks)):
+            for j in range(len(tracks[all_ticks[i]])):
+                results.append(
+                    SingleCommand(
+                        tracks[all_ticks[i]][j],
+                        tick_delay=(
+                            0
+                            if j != 0
+                            else (
+                                all_ticks[i] - all_ticks[i - 1]
+                                if i != 0
+                                else all_ticks[i]
+                            )
+                        ),
+                        annotation="在{}播放{}%的{}音".format(
+                            mctick2timestr(i), max_volume * 100, ""
+                        ),
+                    )
+                )
+
+        self.music_command_list = results
+        self.music_tick_num = max(all_ticks)
+        return results, self.music_tick_num
 
 
 class FutureMidiConvertM4(MidiConvert):
@@ -47,9 +177,7 @@ class FutureMidiConvertM4(MidiConvert):
             ]
         # print(totalCount)
 
-        result: List[
-            Tuple[int, int, int, int, float],
-        ] = []
+        result: List[Tuple[int, int, int, int, float],] = []
 
         for _i in range(totalCount):
             result.append(
@@ -105,7 +233,6 @@ class FutureMidiConvertM4(MidiConvert):
 
             # nowChannel = []
             for track_no, track in self.channels[i].items():
-
                 noteMsgs = []
                 MsgIndex = []
 
@@ -152,7 +279,6 @@ class FutureMidiConvertM4(MidiConvert):
                 for every_note in self._linear_note(
                     note, 50 if note.track_no == 0 else 500
                 ):
-
                     soundID, _X = (
                         self.perc_inst_to_soundID_withX(note.pitch)
                         if SpecialBits
@@ -163,7 +289,13 @@ class FutureMidiConvertM4(MidiConvert):
 
                     max_score = max(max_score, score_now)
                     mc_pitch = 2 ** ((note.pitch - 60 - _X) / 12)
-                    blockmeter = 1 / (1 if note.track_no == 0 else 0.9) / max_volume / every_note[4] - 1
+                    blockmeter = (
+                        1
+                        / (1 if note.track_no == 0 else 0.9)
+                        / max_volume
+                        / every_note[4]
+                        - 1
+                    )
 
                     track_now.append(
                         SingleCommand(
@@ -237,7 +369,6 @@ class FutureMidiConvertM4(MidiConvert):
 
             # nowChannel = []
             for track_no, track in self.channels[i].items():
-
                 noteMsgs = []
                 MsgIndex = []
 
@@ -282,7 +413,6 @@ class FutureMidiConvertM4(MidiConvert):
                 for every_note in self._linear_note(
                     note, 50 if note.track_no == 0 else 500
                 ):
-
                     soundID, _X = (
                         self.perc_inst_to_soundID_withX(note.pitch)
                         if SpecialBits

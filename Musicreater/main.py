@@ -25,7 +25,6 @@ Terms & Conditions: License.md in the root directory
 # 赶快呼叫 程序员！Let's Go！            直ぐに呼びましょプログラマ レッツゴー！
 
 
-
 import math
 import os
 from typing import List, Literal, Tuple, Union
@@ -183,11 +182,18 @@ class MidiConvert:
         """文件名，不含路径且不含后缀"""
 
         try:
-            return cls(mido.MidiFile(midi_file_path,clip=True), midi_music_name, old_exe_format)
+            return cls(
+                mido.MidiFile(midi_file_path, clip=True),
+                midi_music_name,
+                old_exe_format,
+            )
         except (ValueError, TypeError) as E:
             raise MidiDestroyedError(f"文件{midi_file_path}损坏：{E}")
         except FileNotFoundError as E:
             raise FileNotFoundError(f"文件{midi_file_path}不存在：{E}")
+
+        # ……真的那么重要吗
+        # 我又几曾何时，知道祂真的会抛下我
 
     @staticmethod
     def inst_to_souldID_withX(
@@ -214,7 +220,7 @@ class MidiConvert:
         tuple(str我的世界乐器名, int转换算法中的X)
         """
         try:
-            return PITCHED_INSTRUMENT_LIST[instrumentID]
+            return PITCHED_INSTRUMENT_TABLE[instrumentID]
         except KeyError:
             return "note.flute", 5
 
@@ -233,17 +239,12 @@ class MidiConvert:
         tuple(str我的世界乐器名, int转换算法中的X)
         """
         try:
-            return PERCUSSION_INSTRUMENT_LIST[instrumentID]
+            return PERCUSSION_INSTRUMENT_TABLE[instrumentID]
         except KeyError:
-            print("WARN", f"无法使用打击乐器列表库，或者使用了不存在的乐器，打击乐器使用Dislink算法代替。{instrumentID}")
-            if instrumentID == 55:
-                return "note.cow_bell", 5
-            elif instrumentID in [41, 43, 45]:
-                return "note.hat", 7
-            elif instrumentID in [36, 37, 39]:
-                return "note.snare", 7
-            else:
-                return "note.bd", 7
+            return "note.bd", 7
+
+        # 明明已经走了
+        # 凭什么还要在我心里留下缠绵缱绻
 
     def form_progress_bar(
         self,
@@ -355,6 +356,10 @@ class MidiConvert:
                     annotation="使用临时变量计算百分比",
                 )
             )
+
+        # 那是假的
+        # 一切都并未留下痕迹啊
+        # 那梦又是多么的真实……
 
         if r"%%t" in pgs_style:
             result.append(
@@ -552,13 +557,12 @@ class MidiConvert:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
-                    
                     try:
                         if not track_no in midi_channels[msg.channel].keys():
                             midi_channels[msg.channel][track_no] = []
                     except AttributeError as E:
-                        print(msg,E)
-                    
+                        print(msg, E)
+
                     if msg.type == "program_change":
                         midi_channels[msg.channel][track_no].append(
                             ("PgmC", msg.program, microseconds)
@@ -575,7 +579,6 @@ class MidiConvert:
                         midi_channels[msg.channel][track_no].append(
                             ("NoteE", msg.note, microseconds)
                         )
-
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -689,7 +692,7 @@ class MidiConvert:
         max_volume: float = 1.0,
         speed: float = 1.0,
         player_selector: str = "@a",
-    ) -> Tuple[List[SingleCommand], int]:
+    ) -> Tuple[List[SingleCommand], int, int]:
         """
         使用金羿的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
 
@@ -704,7 +707,7 @@ class MidiConvert:
 
         Returns
         -------
-        tuple( list[SingleCommand,...], int音乐时长游戏刻 )
+        tuple( list[SingleCommand,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
         if speed == 0:
@@ -740,10 +743,10 @@ class MidiConvert:
                             else self.inst_to_souldID_withX(InstID)
                         )
 
-                        score_now = round(msg[-1] / float(speed) / 50)
+                        delaytime_now = round(msg[-1] / float(speed) / 50)
 
                         try:
-                            tracks[score_now].append(
+                            tracks[delaytime_now].append(
                                 self.execute_cmd_head.format(player_selector)
                                 + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
                                 + (
@@ -753,7 +756,7 @@ class MidiConvert:
                                 )
                             )
                         except KeyError:
-                            tracks[score_now] = [
+                            tracks[delaytime_now] = [
                                 self.execute_cmd_head.format(player_selector)
                                 + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
                                 + (
@@ -771,8 +774,10 @@ class MidiConvert:
         all_ticks = list(tracks.keys())
         all_ticks.sort()
         results = []
+        max_multi = 0
 
         for i in range(len(all_ticks)):
+            max_multi = max(max_multi, len(tracks[all_ticks[i]]))
             for j in range(len(tracks[all_ticks[i]])):
                 results.append(
                     SingleCommand(
@@ -794,7 +799,7 @@ class MidiConvert:
 
         self.music_command_list = results
         self.music_tick_num = max(all_ticks)
-        return results, self.music_tick_num
+        return results, self.music_tick_num, max_multi
 
     def copy_important(self):
         dst = MidiConvert(

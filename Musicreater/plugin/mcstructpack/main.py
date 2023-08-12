@@ -56,7 +56,7 @@ def to_mcstructure_addon_in_delay(
         data_cfg.volume_ratio,
         data_cfg.speed_multiplier,
         player,
-    )
+    )[:2]
 
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)

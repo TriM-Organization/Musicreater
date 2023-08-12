@@ -1,2 +1,1 @@
-LyricLib>=0.0.3
 mido>=1.3

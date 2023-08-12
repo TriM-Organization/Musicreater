@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Dict, List, Tuple
+
 """
 存放常量与数值性内容
 """
@@ -40,30 +42,34 @@ DEFAULT_PROGRESSBAR_STYLE = (
 默认的进度条样式组
 """
 
-PITCHED_INSTRUMENT_LIST = {
+
+# 以下是由 Touch “偷吃” 带来的高准确率音效对照表
+# 包括乐音乐器对照和打击乐器对照
+
+PITCHED_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
     0: ("note.harp", 6),
     1: ("note.harp", 6),
     2: ("note.pling", 6),
     3: ("note.harp", 6),
     4: ("note.pling", 6),
     5: ("note.pling", 6),
-    6: ("note.harp", 6),
+    6: ("note.guitar", 7),
     7: ("note.harp", 6),
-    8: ("note.share", 7),  # 打击乐器无音域
-    9: ("note.harp", 6),
-    10: ("note.didgeridoo", 8),
-    11: ("note.harp", 6),
-    12: ("note.xylophone", 4),
-    13: ("note.chime", 4),
-    14: ("note.harp", 6),
+    8: ("note.bell", 4),  # 打击乐器无音域
+    9: ("note.bell", 4),
+    10: ("note.iron_xylophone", 6),
+    11: ("note.iron_xylophone", 6),
+    12: ("note.iron_xylophone", 6),
+    13: ("note.xylophone", 4),
+    14: ("note.chime", 4),
     15: ("note.harp", 6),
     16: ("note.bass", 8),
     17: ("note.harp", 6),
-    18: ("note.harp", 6),
+    18: ("note.flute", 5),
     19: ("note.harp", 6),
     20: ("note.harp", 6),
-    21: ("note.harp", 6),
-    22: ("note.harp", 6),
+    21: ("note.flute", 5),
+    22: ("note.flute", 5),
     23: ("note.guitar", 7),
     24: ("note.guitar", 7),
     25: ("note.guitar", 7),
@@ -81,21 +87,21 @@ PITCHED_INSTRUMENT_LIST = {
     37: ("note.bass", 8),
     38: ("note.bass", 8),
     39: ("note.bass", 8),
-    40: ("note.harp", 6),
-    41: ("note.harp", 6),
-    42: ("note.harp", 6),
-    43: ("note.harp", 6),
+    40: ("note.flute", 5),
+    41: ("note.flute", 5),
+    42: ("note.flute", 5),
+    43: ("note.flute", 5),
     44: ("note.iron_xylophone", 6),
     45: ("note.guitar", 7),
     46: ("note.harp", 6),
-    47: ("note.harp", 6),
+    47: ("note.bd", 7),
     48: ("note.guitar", 7),
     49: ("note.guitar", 7),
     50: ("note.bit", 6),
     51: ("note.bit", 6),
-    52: ("note.harp", 6),
-    53: ("note.harp", 6),
-    54: ("note.bit", 6),
+    52: ("note.flute", 5),
+    53: ("note.flute", 5),
+    54: ("note.flute", 5),
     55: ("note.flute", 5),
     56: ("note.flute", 5),
     57: ("note.flute", 5),
@@ -110,16 +116,16 @@ PITCHED_INSTRUMENT_LIST = {
     66: ("note.bit", 6),
     67: ("note.bit", 6),
     68: ("note.flute", 5),
-    69: ("note.harp", 6),
-    70: ("note.harp", 6),
+    69: ("note.bit", 6),
+    70: ("note.banjo", 6),
     71: ("note.flute", 5),
     72: ("note.flute", 5),
     73: ("note.flute", 5),
-    74: ("note.harp", 6),
+    74: ("note.flute", 5),
     75: ("note.flute", 5),
     76: ("note.harp", 6),
     77: ("note.harp", 6),
-    78: ("note.harp", 6),
+    78: ("note.flute", 5),
     79: ("note.harp", 6),
     80: ("note.bit", 6),
     81: ("note.bit", 6),
@@ -149,35 +155,35 @@ PITCHED_INSTRUMENT_LIST = {
     105: ("note.banjo", 6),
     106: ("note.harp", 6),
     107: ("note.harp", 6),
-    108: ("note.harp", 6),
-    109: ("note.harp", 6),
-    110: ("note.harp", 6),
+    108: ("note.bell", 4),
+    109: ("note.flute", 5),
+    110: ("note.flute", 5),
     111: ("note.guitar", 7),
-    112: ("note.harp", 6),
+    112: ("note.bell", 4),
     113: ("note.bell", 4),
-    114: ("note.harp", 6),
+    114: ("note.flute", 5),
     115: ("note.cow_bell", 5),
     116: ("note.bd", 7),  # 打击乐器无音域
     117: ("note.bass", 8),
     118: ("note.bit", 6),
-    119: ("note.bd", 7),  # 打击乐器无音域
+    119: ("firework.blast", 7),  # 打击乐器无音域
     120: ("note.guitar", 7),
     121: ("note.harp", 6),
     122: ("note.harp", 6),
     123: ("note.harp", 6),
     124: ("note.harp", 6),
     125: ("note.hat", 7),  # 打击乐器无音域
-    126: ("note.bd", 7),  # 打击乐器无音域
+    126: ("firework.twinkle", 7),  # 打击乐器无音域
     127: ("note.snare", 7),  # 打击乐器无音域
 }
 
-PERCUSSION_INSTRUMENT_LIST = {
+PERCUSSION_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
     34: ("note.bd", 7),
     35: ("note.bd", 7),
     36: ("note.hat", 7),
     37: ("note.snare", 7),
     38: ("note.snare", 7),
-    39: ("note.snare", 7),
+    39: ("fire.ignite", 7),
     40: ("note.hat", 7),
     41: ("note.snare", 7),
     42: ("note.hat", 7),
@@ -221,11 +227,22 @@ PERCUSSION_INSTRUMENT_LIST = {
     80: ("note.bell", 4),
 }
 
-INSTRUMENT_BLOCKS_LIST = {
+PERCUSSION_INSTRUMENT_LIST: List[str] = [
+    "note.snare",
+    "note.bd",
+    "note.hat",
+    "note.basedrum",
+    "firework.blast",
+    "firework.twinkle",
+    "fire.ignite",
+]
+
+INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str]] = {
     "note.bass": ("planks",),
     "note.snare": ("sand",),
     "note.hat": ("glass",),
     "note.bd": ("stone",),
+    "note.basedrum": ("stone",),
     "note.bell": ("gold_block",),
     "note.flute": ("clay",),
     "note.chime": ("packed_ice",),
@@ -238,7 +255,11 @@ INSTRUMENT_BLOCKS_LIST = {
     "note.banjo": ("hay_block",),
     "note.pling": ("glowstone",),
     "note.bassattack": ("command_block",),  # 无法找到此音效
-    "note.harp": ("glass",),
+    "note.harp": ("dirt",),
+    # 呃……
+    "firework.blast": ("sandstone",),
+    "firework.twinkle": ("red_sandstone",),
+    "fire.ignite": ("concrete_powder",),
 }
 
 

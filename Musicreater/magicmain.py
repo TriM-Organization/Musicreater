@@ -31,69 +31,6 @@ Terms & Conditions: ../License.md
 
 
 
-
-
-def _toCmdList_m1(
-        self,
-        scoreboardname: str = "mscplay",
-        volume: float = 1.0,
-        speed: float = 1.0) -> list:
-    """
-    使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
-    :param scoreboardname: 我的世界的计分板名称
-    :param volume: 音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
-    :param speed: 速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
-    :return: tuple(命令列表, 命令个数, 计分板最大值)
-    """
-    tracks = []
-    if volume > 1:
-        volume = 1
-    if volume <= 0:
-        volume = 0.001
-
-    commands = 0
-    maxscore = 0
-
-    for i, track in enumerate(self.midi.tracks):
-
-        ticks = 0
-        instrumentID = 0
-        singleTrack = []
-
-        for msg in track:
-            ticks += msg.time
-            # print(msg)
-            if msg.is_meta:
-                if msg.type == "set_tempo":
-                    tempo = msg.tempo
-            else:
-                if msg.type == "program_change":
-                    # print("TT")
-                    instrumentID = msg.program
-                if msg.type == "note_on" and msg.velocity != 0:
-                    nowscore = round(
-                        (ticks * tempo)
-                        / ((self.midi.ticks_per_beat * float(speed)) * 50000)
-                    )
-                    maxscore = max(maxscore, nowscore)
-                    soundID, _X = self.__Inst2soundID_withX(instrumentID)
-                    singleTrack.append(
-                        "execute @a[scores={" +
-                        str(scoreboardname) +
-                        "=" +
-                        str(nowscore) +
-                        "}" +
-                        f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}")
-                    commands += 1
-        if len(singleTrack) != 0:
-            tracks.append(singleTrack)
-
-    return [tracks, commands, maxscore]
-
-
-
-
-
 # ============================
 
 
@@ -209,16 +146,13 @@ if __name__ == '__main__':
 
 
 # ============================
-
-
-from typing import Union
-from .plugin import x,y,z,bottem_side_length_of_smallest_square_bottom_box,form_note_block_in_NBT_struct,form_repeater_in_NBT_struct
+from typing import Literal
+from ..constants import x,y,z
 
 # 不要用 没写完
 def delay_to_note_blocks(
     baseblock: str = "stone", 
-    position_forward: Union(x, y, z) = z,
-    max_height: int = 64,
+    position_forward: Literal['x','y','z'] = z,
 ):
     """传入音符，生成以音符盒存储的红石音乐
     :param:
@@ -228,10 +162,6 @@ def delay_to_note_blocks(
     """
 
     from TrimMCStruct import Structure, Block
-
-    _sideLength = bottem_side_length_of_smallest_square_bottom_box(
-        len(commands), max_height
-    )
 
     struct = Structure(
         (_sideLength, max_height, _sideLength),  # 声明结构大小
@@ -293,4 +223,3 @@ def delay_to_note_blocks(
         startpos[0] += posadder[0]
         startpos[1] += posadder[1]
         startpos[2] += posadder[2]
-

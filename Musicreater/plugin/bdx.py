@@ -148,7 +148,6 @@ def commands_to_BDX_bytes(
     now_x = 0
 
     for command in commands_list:
-
         _bytes += form_command_block_in_BDX_bytes(
             command.command_text,
             (1 if y_forward else 0)
@@ -156,12 +155,14 @@ def commands_to_BDX_bytes(
                 ((now_y != 0) and (not y_forward))
                 or (y_forward and (now_y != (max_height - 1)))
             )
-            else (3 if z_forward else 2)
-            if (
-                ((now_z != 0) and (not z_forward))
-                or (z_forward and (now_z != _sideLength - 1))
-            )
-            else 5,
+            else (
+                (3 if z_forward else 2)
+                if (
+                    ((now_z != 0) and (not z_forward))
+                    or (z_forward and (now_z != _sideLength - 1))
+                )
+                else 5
+            ),
             impluse=2,
             condition=command.conditional,
             needRedstone=False,
@@ -170,6 +171,16 @@ def commands_to_BDX_bytes(
             executeOnFirstTick=False,
             trackOutput=True,
         )
+
+        # (1 if y_forward else 0) if (            # 如果y+则向上，反之向下
+        #     ((now_y != 0) and (not y_forward))              # 如果不是y轴上首个方块
+        #     or (y_forward and (now_y != (max_height - 1)))  # 如果不是y轴上末端方块
+        # ) else (                                            # 否则，即是y轴末端或首个方块
+        #     (3 if z_forward else 2) if (                    # 如果z+则向z轴正方向，反之负方向
+        #                 ((now_z != 0) and (not z_forward))              # 如果不是z轴上的首个方块
+        #                 or (z_forward and (now_z != _sideLength - 1))   # 如果不是z轴上的末端方块
+        #             ) else 5                                            # 否则，则要面向x轴正方向
+        #         )
 
         now_y += 1 if y_forward else -1
 
