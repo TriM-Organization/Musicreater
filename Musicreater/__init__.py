@@ -19,7 +19,12 @@ Terms & Conditions: License.md in the root directory
 
 __version__ = "1.4.0"
 __vername__ = "红石指令音乐的生成"
-__author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"), ("鸣凤鸽子", "MingFengPigeon"))
+__author__ = (
+    ("金羿", "Eilles Wan"),
+    ("诸葛亮与八卦阵", "bgArray"),
+    ("偷吃不是Touch", "Touch"),
+    ("鸣凤鸽子", "MingFengPigeon"),
+)
 __all__ = [
     # 主要类
     "MidiConvert",

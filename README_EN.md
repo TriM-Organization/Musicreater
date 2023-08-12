@@ -65,7 +65,7 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
 Commands such as `python`、`pip` could be changed to some like `python3` or `pip3` according to the difference of platforms.
 
 
-## Documentation📄
+## Documentation 📄
 
 (Not in English yet)
 
@@ -73,24 +73,25 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 [仓库 API 文档](./docs/%E5%BA%93%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD%E6%96%87%E6%A1%A3.md)
 
-### Authors✒
+### Authors ✒
 
-Eilles (金羿)：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
+**Eilles (金羿)**：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
 
-bgArray "诸葛亮与八卦阵": A junior high school student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
+**bgArray (诸葛亮与八卦阵)**: A junior high school student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
 
-## Thanks🙏
+**Touch (偷吃不是Touch)**: A man who is used to use command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
+
+## Thanks 🙏
 
 This list is not in any order.
 
 - Thank _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
 - Thank _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
 - Thank _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
-- Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project. We hope he can get into a good university as he wantted to!
-- Thank _Touch “偷吃”_\<QQ1793537164\> for support of debugging and testing program and algorithm, as well his/her suggestions to the improvement of our project
+- Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project.
 - Thank _Mono_\<QQ738893087\> for reporting problems while installing
 - Thank _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
-- Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project. Hope he could get into a good university!
+- Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
 - Thank **指令师\_苦力怕 playjuice123**\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
 - Thank **雷霆**\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
 
@@ -98,7 +99,7 @@ This list is not in any order.
 >
 > If you have given contribution but haven't been in the list, please contact us!
 
-## Contact Us📞
+## Contact Us 📞
 
 Meet problems? Welcome to give out your issue [here](https://github.com/EillesWan/Musicreater/issues/new)!
 
