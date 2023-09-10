@@ -22,7 +22,7 @@ import Musicreater
 from Musicreater.plugin import ConvertConfig
 from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
 from Musicreater.plugin.funcpack import to_function_addon_in_score
-from Musicreater.plugin.mcstructpack import to_mcstructure_addon_in_delay
+from Musicreater.plugin.mcstructpack import to_mcstructure_addon_in_delay, to_mcstructure_addon_in_redstone_cd
 
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")
@@ -34,7 +34,7 @@ out_path = input(f"请输入输出路径：")
 
 # 选择输出格式
 fileFormat = int(input(f"请输入输出格式[BDX(1) 或 MCPACK(0)]：").lower())
-playerFormat = int(input(f"请选择播放方式[计分板(1) 或 延迟(0)]：").lower())
+playerFormat = int(input(f"请选择播放方式[红石(2) 或 计分板(1) 或 延迟(0)]：").lower())
 
 
 # 真假字符串判断
@@ -106,12 +106,18 @@ print(f"正在处理 {midi_path} ：")
 cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=True)
 cvt_cfg = ConvertConfig(out_path, *prompts[:3])
 
+if playerFormat == 1:
+    cvt_method = to_function_addon_in_score
+elif playerFormat == 0:
+    cvt_method = to_mcstructure_addon_in_delay
+elif playerFormat == 2:
+    cvt_method = to_mcstructure_addon_in_redstone_cd
+
+
 print(
     "	指令总长：{}，最高延迟：{}".format(
         *(
-            to_function_addon_in_score(cvt_mid, cvt_cfg, *prompts[3:])
-            if playerFormat == 1
-            else to_mcstructure_addon_in_delay(cvt_mid, cvt_cfg, *prompts[3:])
+            cvt_method(cvt_mid, cvt_cfg, *prompts[3:]) # type: ignore
         )
     )
     if fileFormat == 0
