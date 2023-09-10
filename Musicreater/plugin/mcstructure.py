@@ -23,15 +23,15 @@ from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
 from ..constants import x, y, z
 from ..subclass import SingleCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
-import struct
 
 
-def antiaxis(axis: Literal['x','z','X','Z']):
+def antiaxis(axis: Literal["x", "z", "X", "Z"]):
     return z if axis == x else x
 
 
 def forward_IER(forward: bool):
     return 1 if forward else -1
+
 
 AXIS_PARTICULAR_VALUE = {
     x: {
@@ -48,7 +48,19 @@ AXIS_PARTICULAR_VALUE = {
     },
 }
 
-def command_statevalue(axis_: Literal['x','y','z','X','Y','Z'],forward_:bool):
+# 1.19的结构兼容版本号
+COMPABILITY_VERSION_119: int = 17959425
+"""
+Minecraft 1.19 兼容版本号
+"""
+# 1.17的结构兼容版本号
+COMPABILITY_VERSION_117: int = 17879555
+"""
+Minecraft 1.17 兼容版本号
+"""
+
+
+def command_statevalue(axis_: Literal["x", "y", "z", "X", "Y", "Z"], forward_: bool):
     return AXIS_PARTICULAR_VALUE[axis_.lower()][forward_]
 
 
@@ -57,6 +69,7 @@ def form_note_block_in_NBT_struct(
     coordinate: Tuple[int, int, int],
     instrument: str = "note.harp",
     powered: bool = False,
+    compability_version_number: int = COMPABILITY_VERSION_119,
 ):
     """生成音符盒方块
     :param note: `int`(0~24)
@@ -87,10 +100,15 @@ def form_note_block_in_NBT_struct(
                 "z": coordinate[2],
             }  # type: ignore
         },
+        compability_version=compability_version_number,
     )
 
 
-def form_repeater_in_NBT_struct(delay: int, facing: int):
+def form_repeater_in_NBT_struct(
+    delay: int,
+    facing: int,
+    compability_version_number: int = COMPABILITY_VERSION_119,
+):
     """生成中继器方块
     :param facing: 朝向：
         Z- 北 0
@@ -107,6 +125,7 @@ def form_repeater_in_NBT_struct(delay: int, facing: int):
             "repeater_delay": delay,
             "direction": facing,
         },
+        compability_version=compability_version_number,
     )
 
 
@@ -121,6 +140,7 @@ def form_command_block_in_NBT_struct(
     customName: str = "",
     executeOnFirstTick: bool = False,
     trackOutput: bool = True,
+    compability_version_number: int = COMPABILITY_VERSION_119,
 ):
     """
     使用指定项目返回指定的指令方块结构
@@ -199,13 +219,14 @@ def form_command_block_in_NBT_struct(
                 "z": coordinate[2],
             }  # type: ignore
         },
-        compability_version=17959425,
+        compability_version=compability_version_number,
     )
 
 
 def commands_to_structure(
     commands: List[SingleCommand],
     max_height: int = 64,
+    compability_version_: int = COMPABILITY_VERSION_119,
 ):
     """
     :param commands: 指令列表
@@ -218,7 +239,8 @@ def commands_to_structure(
     )
 
     struct = Structure(
-        (_sideLength, max_height, _sideLength),  # 声明结构大小
+        size=(_sideLength, max_height, _sideLength),  # 声明结构大小
+        compability_version=compability_version_,
     )
 
     y_forward = True
@@ -255,6 +277,7 @@ def commands_to_structure(
                 customName=command.annotation_text,
                 executeOnFirstTick=False,
                 trackOutput=True,
+                compability_version_number=compability_version_,
             ),
         )
 
@@ -284,12 +307,14 @@ def commands_to_structure(
         (now_x, now_y, now_z),
     )
 
+
 def commands_to_redstone_delay_structure(
     commands: List[SingleCommand],
     delay_length: int,
     max_multicmd_length: int,
     base_block: str = "concrete",
-    axis_: Literal["z+","z-","Z+","Z-","x+","x-","X+","X-"] = "z+",
+    axis_: Literal["z+", "z-", "Z+", "Z-", "x+", "x-", "X+", "X-"] = "z+",
+    compability_version_: int = COMPABILITY_VERSION_119,
 ) -> Tuple[Structure, Tuple[int, int, int], Tuple[int, int, int]]:
     """
     :param commands: 指令列表
@@ -322,30 +347,47 @@ def commands_to_redstone_delay_structure(
     else:
         raise ValueError(f"axis_({axis_}) 参数错误。")
 
-
     goahead = forward_IER(forward)
 
     struct = Structure(
-        (round(delay_length/2+0.5+len(commands)) if extensioon_direction == x else max_multicmd_length, 3, round(delay_length/2+0.5+len(commands)) if extensioon_direction == z else max_multicmd_length)
+        size=(
+            round(delay_length / 2 + 0.5 + len(commands))
+            if extensioon_direction == x
+            else max_multicmd_length,
+            3,
+            round(delay_length / 2 + 0.5 + len(commands))
+            if extensioon_direction == z
+            else max_multicmd_length,
+        ),
+        compability_version=compability_version_,
     )
-    
-    pos_now = {x:(0 if forward else struct.size[0]),y:0,z:(0 if forward else struct.size[2])}
+
+    pos_now = {
+        x: (0 if forward else struct.size[0]),
+        y: 0,
+        z: (0 if forward else struct.size[2]),
+    }
 
     first_impluse = True
 
     for cmd in commands:
         single_repeater_value = round(cmd.delay / 2) % 4 - 1
-        additional_repeater = round(cmd.delay / 2)// 4
+        additional_repeater = round(cmd.delay / 2) // 4
         for i in range(additional_repeater):
             struct.set_block(
                 tuple(pos_now.values()),
-                Block("minecraft", base_block,),
+                Block(
+                    "minecraft",
+                    base_block,
+                    compability_version=compability_version_,
+                ),
             )
             struct.set_block(
-                (pos_now[x],1,pos_now[z]),
+                (pos_now[x], 1, pos_now[z]),
                 form_repeater_in_NBT_struct(
                     delay=3,
                     facing=repeater_facing,
+                    compability_version_number=compability_version_,
                 ),
             )
             pos_now[extensioon_direction] += goahead
@@ -353,22 +395,27 @@ def commands_to_redstone_delay_structure(
         if single_repeater_value >= 0:
             struct.set_block(
                 tuple(pos_now.values()),
-                Block("minecraft", base_block,),
+                Block(
+                    "minecraft",
+                    base_block,
+                    compability_version=compability_version_,
+                ),
             )
             struct.set_block(
-                (pos_now[x],1,pos_now[z]),
+                (pos_now[x], 1, pos_now[z]),
                 form_repeater_in_NBT_struct(
                     delay=single_repeater_value,
                     facing=repeater_facing,
+                    compability_version_number=compability_version_,
                 ),
             )
             pos_now[extensioon_direction] += goahead
             first_impluse = True
         struct.set_block(
-            (pos_now[x],1,pos_now[z]),
+            (pos_now[x], 1, pos_now[z]),
             form_command_block_in_NBT_struct(
                 command=cmd.command_text,
-                coordinate=(pos_now[x],1,pos_now[z]),
+                coordinate=(pos_now[x], 1, pos_now[z]),
                 particularValue=command_statevalue(extensioon_direction, forward),
                 # impluse= (0 if first_impluse else 2),
                 impluse=0,
@@ -376,16 +423,19 @@ def commands_to_redstone_delay_structure(
                 alwaysRun=False,
                 tickDelay=0,
                 customName=cmd.annotation_text,
+                compability_version_number=compability_version_,
             ),
         )
         struct.set_block(
-            (pos_now[x],2,pos_now[z]),
-            Block("minecraft", "redstone_wire"),
+            (pos_now[x], 2, pos_now[z]),
+            Block(
+                "minecraft",
+                "redstone_wire",
+                compability_version=compability_version_,
+            ),
         )
         pos_now[extensioon_direction] += goahead
-        
+
         first_impluse = False
 
     return struct, struct.size, tuple(pos_now.values())
-    
-

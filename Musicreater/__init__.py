@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.4.0"
-__vername__ = "红石指令音乐的生成"
+__version__ = "1.4.1"
+__vername__ = "提高mcstructure结构的兼容性"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

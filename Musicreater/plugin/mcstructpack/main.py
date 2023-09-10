@@ -21,7 +21,12 @@ from ...exceptions import CommandFormatError
 from ...main import MidiConvert
 from ..archive import behavior_mcpack_manifest, compress_zipfile
 from ..main import ConvertConfig
-from ..mcstructure import commands_to_structure, form_command_block_in_NBT_struct
+from ..mcstructure import (
+    commands_to_structure,
+    form_command_block_in_NBT_struct,
+    COMPABILITY_VERSION_117,
+    COMPABILITY_VERSION_119,
+)
 
 
 def to_mcstructure_addon_in_delay(
@@ -49,8 +54,11 @@ def to_mcstructure_addon_in_delay(
     tuple[int指令数量, int音乐总延迟]
     """
 
-    if midi_cvt.enable_old_exe_format:
-        raise CommandFormatError("使用mcstructure结构文件导出时不支持旧版本的指令格式。")
+    compability_ver = (
+        COMPABILITY_VERSION_117
+        if midi_cvt.enable_old_exe_format
+        else COMPABILITY_VERSION_119
+    )
 
     command_list, max_delay = midi_cvt.to_command_list_in_delay(
         data_cfg.volume_ratio,
@@ -84,7 +92,11 @@ def to_mcstructure_addon_in_delay(
         f"{data_cfg.dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
     )
 
-    struct, size, end_pos = commands_to_structure(command_list, max_height - 1)
+    struct, size, end_pos = commands_to_structure(
+        command_list,
+        max_height - 1,
+        compability_version_=compability_ver,
+    )
     with open(
         os.path.abspath(
             os.path.join(
@@ -103,9 +115,7 @@ def to_mcstructure_addon_in_delay(
         scb_name = midi_cvt.midi_music_name[:3] + "Pgb"
         index_file.write("scoreboard objectives add {0} dummy {0}计\n".format(scb_name))
 
-        struct_a = Structure(
-            (1, 1, 1),
-        )
+        struct_a = Structure((1, 1, 1), compability_version=compability_ver)
         struct_a.set_block(
             (0, 0, 0),
             form_command_block_in_NBT_struct(
@@ -115,6 +125,7 @@ def to_mcstructure_addon_in_delay(
                 1,
                 alwaysRun=False,
                 customName="显示进度条并加分",
+                compability_version_number=compability_ver,
             ),
         )
 
@@ -135,6 +146,7 @@ def to_mcstructure_addon_in_delay(
         pgb_struct, pgbSize, pgbNowPos = commands_to_structure(
             midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
             max_height - 1,
+            compability_version_=compability_ver,
         )
 
         with open(
@@ -163,6 +175,7 @@ def to_mcstructure_addon_in_delay(
                 0,
                 alwaysRun=False,
                 customName="重置进度条计分板",
+                compability_version_number=compability_ver,
             ),
         )
 

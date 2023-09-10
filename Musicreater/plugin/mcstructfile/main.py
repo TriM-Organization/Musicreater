@@ -18,7 +18,12 @@ from typing import Literal
 from ...exceptions import CommandFormatError
 from ...main import MidiConvert
 from ..main import ConvertConfig
-from ..mcstructure import commands_to_structure,commands_to_redstone_delay_structure
+from ..mcstructure import (
+    commands_to_structure,
+    commands_to_redstone_delay_structure,
+    COMPABILITY_VERSION_119,
+    COMPABILITY_VERSION_117,
+)
 
 
 def to_mcstructure_file_in_delay(
@@ -46,8 +51,11 @@ def to_mcstructure_file_in_delay(
     tuple[tuple[int,]结构大小, int音乐总延迟]
     """
 
-    if midi_cvt.enable_old_exe_format:
-        raise CommandFormatError("使用mcstructure结构文件导出时不支持旧版本的指令格式。")
+    compability_ver = (
+        COMPABILITY_VERSION_117
+        if midi_cvt.enable_old_exe_format
+        else COMPABILITY_VERSION_119
+    )
 
     cmd_list, max_delay = midi_cvt.to_command_list_in_delay(
         data_cfg.volume_ratio,
@@ -58,7 +66,9 @@ def to_mcstructure_file_in_delay(
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)
 
-    struct, size, end_pos = commands_to_structure(cmd_list, max_height - 1)
+    struct, size, end_pos = commands_to_structure(
+        cmd_list, max_height - 1, compability_version_=compability_ver
+    )
 
     with open(
         os.path.abspath(
@@ -71,12 +81,11 @@ def to_mcstructure_file_in_delay(
     return size, max_delay
 
 
-
 def to_mcstructure_file_in_redstone_CD(
     midi_cvt: MidiConvert,
     data_cfg: ConvertConfig,
     player: str = "@a",
-    axis_side: Literal["z+","z-","Z+","Z-","x+","x-","X+","X-"] = "z+",
+    axis_side: Literal["z+", "z-", "Z+", "Z-", "x+", "x-", "X+", "X-"] = "z+",
     basement_block: str = "concrete",
 ):
     """
@@ -100,8 +109,11 @@ def to_mcstructure_file_in_redstone_CD(
     tuple[tuple[int,]结构大小, int音乐总延迟]
     """
 
-    if midi_cvt.enable_old_exe_format:
-        raise CommandFormatError("使用mcstructure结构文件导出时不支持旧版本的指令格式。")
+    compability_ver = (
+        COMPABILITY_VERSION_117
+        if midi_cvt.enable_old_exe_format
+        else COMPABILITY_VERSION_119
+    )
 
     cmd_list, max_delay, max_multiple_cmd = midi_cvt.to_command_list_in_delay(
         data_cfg.volume_ratio,
@@ -112,7 +124,14 @@ def to_mcstructure_file_in_redstone_CD(
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)
 
-    struct, size, end_pos = commands_to_redstone_delay_structure(cmd_list,max_delay,max_multiple_cmd, basement_block, axis_side)
+    struct, size, end_pos = commands_to_redstone_delay_structure(
+        cmd_list,
+        max_delay,
+        max_multiple_cmd,
+        basement_block,
+        axis_side,
+        compability_version_=compability_ver,
+    )
 
     with open(
         os.path.abspath(
@@ -123,4 +142,3 @@ def to_mcstructure_file_in_redstone_CD(
         struct.dump(f)
 
     return size, max_delay
-
