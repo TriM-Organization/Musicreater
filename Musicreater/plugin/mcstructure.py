@@ -349,93 +349,137 @@ def commands_to_redstone_delay_structure(
 
     goahead = forward_IER(forward)
 
+    command_actually_length = sum([int(bool(cmd.delay))for cmd in commands])
+
+    a = 1
+    for cmd in commands:
+        # print("\r 正在进行处理：",end="")
+        if cmd.delay > 2:
+            a = 1
+        else:
+            a += 1
+
+
     struct = Structure(
         size=(
-            round(delay_length / 2 + 0.5 + len(commands))
+            round(delay_length / 2 + command_actually_length)
             if extensioon_direction == x
-            else max_multicmd_length,
+            else a,
             3,
-            round(delay_length / 2 + 0.5 + len(commands))
+            round(delay_length / 2 + command_actually_length)
             if extensioon_direction == z
-            else max_multicmd_length,
+            else a,
         ),
+        fill=Block('minecraft','air',compability_version=compability_version_),
         compability_version=compability_version_,
     )
 
     pos_now = {
-        x: (0 if forward else struct.size[0]),
+        x: ((1 if extensioon_direction == x else 0) if forward else struct.size[0]),
         y: 0,
-        z: (0 if forward else struct.size[2]),
+        z: ((1 if extensioon_direction == z else 0) if forward else struct.size[2]),
     }
 
-    first_impluse = True
+    chain_list = 0
+    # print("结构元信息设定完毕")
 
     for cmd in commands:
-        single_repeater_value = round(cmd.delay / 2) % 4 - 1
-        additional_repeater = round(cmd.delay / 2) // 4
-        for i in range(additional_repeater):
-            struct.set_block(
-                tuple(pos_now.values()),
-                Block(
-                    "minecraft",
-                    base_block,
-                    compability_version=compability_version_,
-                ),
-            )
+        # print("\r 正在进行处理：",end="")
+        if cmd.delay > 1:
+            # print("\rdelay > 0",end='')
+            single_repeater_value = int(cmd.delay / 2) % 4 - 1
+            additional_repeater = int(cmd.delay / 2 // 4)
+            for i in range(additional_repeater):
+                struct.set_block(
+                    tuple(pos_now.values()),# type: ignore
+                    Block(
+                        "minecraft",
+                        base_block,
+                        compability_version=compability_version_,
+                    ),
+                )
+                struct.set_block(
+                    (pos_now[x], 1, pos_now[z]),
+                    form_repeater_in_NBT_struct(
+                        delay=3,
+                        facing=repeater_facing,
+                        compability_version_number=compability_version_,
+                    ),
+                )
+                pos_now[extensioon_direction] += goahead
+            if single_repeater_value >= 0:
+                struct.set_block(
+                    tuple(pos_now.values()),# type: ignore
+                    Block(
+                        "minecraft",
+                        base_block,
+                        compability_version=compability_version_,
+                    ),
+                )
+                struct.set_block(
+                    (pos_now[x], 1, pos_now[z]),
+                    form_repeater_in_NBT_struct(
+                        delay=single_repeater_value,
+                        facing=repeater_facing,
+                        compability_version_number=compability_version_,
+                    ),
+                )
+                pos_now[extensioon_direction] += goahead
             struct.set_block(
                 (pos_now[x], 1, pos_now[z]),
-                form_repeater_in_NBT_struct(
-                    delay=3,
-                    facing=repeater_facing,
+                form_command_block_in_NBT_struct(
+                    command=cmd.command_text,
+                    coordinate=(pos_now[x], 1, pos_now[z]),
+                    particularValue=command_statevalue(extensioon_direction, forward),
+                    # impluse= (0 if first_impluse else 2),
+                    impluse=0,
+                    condition=False,
+                    alwaysRun=False,
+                    tickDelay=cmd.delay % 2,
+                    customName=cmd.annotation_text,
                     compability_version_number=compability_version_,
                 ),
             )
-            pos_now[extensioon_direction] += goahead
-            first_impluse = True
-        if single_repeater_value >= 0:
             struct.set_block(
-                tuple(pos_now.values()),
+                (pos_now[x], 2, pos_now[z]),
                 Block(
                     "minecraft",
-                    base_block,
+                    "redstone_wire",
                     compability_version=compability_version_,
                 ),
             )
+            pos_now[extensioon_direction] += goahead
+            chain_list = 1
+
+        else:
+            # print(pos_now)
+            now_pos_copy = pos_now.copy()
+            now_pos_copy[extensioon_direction] -= goahead
+            now_pos_copy[aside_direction] += chain_list
+            # print(pos_now,"\n=========")
             struct.set_block(
-                (pos_now[x], 1, pos_now[z]),
-                form_repeater_in_NBT_struct(
-                    delay=single_repeater_value,
-                    facing=repeater_facing,
+                (now_pos_copy[x], 1, now_pos_copy[z]),
+                form_command_block_in_NBT_struct(
+                    command=cmd.command_text,
+                    coordinate=(now_pos_copy[x], 1, now_pos_copy[z]),
+                    particularValue=command_statevalue(extensioon_direction, forward),
+                    # impluse= (0 if first_impluse else 2),
+                    impluse=0,
+                    condition=False,
+                    alwaysRun=False,
+                    tickDelay=cmd.delay % 2,
+                    customName=cmd.annotation_text,
                     compability_version_number=compability_version_,
                 ),
             )
-            pos_now[extensioon_direction] += goahead
-            first_impluse = True
-        struct.set_block(
-            (pos_now[x], 1, pos_now[z]),
-            form_command_block_in_NBT_struct(
-                command=cmd.command_text,
-                coordinate=(pos_now[x], 1, pos_now[z]),
-                particularValue=command_statevalue(extensioon_direction, forward),
-                # impluse= (0 if first_impluse else 2),
-                impluse=0,
-                condition=False,
-                alwaysRun=False,
-                tickDelay=0,
-                customName=cmd.annotation_text,
-                compability_version_number=compability_version_,
-            ),
-        )
-        struct.set_block(
-            (pos_now[x], 2, pos_now[z]),
-            Block(
-                "minecraft",
-                "redstone_wire",
-                compability_version=compability_version_,
-            ),
-        )
-        pos_now[extensioon_direction] += goahead
+            struct.set_block(
+                (now_pos_copy[x], 2, now_pos_copy[z]),
+                Block(
+                    "minecraft",
+                    "redstone_wire",
+                    compability_version=compability_version_,
+                ),
+            )
+            chain_list += 1
 
-        first_impluse = False
-
-    return struct, struct.size, tuple(pos_now.values())
+    return struct, struct.size, tuple(pos_now.values())# type: ignore

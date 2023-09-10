@@ -5,12 +5,13 @@
 
 # mystuff
 /.vscode
-*.mid
-*.midi
-*.mcpack
-*.bdx
-*.json
-*.mcstructure
+/*.mid
+/*.midi
+/*.mcpack
+/*.bdx
+/*.json
+/*.mcstructure
+.mscbackup
 /logs
 /languages
 /llc_cli.py

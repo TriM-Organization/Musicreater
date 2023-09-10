@@ -171,6 +171,7 @@ class FutureMidiConvertM4(MidiConvert):
         :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]"""
 
         totalCount = int(_note.duration / _apply_time_division)
+        
         if totalCount == 0:
             return [
                 (_note.start_time, _note.inst, _note.pitch, _note.velocity, 1),
@@ -277,7 +278,7 @@ class FutureMidiConvertM4(MidiConvert):
 
             for note in track:
                 for every_note in self._linear_note(
-                    note, 50 if note.track_no == 0 else 500
+                    note, 100 if note.track_no == 0 else 500
                 ):
                     soundID, _X = (
                         self.perc_inst_to_soundID_withX(note.pitch)
@@ -334,7 +335,7 @@ class FutureMidiConvertM4(MidiConvert):
         max_volume: float = 1.0,
         speed: float = 1.0,
         player_selector: str = "@a",
-    ) -> Tuple[List[SingleCommand], int]:
+    ) -> Tuple[List[SingleCommand], int, int]:
         """
         使用金羿的转换思路，使用完全填充算法优化音感后，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
 
@@ -349,7 +350,7 @@ class FutureMidiConvertM4(MidiConvert):
 
         Returns
         -------
-        tuple( list[SingleCommand,...], int音乐时长游戏刻 )
+        tuple( list[SingleCommand,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
         if speed == 0:
@@ -410,9 +411,10 @@ class FutureMidiConvertM4(MidiConvert):
             SpecialBits = True if no == 9 else False
 
             for note in track:
-                for every_note in self._linear_note(
-                    note, 50 if note.track_no == 0 else 500
-                ):
+                liner_list = self._linear_note(
+                    note, 100 if note.track_no == 0 else 500
+                )
+                for every_note in liner_list:
                     soundID, _X = (
                         self.perc_inst_to_soundID_withX(note.pitch)
                         if SpecialBits
@@ -444,10 +446,14 @@ class FutureMidiConvertM4(MidiConvert):
 
         all_ticks = list(tracks.keys())
         all_ticks.sort()
-        results = []
+        results:List[SingleCommand] = []
+        max_multi = 0
+        now_multi_delay = 0
+        now_multi = 0
 
         for i in range(len(all_ticks)):
-            for j in range(len(tracks[all_ticks[i]])):
+            l = len(tracks[all_ticks[i]])
+            for j in range(l):
                 results.append(
                     SingleCommand(
                         tracks[all_ticks[i]][j],
@@ -460,15 +466,20 @@ class FutureMidiConvertM4(MidiConvert):
                                 else all_ticks[i]
                             )
                         ),
-                        annotation="在{}播放{}%的{}音".format(
-                            mctick2timestr(i), max_volume * 100, ""
-                        ),
+                        annotation="由 音·创 生成",
                     )
                 )
+                if results[-1].delay + now_multi_delay <= 1:
+                    now_multi += 1
+                    now_multi_delay += results[-1].delay
+                else:
+                    max_multi = max(max_multi, now_multi)
+                    now_multi = 0
+                    now_multi_delay = 0
 
         self.music_command_list = results
         self.music_tick_num = max(all_ticks)
-        return results, self.music_tick_num
+        return results, self.music_tick_num, max_multi
 
 
 class FutureMidiConvertM5(MidiConvert):
