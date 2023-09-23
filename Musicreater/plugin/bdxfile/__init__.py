@@ -20,5 +20,5 @@ __all__ = [
 ]
 __author__ = (("金羿", "Eilles Wan"),)
 
-from .main import *
+from .main import to_BDX_file_in_delay,to_BDX_file_in_score
 

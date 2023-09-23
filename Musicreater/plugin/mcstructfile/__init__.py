@@ -16,9 +16,9 @@ Terms & Conditions: License.md in the root directory
 
 __all__ = [
     "to_mcstructure_file_in_delay",
-    "to_mcstructure_file_in_redstone_CD",
+    "to_mcstructure_file_in_repeater",
 ]
 __author__ = (("金羿", "Eilles Wan"),)
 
-from .main import *
+from .main import to_mcstructure_file_in_delay,to_mcstructure_file_in_repeater
 

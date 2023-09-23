@@ -1,9 +1,9 @@
 import Musicreater.experiment
 import Musicreater.plugin
-import Musicreater.plugin.mcstructpack
+import Musicreater.plugin.addonpack
 
 print(
-    Musicreater.plugin.mcstructpack.to_mcstructure_addon_in_delay(
+    Musicreater.plugin.addonpack.to_addon_pack_in_delay(
         Musicreater.experiment.FutureMidiConvertM4.from_midi_file(input("midi路径:"), old_exe_format=False),
         Musicreater.plugin.ConvertConfig(
             input("输出路径:"),

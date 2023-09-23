@@ -25,5 +25,3 @@ def bottem_side_length_of_smallest_square_bottom_box(total: int, maxHeight: int)
     :param maxHeight: 最大高度
     :return: 外切正方形的边长 int"""
     return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
-
-

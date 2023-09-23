@@ -10,7 +10,7 @@
 <h3 align="center">A free open-source library of converting digital music files into <i>Minecraft</i> formats.</h3>
 
 <p align="center">
-    <img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
     </img>
 <p>
 
@@ -28,7 +28,7 @@
 
 [简体中文 🇨🇳](README.md) | English🇬🇧
 
-**Notice that the language translation of _Musicreater_ may be a little SLOW.**
+**Notice that the localizations of documents may NOT be up-to-date.**
 
 ## Introduction🚀
 
@@ -41,21 +41,15 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
 - Via pypi
 
   ```bash
-  pip install Musicreater
+  pip install Musicreater --upgrade
   ```
 
-- If not work, also try:
-  ```bash
-  pip install -i https://pypi.python.org/simple Musicreater
-  ```
-
-- Update:
-
+- If above command cannot fetch latest version, try:
   ```bash
   pip install -i https://pypi.python.org/simple Musicreater --upgrade
   ```
 
-- Clone repo and Install:
+- Clone repo and Install (**NOT RECOMMANDED**):
   ```bash
   git clone https://github.com/TriM-Organization/Musicreater.git
   cd Musicreater
@@ -94,16 +88,20 @@ This list is not in any order.
 - Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
 - Thank **指令师\_苦力怕 playjuice123**\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
 - Thank **雷霆**\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
+- Thank **小埋**\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
+- <table><tr><td>Thank **油炸**\<QQ2836146704\> for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
 
-> Thanks for a lot of groupmates' support and help
+> Thanks for the support and help of a lot of groupmates
 >
-> If you have given contribution but haven't been in the list, please contact us!
+> If you have given contributions but have not been in the list, please contact us!
 
 ## Contact Us 📞
 
 Meet problems? Welcome to give out your issue [here](https://github.com/EillesWan/Musicreater/issues/new)!
 
 Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
+
+Or contact us via [TriM-Org Official Email](mailto:TriM-Organization@hotmail.com)!
 
 ---
 

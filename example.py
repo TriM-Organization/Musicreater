@@ -21,8 +21,11 @@ import os
 import Musicreater
 from Musicreater.plugin import ConvertConfig
 from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
-from Musicreater.plugin.funcpack import to_function_addon_in_score
-from Musicreater.plugin.mcstructpack import to_mcstructure_addon_in_delay, to_mcstructure_addon_in_redstone_cd
+from Musicreater.plugin.addonpack import (
+    to_addon_pack_in_delay,
+    to_addon_pack_in_repeater,
+    to_addon_pack_in_score,
+)
 
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")
@@ -107,18 +110,16 @@ cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=True)
 cvt_cfg = ConvertConfig(out_path, *prompts[:3])
 
 if playerFormat == 1:
-    cvt_method = to_function_addon_in_score
+    cvt_method = to_addon_pack_in_score
 elif playerFormat == 0:
-    cvt_method = to_mcstructure_addon_in_delay
+    cvt_method = to_addon_pack_in_delay
 elif playerFormat == 2:
-    cvt_method = to_mcstructure_addon_in_redstone_cd
+    cvt_method = to_addon_pack_in_repeater
 
 
 print(
     "	指令总长：{}，最高延迟：{}".format(
-        *(
-            cvt_method(cvt_mid, cvt_cfg, *prompts[3:]) # type: ignore
-        )
+        *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
     )
     if fileFormat == 0
     else "	指令总长：{}，最高延迟：{}，结构大小{}，终点坐标{}".format(

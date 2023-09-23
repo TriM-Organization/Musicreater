@@ -349,7 +349,7 @@ def commands_to_redstone_delay_structure(
 
     goahead = forward_IER(forward)
 
-    command_actually_length = sum([int(bool(cmd.delay))for cmd in commands])
+    command_actually_length = sum([int(bool(cmd.delay)) for cmd in commands])
 
     a = 1
     for cmd in commands:
@@ -358,7 +358,6 @@ def commands_to_redstone_delay_structure(
             a = 1
         else:
             a += 1
-
 
     struct = Structure(
         size=(
@@ -370,7 +369,7 @@ def commands_to_redstone_delay_structure(
             if extensioon_direction == z
             else a,
         ),
-        fill=Block('minecraft','air',compability_version=compability_version_),
+        fill=Block("minecraft", "air", compability_version=compability_version_),
         compability_version=compability_version_,
     )
 
@@ -391,7 +390,7 @@ def commands_to_redstone_delay_structure(
             additional_repeater = int(cmd.delay / 2 // 4)
             for i in range(additional_repeater):
                 struct.set_block(
-                    tuple(pos_now.values()),# type: ignore
+                    tuple(pos_now.values()),  # type: ignore
                     Block(
                         "minecraft",
                         base_block,
@@ -409,7 +408,7 @@ def commands_to_redstone_delay_structure(
                 pos_now[extensioon_direction] += goahead
             if single_repeater_value >= 0:
                 struct.set_block(
-                    tuple(pos_now.values()),# type: ignore
+                    tuple(pos_now.values()),  # type: ignore
                     Block(
                         "minecraft",
                         base_block,
@@ -482,4 +481,4 @@ def commands_to_redstone_delay_structure(
             )
             chain_list += 1
 
-    return struct, struct.size, tuple(pos_now.values())# type: ignore
+    return struct, struct.size, tuple(pos_now.values())  # type: ignore

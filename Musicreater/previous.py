@@ -15,8 +15,6 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import Dict, List, Tuple, Union
-
 from .exceptions import *
 from .main import MidiConvert, mido
 from .subclass import *
@@ -99,10 +97,8 @@ class ObsoleteMidiConvert(MidiConvert):
         return [tracks, commands, maxscore]
 
     def _toCmdList_m1(
-            self,
-            scoreboardname: str = "mscplay",
-            volume: float = 1.0,
-            speed: float = 1.0) -> list:
+        self, scoreboardname: str = "mscplay", volume: float = 1.0, speed: float = 1.0
+    ) -> list:
         """
         使用Dislink Sforza的转换思路，将midi转换为我的世界命令列表
         :param scoreboardname: 我的世界的计分板名称
@@ -119,8 +115,7 @@ class ObsoleteMidiConvert(MidiConvert):
         commands = 0
         maxscore = 0
 
-        for i, track in enumerate(self.midi.tracks):
-
+        for i, track in enumerate(self.midi.tracks):  # type:ignore
             ticks = 0
             instrumentID = 0
             singleTrack = []
@@ -137,18 +132,18 @@ class ObsoleteMidiConvert(MidiConvert):
                         instrumentID = msg.program
                     if msg.type == "note_on" and msg.velocity != 0:
                         nowscore = round(
-                            (ticks * tempo)
-                            / ((self.midi.ticks_per_beat * float(speed)) * 50000)
+                            (ticks * tempo) / ((self.midi.ticks_per_beat * float(speed)) * 50000)  # type: ignore
                         )
                         maxscore = max(maxscore, nowscore)
-                        soundID, _X = self.__Inst2soundID_withX(instrumentID)
+                        soundID, _X = self.inst_to_souldID_withX(instrumentID)
                         singleTrack.append(
-                            "execute @a[scores={" +
-                            str(scoreboardname) +
-                            "=" +
-                            str(nowscore) +
-                            "}" +
-                            f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}")
+                            "execute @a[scores={"
+                            + str(scoreboardname)
+                            + "="
+                            + str(nowscore)
+                            + "}"
+                            + f"] ~ ~ ~ playsound {soundID} @s ~ ~{1 / volume - 1} ~ {msg.velocity * (0.7 if msg.channel == 0 else 0.9)} {2 ** ((msg.note - 60 - _X) / 12)}"
+                        )
                         commands += 1
             if len(singleTrack) != 0:
                 tracks.append(singleTrack)

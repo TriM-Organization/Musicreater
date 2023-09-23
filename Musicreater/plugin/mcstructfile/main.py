@@ -81,7 +81,7 @@ def to_mcstructure_file_in_delay(
     return size, max_delay
 
 
-def to_mcstructure_file_in_redstone_CD(
+def to_mcstructure_file_in_repeater(
     midi_cvt: MidiConvert,
     data_cfg: ConvertConfig,
     player: str = "@a",

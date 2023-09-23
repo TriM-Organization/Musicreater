@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-用以生成结构附加包的附加功能
+用以生成附加包的附加功能
 
 版权所有 © 2023 音·创 开发者
 Copyright © 2023 all the developers of Musicreater
@@ -15,9 +15,14 @@ Terms & Conditions: License.md in the root directory
 
 
 __all__ = [
-    "to_mcstructure_addon_in_delay"
+    "to_addon_pack_in_delay",
+    "to_addon_pack_in_score",
+    "to_addon_pack_in_repeater",
 ]
 __author__ = (("金羿", "Eilles Wan"),)
 
-from .main import *
-
+from .main import (
+    to_addon_pack_in_delay,
+    to_addon_pack_in_repeater,
+    to_addon_pack_in_score,
+)

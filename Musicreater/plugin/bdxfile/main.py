@@ -18,8 +18,14 @@ import brotli
 
 from ...main import MidiConvert
 from ...subclass import SingleCommand
-from ..bdx import (bdx_move, commands_to_BDX_bytes,
-                   form_command_block_in_BDX_bytes, x, y, z)
+from ..bdx import (
+    bdx_move,
+    commands_to_BDX_bytes,
+    form_command_block_in_BDX_bytes,
+    x,
+    y,
+    z,
+)
 from ..main import ConvertConfig
 
 

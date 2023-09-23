@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.4.2"
-__vername__ = "优质的红石音乐生成&更好的线性插值算法"
+__version__ = "1.5.0"
+__vername__ = "修改附加包插件的调用方式，新增播放终止函数，文档内容增强"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

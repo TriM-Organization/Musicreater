@@ -10,7 +10,7 @@
 <h3 align="center">一款免费开源的《我的世界》数字音频转换库。</h3>
 
 <p align="center">
-    <img src="https://forthebadge.com/images/badges/built-with-love.svg">
+    <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
     <a href='https://gitee.com/TriM-Organization/Musicreater'>
         <img align="right" src='https://gitee.com/TriM-Organization/Musicreater/widgets/widget_1.svg' alt='Fork me on Gitee'>
         </img>
@@ -42,21 +42,15 @@
 - 使用 pypi
 
   ```bash
-  pip install Musicreater
+  pip install --upgrade Musicreater
   ```
 
-- 如果出现错误，可以尝试：
+- 如果无法更新最新，可以尝试：
   ```bash
-  pip install -i https://pypi.python.org/simple Musicreater
+  pip install --upgrade -i https://pypi.python.org/simple Musicreater
   ```
 
-- 升级：
-
-  ```bash
-  pip install -i https://pypi.python.org/simple Musicreater --upgrade
-  ```
-
-- 克隆仓库并安装
+- 克隆仓库并安装（**不推荐**）
   ```bash
   git clone https://gitee.com/TriM-Organization/Musicreater.git
   cd Musicreater
@@ -92,11 +86,12 @@
 - 感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
 - 感谢 **指令师\_苦力怕 playjuice123**\<QQ240667197\> 为我们的程序找出错误，并提醒我们修复一个一直存在的大 bug。
 - 感谢 **雷霆**\<QQ3555268519\> 用他那令所有开发者都大为光火的操作方法为我们的程序找出错误，并提醒修复 bug。
-- 感谢 **小埋**\<2039310975\> 反馈附加包生成时缺少描述和标题的问题。
+- 感谢 **小埋**\<QQ2039310975\> 反馈附加包生成时缺少描述和标题的问题。
+- <table><tr><td>感谢 **油炸**\<QQ2836146704\> 激励我们不断开发新的内容。</td><td><img height="50" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg"></td></tr></table>
 
->     感谢广大群友为此程序提供的测试等支持
+>     感谢广大群友为此库提供的测试和建议等
 >
->     若您对我们有所贡献但您的名字没有显示在此列表中，请联系我们！
+>     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！
 
 ## 联系 📞
 
