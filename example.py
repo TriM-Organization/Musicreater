@@ -106,7 +106,7 @@ else:
 
 
 print(f"正在处理 {midi_path} ：")
-cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=True)
+cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=False)
 cvt_cfg = ConvertConfig(out_path, *prompts[:3])
 
 if playerFormat == 1:

@@ -603,7 +603,7 @@ class MidiConvert:
         speed: float = 1.0,
     ) -> Tuple[List[List[SingleCommand]], int, int]:
         """
-        使用金羿的转换思路，将midi转换为我的世界命令列表
+        将midi转换为我的世界命令列表
 
         Parameters
         ----------
@@ -655,6 +655,9 @@ class MidiConvert:
                         score_now = round(msg[-1] / float(speed) / 50)
                         maxScore = max(maxScore, score_now)
                         mc_pitch = "" if SpecialBits else 2 ** ((msg[1] - 60 - _X) / 12)
+                        mc_distance_volume = 128 / max_volume / msg[2] + (
+                            1 if SpecialBits else -1
+                        )
 
                         nowTrack.append(
                             SingleCommand(
@@ -666,7 +669,10 @@ class MidiConvert:
                                     .replace(")", r"}")
                                 )
                                 + "playsound {} @s ^ ^ ^{} {} {}".format(
-                                    soundID, 1 / max_volume - 1, msg[2] / 128, mc_pitch
+                                    soundID,
+                                    mc_distance_volume,
+                                    msg[2] / 128,
+                                    mc_pitch,
                                 ),
                                 annotation="在{}播放{}%的{}音".format(
                                     mctick2timestr(score_now),
@@ -694,7 +700,7 @@ class MidiConvert:
         player_selector: str = "@a",
     ) -> Tuple[List[SingleCommand], int, int]:
         """
-        使用金羿的转换思路，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+        将midi转换为我的世界命令列表，并输出每个音符之后的延迟
 
         Parameters
         ----------
@@ -744,25 +750,29 @@ class MidiConvert:
                         )
 
                         delaytime_now = round(msg[-1] / float(speed) / 50)
+                        mc_pitch = "" if SpecialBits else 2 ** ((msg[1] - 60 - _X) / 12)
+                        mc_distance_volume = 128 / max_volume / msg[2] + (
+                            1 if SpecialBits else -1
+                        )
 
                         try:
                             tracks[delaytime_now].append(
                                 self.execute_cmd_head.format(player_selector)
-                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
-                                + (
-                                    ""
-                                    if SpecialBits
-                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                + "playsound {} @s ^ ^ ^{} {} {}".format(
+                                    soundID,
+                                    mc_distance_volume,
+                                    msg[2] / 128,
+                                    mc_pitch,
                                 )
                             )
                         except KeyError:
                             tracks[delaytime_now] = [
                                 self.execute_cmd_head.format(player_selector)
-                                + f"playsound {soundID} @s ^ ^ ^{128 / max_volume / msg[2] - 1} {msg[2] / 128} "
-                                + (
-                                    ""
-                                    if SpecialBits
-                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                + "playsound {} @s ^ ^ ^{} {} {}".format(
+                                    soundID,
+                                    mc_distance_volume,
+                                    msg[2] / 128,
+                                    mc_pitch,
                                 )
                             ]
 
