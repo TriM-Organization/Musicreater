@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.5.1"
-__vername__ = "优化生成结构，提高生成效率，完善版权说明"
+__version__ = "1.5.2"
+__vername__ = "添加midi对应的键盘符号表"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
