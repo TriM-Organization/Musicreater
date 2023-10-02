@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.5.2"
-__vername__ = "添加midi对应的键盘符号表"
+__version__ = "1.6.0"
+__vername__ = "切换ChannelType类型为NoteChannelType类型"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -29,7 +29,7 @@ __all__ = [
     # 主要类
     "MidiConvert",
     # 附加类
-    # "SingleNote",
+    "SingleNote",
     "SingleCommand",
     # "TimeStamp", 未来功能
 ]

@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .constants import PERCUSSION_INSTRUMENT_LIST
+from .utils import inst_to_souldID_withX, perc_inst_to_soundID_withX
 
 
 @dataclass(init=False)
@@ -45,14 +46,18 @@ class SingleNote:
     track_no: int
     """音符所处的音轨"""
 
+    percussive: bool
+    """是否为打击乐器"""
+
     def __init__(
         self,
         instrument: int,
         pitch: int,
         velocity: int,
-        startTime: int,
-        lastTime: int,
+        startime: int,
+        lastime: int,
         track_number: int = 0,
+        is_percussion: Optional[bool] = None,
     ):
         """用于存储单个音符的类
         :param instrument 乐器编号
@@ -67,12 +72,21 @@ class SingleNote:
         """音符编号"""
         self.velocity: int = velocity
         """力度/响度"""
-        self.start_time: int = startTime
+        self.start_time: int = startime
         """开始之时 ms"""
-        self.duration: int = lastTime
+        self.duration: int = lastime
         """音符持续时间 ms"""
         self.track_no: int = track_number
         """音符所处的音轨"""
+        self.track_no: int = track_number
+        """音符所处的音轨"""
+
+        self.percussive = (
+            (is_percussion in PERCUSSION_INSTRUMENT_LIST)
+            if (is_percussion is None)
+            else is_percussion
+        )
+        """是否为打击乐器"""
 
     @property
     def inst(self):
@@ -89,27 +103,72 @@ class SingleNote:
         return self.note
 
     def __str__(self):
-        return (
-            f"Note(inst = {self.inst}, pitch = {self.note}, velocity = {self.velocity}, "
-            f"startTime = {self.start_time}, lastTime = {self.duration}, )"
+        return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {},)".format(
+            "Percussive" if self.percussive else "",
+            self.inst,
+            "" if self.percussive else "Pitch = {}, ".format(self.pitch),
+            self.start_time,
+            self.duration,
         )
 
     def __tuple__(self):
-        return self.inst, self.note, self.velocity, self.start_time, self.duration
+        return (
+            (self.percussive, self.inst, self.velocity, self.start_time, self.duration)
+            if self.percussive
+            else (
+                self.percussive,
+                self.inst,
+                self.note,
+                self.velocity,
+                self.start_time,
+                self.duration,
+            )
+        )
 
     def __dict__(self):
-        return {
-            "inst": self.inst,
-            "pitch": self.note,
-            "velocity": self.velocity,
-            "startTime": self.start_time,
-            "lastTime": self.duration,
-        }
+        return (
+            {
+                "Percussive": self.percussive,
+                "Instrument": self.inst,
+                "Velocity": self.velocity,
+                "StartTime": self.start_time,
+                "Duration": self.duration,
+            }
+            if self.percussive
+            else {
+                "Percussive": self.percussive,
+                "Instrument": self.inst,
+                "Pitch": self.note,
+                "Velocity": self.velocity,
+                "StartTime": self.start_time,
+                "Duration": self.duration,
+            }
+        )
 
     def __eq__(self, other) -> bool:
         if not isinstance(other, self.__class__):
             return False
         return self.__str__() == other.__str__()
+
+    def to_command(self, volume_percentage) -> str:
+        self.mc_sound_ID, _X = (
+            perc_inst_to_soundID_withX(self.inst)
+            if self.percussive
+            else inst_to_souldID_withX(self.inst)
+        )
+
+        # delaytime_now = round(self.start_time / float(speed) / 50)
+        self.mc_pitch = "" if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+        self.mc_distance_volume = 128 / volume_percentage / self.velocity + (
+            1 if self.percussive else self.velocity / 32
+        )
+
+        return "playsound {} @s ^ ^ ^{} {} {}".format(
+            self.mc_sound_ID,
+            self.mc_distance_volume,
+            self.velocity / 128,
+            self.mc_pitch,
+        )
 
 
 @dataclass(init=False)

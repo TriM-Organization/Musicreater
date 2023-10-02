@@ -17,7 +17,7 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import Tuple, Union, Literal
+from typing import Literal, Tuple, Union
 
 from ..constants import DEFAULT_PROGRESSBAR_STYLE
 

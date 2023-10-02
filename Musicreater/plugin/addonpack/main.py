@@ -22,11 +22,11 @@ from ...main import MidiConvert
 from ..archive import behavior_mcpack_manifest, compress_zipfile
 from ..main import ConvertConfig
 from ..mcstructure import (
-    commands_to_structure,
-    form_command_block_in_NBT_struct,
-    commands_to_redstone_delay_structure,
     COMPABILITY_VERSION_117,
     COMPABILITY_VERSION_119,
+    commands_to_redstone_delay_structure,
+    commands_to_structure,
+    form_command_block_in_NBT_struct,
 )
 
 
@@ -393,7 +393,7 @@ def to_addon_pack_in_repeater(
     with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
-                pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 延迟播放器 - 由 音·创 生成",
+                pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
                 pack_name=midi_cvt.midi_music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
             ),

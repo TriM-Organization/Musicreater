@@ -27,38 +27,12 @@ Terms & Conditions: License.md in the root directory
 
 import math
 import os
-from typing import List, Literal, Tuple, Union
-
-import mido
 
 from .constants import *
 from .exceptions import *
 from .subclass import *
+from .types import *
 from .utils import *
-
-VoidMido = Union[mido.MidiFile, None]  # void mido
-"""
-空Midi类类型
-"""
-
-ChannelType = Dict[
-    int,
-    Dict[
-        int,
-        List[
-            Union[
-                Tuple[Literal["PgmC"], int, int],
-                Tuple[Literal["NoteS"], int, int, int],
-                Tuple[Literal["NoteE"], int, int],
-            ]
-        ],
-    ],
-]
-"""
-以字典所标记的频道信息类型
-
-Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
-"""
 
 """
 学习笔记：
@@ -112,7 +86,7 @@ class MidiConvert:
     execute_cmd_head: str
     """execute指令头部"""
 
-    channels: ChannelType
+    channels: Union[ChannelType, NoteChannelType]
     """频道信息字典"""
 
     music_command_list: List[SingleCommand]
@@ -194,57 +168,6 @@ class MidiConvert:
 
         # ……真的那么重要吗
         # 我又几曾何时，知道祂真的会抛下我
-
-    @staticmethod
-    def inst_to_souldID_withX(
-        instrumentID: int,
-    ) -> Tuple[str, int]:
-        """
-        返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
-        2**( ( msg.note - 60 - X ) / 12 ) 即为MC的音高，其中
-        X的取值随乐器不同而变化：
-        竖琴harp、电钢琴pling、班卓琴banjo、方波bit、颤音琴iron_xylophone 的时候为6
-        吉他的时候为7
-        贝斯bass、迪吉里杜管didgeridoo的时候为8
-        长笛flute、牛铃cou_bell的时候为5
-        钟琴bell、管钟chime、木琴xylophone的时候为4
-        而存在一些打击乐器bd(basedrum)、hat、snare，没有音域，则没有X，那么我们返回7即可
-
-        Parameters
-        ----------
-        instrumentID: int
-            midi的乐器ID
-
-        Returns
-        -------
-        tuple(str我的世界乐器名, int转换算法中的X)
-        """
-        try:
-            return PITCHED_INSTRUMENT_TABLE[instrumentID]
-        except KeyError:
-            return "note.flute", 5
-
-    @staticmethod
-    def perc_inst_to_soundID_withX(instrumentID: int) -> Tuple[str, int]:
-        """
-        对于Midi第10通道所对应的打击乐器，返回我的世界乐器名
-
-        Parameters
-        ----------
-        instrumentID: int
-            midi的乐器ID
-
-        Returns
-        -------
-        tuple(str我的世界乐器名, int转换算法中的X)
-        """
-        try:
-            return PERCUSSION_INSTRUMENT_TABLE[instrumentID]
-        except KeyError:
-            return "note.bd", 7
-
-        # 明明已经走了
-        # 凭什么还要在我心里留下缠绵缱绻
 
     def form_progress_bar(
         self,
@@ -522,24 +445,26 @@ class MidiConvert:
         self.progress_bar_command = result
         return result
 
-    def to_music_channels(
+    def to_music_note_channels(
         self,
-    ) -> ChannelType:
+        ignore_mismatch_error: bool = True,
+    ) -> NoteChannelType:
         """
-        使用金羿的转换思路，将midi解析并转换为频道信息字典
+        将midi解析并转换为频道音符字典
 
         Returns
         -------
-        以频道作为分割的Midi信息字典:
-        Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
+        以频道作为分割的Midi音符列表字典:
+        Dict[int,List[SingleNote,]]
         """
+
         if self.midi is None:
             raise MidiUnboundError(
                 "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
             )
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: ChannelType = empty_midi_channels()
+        midi_channels: NoteChannelType = empty_midi_channels(staff=[])
         tempo = mido.midifiles.midifiles.DEFAULT_TEMPO
 
         # 我们来用通道统计音乐信息
@@ -549,6 +474,27 @@ class MidiConvert:
             if not track:
                 continue
 
+            note_queue_A: Dict[
+                int,
+                List[
+                    Tuple[
+                        int,
+                        int,
+                    ]
+                ],
+            ] = empty_midi_channels(staff=[])
+            note_queue_B: Dict[
+                int,
+                List[
+                    Tuple[
+                        int,
+                        int,
+                    ]
+                ],
+            ] = empty_midi_channels(staff=[])
+
+            channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
+
             for msg in track:
                 if msg.time != 0:
                     microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
@@ -557,28 +503,58 @@ class MidiConvert:
                     if msg.type == "set_tempo":
                         tempo = msg.tempo
                 else:
-                    try:
-                        if not track_no in midi_channels[msg.channel].keys():
-                            midi_channels[msg.channel][track_no] = []
-                    except AttributeError as E:
-                        print(msg, E)
-
                     if msg.type == "program_change":
-                        midi_channels[msg.channel][track_no].append(
-                            ("PgmC", msg.program, microseconds)
-                        )
+                        channel_program[msg.channel] = msg.program
 
                     elif msg.type == "note_on" and msg.velocity != 0:
-                        midi_channels[msg.channel][track_no].append(
-                            ("NoteS", msg.note, msg.velocity, microseconds)
+                        note_queue_A[msg.channel].append(
+                            (msg.note, channel_program[msg.channel])
                         )
+                        note_queue_B[msg.channel].append((msg.velocity, microseconds))
 
-                    elif (msg.type == "note_on" and msg.velocity == 0) or (
-                        msg.type == "note_off"
+                    elif (msg.type == "note_off") or (
+                        msg.type == "note_on" and msg.velocity == 0
                     ):
-                        midi_channels[msg.channel][track_no].append(
-                            ("NoteE", msg.note, microseconds)
-                        )
+                        if (msg.note, channel_program[msg.channel]) in note_queue_A[
+                            msg.channel
+                        ]:
+                            _velocity, _ms = note_queue_B[msg.channel][
+                                note_queue_A[msg.channel].index(
+                                    (msg.note, channel_program[msg.channel])
+                                )
+                            ]
+                            note_queue_A[msg.channel].remove(
+                                (msg.note, channel_program[msg.channel])
+                            )
+                            note_queue_B[msg.channel].remove((_velocity, _ms))
+                            midi_channels[msg.channel].append(
+                                SingleNote(
+                                    instrument=msg.note,
+                                    pitch=channel_program[msg.channel],
+                                    velocity=_velocity,
+                                    startime=_ms,
+                                    lastime=microseconds - _ms,
+                                    track_number=track_no,
+                                    is_percussion=True,
+                                )
+                                if msg.channel == 9
+                                else SingleNote(
+                                    instrument=channel_program[msg.channel],
+                                    pitch=msg.note,
+                                    velocity=_velocity,
+                                    startime=_ms,
+                                    lastime=microseconds - _ms,
+                                    track_number=track_no,
+                                    is_percussion=False,
+                                )
+                            )
+                        else:
+                            if ignore_mismatch_error:
+                                print("[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(msg))
+                            else:
+                                raise NoteOnOffMismatchError(
+                                    "当前的MIDI很可能有损坏之嫌……", msg, "无法在上文中找到与之匹配的音符开音消息。"
+                                )
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -592,9 +568,14 @@ class MidiConvert:
         3 音符结束消息
         ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
         del tempo, self.channels
-        self.channels = midi_channels
-        # [print([print(no,tno,sum([True if i[0] == 'NoteS' else False for i in track])) for tno,track in cna.items()]) if cna else False for no,cna in midi_channels.items()]
-        return midi_channels
+        self.channels = dict(
+            [
+                (channel_no, sorted(channel_notes, key=lambda note: note.start_time))
+                for channel_no, channel_notes in midi_channels.items()
+            ]
+        )
+
+        return self.channels
 
     def to_command_list_in_score(
         self,
@@ -623,75 +604,46 @@ class MidiConvert:
             raise ZeroSpeedError("播放速度仅可为正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
-        tracks = []
-        cmdAmount = 0
-        maxScore = 0
-        InstID = -1
-
-        self.to_music_channels()
+        command_channels = []
+        command_amount = 0
+        max_score = 0
 
         # 此处 我们把通道视为音轨
-        for i in self.channels.keys():
+        for channel in self.to_music_note_channels().values():
             # 如果当前通道为空 则跳过
-            if not self.channels[i]:
+            if not channel:
                 continue
 
-            # 第十通道是打击乐通道
-            SpecialBits = True if i == 9 else False
+            this_channel = []
 
-            for track_no, track in self.channels[i].items():
-                nowTrack = []
+            for note in channel:
+                score_now = round(note.start_time / float(speed) / 50)
+                max_score = max(max_score, score_now)
 
-                for msg in track:
-                    if msg[0] == "PgmC":
-                        InstID = msg[1]
-
-                    elif msg[0] == "NoteS":
-                        soundID, _X = (
-                            self.perc_inst_to_soundID_withX(msg[1])
-                            if SpecialBits
-                            else self.inst_to_souldID_withX(InstID)
+                this_channel.append(
+                    SingleCommand(
+                        self.execute_cmd_head.format(
+                            "@a[scores=({}={})]".format(scoreboard_name, score_now)
+                            .replace("(", r"{")
+                            .replace(")", r"}")
                         )
-                        score_now = round(msg[-1] / float(speed) / 50)
-                        maxScore = max(maxScore, score_now)
-                        mc_pitch = "" if SpecialBits else 2 ** ((msg[1] - 60 - _X) / 12)
-                        mc_distance_volume = 128 / max_volume / msg[2] + (
-                            1 if SpecialBits else -1
-                        )
+                        + note.to_command(max_volume),
+                        annotation="在{}播放{}%的{}音".format(
+                            mctick2timestr(score_now),
+                            max_volume * 100,
+                            "{}:{}".format(note.mc_sound_ID, note.mc_pitch),
+                        ),
+                    ),
+                )
 
-                        nowTrack.append(
-                            SingleCommand(
-                                self.execute_cmd_head.format(
-                                    "@a[scores=({}={})]".format(
-                                        scoreboard_name, score_now
-                                    )
-                                    .replace("(", r"{")
-                                    .replace(")", r"}")
-                                )
-                                + "playsound {} @s ^ ^ ^{} {} {}".format(
-                                    soundID,
-                                    mc_distance_volume,
-                                    msg[2] / 128,
-                                    mc_pitch,
-                                ),
-                                annotation="在{}播放{}%的{}音".format(
-                                    mctick2timestr(score_now),
-                                    max_volume * 100,
-                                    "{}:{}".format(soundID, mc_pitch),
-                                ),
-                            ),
-                        )
+                command_amount += 1
 
-                        cmdAmount += 1
+            if this_channel:
+                self.music_command_list.extend(this_channel)
+                command_channels.append(this_channel)
 
-                if nowTrack:
-                    self.music_command_list.extend(nowTrack)
-                    tracks.append(nowTrack)
-
-        # print(cmdAmount)
-        del InstID
-        self.music_tick_num = maxScore
-        return (tracks, cmdAmount, maxScore)
+        self.music_tick_num = max_score
+        return (command_channels, command_amount, max_score)
 
     def to_command_list_in_delay(
         self,
@@ -720,96 +672,40 @@ class MidiConvert:
             raise ZeroSpeedError("播放速度仅可为正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
-        self.to_music_channels()
-
-        tracks = {}
-        InstID = -1
-        # cmd_amount = 0
+        notes_list: List[SingleNote] = []
 
         # 此处 我们把通道视为音轨
-        for i in self.channels.keys():
-            # 如果当前通道为空 则跳过
-            if not self.channels[i]:
-                continue
+        for channel in self.to_music_note_channels().values():
+            notes_list.extend(channel)
 
-            # 第十通道是打击乐通道
-            SpecialBits = True if i == 9 else False
+        notes_list.sort(key=lambda a: a.start_time)
+        self.music_command_list = []
+        multi = max_multi = 0
+        delaytime_previous = 0
 
-            # nowChannel = []
-
-            for track_no, track in self.channels[i].items():
-                for msg in track:
-                    if msg[0] == "PgmC":
-                        InstID = msg[1]
-
-                    elif msg[0] == "NoteS":
-                        soundID, _X = (
-                            self.perc_inst_to_soundID_withX(msg[1])
-                            if SpecialBits
-                            else self.inst_to_souldID_withX(InstID)
-                        )
-
-                        delaytime_now = round(msg[-1] / float(speed) / 50)
-                        mc_pitch = "" if SpecialBits else 2 ** ((msg[1] - 60 - _X) / 12)
-                        mc_distance_volume = 128 / max_volume / msg[2] + (
-                            1 if SpecialBits else -1
-                        )
-
-                        try:
-                            tracks[delaytime_now].append(
-                                self.execute_cmd_head.format(player_selector)
-                                + "playsound {} @s ^ ^ ^{} {} {}".format(
-                                    soundID,
-                                    mc_distance_volume,
-                                    msg[2] / 128,
-                                    mc_pitch,
-                                )
-                            )
-                        except KeyError:
-                            tracks[delaytime_now] = [
-                                self.execute_cmd_head.format(player_selector)
-                                + "playsound {} @s ^ ^ ^{} {} {}".format(
-                                    soundID,
-                                    mc_distance_volume,
-                                    msg[2] / 128,
-                                    mc_pitch,
-                                )
-                            ]
-
-                        # cmd_amount += 1
-
-        # print(cmd_amount)
-
-        del InstID
-        all_ticks = list(tracks.keys())
-        all_ticks.sort()
-        results = []
-        max_multi = 0
-
-        for i in range(len(all_ticks)):
-            max_multi = max(max_multi, len(tracks[all_ticks[i]]))
-            for j in range(len(tracks[all_ticks[i]])):
-                results.append(
-                    SingleCommand(
-                        tracks[all_ticks[i]][j],
-                        tick_delay=(
-                            0
-                            if j != 0
-                            else (
-                                all_ticks[i] - all_ticks[i - 1]
-                                if i != 0
-                                else all_ticks[i]
-                            )
-                        ),
-                        annotation="在{}播放{}%的{}音".format(
-                            mctick2timestr(i), max_volume * 100, ""
-                        ),
-                    )
+        for note in notes_list:
+            delaytime_now = round(note.start_time / speed / 50)
+            if (tickdelay := (delaytime_now - delaytime_previous)) == 0:
+                multi += 1
+            else:
+                max_multi = max(max_multi, multi)
+                multi = 0
+            self.music_command_list.append(
+                SingleCommand(
+                    self.execute_cmd_head.format(player_selector)
+                    + note.to_command(max_volume),
+                    tick_delay=tickdelay,
+                    annotation="在{}播放{}%的{}音".format(
+                        mctick2timestr(delaytime_now),
+                        max_volume * 100,
+                        "{}:{}".format(note.mc_sound_ID, note.mc_pitch),
+                    ),
                 )
+            )
+            delaytime_previous = delaytime_now
 
-        self.music_command_list = results
-        self.music_tick_num = max(all_ticks)
-        return results, self.music_tick_num, max_multi
+        self.music_tick_num = round(notes_list[-1].start_time / speed / 50)
+        return self.music_command_list, self.music_tick_num, max_multi + 1
 
     def copy_important(self):
         dst = MidiConvert(

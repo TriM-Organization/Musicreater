@@ -19,6 +19,7 @@ Terms & Conditions: License.md in the root directory
 from ..exceptions import NotDefineProgramError, ZeroSpeedError
 from ..main import MidiConvert
 from ..subclass import SingleCommand
+from ..utils import inst_to_souldID_withX, perc_inst_to_soundID_withX
 
 # 你以为写完了吗？其实并没有
 
@@ -68,15 +69,15 @@ def to_note_list(
                 elif msg[0] == "NoteS":
                     try:
                         soundID, _X = (
-                            midi_cvt.perc_inst_to_soundID_withX(InstID)
+                            perc_inst_to_soundID_withX(InstID)
                             if SpecialBits
-                            else midi_cvt.inst_to_souldID_withX(InstID)
+                            else inst_to_souldID_withX(InstID)
                         )
                     except UnboundLocalError as E:
                         soundID, _X = (
-                            midi_cvt.perc_inst_to_soundID_withX(-1)
+                            perc_inst_to_soundID_withX(-1)
                             if SpecialBits
-                            else midi_cvt.inst_to_souldID_withX(-1)
+                            else inst_to_souldID_withX(-1)
                         )
                     score_now = round(msg[-1] / float(speed) / 50)
                     # print(score_now)

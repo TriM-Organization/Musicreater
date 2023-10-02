@@ -12,17 +12,16 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 import os
-
 from typing import Literal
 
 from ...exceptions import CommandFormatError
 from ...main import MidiConvert
 from ..main import ConvertConfig
 from ..mcstructure import (
-    commands_to_structure,
-    commands_to_redstone_delay_structure,
-    COMPABILITY_VERSION_119,
     COMPABILITY_VERSION_117,
+    COMPABILITY_VERSION_119,
+    commands_to_redstone_delay_structure,
+    commands_to_structure,
 )
 
 

@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from typing import Dict, List, Tuple
-
 """
 存放常量与数值性内容
 """
@@ -18,6 +16,7 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+from typing import Dict, List, Tuple
 
 x = "x"
 """
@@ -368,7 +367,7 @@ PERCUSSION_INSTRUMENT_LIST: List[str] = [
     "fire.ignite",
 ]
 
-INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str]] = {
+INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "note.bass": ("planks",),
     "note.snare": ("sand",),
     "note.hat": ("glass",),

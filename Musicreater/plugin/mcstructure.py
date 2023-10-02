@@ -351,23 +351,26 @@ def commands_to_redstone_delay_structure(
 
     command_actually_length = sum([int(bool(cmd.delay)) for cmd in commands])
 
-    # a = 1
-    # for cmd in commands:
-    #     # print("\r 正在进行处理：",end="")
-    #     if cmd.delay > 2:
-    #         a = 1
-    #     else:
-    #         a += 1
+    a = 1
+    a_max = 0
+    total_cmd = 0
+    for cmd in commands:
+        # print("\r 正在进行处理：",end="")
+        if cmd.delay > 2:
+            a_max = max(a,a_max)
+            total_cmd += (a := 1)
+        else:
+            a += 1
 
     struct = Structure(
         size=(
-            round(delay_length / 2 + command_actually_length)
+            round(delay_length / 2 + total_cmd)
             if extensioon_direction == x
-            else max_multicmd_length,
+            else a_max,
             3,
-            round(delay_length / 2 + command_actually_length)
+            round(delay_length / 2 + total_cmd)
             if extensioon_direction == z
-            else max_multicmd_length,
+            else a_max,
         ),
         fill=Block("minecraft", "air", compability_version=compability_version_),
         compability_version=compability_version_,

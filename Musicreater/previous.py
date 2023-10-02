@@ -18,6 +18,7 @@ Terms & Conditions: License.md in the root directory
 from .exceptions import *
 from .main import MidiConvert, mido
 from .subclass import *
+from .types import ChannelType
 from .utils import *
 
 
@@ -26,6 +27,82 @@ class ObsoleteMidiConvert(MidiConvert):
     我说一句话：
     这些破烂老代码能跑得起来就是谢天谢地，你们还指望我怎么样？这玩意真的不会再维护了，我发誓！
     """
+
+    def to_music_channels(
+        self,
+    ) -> ChannelType:
+        """
+        使用金羿的转换思路，将midi解析并转换为频道信息字典
+
+        Returns
+        -------
+        以频道作为分割的Midi信息字典:
+        Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
+        """
+        if self.midi is None:
+            raise MidiUnboundError(
+                "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
+            )
+
+        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
+        midi_channels: ChannelType = empty_midi_channels()
+        tempo = mido.midifiles.midifiles.DEFAULT_TEMPO
+
+        # 我们来用通道统计音乐信息
+        # 但是是用分轨的思路的
+        for track_no, track in enumerate(self.midi.tracks):
+            microseconds = 0
+            if not track:
+                continue
+
+            note_queue = empty_midi_channels(staff=[])
+
+            for msg in track:
+                if msg.time != 0:
+                    microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
+
+                if msg.is_meta:
+                    if msg.type == "set_tempo":
+                        tempo = msg.tempo
+                else:
+                    try:
+                        if not track_no in midi_channels[msg.channel].keys():
+                            midi_channels[msg.channel][track_no] = []
+                    except AttributeError as E:
+                        print(msg, E)
+
+                    if msg.type == "program_change":
+                        midi_channels[msg.channel][track_no].append(
+                            ("PgmC", msg.program, microseconds)
+                        )
+
+                    elif msg.type == "note_on" and msg.velocity != 0:
+                        midi_channels[msg.channel][track_no].append(
+                            ("NoteS", msg.note, msg.velocity, microseconds)
+                        )
+
+                    elif (msg.type == "note_on" and msg.velocity == 0) or (
+                        msg.type == "note_off"
+                    ):
+                        midi_channels[msg.channel][track_no].append(
+                            ("NoteE", msg.note, microseconds)
+                        )
+
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+        del tempo, self.channels
+        self.channels = midi_channels
+        # [print([print(no,tno,sum([True if i[0] == 'NoteS' else False for i in track])) for tno,track in cna.items()]) if cna else False for no,cna in midi_channels.items()]
+        return midi_channels
 
     def to_command_list_method1(
         self,
@@ -76,9 +153,9 @@ class ObsoleteMidiConvert(MidiConvert):
                         )
                         maxscore = max(maxscore, nowscore)
                         if msg.channel == 9:
-                            soundID, _X = self.perc_inst_to_soundID_withX(instrumentID)
+                            soundID, _X = perc_inst_to_soundID_withX(instrumentID)
                         else:
-                            soundID, _X = self.inst_to_souldID_withX(instrumentID)
+                            soundID, _X = inst_to_souldID_withX(instrumentID)
 
                         singleTrack.append(
                             "execute @a[scores={"
@@ -135,7 +212,7 @@ class ObsoleteMidiConvert(MidiConvert):
                             (ticks * tempo) / ((self.midi.ticks_per_beat * float(speed)) * 50000)  # type: ignore
                         )
                         maxscore = max(maxscore, nowscore)
-                        soundID, _X = self.inst_to_souldID_withX(instrumentID)
+                        soundID, _X = inst_to_souldID_withX(instrumentID)
                         singleTrack.append(
                             "execute @a[scores={"
                             + str(scoreboardname)
@@ -152,7 +229,7 @@ class ObsoleteMidiConvert(MidiConvert):
 
     # 原本这个算法的转换效果应该和上面的算法相似的
     def _toCmdList_m2(
-        self: MidiConvert,
+        self,
         scoreboard_name: str = "mscplay",
         MaxVolume: float = 1.0,
         speed: float = 1.0,
@@ -189,16 +266,16 @@ class ObsoleteMidiConvert(MidiConvert):
 
             nowTrack = []
 
-            for track_no, track in self.channels[i].items():
+            for track_no, track in self.channels[i].items():  # type: ignore
                 for msg in track:
                     if msg[0] == "PgmC":
                         InstID = msg[1]
 
                     elif msg[0] == "NoteS":
                         soundID, _X = (
-                            self.perc_inst_to_soundID_withX(msg[1])
+                            perc_inst_to_soundID_withX(msg[1])
                             if SpecialBits
-                            else self.inst_to_souldID_withX(InstID)
+                            else inst_to_souldID_withX(InstID)
                         )
                         score_now = round(msg[-1] / float(speed) / 50)
                         maxScore = max(maxScore, score_now)
@@ -221,7 +298,7 @@ class ObsoleteMidiConvert(MidiConvert):
         return tracks, cmdAmount, maxScore
 
     def _toCmdList_withDelay_m1(
-        self: MidiConvert,
+        self,
         MaxVolume: float = 1.0,
         speed: float = 1.0,
         player: str = "@a",
@@ -262,7 +339,7 @@ class ObsoleteMidiConvert(MidiConvert):
                             (ticks * tempo)
                             / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                         )
-                        soundID, _X = self.inst_to_souldID_withX(instrumentID)
+                        soundID, _X = inst_to_souldID_withX(instrumentID)
                         try:
                             tracks[now_tick].append(
                                 self.execute_cmd_head.format(player)
@@ -297,7 +374,7 @@ class ObsoleteMidiConvert(MidiConvert):
         return [results, max(all_ticks)]
 
     def _toCmdList_withDelay_m2(
-        self: MidiConvert,
+        self,
         MaxVolume: float = 1.0,
         speed: float = 1.0,
         player: str = "@a",
@@ -329,16 +406,16 @@ class ObsoleteMidiConvert(MidiConvert):
             else:
                 SpecialBits = False
 
-            for track_no, track in self.channels[i].items():
+            for track_no, track in self.channels[i].items():  # type: ignore
                 for msg in track:
                     if msg[0] == "PgmC":
                         InstID = msg[1]
 
                     elif msg[0] == "NoteS":
                         soundID, _X = (
-                            self.perc_inst_to_soundID_withX(msg[1])
+                            perc_inst_to_soundID_withX(msg[1])
                             if SpecialBits
-                            else self.inst_to_souldID_withX(InstID)
+                            else inst_to_souldID_withX(InstID)
                         )
                         score_now = round(msg[-1] / float(speed) / 50)
 

@@ -24,7 +24,7 @@ class MSCTBaseException(Exception):
         """音·创库版本的所有错误均继承于此"""
         super().__init__(*args)
 
-    def miao(
+    def meow(
         self,
     ):
         for i in self.args:
@@ -66,12 +66,15 @@ class CommandFormatError(RuntimeError):
         super().__init__("指令格式不匹配", *args)
 
 
-class CrossNoteError(MidiFormatException):
-    """同通道下同音符交叉出现所产生的错误"""
+# class CrossNoteError(MidiFormatException):
+#     """同通道下同音符交叉出现所产生的错误"""
 
-    def __init__(self, *args):
-        """同通道下同音符交叉出现所产生的错误"""
-        super().__init__("同通道下同音符交叉", *args)
+#     def __init__(self, *args):
+#         """同通道下同音符交叉出现所产生的错误"""
+#         super().__init__("同通道下同音符交叉", *args)
+# 这TM是什么错误？
+# 我什么时候写的这玩意？
+# 我哪知道这说的是啥？
 
 
 class NotDefineTempoError(MidiFormatException):
@@ -98,7 +101,15 @@ class NotDefineProgramError(MidiFormatException):
         super().__init__("未指定演奏乐器", *args)
 
 
-class ZeroSpeedError(MidiFormatException):
+class NoteOnOffMismatchError(MidiFormatException):
+    """音符开音和停止不匹配的错误"""
+
+    def __init__(self, *args):
+        """音符开音和停止不匹配的错误"""
+        super().__init__("音符不匹配", *args)
+
+
+class ZeroSpeedError(ZeroDivisionError):
     """以0作为播放速度的错误"""
 
     def __init__(self, *args):

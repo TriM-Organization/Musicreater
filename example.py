@@ -20,12 +20,12 @@ import os
 
 import Musicreater
 from Musicreater.plugin import ConvertConfig
-from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
 from Musicreater.plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
     to_addon_pack_in_score,
 )
+from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
 
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")
@@ -41,13 +41,13 @@ playerFormat = int(input(f"请选择播放方式[红石(2) 或 计分板(1) 或 
 
 
 # 真假字符串判断
-def bool_str(sth: str) -> bool:
+def bool_str(sth: str):
     try:
         return bool(float(sth))
-    except ValueError:
-        if str(sth).lower() == "true":
+    except:
+        if str(sth).lower() in ("true", "真", "是", "y", "t"):
             return True
-        elif str(sth).lower() == "false":
+        elif str(sth).lower() in ("false", "假", "否", "f", "n"):
             return False
         else:
             raise ValueError("布尔字符串啊？")

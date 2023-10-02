@@ -17,14 +17,13 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 import random
-from typing import Dict, List, Tuple, Union
 
 from .constants import INSTRUMENT_BLOCKS_TABLE
 from .exceptions import *
 from .main import MidiConvert
 from .subclass import *
 from .utils import *
-
+from .types import Tuple, List, Dict
 
 class FutureMidiConvertRSNB(MidiConvert):
     """

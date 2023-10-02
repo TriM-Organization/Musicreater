@@ -17,11 +17,11 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
+import datetime
 import os
 import uuid
 import zipfile
-import datetime
-from typing import List, Union, Literal
+from typing import List, Literal, Union
 
 
 def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
