@@ -12,13 +12,13 @@ Copyright © 2023 all the developers of Musicreater
 Terms & Conditions: License.md in the root directory
 """
 
-# 睿穆组织 开发交流群 861684859
+# 睿乐组织 开发交流群 861684859
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.6.0"
-__vername__ = "切换ChannelType类型为NoteChannelType类型"
+__version__ = "1.6.1"
+__vername__ = "更新乐器对照表"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

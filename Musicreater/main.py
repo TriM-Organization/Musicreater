@@ -550,7 +550,11 @@ class MidiConvert:
                             )
                         else:
                             if ignore_mismatch_error:
-                                print("[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(msg))
+                                print(
+                                    "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                        msg
+                                    )
+                                )
                             else:
                                 raise NoteOnOffMismatchError(
                                     "当前的MIDI很可能有损坏之嫌……", msg, "无法在上文中找到与之匹配的音符开音消息。"
@@ -601,7 +605,7 @@ class MidiConvert:
         """
 
         if speed == 0:
-            raise ZeroSpeedError("播放速度仅可为正实数")
+            raise ZeroSpeedError("播放速度仅可为(0,1]范围内的正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
         command_channels = []
@@ -669,7 +673,7 @@ class MidiConvert:
         """
 
         if speed == 0:
-            raise ZeroSpeedError("播放速度仅可为正实数")
+            raise ZeroSpeedError("播放速度仅可为(0,1]范围内的正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
         notes_list: List[SingleNote] = []
@@ -679,6 +683,7 @@ class MidiConvert:
             notes_list.extend(channel)
 
         notes_list.sort(key=lambda a: a.start_time)
+
         self.music_command_list = []
         multi = max_multi = 0
         delaytime_previous = 0

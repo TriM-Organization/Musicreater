@@ -12,7 +12,7 @@ Copyright © 2023 all the developers of Musicreater
 Terms & Conditions: License.md in the root directory
 """
 
-# 睿穆组织 开发交流群 861684859
+# 睿乐组织 开发交流群 861684859
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
@@ -184,23 +184,23 @@ PITCHED_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
     4: ("note.pling", 6),
     5: ("note.pling", 6),
     6: ("note.guitar", 7),
-    7: ("note.harp", 6),
-    8: ("note.bell", 4),  # 打击乐器无音域
-    9: ("note.bell", 4),
+    7: ("note.guitar", 7),
+    8: ("note.iron_xylophone", 8),
+    9: ("note.bell", 4),  # 打击乐器无音域
     10: ("note.iron_xylophone", 6),
     11: ("note.iron_xylophone", 6),
     12: ("note.iron_xylophone", 6),
     13: ("note.xylophone", 4),
     14: ("note.chime", 4),
-    15: ("note.harp", 6),
-    16: ("note.bass", 8),
-    17: ("note.harp", 6),
+    15: ("note.banjo", 6),
+    16: ("note.xylophone", 6),
+    17: ("note.iron_xylophone", 6),
     18: ("note.flute", 5),
-    19: ("note.harp", 6),
-    20: ("note.harp", 6),
+    19: ("note.flute", 5),
+    20: ("note.flute", 5),
     21: ("note.flute", 5),
     22: ("note.flute", 5),
-    23: ("note.guitar", 7),
+    23: ("note.flute", 5),
     24: ("note.guitar", 7),
     25: ("note.guitar", 7),
     26: ("note.guitar", 7),
@@ -220,19 +220,19 @@ PITCHED_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
     40: ("note.flute", 5),
     41: ("note.flute", 5),
     42: ("note.flute", 5),
-    43: ("note.flute", 5),
-    44: ("note.iron_xylophone", 6),
-    45: ("note.guitar", 7),
+    43: ("note.bass", 8),
+    44: ("note.flute", 5),
+    45: ("note.iron_xylophone", 6),
     46: ("note.harp", 6),
-    47: ("note.bd", 7),
-    48: ("note.guitar", 7),
-    49: ("note.guitar", 7),
-    50: ("note.bit", 6),
-    51: ("note.bit", 6),
-    52: ("note.flute", 5),
-    53: ("note.flute", 5),
-    54: ("note.flute", 5),
-    55: ("note.flute", 5),
+    47: ("note.snare", 7),
+    48: ("note.flute", 5),
+    49: ("note.flute", 5),
+    50: ("note.flute", 5),
+    51: ("note.flute", 5),
+    52: ("note.didgeridoo", 5),
+    53: ("note.flute", 5),  # 合唱“啊”音
+    54: ("note.flute", 5),  # 人声“嘟”音
+    55: ("mob.zombie.wood", 7),  # 合成人声
     56: ("note.flute", 5),
     57: ("note.flute", 5),
     58: ("note.flute", 5),
@@ -253,73 +253,73 @@ PITCHED_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
     73: ("note.flute", 5),
     74: ("note.flute", 5),
     75: ("note.flute", 5),
-    76: ("note.harp", 6),
-    77: ("note.harp", 6),
+    76: ("note.iron_xylophone", 6),
+    77: ("note.iron_xylophone", 6),
     78: ("note.flute", 5),
-    79: ("note.harp", 6),
+    79: ("note.flute", 5),
     80: ("note.bit", 6),
     81: ("note.bit", 6),
-    82: ("note.bit", 6),
-    83: ("note.bit", 6),
-    84: ("note.bit", 6),
-    85: ("note.bit", 6),
-    86: ("note.bit", 6),
-    87: ("note.bit", 6),
+    82: ("note.flute", 5),
+    83: ("note.flute", 5),
+    84: ("note.guitar", 7),
+    85: ("note.flute", 5),
+    86: ("note.bass", 8),
+    87: ("note.bass", 8),
     88: ("note.bit", 6),
-    89: ("note.bit", 6),
+    89: ("note.flute", 5),
     90: ("note.bit", 6),
-    91: ("note.bit", 6),
-    92: ("note.bit", 6),
-    93: ("note.bit", 6),
-    94: ("note.bit", 6),
+    91: ("note.flute", 5),
+    92: ("note.bell", 4),
+    93: ("note.guitar", 7),
+    94: ("note.flute", 5),
     95: ("note.bit", 6),
-    96: ("note.bit", 6),
-    97: ("note.bit", 6),
-    98: ("note.bit", 6),
-    99: ("note.bit", 6),
-    100: ("note.bit", 6),
-    101: ("note.bit", 6),
-    102: ("note.bit", 6),
-    103: ("note.bit", 6),
-    104: ("note.harp", 6),
+    96: ("note.bit", 6),  # 雨声
+    97: ("note.flute", 5),
+    98: ("note.bell", 4),
+    99: ("note.bit", 6),  # 大气
+    100: ("note.bit", 6),  # 明亮
+    101: ("note.bit", 6),  # 鬼怪
+    102: ("note.bit", 6),  # 回声
+    103: ("note.bit", 6),  # 科幻
+    104: ("note.iron_xylophone", 6),
     105: ("note.banjo", 6),
     106: ("note.harp", 6),
     107: ("note.harp", 6),
     108: ("note.bell", 4),
     109: ("note.flute", 5),
     110: ("note.flute", 5),
-    111: ("note.guitar", 7),
+    111: ("note.flute", 5),
     112: ("note.bell", 4),
-    113: ("note.bell", 4),
+    113: ("note.xylophone", 4),
     114: ("note.flute", 5),
-    115: ("note.cow_bell", 5),
-    116: ("note.bd", 7),  # 打击乐器无音域
-    117: ("note.bass", 8),
-    118: ("note.bit", 6),
+    115: ("note.hat", 7),  # 打击乐器无音域
+    116: ("note.snare", 7),  # 打击乐器无音域
+    117: ("note.snare", 7),  # 打击乐器无音域
+    118: ("note.bd", 7),  # 打击乐器无音域
     119: ("firework.blast", 7),  # 打击乐器无音域
-    120: ("note.guitar", 7),
-    121: ("note.harp", 6),
-    122: ("note.harp", 6),
-    123: ("note.harp", 6),
-    124: ("note.harp", 6),
-    125: ("note.hat", 7),  # 打击乐器无音域
+    120: ("note.guitar", 7),  # 吉他还把杂音
+    121: ("note.harp", 6),  # 呼吸声
+    122: ("note.harp", 6),  # 海浪声
+    123: ("note.harp", 6),  # 鸟鸣
+    124: ("note.bit", 6),
+    125: ("note.hat", 7),  # 直升机
     126: ("firework.twinkle", 7),  # 打击乐器无音域
-    127: ("note.snare", 7),  # 打击乐器无音域
+    127: ("mob.zombie.wood", 7),  # 打击乐器无音域
 }
 
 PERCUSSION_INSTRUMENT_TABLE: Dict[int, Tuple[str, int]] = {
-    34: ("note.bd", 7),
+    34: ("note.hat", 7),
     35: ("note.bd", 7),
-    36: ("note.hat", 7),
+    36: ("note.bd", 7),
     37: ("note.snare", 7),
     38: ("note.snare", 7),
     39: ("fire.ignite", 7),
-    40: ("note.hat", 7),
-    41: ("note.snare", 7),
+    40: ("note.snare", 7),
+    41: ("note.hat", 7),
     42: ("note.hat", 7),
-    43: ("note.snare", 7),
-    44: ("note.snare", 7),
-    45: ("note.bell", 4),
+    43: ("firework.blast", 7),
+    44: ("note.hat", 7),
+    45: ("note.snare", 4),
     46: ("note.snare", 7),
     47: ("note.snare", 7),
     48: ("note.bell", 4),
@@ -365,6 +365,7 @@ PERCUSSION_INSTRUMENT_LIST: List[str] = [
     "firework.blast",
     "firework.twinkle",
     "fire.ignite",
+    "mob.zombie.wood",
 ]
 
 INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
@@ -390,6 +391,7 @@ INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "firework.blast": ("sandstone",),
     "firework.twinkle": ("red_sandstone",),
     "fire.ignite": ("concrete_powder",),
+    "mob.zombie.wood": ("sand",),
 }
 
 

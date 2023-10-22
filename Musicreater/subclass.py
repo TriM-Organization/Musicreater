@@ -12,7 +12,7 @@ Copyright © 2023 all the developers of Musicreater
 Terms & Conditions: License.md in the root directory
 """
 
-# 睿穆组织 开发交流群 861684859
+# 睿乐组织 开发交流群 861684859
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
@@ -150,7 +150,13 @@ class SingleNote:
             return False
         return self.__str__() == other.__str__()
 
-    def to_command(self, volume_percentage) -> str:
+    def to_command(self, volume_percentage: float = 1) -> str:
+        """
+        将音符转为播放的指令
+        :param volume_percentage:int 音量占比(0,1]
+
+        :return str指令
+        """
         self.mc_sound_ID, _X = (
             perc_inst_to_soundID_withX(self.inst)
             if self.percussive
