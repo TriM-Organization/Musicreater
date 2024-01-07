@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.6.1"
-__vername__ = "更新乐器对照表"
+__version__ = "1.6.2"
+__vername__ = "新的转换算法测试，更好的声音适配"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

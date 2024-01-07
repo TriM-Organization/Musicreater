@@ -21,7 +21,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from .constants import PERCUSSION_INSTRUMENT_LIST
-from .utils import inst_to_souldID_withX, perc_inst_to_soundID_withX
+from .utils import inst_to_souldID_withX, perc_inst_to_soundID_withX, volume2distance
 
 
 @dataclass(init=False)
@@ -78,8 +78,6 @@ class SingleNote:
         """音符持续时间 ms"""
         self.track_no: int = track_number
         """音符所处的音轨"""
-        self.track_no: int = track_number
-        """音符所处的音轨"""
 
         self.percussive = (
             (is_percussion in PERCUSSION_INSTRUMENT_LIST)
@@ -89,31 +87,48 @@ class SingleNote:
         """是否为打击乐器"""
 
     @property
-    def inst(self):
+    def inst(self) -> int:
         """乐器编号"""
         return self.instrument
 
     @inst.setter
-    def inst(self, inst_):
+    def inst(self, inst_: int):
         self.instrument = inst_
 
     @property
-    def pitch(self):
+    def pitch(self) -> int:
         """音符编号"""
         return self.note
 
-    def __str__(self):
-        return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {},)".format(
+    @property
+    def get_mc_pitch(self) -> float:
+        self.mc_sound_ID, _X = (
+            perc_inst_to_soundID_withX(self.inst)
+            if self.percussive
+            else inst_to_souldID_withX(self.inst)
+        )
+        return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+
+    def __str__(self, is_track: bool = False):
+        return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {}{})".format(
             "Percussive" if self.percussive else "",
             self.inst,
             "" if self.percussive else "Pitch = {}, ".format(self.pitch),
             self.start_time,
             self.duration,
+            ", Track = {}".format(self.track_no) if is_track else "",
         )
 
     def __tuple__(self):
         return (
-            (self.percussive, self.inst, self.velocity, self.start_time, self.duration)
+            (
+                self.percussive,
+                self.inst,
+                self.velocity,
+                self.start_time,
+                self.duration,
+                self.track_no,
+            )
             if self.percussive
             else (
                 self.percussive,
@@ -122,6 +137,7 @@ class SingleNote:
                 self.velocity,
                 self.start_time,
                 self.duration,
+                self.track_no,
             )
         )
 
@@ -133,6 +149,7 @@ class SingleNote:
                 "Velocity": self.velocity,
                 "StartTime": self.start_time,
                 "Duration": self.duration,
+                "Track": self.track_no,
             }
             if self.percussive
             else {
@@ -142,6 +159,7 @@ class SingleNote:
                 "Velocity": self.velocity,
                 "StartTime": self.start_time,
                 "Duration": self.duration,
+                "Track": self.track_no,
             }
         )
 
@@ -165,14 +183,13 @@ class SingleNote:
 
         # delaytime_now = round(self.start_time / float(speed) / 50)
         self.mc_pitch = "" if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
-        self.mc_distance_volume = 128 / volume_percentage / self.velocity + (
-            1 if self.percussive else self.velocity / 32
-        )
+
+        self.mc_distance_volume = volume2distance(self.velocity * volume_percentage)
 
         return "playsound {} @s ^ ^ ^{} {} {}".format(
             self.mc_sound_ID,
             self.mc_distance_volume,
-            self.velocity / 128,
+            volume_percentage,
             self.mc_pitch,
         )
 

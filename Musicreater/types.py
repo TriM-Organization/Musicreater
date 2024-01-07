@@ -58,7 +58,7 @@ ChannelType = Dict[
     ],
 ]
 """
-以字典所标记的频道信息类型（即将弃用）
+以字典所标记的频道信息类型（已弃用）
 
 Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
 """

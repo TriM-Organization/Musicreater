@@ -631,7 +631,9 @@ class MidiConvert:
                             .replace("(", r"{")
                             .replace(")", r"}")
                         )
-                        + note.to_command(max_volume),
+                        + note.to_command(
+                            (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                        ),
                         annotation="在{}播放{}%的{}音".format(
                             mctick2timestr(score_now),
                             max_volume * 100,
@@ -698,7 +700,9 @@ class MidiConvert:
             self.music_command_list.append(
                 SingleCommand(
                     self.execute_cmd_head.format(player_selector)
-                    + note.to_command(max_volume),
+                    + note.to_command(
+                        (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                    ),
                     tick_delay=tickdelay,
                     annotation="在{}播放{}%的{}音".format(
                         mctick2timestr(delaytime_now),

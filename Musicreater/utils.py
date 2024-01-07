@@ -15,6 +15,8 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+import math
+
 from .constants import PERCUSSION_INSTRUMENT_TABLE, PITCHED_INSTRUMENT_TABLE
 from typing import Any, Dict, Tuple
 
@@ -89,3 +91,29 @@ def perc_inst_to_soundID_withX(instrumentID: int) -> Tuple[str, int]:
 
     # 明明已经走了
     # 凭什么还要在我心里留下缠绵缱绻
+
+
+def volume2distance(vol: float) -> float:
+    """
+    midi力度值拟合成的距离函数
+
+    Parameters
+    ----------
+    vol: int
+        midi音符力度值
+
+    Returns
+    -------
+    float播放中心到玩家的距离
+    """
+    return (
+        -8.081720684086314
+        * math.log(
+            vol + 14.579508825070013,
+        )
+        + 37.65806375944386
+        if vol < 60.64
+        else 0.2721359356095803 * ((vol + 2592.272889454798) ** 1.358571233418649)
+        + -6.313841334963396 * (vol + 2592.272889454798)
+        + 4558.496367823575
+    )
