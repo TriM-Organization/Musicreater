@@ -77,6 +77,15 @@ class MidiConvert:
     midi: VoidMido
     """MidiFile对象"""
 
+    pitched_note_reference_table: Dict[int, Tuple[str, int]]
+    """乐音乐器Midi-MC对照表"""
+
+    percussion_note_referrence_table: Dict[int, Tuple[str, int]]
+    """打击乐器Midi-MC对照表"""
+
+    volume_processing_function: Callable[[float], float]
+    """音量处理函数"""
+
     midi_music_name: str
     """Midi乐曲名"""
 
@@ -103,6 +112,13 @@ class MidiConvert:
         midi_obj: VoidMido,
         midi_name: str,
         enable_old_exe_format: bool = False,
+        pitched_note_rtable: Dict[
+            int, Tuple[str, int]
+        ] = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_rtable: Dict[
+            int, Tuple[str, int]
+        ] = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_function: Callable[[float], float] = natural_curve,
     ):
         """
         简单的midi转换类，将midi对象转换为我的世界结构或者包
@@ -115,6 +131,10 @@ class MidiConvert:
             此音乐之名
         enable_old_exe_format: bool
             是否启用旧版(≤1.19)指令格式，默认为否
+        pitched_note_rtable: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_rtable: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
         """
 
         self.midi: VoidMido = midi_obj
@@ -129,6 +149,10 @@ class MidiConvert:
             else "execute as {} at @s positioned ~ ~ ~ run "
         )
 
+        self.pitched_note_reference_table = pitched_note_rtable
+        self.percussion_note_referrence_table = percussion_note_rtable
+        self.volume_processing_function = vol_processing_function
+
         self.progress_bar_command = self.music_command_list = []
         self.channels = {}
         self.music_tick_num = 0
@@ -138,6 +162,13 @@ class MidiConvert:
         cls,
         midi_file_path: str,
         old_exe_format: bool = False,
+        pitched_note_table: Dict[
+            int, Tuple[str, int]
+        ] = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_table: Dict[
+            int, Tuple[str, int]
+        ] = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_func: Callable[[float], float] = natural_curve,
     ):
         """
         直接输入文件地址，将midi文件读入
@@ -148,6 +179,10 @@ class MidiConvert:
             midi文件地址
         enable_old_exe_format: bool
             是否启用旧版(≤1.19)指令格式，默认为否
+        pitched_note_table: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_table: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
         """
 
         midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(
@@ -160,6 +195,9 @@ class MidiConvert:
                 mido.MidiFile(midi_file_path, clip=True),
                 midi_music_name,
                 old_exe_format,
+                pitched_note_table,
+                percussion_note_table,
+                vol_processing_func,
             )
         except (ValueError, TypeError) as E:
             raise MidiDestroyedError(f"文件{midi_file_path}损坏：{E}")
@@ -447,6 +485,7 @@ class MidiConvert:
 
     def to_music_note_channels(
         self,
+        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         ignore_mismatch_error: bool = True,
     ) -> NoteChannelType:
         """
@@ -465,7 +504,7 @@ class MidiConvert:
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: NoteChannelType = empty_midi_channels(staff=[])
-        tempo = mido.midifiles.midifiles.DEFAULT_TEMPO
+        tempo = default_tempo_value
 
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
@@ -624,6 +663,20 @@ class MidiConvert:
                 score_now = round(note.start_time / float(speed) / 50)
                 max_score = max(max_score, score_now)
 
+                (
+                    mc_sound_ID,
+                    mc_distance_volume,
+                    volume_percentage,
+                    mc_pitch,
+                ) = note_to_command_parameters(
+                    note,
+                    self.percussion_note_referrence_table
+                    if note.percussive
+                    else self.pitched_note_reference_table,
+                    (max_volume) if note.track_no == 0 else (max_volume * 0.9),
+                    self.volume_processing_function,
+                )
+
                 this_channel.append(
                     SingleCommand(
                         self.execute_cmd_head.format(
@@ -631,13 +684,13 @@ class MidiConvert:
                             .replace("(", r"{")
                             .replace(")", r"}")
                         )
-                        + note.to_command(
-                            (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                        + r"playsound {} @s ^ ^ ^{} {} {}".format(
+                            mc_sound_ID, mc_distance_volume, volume_percentage, mc_pitch
                         ),
                         annotation="在{}播放{}%的{}音".format(
                             mctick2timestr(score_now),
                             max_volume * 100,
-                            "{}:{}".format(note.mc_sound_ID, note.mc_pitch),
+                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                         ),
                     ),
                 )
@@ -697,17 +750,35 @@ class MidiConvert:
             else:
                 max_multi = max(max_multi, multi)
                 multi = 0
+
+            (
+                mc_sound_ID,
+                mc_distance_volume,
+                volume_percentage,
+                mc_pitch,
+            ) = note_to_command_parameters(
+                note,
+                self.percussion_note_referrence_table
+                if note.percussive
+                else self.pitched_note_reference_table,
+                (max_volume) if note.track_no == 0 else (max_volume * 0.9),
+                self.volume_processing_function,
+            )
+
             self.music_command_list.append(
                 SingleCommand(
                     self.execute_cmd_head.format(player_selector)
-                    + note.to_command(
-                        (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                    + r"playsound {} @s ^ ^ ^{} {} {}".format(
+                        mc_sound_ID,
+                        mc_distance_volume,
+                        volume_percentage,
+                        mc_pitch,
                     ),
                     tick_delay=tickdelay,
                     annotation="在{}播放{}%的{}音".format(
                         mctick2timestr(delaytime_now),
                         max_volume * 100,
-                        "{}:{}".format(note.mc_sound_ID, note.mc_pitch),
+                        "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                     ),
                 )
             )

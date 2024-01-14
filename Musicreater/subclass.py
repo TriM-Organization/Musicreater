@@ -18,10 +18,9 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Any
 
-from .constants import PERCUSSION_INSTRUMENT_LIST
-from .utils import inst_to_souldID_withX, perc_inst_to_soundID_withX, volume2distance
+from .constants import MC_PERCUSSION_INSTRUMENT_LIST
 
 
 @dataclass(init=False)
@@ -49,6 +48,9 @@ class SingleNote:
     percussive: bool
     """是否为打击乐器"""
 
+    extra_info: Any
+    """你觉得放什么好？"""
+
     def __init__(
         self,
         instrument: int,
@@ -58,6 +60,7 @@ class SingleNote:
         lastime: int,
         track_number: int = 0,
         is_percussion: Optional[bool] = None,
+        extra_information: Any = None,
     ):
         """用于存储单个音符的类
         :param instrument 乐器编号
@@ -80,11 +83,13 @@ class SingleNote:
         """音符所处的音轨"""
 
         self.percussive = (
-            (is_percussion in PERCUSSION_INSTRUMENT_LIST)
+            (is_percussion in MC_PERCUSSION_INSTRUMENT_LIST)
             if (is_percussion is None)
             else is_percussion
         )
         """是否为打击乐器"""
+
+        self.extra_info = extra_information
 
     @property
     def inst(self) -> int:
@@ -100,14 +105,14 @@ class SingleNote:
         """音符编号"""
         return self.note
 
-    @property
-    def get_mc_pitch(self) -> float:
-        self.mc_sound_ID, _X = (
-            perc_inst_to_soundID_withX(self.inst)
-            if self.percussive
-            else inst_to_souldID_withX(self.inst)
-        )
-        return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+    # @property
+    # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
+    #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
+    #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+
+    def set_info(self, sth: Any):
+        """设置附加信息"""
+        self.extra_info = sth
 
     def __str__(self, is_track: bool = False):
         return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {}{})".format(
@@ -167,31 +172,6 @@ class SingleNote:
         if not isinstance(other, self.__class__):
             return False
         return self.__str__() == other.__str__()
-
-    def to_command(self, volume_percentage: float = 1) -> str:
-        """
-        将音符转为播放的指令
-        :param volume_percentage:int 音量占比(0,1]
-
-        :return str指令
-        """
-        self.mc_sound_ID, _X = (
-            perc_inst_to_soundID_withX(self.inst)
-            if self.percussive
-            else inst_to_souldID_withX(self.inst)
-        )
-
-        # delaytime_now = round(self.start_time / float(speed) / 50)
-        self.mc_pitch = "" if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
-
-        self.mc_distance_volume = volume2distance(self.velocity * volume_percentage)
-
-        return "playsound {} @s ^ ^ ^{} {} {}".format(
-            self.mc_sound_ID,
-            self.mc_distance_volume,
-            volume_percentage,
-            self.mc_pitch,
-        )
 
 
 @dataclass(init=False)
@@ -304,7 +284,7 @@ class SingleNoteBox:
         self.annotation_text = annotation
         """音符注释"""
         if percussion is None:
-            self.is_percussion = percussion in PERCUSSION_INSTRUMENT_LIST
+            self.is_percussion = percussion in MC_PERCUSSION_INSTRUMENT_LIST
         else:
             self.is_percussion = percussion
 

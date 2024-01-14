@@ -16,9 +16,12 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 import math
+import random
 
-from .constants import PERCUSSION_INSTRUMENT_TABLE, PITCHED_INSTRUMENT_TABLE
-from typing import Any, Dict, Tuple
+from .constants import MM_INSTRUMENT_DEVIATION_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
+from .subclass import SingleNote
+
+from typing import Any, Dict, Tuple, Optional, Callable, Literal, Union
 
 
 def mctick2timestr(mc_tick: int) -> str:
@@ -42,8 +45,11 @@ def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, A
     )
 
 
-def inst_to_souldID_withX(
+def inst_to_sould_with_deviation(
     instrumentID: int,
+    reference_table: Dict[int, Tuple[str, int]],
+    default_instrument: str = "note.flute",
+    default_deviation: Optional[int] = 5,
 ) -> Tuple[str, int]:
     """
     返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
@@ -60,40 +66,30 @@ def inst_to_souldID_withX(
     ----------
     instrumentID: int
         midi的乐器ID
+    reference_table: Dict[int, Tuple[str, int]]
+        转换乐器参照表
 
     Returns
     -------
     tuple(str我的世界乐器名, int转换算法中的X)
     """
-    try:
-        return PITCHED_INSTRUMENT_TABLE[instrumentID]
-    except KeyError:
-        return "note.flute", 5
-
-
-def perc_inst_to_soundID_withX(instrumentID: int) -> Tuple[str, int]:
-    """
-    对于Midi第10通道所对应的打击乐器，返回我的世界乐器名
-
-    Parameters
-    ----------
-    instrumentID: int
-        midi的乐器ID
-
-    Returns
-    -------
-    tuple(str我的世界乐器名, int转换算法中的X)
-    """
-    try:
-        return PERCUSSION_INSTRUMENT_TABLE[instrumentID]
-    except KeyError:
-        return "note.bd", 7
+    return reference_table.get(
+        instrumentID,
+        (
+            default_instrument,
+            default_deviation
+            if default_deviation
+            else MM_INSTRUMENT_DEVIATION_TABLE.get(default_instrument, -1),
+        ),
+    )
 
     # 明明已经走了
     # 凭什么还要在我心里留下缠绵缱绻
 
 
-def volume2distance(vol: float) -> float:
+def natural_curve(
+    vol: float,
+) -> float:
     """
     midi力度值拟合成的距离函数
 
@@ -117,3 +113,97 @@ def volume2distance(vol: float) -> float:
         + -6.313841334963396 * (vol + 2592.272889454798)
         + 4558.496367823575
     )
+
+
+def straight_line(vol: float) -> float:
+    """
+    midi力度值拟合成的距离函数
+
+    Parameters
+    ----------
+    vol: int
+        midi音符力度值
+
+    Returns
+    -------
+    float播放中心到玩家的距离
+    """
+    return vol / -8 + 16
+
+
+def note_to_command_parameters(
+    note_: SingleNote,
+    reference_table: Dict[int, Tuple[str, int]],
+    volume_percentage: float = 1,
+    volume_processing_method: Callable[[float], float] = natural_curve,
+) -> Tuple[str, float, float, Union[float, Literal[None]],]:
+    """
+    将音符转为播放的指令
+    :param note_:int 音符对象
+    :param reference_table:Dict[int, Tuple[str, int]] 转换对照表
+    :param volume_percentage:int 音量占比(0,1]
+    :param volume_proccessing_method:Callable[[float], float]: 音量处理函数
+
+    :return str[我的世界音符ID], float[播放距离], float[指令音量参数], float[指令音调参数]
+    """
+    mc_sound_ID, deviation = inst_to_sould_with_deviation(
+        note_.inst,
+        reference_table,
+        "note.bd" if note_.percussive else "note.flute",
+    )
+
+    # delaytime_now = round(self.start_time / float(speed) / 50)
+    mc_pitch = None if note_.percussive else 2 ** ((note_.note - 60 - deviation) / 12)
+
+    mc_distance_volume = volume_processing_method(note_.velocity * volume_percentage)
+
+    return mc_sound_ID, mc_distance_volume, volume_percentage, mc_pitch
+
+
+def from_single_note(
+    note_: SingleNote, random_select: bool = False, default_block: str = "air"
+):
+    """
+    将我的世界乐器名改作音符盒所需的对应方块名称
+
+    Parameters
+    ----------
+    note_: SingleNote
+        音符类
+    random_select: bool
+        是否随机选取对应方块
+    default_block: str
+        查表查不到怎么办？默认一个！
+
+    Returns
+    -------
+    str方块名称
+    """
+    pass
+    # return SingleNoteBox()  # TO-DO
+
+
+@staticmethod
+def soundID_to_blockID(
+    sound_id: str, random_select: bool = False, default_block: str = "air"
+) -> str:
+    """
+    将我的世界乐器名改作音符盒所需的对应方块名称
+
+    Parameters
+    ----------
+    sound_id: str
+        将我的世界乐器名
+    random_select: bool
+        是否随机选取对应方块
+    default_block: str
+        查表查不到怎么办？默认一个！
+
+    Returns
+    -------
+    str方块名称
+    """
+    if random_select:
+        return random.choice(MC_INSTRUMENT_BLOCKS_TABLE.get(sound_id, (default_block,)))
+    else:
+        return MC_INSTRUMENT_BLOCKS_TABLE.get(sound_id, (default_block,))[0]
