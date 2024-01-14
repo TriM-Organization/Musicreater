@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.6.2"
-__vername__ = "新的转换算法测试，更好的声音适配"
+__version__ = "1.7.0"
+__vername__ = "更高的自定义化程度"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -31,7 +31,16 @@ __all__ = [
     # 附加类
     "SingleNote",
     "SingleCommand",
+    "SingleNoteBox",
     # "TimeStamp", 未来功能
+
+    # 默认值
+    "DEFAULT_PROGRESSBAR_STYLE",
+    "MM_INSTRUMENT_DEVIATION_TABLE",
+    "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
+    "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_TOUCH_PITCHED_INSTRUMENT_TABLE",
+    "MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE",
 ]
 
 from .main import *
