@@ -19,7 +19,7 @@ Terms & Conditions: License.md in the root directory
 from dataclasses import dataclass
 from typing import Literal, Tuple, Union
 
-from ..constants import DEFAULT_PROGRESSBAR_STYLE
+from ..subclass import DEFAULT_PROGRESSBAR_STYLE, ProgressBarStyle
 
 
 @dataclass(init=False)
@@ -34,8 +34,8 @@ class ConvertConfig:
     speed_multiplier: float
     """速度倍率"""
 
-    progressbar_style: Union[Tuple[str, Tuple[str, str]], Literal[None]]
-    """进度条样式组"""
+    progressbar_style: Union[ProgressBarStyle, None]
+    """进度条样式"""
 
     dist_path: str
     """输出目录"""
@@ -45,7 +45,8 @@ class ConvertConfig:
         output_path: str,
         volume: float = 1.0,
         speed: float = 1.0,
-        progressbar: Union[bool, Tuple[str, Tuple[str, str]]] = True,
+        progressbar: Union[bool, Tuple[str, Tuple[str, str]], ProgressBarStyle] = True,
+        ignore_progressbar_param_error: bool = False,
     ):
         """
         将已经转换好的数据内容指令载入MC可读格式
@@ -77,10 +78,20 @@ class ConvertConfig:
             # 改这一段没🐎
             if progressbar is True:
                 self.progressbar_style = DEFAULT_PROGRESSBAR_STYLE
-                """进度条样式组"""
-            else:
+                """进度条样式"""
+                return
+            elif isinstance(progressbar, ProgressBarStyle):
                 self.progressbar_style = progressbar
-                """进度条样式组"""
-        else:
-            self.progressbar_style = None
-            """进度条样式组"""
+                """进度条样式"""
+                return
+            elif isinstance(progressbar, tuple):
+                if isinstance(progressbar[0],str) and isinstance(progressbar[1], tuple):
+                    if isinstance(progressbar[1][0], str) and isinstance(progressbar[1][1], str):
+                        self.progressbar_style = ProgressBarStyle(progressbar[0],progressbar[1][0],progressbar[1][1])
+                        return
+            if not ignore_progressbar_param_error:
+                raise TypeError("参数 {} 的类型 {} 与所需类型 Union[bool, Tuple[str, Tuple[str, str]], ProgressBarStyle] 不符。".format(progressbar,type(progressbar)))
+        
+        self.progressbar_style = None
+        """进度条样式组"""
+            
