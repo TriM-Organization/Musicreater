@@ -376,6 +376,10 @@ class ProgressBarStyle:
         """设置已播放之样式"""
         self.played_style = value
 
+    def copy(self):
+        dst = ProgressBarStyle(self.base_style,self.to_play_style,self.played_style)
+        return dst
+
 
 DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
     r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
