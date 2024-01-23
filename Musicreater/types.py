@@ -16,13 +16,25 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union
+from typing import Any, Dict, List, Literal, Optional, Tuple, Union, Iterable, Sequence, Mapping, Callable
 
 import mido
 
 from .subclass import SingleNote
 
-ProgressStyle = Tuple[str, Tuple[str, str]]
+MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
+"""
+Midi音符名称对照表类型
+"""
+
+MidiInstrumentTableType = Mapping[int, Tuple[str, int]]
+"""
+Midi乐器对照表类型
+"""
+
+FittingFunctionType = Callable[[float], float]
+
+ProgressBarStyleType = Tuple[str, Tuple[str, str]]
 """
 进度条样式类型
 """

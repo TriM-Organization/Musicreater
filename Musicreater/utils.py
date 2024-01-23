@@ -21,7 +21,7 @@ import random
 from .constants import MM_INSTRUMENT_DEVIATION_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
 from .subclass import SingleNote
 
-from typing import Any, Dict, Tuple, Optional, Callable, Literal, Union
+from .types import Any, Dict, Tuple, Optional, Callable, Literal, Union, MidiInstrumentTableType
 
 
 def mctick2timestr(mc_tick: int) -> str:
@@ -47,7 +47,7 @@ def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, A
 
 def inst_to_sould_with_deviation(
     instrumentID: int,
-    reference_table: Dict[int, Tuple[str, int]],
+    reference_table: MidiInstrumentTableType,
     default_instrument: str = "note.flute",
     default_deviation: Optional[int] = 5,
 ) -> Tuple[str, int]:
@@ -133,7 +133,7 @@ def straight_line(vol: float) -> float:
 
 def note_to_command_parameters(
     note_: SingleNote,
-    reference_table: Dict[int, Tuple[str, int]],
+    reference_table: MidiInstrumentTableType,
     volume_percentage: float = 1,
     volume_processing_method: Callable[[float], float] = natural_curve,
 ) -> Tuple[str, float, float, Union[float, Literal[None]],]:

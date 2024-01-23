@@ -77,13 +77,13 @@ class MidiConvert:
     midi: VoidMido
     """MidiFile对象"""
 
-    pitched_note_reference_table: Dict[int, Tuple[str, int]]
+    pitched_note_reference_table: MidiInstrumentTableType
     """乐音乐器Midi-MC对照表"""
 
-    percussion_note_referrence_table: Dict[int, Tuple[str, int]]
+    percussion_note_referrence_table: MidiInstrumentTableType
     """打击乐器Midi-MC对照表"""
 
-    volume_processing_function: Callable[[float], float]
+    volume_processing_function: FittingFunctionType
     """音量处理函数"""
 
     midi_music_name: str
@@ -112,13 +112,9 @@ class MidiConvert:
         midi_obj: VoidMido,
         midi_name: str,
         enable_old_exe_format: bool = False,
-        pitched_note_rtable: Dict[
-            int, Tuple[str, int]
-        ] = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
-        percussion_note_rtable: Dict[
-            int, Tuple[str, int]
-        ] = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        vol_processing_function: Callable[[float], float] = natural_curve,
+        pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_function: FittingFunctionType = natural_curve,
     ):
         """
         简单的midi转换类，将midi对象转换为我的世界结构或者包
@@ -162,13 +158,9 @@ class MidiConvert:
         cls,
         midi_file_path: str,
         old_exe_format: bool = False,
-        pitched_note_table: Dict[
-            int, Tuple[str, int]
-        ] = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
-        percussion_note_table: Dict[
-            int, Tuple[str, int]
-        ] = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        vol_processing_func: Callable[[float], float] = natural_curve,
+        pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_func: FittingFunctionType = natural_curve,
     ):
         """
         直接输入文件地址，将midi文件读入
@@ -211,7 +203,7 @@ class MidiConvert:
         self,
         max_score: int,
         scoreboard_name: str,
-        progressbar_style: tuple = DEFAULT_PROGRESSBAR_STYLE,
+        progressbar_style: ProgressBarStyleType = DEFAULT_PROGRESSBAR_STYLE,
     ) -> List[SingleCommand]:
         """
         生成进度条

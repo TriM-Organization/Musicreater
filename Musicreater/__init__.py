@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.7.0"
-__vername__ = "更高的自定义化程度"
+__version__ = "1.7.1"
+__vername__ = "更高的自定义化程度—修复类型定义的重复问题"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
