@@ -18,9 +18,6 @@ Terms & Conditions: License.md in the root directory
 
 from typing import Any, Dict, List, Literal, Optional, Tuple, Union, Iterable, Sequence, Mapping, Callable
 
-import mido
-
-from .subclass import SingleNote
 
 MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
 """
@@ -34,26 +31,7 @@ Midi乐器对照表类型
 
 FittingFunctionType = Callable[[float], float]
 
-ProgressBarStyleType = Tuple[str, Tuple[str, str]]
-"""
-进度条样式类型
-"""
 
-VoidMido = Union[mido.MidiFile, None]  # void mido
-"""
-空Midi类类型
-"""
-
-
-NoteChannelType = Dict[
-    int,
-    List[SingleNote,],
-]
-"""
-频道信息类型
-
-Dict[int,Dict[int,List[SingleNote,],],]
-"""
 
 
 ChannelType = Dict[

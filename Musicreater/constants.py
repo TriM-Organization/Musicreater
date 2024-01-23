@@ -16,7 +16,7 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import Dict, List, Tuple
+from .types import Dict, List, Tuple, MidiInstrumentTableType, MidiNoteNameTableType
 
 x = "x"
 """
@@ -33,13 +33,6 @@ z = "z"
 z
 """
 
-DEFAULT_PROGRESSBAR_STYLE = (
-    r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-    ("§e=§r", "§7=§r"),
-)
-"""
-默认的进度条样式组
-"""
 
 # Midi用对照表
 

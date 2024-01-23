@@ -28,6 +28,8 @@ Terms & Conditions: License.md in the root directory
 import math
 import os
 
+import mido
+
 from .constants import *
 from .exceptions import *
 from .subclass import *
@@ -65,6 +67,12 @@ gameticks:
 tick * tempo / 1000000.0 / ticks_per_beat * 一秒多少游戏刻
 
 
+"""
+
+
+VoidMido = Union[mido.MidiFile, None]  # void mido
+"""
+空Midi类类型
 """
 
 
@@ -203,7 +211,7 @@ class MidiConvert:
         self,
         max_score: int,
         scoreboard_name: str,
-        progressbar_style: ProgressBarStyleType = DEFAULT_PROGRESSBAR_STYLE,
+        progressbar_style: ProgressBarStyle = DEFAULT_PROGRESSBAR_STYLE,
     ) -> List[SingleCommand]:
         """
         生成进度条
@@ -223,7 +231,7 @@ class MidiConvert:
         -------
         list[SingleCommand,]
         """
-        pgs_style = progressbar_style[0]
+        pgs_style = progressbar_style.base_style
         """用于被替换的进度条原始样式"""
 
         """
@@ -253,7 +261,7 @@ class MidiConvert:
             result.append(
                 SingleCommand(
                     'scoreboard objectives add {}PercT dummy "百分比计算"'.format(sbn_pc),
-                    annotation="新增临时计算用计分板（百分比）",
+                    annotation="新增临时百分比变量",
                 )
             )
             result.append(
@@ -264,7 +272,7 @@ class MidiConvert:
                     + "scoreboard players set MaxScore {} {}".format(
                         scoreboard_name, max_score
                     ),
-                    annotation="设定此音乐最大计分",
+                    annotation="设定音乐最大延迟分数",
                 )
             )
             result.append(
@@ -284,7 +292,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} = @s {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="为临时变量赋值",
+                    annotation="赋值临时百分比",
                 )
             )
             result.append(
@@ -295,7 +303,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} *= n100 {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="改变临时变量的单位为百分比（扩大精度）",
+                    annotation="转换临时百分比之单位至%（扩大精度）",
                 )
             )
             result.append(
@@ -306,7 +314,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} /= MaxScore {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="使用临时变量计算百分比",
+                    annotation="计算百分比",
                 )
             )
 
@@ -318,13 +326,13 @@ class MidiConvert:
             result.append(
                 SingleCommand(
                     'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(sbn_pc),
-                    annotation="新增临时计算计分板（分）",
+                    annotation="新增临时分变量",
                 )
             )
             result.append(
                 SingleCommand(
                     'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(sbn_pc),
-                    annotation="新增临时计算计分板（秒）",
+                    annotation="新增临时秒变量",
                 )
             )
             result.append(
@@ -354,7 +362,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} = @s {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="为临时变量（分）赋值",
+                    annotation="赋值临时分",
                 )
             )
             result.append(
@@ -365,7 +373,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} /= n20 {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="将临时变量转换单位为秒（缩减精度）",
+                    annotation="转换临时分之单位为秒（缩减精度）",
                 )
             )
             result.append(
@@ -376,7 +384,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} = @s {}".format(
                         sbn_pc + "TSecT", sbn_pc + "TMinT"
                     ),
-                    annotation="为临时变量（秒）赋值",
+                    annotation="赋值临时秒",
                 )
             )
 
@@ -388,7 +396,7 @@ class MidiConvert:
                     + "scoreboard players operation @s {} /= n60 {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="将临时变量（分）转换单位为分（缩减精度）",
+                    annotation="转换临时分之单位为分（缩减精度）",
                 )
             )
 
@@ -400,42 +408,35 @@ class MidiConvert:
                     + "scoreboard players operation @s {} %= n60 {}".format(
                         sbn_pc + "TSecT", scoreboard_name
                     ),
-                    annotation="将临时变量（秒）确定下来（框定精度区间）",
+                    annotation="确定临时秒（框定精度区间）",
                 )
             )
 
         for i in range(pgs_style.count("_")):
             npg_stl = (
-                pgs_style.replace("_", progressbar_style[1][0], i + 1)
-                .replace("_", progressbar_style[1][1])
+                pgs_style.replace("_", progressbar_style.played_style, i + 1)
+                .replace("_", progressbar_style.to_play_style)
                 .replace(r"%%N", self.midi_music_name)
-                if r"%%N" in pgs_style
-                else pgs_style.replace("_", progressbar_style[1][0], i + 1).replace(
-                    "_", progressbar_style[1][1]
-                )
-            )
-            if r"%%s" in npg_stl:
-                npg_stl = npg_stl.replace(
+                .replace(
                     r"%%s",
                     '"},{"score":{"name":"*","objective":"'
                     + scoreboard_name
                     + '"}},{"text":"',
                 )
-            if r"%%%" in npg_stl:
-                npg_stl = npg_stl.replace(
+                .replace(
                     r"%%%",
                     r'"},{"score":{"name":"*","objective":"'
                     + sbn_pc
                     + r'PercT"}},{"text":"%',
                 )
-            if r"%%t" in npg_stl:
-                npg_stl = npg_stl.replace(
+                .replace(
                     r"%%t",
                     r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
                     r'{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
                         r"{-}", sbn_pc
                     ),
                 )
+            )
             result.append(
                 SingleCommand(
                     self.execute_cmd_head.format(
@@ -455,20 +456,20 @@ class MidiConvert:
             result.append(
                 SingleCommand(
                     "scoreboard objectives remove {}PercT".format(sbn_pc),
-                    annotation="移除临时计算计分板（百分比）",
+                    annotation="移除临时百分比变量",
                 )
             )
         if r"%%t" in pgs_style:
             result.append(
                 SingleCommand(
                     "scoreboard objectives remove {}TMinT".format(sbn_pc),
-                    annotation="移除临时计算计分板（分）",
+                    annotation="移除临时分变量",
                 )
             )
             result.append(
                 SingleCommand(
                     "scoreboard objectives remove {}TSecT".format(sbn_pc),
-                    annotation="移除临时计算计分板（秒）",
+                    annotation="移除临时秒变量",
                 )
             )
 

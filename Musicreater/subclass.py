@@ -18,7 +18,8 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import Optional, Any
+from typing import Any
+from .types import Optional, Any, List, Mapping
 
 from .constants import MC_PERCUSSION_INSTRUMENT_LIST
 
@@ -339,3 +340,58 @@ class SingleNoteBox:
         if not isinstance(other, self.__class__):
             return False
         return self.__str__() == other.__str__()
+
+
+@dataclass(init=False)
+class ProgressBarStyle:
+    """进度条样式类"""
+
+    base_style: str
+    """基础样式"""
+
+    to_play_style: str
+    """未播放之样式"""
+
+    played_style: str
+    """已播放之样式"""
+
+    def __init__(self, base_s: str, to_play_s: str, played_s: str):
+        """用于存储进度条样式的类
+        :param base_s 基础样式，用以定义进度条整体
+        :param to_play_s 进度条样式：尚未播放的样子
+        :param played_s 已经播放的样子"""
+        self.base_style = base_s
+        self.to_play_style = to_play_s
+        self.played_style = played_s
+
+    def set_base_style(self, value: str):
+        """设置基础样式"""
+        self.base_style = value
+
+    def set_to_play_style(self, value: str):
+        """设置未播放之样式"""
+        self.to_play_style = value
+
+    def set_played_style(self, value: str):
+        """设置已播放之样式"""
+        self.played_style = value
+
+
+DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
+    r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
+    r"§e=§r",
+    r"§7=§r",
+)
+"""
+默认的进度条样式
+"""
+
+NoteChannelType = Mapping[
+    int,
+    List[SingleNote,],
+]
+"""
+频道信息类型
+
+Dict[int,Dict[int,List[SingleNote,],],]
+"""
