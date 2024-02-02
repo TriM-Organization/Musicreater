@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.7.2"
-__vername__ = "修复部分情况下的崩溃问题"
+__version__ = "1.7.2.1"
+__vername__ = "修复指令错误问题"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

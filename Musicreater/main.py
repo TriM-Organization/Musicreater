@@ -688,15 +688,17 @@ class MidiConvert:
                                 .replace("(", r"{")
                                 .replace(")", r"}")
                             )
-                            + r"playsound {} @s ^ ^ ^{} {}".format(
-                                mc_sound_ID, mc_distance_volume, volume_percentage
-                            )
-                            if note.percussive
-                            else r"playsound {} @s ^ ^ ^{} {} {}".format(
-                                mc_sound_ID,
-                                mc_distance_volume,
-                                volume_percentage,
-                                mc_pitch,
+                            + (
+                                r"playsound {} @s ^ ^ ^{} {}".format(
+                                    mc_sound_ID, mc_distance_volume, volume_percentage
+                                )
+                                if note.percussive
+                                else r"playsound {} @s ^ ^ ^{} {} {}".format(
+                                    mc_sound_ID,
+                                    mc_distance_volume,
+                                    volume_percentage,
+                                    mc_pitch,
+                                )
                             )
                         ),
                         annotation=(
@@ -791,15 +793,17 @@ class MidiConvert:
                 SingleCommand(
                     command=(
                         self.execute_cmd_head.format(player_selector)
-                        + r"playsound {} @s ^ ^ ^{} {}".format(
-                            mc_sound_ID, mc_distance_volume, volume_percentage
-                        )
-                        if note.percussive
-                        else r"playsound {} @s ^ ^ ^{} {} {}".format(
-                            mc_sound_ID,
-                            mc_distance_volume,
-                            volume_percentage,
-                            mc_pitch,
+                        + (
+                            r"playsound {} @s ^ ^ ^{} {}".format(
+                                mc_sound_ID, mc_distance_volume, volume_percentage
+                            )
+                            if note.percussive
+                            else r"playsound {} @s ^ ^ ^{} {} {}".format(
+                                mc_sound_ID,
+                                mc_distance_volume,
+                                volume_percentage,
+                                mc_pitch,
+                            )
                         )
                     ),
                     annotation=(
