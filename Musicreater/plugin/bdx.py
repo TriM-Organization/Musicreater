@@ -150,18 +150,20 @@ def commands_to_BDX_bytes(
     for command in commands_list:
         _bytes += form_command_block_in_BDX_bytes(
             command.command_text,
-            (1 if y_forward else 0)
-            if (
-                ((now_y != 0) and (not y_forward))
-                or (y_forward and (now_y != (max_height - 1)))
-            )
-            else (
-                (3 if z_forward else 2)
+            (
+                (1 if y_forward else 0)
                 if (
-                    ((now_z != 0) and (not z_forward))
-                    or (z_forward and (now_z != _sideLength - 1))
+                    ((now_y != 0) and (not y_forward))
+                    or (y_forward and (now_y != (max_height - 1)))
                 )
-                else 5
+                else (
+                    (3 if z_forward else 2)
+                    if (
+                        ((now_z != 0) and (not z_forward))
+                        or (z_forward and (now_z != _sideLength - 1))
+                    )
+                    else 5
+                )
             ),
             impluse=2,
             condition=command.conditional,

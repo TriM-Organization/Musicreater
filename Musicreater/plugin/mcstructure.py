@@ -189,9 +189,11 @@ def form_command_block_in_NBT_struct(
 
     return Block(
         "minecraft",
-        "command_block"
-        if impluse == 0
-        else ("repeating_command_block" if impluse == 1 else "chain_command_block"),
+        (
+            "command_block"
+            if impluse == 0
+            else ("repeating_command_block" if impluse == 1 else "chain_command_block")
+        ),
         states={"conditional_bit": condition, "facing_direction": particularValue},
         extra_data={
             "block_entity_data": {
@@ -257,18 +259,20 @@ def commands_to_structure(
             form_command_block_in_NBT_struct(
                 command=command.command_text,
                 coordinate=coordinate,
-                particularValue=(1 if y_forward else 0)
-                if (
-                    ((now_y != 0) and (not y_forward))
-                    or (y_forward and (now_y != (max_height - 1)))
-                )
-                else (
-                    (3 if z_forward else 2)
+                particularValue=(
+                    (1 if y_forward else 0)
                     if (
-                        ((now_z != 0) and (not z_forward))
-                        or (z_forward and (now_z != _sideLength - 1))
+                        ((now_y != 0) and (not y_forward))
+                        or (y_forward and (now_y != (max_height - 1)))
                     )
-                    else 5
+                    else (
+                        (3 if z_forward else 2)
+                        if (
+                            ((now_z != 0) and (not z_forward))
+                            or (z_forward and (now_z != _sideLength - 1))
+                        )
+                        else 5
+                    )
                 ),
                 impluse=2,
                 condition=False,
@@ -357,20 +361,16 @@ def commands_to_redstone_delay_structure(
     for cmd in commands:
         # print("\r 正在进行处理：",end="")
         if cmd.delay > 2:
-            a_max = max(a,a_max)
+            a_max = max(a, a_max)
             total_cmd += (a := 1)
         else:
             a += 1
 
     struct = Structure(
         size=(
-            round(delay_length / 2 + total_cmd)
-            if extensioon_direction == x
-            else a_max,
+            round(delay_length / 2 + total_cmd) if extensioon_direction == x else a_max,
             3,
-            round(delay_length / 2 + total_cmd)
-            if extensioon_direction == z
-            else a_max,
+            round(delay_length / 2 + total_cmd) if extensioon_direction == z else a_max,
         ),
         fill=Block("minecraft", "air", compability_version=compability_version_),
         compability_version=compability_version_,

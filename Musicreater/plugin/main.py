@@ -85,13 +85,22 @@ class ConvertConfig:
                 """进度条样式"""
                 return
             elif isinstance(progressbar, tuple):
-                if isinstance(progressbar[0],str) and isinstance(progressbar[1], tuple):
-                    if isinstance(progressbar[1][0], str) and isinstance(progressbar[1][1], str):
-                        self.progressbar_style = ProgressBarStyle(progressbar[0],progressbar[1][0],progressbar[1][1])
+                if isinstance(progressbar[0], str) and isinstance(
+                    progressbar[1], tuple
+                ):
+                    if isinstance(progressbar[1][0], str) and isinstance(
+                        progressbar[1][1], str
+                    ):
+                        self.progressbar_style = ProgressBarStyle(
+                            progressbar[0], progressbar[1][0], progressbar[1][1]
+                        )
                         return
             if not ignore_progressbar_param_error:
-                raise TypeError("参数 {} 的类型 {} 与所需类型 Union[bool, Tuple[str, Tuple[str, str]], ProgressBarStyle] 不符。".format(progressbar,type(progressbar)))
-        
+                raise TypeError(
+                    "参数 {} 的类型 {} 与所需类型 Union[bool, Tuple[str, Tuple[str, str]], ProgressBarStyle] 不符。".format(
+                        progressbar, type(progressbar)
+                    )
+                )
+
         self.progressbar_style = None
         """进度条样式组"""
-            

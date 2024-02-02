@@ -21,7 +21,16 @@ import random
 from .constants import MM_INSTRUMENT_DEVIATION_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
 from .subclass import SingleNote
 
-from .types import Any, Dict, Tuple, Optional, Callable, Literal, Union, MidiInstrumentTableType
+from .types import (
+    Any,
+    Dict,
+    Tuple,
+    Optional,
+    Callable,
+    Literal,
+    Union,
+    MidiInstrumentTableType,
+)
 
 
 def mctick2timestr(mc_tick: int) -> str:
@@ -77,9 +86,11 @@ def inst_to_sould_with_deviation(
         instrumentID,
         (
             default_instrument,
-            default_deviation
-            if default_deviation
-            else MM_INSTRUMENT_DEVIATION_TABLE.get(default_instrument, -1),
+            (
+                default_deviation
+                if default_deviation
+                else MM_INSTRUMENT_DEVIATION_TABLE.get(default_instrument, -1)
+            ),
         ),
     )
 
@@ -136,7 +147,12 @@ def note_to_command_parameters(
     reference_table: MidiInstrumentTableType,
     volume_percentage: float = 1,
     volume_processing_method: Callable[[float], float] = natural_curve,
-) -> Tuple[str, float, float, Union[float, Literal[None]],]:
+) -> Tuple[
+    str,
+    float,
+    float,
+    Union[float, Literal[None]],
+]:
     """
     将音符转为播放的指令
     :param note_:int 音符对象

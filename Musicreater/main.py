@@ -260,7 +260,9 @@ class MidiConvert:
         if r"%%%" in pgs_style:
             result.append(
                 SingleCommand(
-                    'scoreboard objectives add {}PercT dummy "百分比计算"'.format(sbn_pc),
+                    'scoreboard objectives add {}PercT dummy "百分比计算"'.format(
+                        sbn_pc
+                    ),
                     annotation="新增临时百分比变量",
                 )
             )
@@ -325,13 +327,17 @@ class MidiConvert:
         if r"%%t" in pgs_style:
             result.append(
                 SingleCommand(
-                    'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(sbn_pc),
+                    'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(
+                        sbn_pc
+                    ),
                     annotation="新增临时分变量",
                 )
             )
             result.append(
                 SingleCommand(
-                    'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(sbn_pc),
+                    'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(
+                        sbn_pc
+                    ),
                     annotation="新增临时秒变量",
                 )
             )
@@ -589,7 +595,9 @@ class MidiConvert:
                                 )
                             else:
                                 raise NoteOnOffMismatchError(
-                                    "当前的MIDI很可能有损坏之嫌……", msg, "无法在上文中找到与之匹配的音符开音消息。"
+                                    "当前的MIDI很可能有损坏之嫌……",
+                                    msg,
+                                    "无法在上文中找到与之匹配的音符开音消息。",
                                 )
 
         """整合后的音乐通道格式
@@ -663,27 +671,46 @@ class MidiConvert:
                     mc_pitch,
                 ) = note_to_command_parameters(
                     note,
-                    self.percussion_note_referrence_table
-                    if note.percussive
-                    else self.pitched_note_reference_table,
+                    (
+                        self.percussion_note_referrence_table
+                        if note.percussive
+                        else self.pitched_note_reference_table
+                    ),
                     (max_volume) if note.track_no == 0 else (max_volume * 0.9),
                     self.volume_processing_function,
                 )
 
                 this_channel.append(
                     SingleCommand(
-                        self.execute_cmd_head.format(
-                            "@a[scores=({}={})]".format(scoreboard_name, score_now)
-                            .replace("(", r"{")
-                            .replace(")", r"}")
-                        )
-                        + r"playsound {} @s ^ ^ ^{} {} {}".format(
-                            mc_sound_ID, mc_distance_volume, volume_percentage, mc_pitch
+                        (
+                            self.execute_cmd_head.format(
+                                "@a[scores=({}={})]".format(scoreboard_name, score_now)
+                                .replace("(", r"{")
+                                .replace(")", r"}")
+                            )
+                            + r"playsound {} @s ^ ^ ^{} {}".format(
+                                mc_sound_ID, mc_distance_volume, volume_percentage
+                            )
+                            if note.percussive
+                            else r"playsound {} @s ^ ^ ^{} {} {}".format(
+                                mc_sound_ID,
+                                mc_distance_volume,
+                                volume_percentage,
+                                mc_pitch,
+                            )
                         ),
-                        annotation="在{}播放{}%的{}音".format(
-                            mctick2timestr(score_now),
-                            max_volume * 100,
-                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                        annotation=(
+                            "在{}播放{}%的{}噪音".format(
+                                mctick2timestr(score_now),
+                                max_volume * 100,
+                                mc_sound_ID,
+                            )
+                            if note.percussive
+                            else "在{}播放{}%的{}乐音".format(
+                                mctick2timestr(score_now),
+                                max_volume * 100,
+                                "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                            )
                         ),
                     ),
                 )
@@ -751,29 +778,45 @@ class MidiConvert:
                 mc_pitch,
             ) = note_to_command_parameters(
                 note,
-                self.percussion_note_referrence_table
-                if note.percussive
-                else self.pitched_note_reference_table,
+                (
+                    self.percussion_note_referrence_table
+                    if note.percussive
+                    else self.pitched_note_reference_table
+                ),
                 (max_volume) if note.track_no == 0 else (max_volume * 0.9),
                 self.volume_processing_function,
             )
 
             self.music_command_list.append(
                 SingleCommand(
-                    self.execute_cmd_head.format(player_selector)
-                    + r"playsound {} @s ^ ^ ^{} {} {}".format(
-                        mc_sound_ID,
-                        mc_distance_volume,
-                        volume_percentage,
-                        mc_pitch,
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^ ^ ^{} {}".format(
+                            mc_sound_ID, mc_distance_volume, volume_percentage
+                        )
+                        if note.percussive
+                        else r"playsound {} @s ^ ^ ^{} {} {}".format(
+                            mc_sound_ID,
+                            mc_distance_volume,
+                            volume_percentage,
+                            mc_pitch,
+                        )
+                    ),
+                    annotation=(
+                        "在{}播放{}%的{}噪音".format(
+                            mctick2timestr(delaytime_now),
+                            max_volume * 100,
+                            mc_sound_ID,
+                        )
+                        if note.percussive
+                        else "在{}播放{}%的{}乐音".format(
+                            mctick2timestr(delaytime_now),
+                            max_volume * 100,
+                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                        )
                     ),
                     tick_delay=tickdelay,
-                    annotation="在{}播放{}%的{}音".format(
-                        mctick2timestr(delaytime_now),
-                        max_volume * 100,
-                        "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
-                    ),
-                )
+                ),
             )
             delaytime_previous = delaytime_now
 

@@ -16,7 +16,19 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import Any, Dict, List, Literal, Optional, Tuple, Union, Iterable, Sequence, Mapping, Callable
+from typing import (
+    Any,
+    Dict,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
+    Iterable,
+    Sequence,
+    Mapping,
+    Callable,
+)
 
 
 MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
@@ -30,8 +42,6 @@ Midi乐器对照表类型
 """
 
 FittingFunctionType = Callable[[float], float]
-
-
 
 
 ChannelType = Dict[

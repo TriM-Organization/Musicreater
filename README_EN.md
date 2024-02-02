@@ -49,7 +49,7 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
   pip install -i https://pypi.python.org/simple Musicreater --upgrade
   ```
 
-- Clone repo and Install (**NOT RECOMMANDED**):
+- Clone repo and Install (Latest but **NOT RECOMMANDED**):
   ```bash
   git clone https://github.com/TriM-Organization/Musicreater.git
   cd Musicreater
@@ -75,7 +75,7 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 **Touch (偷吃不是Touch)**: A man who is used to use command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
 
-## Thanks 🙏
+## Acknowledgements 🙏
 
 This list is not in any order.
 

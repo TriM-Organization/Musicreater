@@ -154,9 +154,13 @@ class ObsoleteMidiConvert(MidiConvert):
                         )
                         maxscore = max(maxscore, nowscore)
                         if msg.channel == 9:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                         else:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
 
                         singleTrack.append(
                             "execute @a[scores={"
@@ -214,9 +218,13 @@ class ObsoleteMidiConvert(MidiConvert):
                         )
                         maxscore = max(maxscore, nowscore)
                         if msg.channel == 9:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                         else:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
                         singleTrack.append(
                             "execute @a[scores={"
                             + str(scoreboardname)
@@ -277,9 +285,13 @@ class ObsoleteMidiConvert(MidiConvert):
 
                     elif msg[0] == "NoteS":
                         soundID, _X = (
-                            inst_to_sould_with_deviation(msg[1],MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            inst_to_sould_with_deviation(
+                                msg[1], MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                             if SpecialBits
-                            else inst_to_sould_with_deviation(InstID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            else inst_to_sould_with_deviation(
+                                InstID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
                         )
                         score_now = round(msg[-1] / float(speed) / 50)
                         maxScore = max(maxScore, score_now)
@@ -343,11 +355,15 @@ class ObsoleteMidiConvert(MidiConvert):
                             (ticks * tempo)
                             / ((self.midi.ticks_per_beat * float(speed)) * 50000)
                         )
-                        
+
                         if msg.channel == 9:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                         else:
-                            soundID, _X = inst_to_sould_with_deviation(instrumentID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            soundID, _X = inst_to_sould_with_deviation(
+                                instrumentID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
                         try:
                             tracks[now_tick].append(
                                 self.execute_cmd_head.format(player)
@@ -421,9 +437,13 @@ class ObsoleteMidiConvert(MidiConvert):
 
                     elif msg[0] == "NoteS":
                         soundID, _X = (
-                            inst_to_sould_with_deviation(msg[1],MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            inst_to_sould_with_deviation(
+                                msg[1], MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                             if SpecialBits
-                            else inst_to_sould_with_deviation(InstID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            else inst_to_sould_with_deviation(
+                                InstID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
                         )
                         score_now = round(msg[-1] / float(speed) / 50)
 

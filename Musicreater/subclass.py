@@ -377,7 +377,7 @@ class ProgressBarStyle:
         self.played_style = value
 
     def copy(self):
-        dst = ProgressBarStyle(self.base_style,self.to_play_style,self.played_style)
+        dst = ProgressBarStyle(self.base_style, self.to_play_style, self.played_style)
         return dst
 
 

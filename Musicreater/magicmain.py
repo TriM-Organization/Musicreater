@@ -30,16 +30,16 @@ Terms & Conditions: ../License.md
 """
 
 
-
 # ============================
-
-
 
 
 import mido
 
+
 class NoteMessage:
-    def __init__(self, channel, pitch, velocity, startT, lastT, midi, now_bpm, change_bpm=None):
+    def __init__(
+        self, channel, pitch, velocity, startT, lastT, midi, now_bpm, change_bpm=None
+    ):
         self.channel = channel
         self.note = pitch
         self.velocity = velocity
@@ -49,19 +49,39 @@ class NoteMessage:
 
         def mt2gt(mt, tpb_a, bpm_a):
             return mt / tpb_a / bpm_a * 60
-        self.startTrueTime = mt2gt(self.startTime, midi.ticks_per_beat, self.tempo)  # / 20
+
+        self.startTrueTime = mt2gt(
+            self.startTime, midi.ticks_per_beat, self.tempo
+        )  # / 20
         # delete_extra_zero(round_up())
         if change_bpm is not None:
-            self.lastTrueTime = mt2gt(self.lastTime, midi.ticks_per_beat, change_bpm)  # / 20
+            self.lastTrueTime = mt2gt(
+                self.lastTime, midi.ticks_per_beat, change_bpm
+            )  # / 20
         else:
-            self.lastTrueTime = mt2gt(self.lastTime, midi.ticks_per_beat, self.tempo)  # / 20
+            self.lastTrueTime = mt2gt(
+                self.lastTime, midi.ticks_per_beat, self.tempo
+            )  # / 20
         # delete_extra_zero(round_up())
         print((self.startTime * self.tempo) / (midi.ticks_per_beat * 50000))
 
     def __str__(self):
-        return "noteMessage channel=" + str(self.channel) + " note=" + str(self.note) + " velocity=" + \
-               str(self.velocity) + " startTime=" + str(self.startTime) + " lastTime=" + str(self.lastTime) + \
-               " startTrueTime=" + str(self.startTrueTime) + " lastTrueTime=" + str(self.lastTrueTime)
+        return (
+            "noteMessage channel="
+            + str(self.channel)
+            + " note="
+            + str(self.note)
+            + " velocity="
+            + str(self.velocity)
+            + " startTime="
+            + str(self.startTime)
+            + " lastTime="
+            + str(self.lastTime)
+            + " startTrueTime="
+            + str(self.startTrueTime)
+            + " lastTrueTime="
+            + str(self.lastTrueTime)
+        )
 
 
 def load(mid: mido.MidiFile):
@@ -75,7 +95,7 @@ def load(mid: mido.MidiFile):
         for msg in track:
             # print(msg)
             if msg.is_meta is not True:
-                if msg.type == 'note_on' and msg.velocity == 0:
+                if msg.type == "note_on" and msg.velocity == 0:
                     type_[1] = True
                 elif msg.type == "note_off":
                     type_[0] = True
@@ -105,13 +125,13 @@ def load(mid: mido.MidiFile):
             print(ticks)
             if msg.is_meta is True and msg.type == "set_tempo":
                 recent_change_bpm = bpm
-                bpm =  60000000 / msg.tempo
+                bpm = 60000000 / msg.tempo
                 is_change_bpm = True
 
-            if msg.type == 'note_on' and msg.velocity != 0:
+            if msg.type == "note_on" and msg.velocity != 0:
                 noteOn.append([msg, msg.note, ticks])
             if type_[1] is True:
-                if msg.type == 'note_on' and msg.velocity == 0:
+                if msg.type == "note_on" and msg.velocity == 0:
                     for u in noteOn:
                         index = 0
                         if u[1] == msg.note:
@@ -121,13 +141,31 @@ def load(mid: mido.MidiFile):
                         index += 1
                     print(lastTick)
                     if is_change_bpm and recent_change_bpm != 0:
-                        trackS.append(NoteMessage(msg.channel, msg.note, lastMessage.velocity, lastTick, ticks - lastTick,
-                                                  mid, recent_change_bpm, bpm))
+                        trackS.append(
+                            NoteMessage(
+                                msg.channel,
+                                msg.note,
+                                lastMessage.velocity,
+                                lastTick,
+                                ticks - lastTick,
+                                mid,
+                                recent_change_bpm,
+                                bpm,
+                            )
+                        )
                         is_change_bpm = False
                     else:
                         trackS.append(
-                            NoteMessage(msg.channel, msg.note, lastMessage.velocity, lastTick, ticks - lastTick,
-                                        mid, bpm))
+                            NoteMessage(
+                                msg.channel,
+                                msg.note,
+                                lastMessage.velocity,
+                                lastTick,
+                                ticks - lastTick,
+                                mid,
+                                bpm,
+                            )
+                        )
                     # print(noteOn)
                     # print(index)
                     try:
@@ -139,20 +177,19 @@ def load(mid: mido.MidiFile):
             print(j)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     load(mido.MidiFile("test.mid"))
-
-
 
 
 # ============================
 from typing import Literal
-from ..constants import x,y,z
+from ..constants import x, y, z
+
 
 # 不要用 没写完
 def delay_to_note_blocks(
-    baseblock: str = "stone", 
-    position_forward: Literal['x','y','z'] = z,
+    baseblock: str = "stone",
+    position_forward: Literal["x", "y", "z"] = z,
 ):
     """传入音符，生成以音符盒存储的红石音乐
     :param:
@@ -169,8 +206,7 @@ def delay_to_note_blocks(
 
     log = print
 
-    startpos = [0,0,0]
-
+    startpos = [0, 0, 0]
 
     # 1拍 x 2.5 rt
     for i in notes:
@@ -180,7 +216,10 @@ def delay_to_note_blocks(
                 [startpos[0], startpos[1] + 1, startpos[2]],
                 form_note_block_in_NBT_struct(height2note[i[0]], instrument),
             )
-            struct.set_block(startpos, Block("universal_minecraft", instuments[i[0]][1]),)
+            struct.set_block(
+                startpos,
+                Block("universal_minecraft", instuments[i[0]][1]),
+            )
             error = False
         except ValueError:
             log("无法放置音符：" + str(i) + "于" + str(startpos))

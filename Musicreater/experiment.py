@@ -20,7 +20,11 @@ Terms & Conditions: License.md in the root directory
 from .exceptions import *
 from .subclass import *
 from .utils import *
-from .main import MidiConvert, MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+from .main import (
+    MidiConvert,
+    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
+    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+)
 from .types import Tuple, List, Dict, ChannelType
 
 
@@ -75,7 +79,7 @@ class FutureMidiConvertM4(MidiConvert):
                     lastime=int(_note.duration / totalCount),
                     track_number=_note.track_no,
                     is_percussion=_note.percussive,
-                    extra_information=_note.extra_info
+                    extra_information=_note.extra_info,
                 )
                 # (
                 #     _note.start_time + _i * _apply_time_division,
@@ -120,8 +124,18 @@ class FutureMidiConvertM4(MidiConvert):
         # 此处 我们把通道视为音轨
         for channel in self.to_music_note_channels().values():
             for note in channel:
-                note.set_info(note_to_command_parameters(note,self.percussion_note_referrence_table if note.percussive else self.pitched_note_reference_table, (max_volume) if note.track_no == 0 else (max_volume * 0.9),self.volume_processing_function,))
-                
+                note.set_info(
+                    note_to_command_parameters(
+                        note,
+                        (
+                            self.percussion_note_referrence_table
+                            if note.percussive
+                            else self.pitched_note_reference_table
+                        ),
+                        (max_volume) if note.track_no == 0 else (max_volume * 0.9),
+                        self.volume_processing_function,
+                    )
+                )
 
                 if not note.percussive:
                     notes_list.extend(self._linear_note(note, note.extra_info[3] * 500))
@@ -239,7 +253,7 @@ class FutureMidiConvertM5(MidiConvert):
         self.channels: ChannelType = midi_channels
         # [print([print(no,tno,sum([True if i[0] == 'NoteS' else False for i in track])) for tno,track in cna.items()]) if cna else False for no,cna in midi_channels.items()]
         return midi_channels
-    
+
     # 神奇的偏移音
     def to_command_list_in_delay(
         self,
@@ -291,9 +305,13 @@ class FutureMidiConvertM5(MidiConvert):
 
                     elif msg[0] == "NoteS":
                         soundID, _X = (
-                            inst_to_sould_with_deviation(msg[1],MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE)
+                            inst_to_sould_with_deviation(
+                                msg[1], MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
+                            )
                             if SpecialBits
-                            else inst_to_sould_with_deviation(InstID,MM_CLASSIC_PITCHED_INSTRUMENT_TABLE)
+                            else inst_to_sould_with_deviation(
+                                InstID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
+                            )
                         )
 
                         score_now = round(msg[-1] / float(speed) / 50)

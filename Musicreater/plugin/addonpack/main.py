@@ -102,15 +102,17 @@ def to_addon_pack_in_score(
             + scoreboard_name
             + " 1\n",
             (
-                "scoreboard players reset @a[scores={"
-                + scoreboard_name
-                + "="
-                + str(maxscore + 20)
-                + "..}]"
-                + f" {scoreboard_name}\n"
-            )
-            if auto_reset
-            else "",
+                (
+                    "scoreboard players reset @a[scores={"
+                    + scoreboard_name
+                    + "="
+                    + str(maxscore + 20)
+                    + "..}]"
+                    + f" {scoreboard_name}\n"
+                )
+                if auto_reset
+                else ""
+            ),
             f"function mscplay/progressShow\n" if data_cfg.progressbar_style else "",
         )
     )

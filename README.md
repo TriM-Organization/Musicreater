@@ -50,7 +50,7 @@
   pip install --upgrade -i https://pypi.python.org/simple Musicreater
   ```
 
-- 克隆仓库并安装（**不推荐**）
+- 克隆仓库并安装（最新版本但**不推荐**）
   ```bash
   git clone https://gitee.com/TriM-Organization/Musicreater.git
   cd Musicreater
