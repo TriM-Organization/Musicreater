@@ -18,6 +18,9 @@
 /utils
 test.py
 RES.txt
+/MSCT_Packer.py
+/Packer/*.MPK
+/Packer/checksum.txt
 
 # Byte-compiled / optimized
 __pycache__/

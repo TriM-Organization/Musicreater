@@ -22,8 +22,8 @@
 Musicreater (音·创)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft**.
 
-版权所有 © 2023 音·创 开发者
-Copyright © 2023 all the developers of Musicreater
+版权所有 © 2024 音·创 开发者
+Copyright © 2024 all the developers of Musicreater
 
 开源相关声明请见 ../License.md
 Terms & Conditions: ../License.md

@@ -4,8 +4,8 @@
 """
 
 """
-版权所有 © 2023 音·创 开发者
-Copyright © 2023 all the developers of Musicreater
+版权所有 © 2024 音·创 开发者
+Copyright © 2024 all the developers of Musicreater
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -21,7 +21,7 @@ from ..constants import x, y, z
 from ..subclass import SingleCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
 
-bdx_key = {
+BDX_MOVE_KEY = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
     "y": [b"\x11", b"\x10", b"\x1d", b"\x16", b"\x17"],
     "z": [b"\x13", b"\x12", b"\x1e", b"\x18", b"\x19"],
@@ -34,21 +34,18 @@ def bdx_move(axis: str, value: int):
     if value == 0:
         return b""
     if abs(value) == 1:
-        return bdx_key[axis][0 if value == -1 else 1]
+        return BDX_MOVE_KEY[axis][0 if value == -1 else 1]
 
     pointer = sum(
         [
-            1 if i else 0
-            for i in (
-                value != -1,
-                value < -1 or value > 1,
-                value < -128 or value > 127,
-                value < -32768 or value > 32767,
-            )
+            value != -1,
+            value < -1 or value > 1,
+            value < -128 or value > 127,
+            value < -32768 or value > 32767,
         ]
     )
 
-    return bdx_key[axis][pointer] + value.to_bytes(
+    return BDX_MOVE_KEY[axis][pointer] + value.to_bytes(
         2 ** (pointer - 2), "big", signed=True
     )
 
@@ -198,13 +195,13 @@ def commands_to_BDX_bytes(
             ):
                 now_z -= 1 if z_forward else -1
                 z_forward = not z_forward
-                _bytes += bdx_key[x][1]
+                _bytes += BDX_MOVE_KEY[x][1]
                 now_x += 1
             else:
-                _bytes += bdx_key[z][int(z_forward)]
+                _bytes += BDX_MOVE_KEY[z][int(z_forward)]
 
         else:
-            _bytes += bdx_key[y][int(y_forward)]
+            _bytes += BDX_MOVE_KEY[y][int(y_forward)]
 
     return (
         _bytes,
