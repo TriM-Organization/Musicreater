@@ -42,7 +42,7 @@ import dill
 import brotli
 
 
-def enpack_llc_pack(sth, to_dist: str):
+def enpack_msct_pack(sth, to_dist: str):
     packing_bytes = brotli.compress(
         dill.dumps(
             sth,
@@ -59,12 +59,12 @@ def enpack_llc_pack(sth, to_dist: str):
 
 with open("./Packer/checksum.txt", "w", encoding="utf-8") as f:
     f.write("MSCT_MAIN:\n")
-    f.write(enpack_llc_pack(MSCT_MAIN, "./Packer/MSCT_MAIN.MPK").hexdigest())
+    f.write(enpack_msct_pack(MSCT_MAIN, "./Packer/MSCT_MAIN.MPK").hexdigest())
     f.write("\nMSCT_PLUGIN:\n")
-    f.write(enpack_llc_pack(MSCT_PLUGIN, "./Packer/MSCT_PLUGIN.MPK").hexdigest())
+    f.write(enpack_msct_pack(MSCT_PLUGIN, "./Packer/MSCT_PLUGIN.MPK").hexdigest())
     f.write("\nMSCT_PLUGIN_FUNCTION:\n")
     f.write(
-        enpack_llc_pack(
+        enpack_msct_pack(
             MSCT_PLUGIN_FUNCTION, "./Packer/MSCT_PLUGIN_FUNCTION.MPK"
         ).hexdigest()
     )

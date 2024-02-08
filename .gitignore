@@ -21,6 +21,7 @@ RES.txt
 /MSCT_Packer.py
 /Packer/*.MPK
 /Packer/checksum.txt
+/bgArrayLib
 
 # Byte-compiled / optimized
 __pycache__/
