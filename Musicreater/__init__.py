@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.7.4"
-__vername__ = "部分音色更新"
+__version__ = "1.8"
+__vername__ = "音调总体偏移的处理支持"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -27,6 +27,7 @@ __author__ = (
 )
 __all__ = [
     # 主要类
+    "MusicSequence",
     "MidiConvert",
     # 附加类
     "SingleNote",
@@ -35,7 +36,7 @@ __all__ = [
     # "TimeStamp", 未来功能
     # 默认值
     "DEFAULT_PROGRESSBAR_STYLE",
-    "MM_INSTRUMENT_DEVIATION_TABLE",
+    "MM_INSTRUMENT_RANGE_TABLE",
     "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
     "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
     "MM_TOUCH_PITCHED_INSTRUMENT_TABLE",

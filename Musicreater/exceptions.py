@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存放一堆报错类型
+存放一些报错类型
 """
 
 """
@@ -50,13 +50,13 @@ class MidiDestroyedError(MSCTBaseException):
         super().__init__("MIDI文件损坏：无法读取MIDI文件", *args)
 
 
-class MidiUnboundError(MSCTBaseException):
-    """未定义Midi对象"""
+# class MidiUnboundError(MSCTBaseException):
+#     """未定义Midi对象（无用）"""
 
-    def __init__(self, *args):
-        """未绑定Midi对象"""
-        super().__init__("未定义MidiFile对象：你甚至没有对象就想要生孩子？", *args)
-
+#     def __init__(self, *args):
+#         """未绑定Midi对象"""
+#         super().__init__("未定义MidiFile对象：你甚至没有对象就想要生孩子？", *args)
+# 此错误在本版本内已经不再使用
 
 class CommandFormatError(RuntimeError):
     """指令格式与目标格式不匹配而引起的错误"""

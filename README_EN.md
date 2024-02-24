@@ -7,7 +7,7 @@
     </img>
 </p>
 
-<h3 align="center">A free open-source library of converting digital music files into <i>Minecraft</i> formats.</h3>
+<h3 align="center">A free open-source library of <i>Minecraft</i> digital music.</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
@@ -45,6 +45,7 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
   ```
 
 - If above command cannot fetch latest version, try:
+
   ```bash
   pip install -i https://pypi.python.org/simple Musicreater --upgrade
   ```
@@ -57,7 +58,6 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
   ```
 
 Commands such as `python`、`pip` could be changed to some like `python3` or `pip3` according to the difference of platforms.
-
 
 ## Documentation 📄
 
@@ -120,7 +120,6 @@ NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
 “Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为引用性使用
 
 - 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易网络科技发展有限公司
-
 
 [Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E5%87%8C%E4%BA%91%E9%87%91%E7%BE%BF-00A1E7?style=for-the-badge
 [Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge

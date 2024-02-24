@@ -70,20 +70,202 @@ tick * tempo / 1000000.0 / ticks_per_beat * 一秒多少游戏刻
 """
 
 
-VoidMido = Union[mido.MidiFile, None]  # void mido
-"""
-空Midi类类型
-"""
+# VoidMido = Union[mido.MidiFile, None]  # void mido
+# """
+# 空Midi类类型
+# """
+# 已经成为历史了
 
 
 @dataclass(init=False)
-class MidiConvert:
+class MusicSequence:
+    """
+    音乐曲谱序列存储类
+    """
+
+    music_name: str
+    """Midi乐曲名"""
+
+    channels: NoteChannelType
+    """频道信息字典"""
+
+    def __init__(
+        self,
+        name_of_music: str,
+        channels_of_notes: NoteChannelType,
+    ) -> None:
+        self.music_name = name_of_music
+        self.channels = channels_of_notes
+
+    @classmethod
+    def from_mido(
+        cls,
+        mido_file: mido.MidiFile,
+        midi_music_name,
+        default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
+        mismatch_error_ignorance: bool = True,
+    ):
+
+        return cls(
+            midi_music_name,
+            cls.to_music_note_channels(
+                midi=mido_file,
+                default_tempo_value=default_tempo,
+                ignore_mismatch_error=mismatch_error_ignorance,
+            ),
+        )
+
+    def set_deviation(self, deviation_value: int):
+        self.music_deviation = deviation_value
+
+    def rename_music(self, new_name: str):
+        self.music_name = new_name
+
+    @staticmethod
+    def to_music_note_channels(
+        midi: mido.MidiFile,
+        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
+        ignore_mismatch_error: bool = True,
+    ) -> NoteChannelType:
+        """
+        将midi解析并转换为频道音符字典
+
+        Returns
+        -------
+        以频道作为分割的Midi音符列表字典:
+        Dict[int,List[SingleNote,]]
+        """
+
+        # if midi is None:
+        #     raise MidiUnboundError(
+        #         "Midi参量为空。你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
+        #     )
+
+        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
+        midi_channels: NoteChannelType = empty_midi_channels(staff=[])
+        tempo = default_tempo_value
+
+        # 我们来用通道统计音乐信息
+        # 但是是用分轨的思路的
+        for track_no, track in enumerate(midi.tracks):
+            microseconds = 0
+            if not track:
+                continue
+
+            note_queue_A: Dict[
+                int,
+                List[
+                    Tuple[
+                        int,
+                        int,
+                    ]
+                ],
+            ] = empty_midi_channels(staff=[])
+            note_queue_B: Dict[
+                int,
+                List[
+                    Tuple[
+                        int,
+                        int,
+                    ]
+                ],
+            ] = empty_midi_channels(staff=[])
+
+            channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
+
+            for msg in track:
+                if msg.time != 0:
+                    microseconds += msg.time * tempo / midi.ticks_per_beat / 1000
+
+                if msg.is_meta:
+                    if msg.type == "set_tempo":
+                        tempo = msg.tempo
+                else:
+                    if msg.type == "program_change":
+                        channel_program[msg.channel] = msg.program
+
+                    elif msg.type == "note_on" and msg.velocity != 0:
+                        note_queue_A[msg.channel].append(
+                            (msg.note, channel_program[msg.channel])
+                        )
+                        note_queue_B[msg.channel].append((msg.velocity, microseconds))
+
+                    elif (msg.type == "note_off") or (
+                        msg.type == "note_on" and msg.velocity == 0
+                    ):
+                        if (msg.note, channel_program[msg.channel]) in note_queue_A[
+                            msg.channel
+                        ]:
+                            _velocity, _ms = note_queue_B[msg.channel][
+                                note_queue_A[msg.channel].index(
+                                    (msg.note, channel_program[msg.channel])
+                                )
+                            ]
+                            note_queue_A[msg.channel].remove(
+                                (msg.note, channel_program[msg.channel])
+                            )
+                            note_queue_B[msg.channel].remove((_velocity, _ms))
+                            midi_channels[msg.channel].append(
+                                SingleNote(
+                                    instrument=msg.note,
+                                    pitch=channel_program[msg.channel],
+                                    velocity=_velocity,
+                                    startime=_ms,
+                                    lastime=microseconds - _ms,
+                                    track_number=track_no,
+                                    is_percussion=True,
+                                )
+                                if msg.channel == 9
+                                else SingleNote(
+                                    instrument=channel_program[msg.channel],
+                                    pitch=msg.note,
+                                    velocity=_velocity,
+                                    startime=_ms,
+                                    lastime=microseconds - _ms,
+                                    track_number=track_no,
+                                    is_percussion=False,
+                                )
+                            )
+                        else:
+                            if ignore_mismatch_error:
+                                print(
+                                    "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                        msg
+                                    )
+                                )
+                            else:
+                                raise NoteOnOffMismatchError(
+                                    "当前的MIDI很可能有损坏之嫌……",
+                                    msg,
+                                    "无法在上文中找到与之匹配的音符开音消息。",
+                                )
+
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+        del tempo
+        channels = dict(
+            [
+                (channel_no, sorted(channel_notes, key=lambda note: note.start_time))
+                for channel_no, channel_notes in midi_channels.items()
+            ]
+        )
+
+        return channels
+
+
+class MidiConvert(MusicSequence):
     """
     将Midi文件转换为我的世界内容
     """
-
-    midi: VoidMido
-    """MidiFile对象"""
 
     pitched_note_reference_table: MidiInstrumentTableType
     """乐音乐器Midi-MC对照表"""
@@ -94,17 +276,11 @@ class MidiConvert:
     volume_processing_function: FittingFunctionType
     """音量处理函数"""
 
-    midi_music_name: str
-    """Midi乐曲名"""
-
     enable_old_exe_format: bool
     """是否启用旧版execute指令格式"""
 
     execute_cmd_head: str
     """execute指令头部"""
-
-    channels: Union[ChannelType, NoteChannelType]
-    """频道信息字典"""
 
     music_command_list: List[SingleCommand]
     """音乐指令列表"""
@@ -115,10 +291,15 @@ class MidiConvert:
     progress_bar_command: List[SingleCommand]
     """进度条指令列表"""
 
+    music_deviation: int
+    """音乐音调总偏移"""
+
     def __init__(
         self,
-        midi_obj: VoidMido,
+        midi_obj: mido.MidiFile,
         midi_name: str,
+        deviation: Union[int, Literal[None]] = 0,
+        ignore_mismatch_error: bool = True,
         enable_old_exe_format: bool = False,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
@@ -141,9 +322,15 @@ class MidiConvert:
             打击乐器Midi-MC对照表
         """
 
-        self.midi: VoidMido = midi_obj
+        super(MidiConvert, self).from_mido(
+            midi_obj,
+            midi_name,
+            mismatch_error_ignorance=ignore_mismatch_error,
+        )
 
-        self.midi_music_name: str = midi_name
+        self.music_deviation = (
+            self.guess_deviation() if deviation is None else deviation
+        )
 
         self.enable_old_exe_format: bool = enable_old_exe_format
 
@@ -165,6 +352,7 @@ class MidiConvert:
     def from_midi_file(
         cls,
         midi_file_path: str,
+        ignore_mismatch_error: bool = True,
         old_exe_format: bool = False,
         pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
@@ -192,9 +380,14 @@ class MidiConvert:
 
         try:
             return cls(
-                mido.MidiFile(midi_file_path, clip=True),
+                mido.MidiFile(
+                    midi_file_path,
+                    clip=True,
+                ),
                 midi_music_name,
+                None,
                 old_exe_format,
+                ignore_mismatch_error,
                 pitched_note_table,
                 percussion_note_table,
                 vol_processing_func,
@@ -206,6 +399,11 @@ class MidiConvert:
 
         # ……真的那么重要吗
         # 我又几曾何时，知道祂真的会抛下我
+
+    def guess_deviation(self) -> int:
+
+        # 等我想想看
+        return 0
 
     def form_progress_bar(
         self,
@@ -422,7 +620,7 @@ class MidiConvert:
             npg_stl = (
                 pgs_style.replace("_", progressbar_style.played_style, i + 1)
                 .replace("_", progressbar_style.to_play_style)
-                .replace(r"%%N", self.midi_music_name)
+                .replace(r"%%N", self.music_name)
                 .replace(
                     r"%%s",
                     '"},{"score":{"name":"*","objective":"'
@@ -482,145 +680,6 @@ class MidiConvert:
         self.progress_bar_command = result
         return result
 
-    def to_music_note_channels(
-        self,
-        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
-        ignore_mismatch_error: bool = True,
-    ) -> NoteChannelType:
-        """
-        将midi解析并转换为频道音符字典
-
-        Returns
-        -------
-        以频道作为分割的Midi音符列表字典:
-        Dict[int,List[SingleNote,]]
-        """
-
-        if self.midi is None:
-            raise MidiUnboundError(
-                "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
-            )
-
-        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: NoteChannelType = empty_midi_channels(staff=[])
-        tempo = default_tempo_value
-
-        # 我们来用通道统计音乐信息
-        # 但是是用分轨的思路的
-        for track_no, track in enumerate(self.midi.tracks):
-            microseconds = 0
-            if not track:
-                continue
-
-            note_queue_A: Dict[
-                int,
-                List[
-                    Tuple[
-                        int,
-                        int,
-                    ]
-                ],
-            ] = empty_midi_channels(staff=[])
-            note_queue_B: Dict[
-                int,
-                List[
-                    Tuple[
-                        int,
-                        int,
-                    ]
-                ],
-            ] = empty_midi_channels(staff=[])
-
-            channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
-
-            for msg in track:
-                if msg.time != 0:
-                    microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
-
-                if msg.is_meta:
-                    if msg.type == "set_tempo":
-                        tempo = msg.tempo
-                else:
-                    if msg.type == "program_change":
-                        channel_program[msg.channel] = msg.program
-
-                    elif msg.type == "note_on" and msg.velocity != 0:
-                        note_queue_A[msg.channel].append(
-                            (msg.note, channel_program[msg.channel])
-                        )
-                        note_queue_B[msg.channel].append((msg.velocity, microseconds))
-
-                    elif (msg.type == "note_off") or (
-                        msg.type == "note_on" and msg.velocity == 0
-                    ):
-                        if (msg.note, channel_program[msg.channel]) in note_queue_A[
-                            msg.channel
-                        ]:
-                            _velocity, _ms = note_queue_B[msg.channel][
-                                note_queue_A[msg.channel].index(
-                                    (msg.note, channel_program[msg.channel])
-                                )
-                            ]
-                            note_queue_A[msg.channel].remove(
-                                (msg.note, channel_program[msg.channel])
-                            )
-                            note_queue_B[msg.channel].remove((_velocity, _ms))
-                            midi_channels[msg.channel].append(
-                                SingleNote(
-                                    instrument=msg.note,
-                                    pitch=channel_program[msg.channel],
-                                    velocity=_velocity,
-                                    startime=_ms,
-                                    lastime=microseconds - _ms,
-                                    track_number=track_no,
-                                    is_percussion=True,
-                                )
-                                if msg.channel == 9
-                                else SingleNote(
-                                    instrument=channel_program[msg.channel],
-                                    pitch=msg.note,
-                                    velocity=_velocity,
-                                    startime=_ms,
-                                    lastime=microseconds - _ms,
-                                    track_number=track_no,
-                                    is_percussion=False,
-                                )
-                            )
-                        else:
-                            if ignore_mismatch_error:
-                                print(
-                                    "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
-                                        msg
-                                    )
-                                )
-                            else:
-                                raise NoteOnOffMismatchError(
-                                    "当前的MIDI很可能有损坏之嫌……",
-                                    msg,
-                                    "无法在上文中找到与之匹配的音符开音消息。",
-                                )
-
-        """整合后的音乐通道格式
-        每个通道包括若干消息元素其中逃不过这三种：
-
-        1 切换乐器消息
-        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
-
-        2 音符开始消息
-        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
-
-        3 音符结束消息
-        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
-        del tempo, self.channels
-        self.channels = dict(
-            [
-                (channel_no, sorted(channel_notes, key=lambda note: note.start_time))
-                for channel_no, channel_notes in midi_channels.items()
-            ]
-        )
-
-        return self.channels
-
     def to_command_list_in_score(
         self,
         scoreboard_name: str = "mscplay",
@@ -653,7 +712,7 @@ class MidiConvert:
         max_score = 0
 
         # 此处 我们把通道视为音轨
-        for channel in self.to_music_note_channels().values():
+        for channel in self.channels.values():
             # 如果当前通道为空 则跳过
             if not channel:
                 continue
@@ -676,8 +735,11 @@ class MidiConvert:
                         if note.percussive
                         else self.pitched_note_reference_table
                     ),
-                    (max_volume) if note.track_no == 0 else (max_volume * 0.9),
-                    self.volume_processing_function,
+                    deviation=self.music_deviation,
+                    volume_percentage=(
+                        (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                    ),
+                    volume_processing_method=self.volume_processing_function,
                 )
 
                 this_channel.append(
@@ -756,7 +818,7 @@ class MidiConvert:
         notes_list: List[SingleNote] = []
 
         # 此处 我们把通道视为音轨
-        for channel in self.to_music_note_channels().values():
+        for channel in self.channels.values():
             notes_list.extend(channel)
 
         notes_list.sort(key=lambda a: a.start_time)
@@ -785,8 +847,11 @@ class MidiConvert:
                     if note.percussive
                     else self.pitched_note_reference_table
                 ),
-                (max_volume) if note.track_no == 0 else (max_volume * 0.9),
-                self.volume_processing_function,
+                deviation=self.music_deviation,
+                volume_percentage=(
+                    (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                ),
+                volume_processing_method=self.volume_processing_function,
             )
 
             self.music_command_list.append(
@@ -829,8 +894,8 @@ class MidiConvert:
 
     def copy_important(self):
         dst = MidiConvert(
-            midi_obj=None,
-            midi_name=self.midi_music_name,
+            midi_obj=mido.MidiFile(),
+            midi_name=self.music_name,
             enable_old_exe_format=self.enable_old_exe_format,
         )
         dst.music_command_list = [i.copy() for i in self.music_command_list]

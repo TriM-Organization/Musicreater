@@ -36,7 +36,7 @@ MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
 Midi音符名称对照表类型
 """
 
-MidiInstrumentTableType = Mapping[int, Tuple[str, int]]
+MidiInstrumentTableType = Mapping[int, str]
 """
 Midi乐器对照表类型
 """

@@ -189,10 +189,12 @@ print(
             )
         )
         if fileFormat == 1
-        else ("	结构大小：{}，延迟总数：{}，指令数量：{}".format(
+        else (
+            "	结构大小：{}，延迟总数：{}，指令数量：{}".format(
                 *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
-            ) if playerFormat == 2 else 
-            "	结构大小：{}，延迟总数：{}".format(
+            )
+            if playerFormat == 2
+            else "	结构大小：{}，延迟总数：{}".format(
                 *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
             )
         )

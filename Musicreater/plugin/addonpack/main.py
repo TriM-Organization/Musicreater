@@ -68,8 +68,8 @@ def to_addon_pack_in_score(
     with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
-                pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCFUNCTION(MCPACK) 计分播放器 - 由 音·创 生成",
-                pack_name=midi_cvt.midi_music_name + "播放",
+                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCFUNCTION(MCPACK) 计分播放器 - 由 音·创 生成",
+                pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
             ),
             fp=f,
@@ -136,11 +136,11 @@ def to_addon_pack_in_score(
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack")
+    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack",
+        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
     shutil.rmtree(f"{data_cfg.dist_path}/temp/")
@@ -198,8 +198,8 @@ def to_addon_pack_in_delay(
     with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
-                pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 延迟播放器 - 由 音·创 生成",
-                pack_name=midi_cvt.midi_music_name + "播放",
+                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 延迟播放器 - 由 音·创 生成",
+                pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
             ),
             fp=f,
@@ -229,7 +229,7 @@ def to_addon_pack_in_delay(
             os.path.join(
                 data_cfg.dist_path,
                 "temp/structures/",
-                f"{midi_cvt.midi_music_name}_main.mcstructure",
+                f"{midi_cvt.music_name}_main.mcstructure",
             )
         ),
         "wb+",
@@ -239,7 +239,7 @@ def to_addon_pack_in_delay(
     del struct
 
     if data_cfg.progressbar_style:
-        scb_name = midi_cvt.midi_music_name[:3] + "Pgb"
+        scb_name = midi_cvt.music_name[:3] + "Pgb"
         index_file.write("scoreboard objectives add {0} dummy {0}计\n".format(scb_name))
 
         struct_a = Structure((1, 1, 1), compability_version=compability_ver)
@@ -261,14 +261,14 @@ def to_addon_pack_in_delay(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_start.mcstructure",
+                    f"{midi_cvt.music_name}_start.mcstructure",
                 )
             ),
             "wb+",
         ) as f:
             struct_a.dump(f)
 
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_start ~ ~ ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_start ~ ~ ~1\n")
 
         pgb_struct, pgbSize, pgbNowPos = commands_to_structure(
             midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
@@ -281,14 +281,14 @@ def to_addon_pack_in_delay(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_pgb.mcstructure",
+                    f"{midi_cvt.music_name}_pgb.mcstructure",
                 )
             ),
             "wb+",
         ) as f:
             pgb_struct.dump(f)
 
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_pgb ~ ~1 ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_pgb ~ ~1 ~1\n")
 
         struct_a = Structure(
             (1, 1, 1),
@@ -311,7 +311,7 @@ def to_addon_pack_in_delay(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_reset.mcstructure",
+                    f"{midi_cvt.music_name}_reset.mcstructure",
                 )
             ),
             "wb+",
@@ -321,23 +321,23 @@ def to_addon_pack_in_delay(
         del struct_a, pgb_struct
 
         index_file.write(
-            f"structure load {midi_cvt.midi_music_name}_reset ~{pgbSize[0] + 2} ~ ~1\n"
+            f"structure load {midi_cvt.music_name}_reset ~{pgbSize[0] + 2} ~ ~1\n"
         )
 
         index_file.write(
-            f"structure load {midi_cvt.midi_music_name}_main ~{pgbSize[0] + 2} ~1 ~1\n"
+            f"structure load {midi_cvt.music_name}_main ~{pgbSize[0] + 2} ~1 ~1\n"
         )
 
     else:
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_main ~ ~ ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_main ~ ~ ~1\n")
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack")
+    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack",
+        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
     shutil.rmtree(f"{data_cfg.dist_path}/temp/")
@@ -395,8 +395,8 @@ def to_addon_pack_in_repeater(
     with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
-                pack_description=f"{midi_cvt.midi_music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
-                pack_name=midi_cvt.midi_music_name + "播放",
+                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
+                pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
             ),
             fp=f,
@@ -427,7 +427,7 @@ def to_addon_pack_in_repeater(
             os.path.join(
                 data_cfg.dist_path,
                 "temp/structures/",
-                f"{midi_cvt.midi_music_name}_main.mcstructure",
+                f"{midi_cvt.music_name}_main.mcstructure",
             )
         ),
         "wb+",
@@ -437,7 +437,7 @@ def to_addon_pack_in_repeater(
     del struct
 
     if data_cfg.progressbar_style:
-        scb_name = midi_cvt.midi_music_name[:3] + "Pgb"
+        scb_name = midi_cvt.music_name[:3] + "Pgb"
         index_file.write("scoreboard objectives add {0} dummy {0}计\n".format(scb_name))
 
         struct_a = Structure((1, 1, 1), compability_version=compability_ver)
@@ -459,14 +459,14 @@ def to_addon_pack_in_repeater(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_start.mcstructure",
+                    f"{midi_cvt.music_name}_start.mcstructure",
                 )
             ),
             "wb+",
         ) as f:
             struct_a.dump(f)
 
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_start ~ ~ ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_start ~ ~ ~1\n")
 
         pgb_struct, pgbSize, pgbNowPos = commands_to_structure(
             midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
@@ -479,14 +479,14 @@ def to_addon_pack_in_repeater(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_pgb.mcstructure",
+                    f"{midi_cvt.music_name}_pgb.mcstructure",
                 )
             ),
             "wb+",
         ) as f:
             pgb_struct.dump(f)
 
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_pgb ~ ~1 ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_pgb ~ ~1 ~1\n")
 
         struct_a = Structure(
             (1, 1, 1),
@@ -509,7 +509,7 @@ def to_addon_pack_in_repeater(
                 os.path.join(
                     data_cfg.dist_path,
                     "temp/structures/",
-                    f"{midi_cvt.midi_music_name}_reset.mcstructure",
+                    f"{midi_cvt.music_name}_reset.mcstructure",
                 )
             ),
             "wb+",
@@ -519,23 +519,23 @@ def to_addon_pack_in_repeater(
         del struct_a, pgb_struct
 
         index_file.write(
-            f"structure load {midi_cvt.midi_music_name}_reset ~{pgbSize[0] + 2} ~ ~1\n"
+            f"structure load {midi_cvt.music_name}_reset ~{pgbSize[0] + 2} ~ ~1\n"
         )
 
         index_file.write(
-            f"structure load {midi_cvt.midi_music_name}_main ~{pgbSize[0] + 2} ~1 ~1\n"
+            f"structure load {midi_cvt.music_name}_main ~{pgbSize[0] + 2} ~1 ~1\n"
         )
 
     else:
-        index_file.write(f"structure load {midi_cvt.midi_music_name}_main ~ ~ ~1\n")
+        index_file.write(f"structure load {midi_cvt.music_name}_main ~ ~ ~1\n")
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack")
+    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.midi_music_name}.mcpack",
+        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
     shutil.rmtree(f"{data_cfg.dist_path}/temp/")

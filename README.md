@@ -7,7 +7,7 @@
     </img>
 </p>
 
-<h3 align="center">一款免费开源的《我的世界》数字音频转换库。</h3>
+<h3 align="center">一款免费开源的《我的世界》数字音频库。</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
@@ -46,6 +46,7 @@
   ```
 
 - 如果无法更新最新，可以尝试：
+
   ```bash
   pip install --upgrade -i https://pypi.python.org/simple Musicreater
   ```

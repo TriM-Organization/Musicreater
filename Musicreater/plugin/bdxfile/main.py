@@ -69,7 +69,7 @@ def to_BDX_file_in_score(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.bdx")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
         ),
         "w+",
     ) as f:
@@ -119,7 +119,7 @@ def to_BDX_file_in_score(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.bdx")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
         ),
         "ab+",
     ) as f:
@@ -167,7 +167,7 @@ def to_BDX_file_in_delay(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.bdx")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
         ),
         "w+",
     ) as f:
@@ -180,7 +180,7 @@ def to_BDX_file_in_delay(
     cmdBytes, size, finalPos = commands_to_BDX_bytes(cmdlist, max_height - 1)
 
     if data_cfg.progressbar_style:
-        scb_name = midi_cvt.midi_music_name[:3] + "Pgb"
+        scb_name = midi_cvt.music_name[:3] + "Pgb"
         _bytes += form_command_block_in_BDX_bytes(
             r"scoreboard objectives add {} dummy {}计".replace(r"{}", scb_name),
             1,
@@ -217,7 +217,7 @@ def to_BDX_file_in_delay(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.bdx")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
         ),
         "ab+",
     ) as f:

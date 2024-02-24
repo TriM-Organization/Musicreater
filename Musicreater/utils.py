@@ -18,7 +18,7 @@ Terms & Conditions: License.md in the root directory
 import math
 import random
 
-from .constants import MM_INSTRUMENT_DEVIATION_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
+from .constants import MM_INSTRUMENT_RANGE_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
 from .subclass import SingleNote
 
 from .types import (
@@ -58,18 +58,10 @@ def inst_to_sould_with_deviation(
     instrumentID: int,
     reference_table: MidiInstrumentTableType,
     default_instrument: str = "note.flute",
-    default_deviation: Optional[int] = 5,
 ) -> Tuple[str, int]:
     """
     返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
-    2**( ( msg.note - 60 - X ) / 12 ) 即为MC的音高，其中
-    X的取值随乐器不同而变化：
-    竖琴harp、电钢琴pling、班卓琴banjo、方波bit、颤音琴iron_xylophone 的时候为6
-    吉他的时候为7
-    贝斯bass、迪吉里杜管didgeridoo的时候为8
-    长笛flute、牛铃cou_bell的时候为5
-    钟琴bell、管钟chime、木琴xylophone的时候为4
-    而存在一些打击乐器bd(basedrum)、hat、snare，没有音域，则没有X，那么我们返回7即可
+    2**( ( msg.note - 66 ) / 12 ) 即为MC的音高
 
     Parameters
     ----------
@@ -84,18 +76,41 @@ def inst_to_sould_with_deviation(
     """
     return reference_table.get(
         instrumentID,
-        (
-            default_instrument,
-            (
-                default_deviation
-                if default_deviation
-                else MM_INSTRUMENT_DEVIATION_TABLE.get(default_instrument, -1)
-            ),
-        ),
+        default=default_instrument,
+    ), 6
+
+    # 明明已经走了
+    # 凭什么还要在我心里留下缠绵缱绻
+
+
+def midi_inst_to_mc_sould(
+    instrumentID: int,
+    reference_table: MidiInstrumentTableType,
+    default_instrument: str = "note.flute",
+) -> str:
+    """
+    返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
+    2**( ( msg.note - 66 ) / 12 ) 即为MC的音高
+
+    Parameters
+    ----------
+    instrumentID: int
+        midi的乐器ID
+    reference_table: Dict[int, Tuple[str, int]]
+        转换乐器参照表
+
+    Returns
+    -------
+    tuple(str我的世界乐器名, int转换算法中的X)
+    """
+    return reference_table.get(
+        instrumentID,
+        default=default_instrument,
     )
 
     # 明明已经走了
     # 凭什么还要在我心里留下缠绵缱绻
+
 
 
 def natural_curve(
@@ -145,6 +160,7 @@ def straight_line(vol: float) -> float:
 def note_to_command_parameters(
     note_: SingleNote,
     reference_table: MidiInstrumentTableType,
+    deviation: int = 0,
     volume_percentage: float = 1,
     volume_processing_method: Callable[[float], float] = natural_curve,
 ) -> Tuple[
@@ -156,20 +172,21 @@ def note_to_command_parameters(
     """
     将音符转为播放的指令
     :param note_:int 音符对象
-    :param reference_table:Dict[int, Tuple[str, int]] 转换对照表
+    :param reference_table:Dict[int, str] 转换对照表
+    :param deviation:int 音调偏移量
     :param volume_percentage:int 音量占比(0,1]
-    :param volume_proccessing_method:Callable[[float], float]: 音量处理函数
+    :param volume_proccessing_method:Callable[[float], float] 音量处理函数
 
     :return str[我的世界音符ID], float[播放距离], float[指令音量参数], float[指令音调参数]
     """
-    mc_sound_ID, deviation = inst_to_sould_with_deviation(
+    mc_sound_ID = midi_inst_to_mc_sould(
         note_.inst,
         reference_table,
         "note.bd" if note_.percussive else "note.flute",
     )
 
     # delaytime_now = round(self.start_time / float(speed) / 50)
-    mc_pitch = None if note_.percussive else 2 ** ((note_.note - 60 - deviation) / 12)
+    mc_pitch = None if note_.percussive else 2 ** ((note_.note - 66 + deviation) / 12)
 
     mc_distance_volume = volume_processing_method(note_.velocity * volume_percentage)
 

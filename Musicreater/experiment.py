@@ -24,6 +24,7 @@ from .main import (
     MidiConvert,
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    mido,
 )
 from .types import Tuple, List, Dict, ChannelType
 
@@ -122,7 +123,7 @@ class FutureMidiConvertM4(MidiConvert):
         notes_list: List[SingleNote] = []
 
         # 此处 我们把通道视为音轨
-        for channel in self.to_music_note_channels().values():
+        for channel in self.channels.values():
             for note in channel:
                 note.set_info(
                     note_to_command_parameters(
@@ -132,8 +133,11 @@ class FutureMidiConvertM4(MidiConvert):
                             if note.percussive
                             else self.pitched_note_reference_table
                         ),
-                        (max_volume) if note.track_no == 0 else (max_volume * 0.9),
-                        self.volume_processing_function,
+                        deviation=0,
+                        volume_percentage=(
+                            (max_volume) if note.track_no == 0 else (max_volume * 0.9)
+                        ),
+                        volume_processing_method=self.volume_processing_function,
                     )
                 )
 
@@ -180,6 +184,7 @@ class FutureMidiConvertM5(MidiConvert):
 
     def to_music_channels(
         self,
+        midi: mido.MidiFile,
     ) -> ChannelType:
         """
         使用金羿的转换思路，将midi解析并转换为频道信息字典
@@ -189,10 +194,11 @@ class FutureMidiConvertM5(MidiConvert):
         以频道作为分割的Midi信息字典:
         Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
         """
-        if self.midi is None:
-            raise MidiUnboundError(
-                "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
-            )
+
+        # if self.midi is None:
+        #     raise MidiUnboundError(
+        #         "你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
+        #     )
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: ChannelType = empty_midi_channels()
@@ -200,7 +206,7 @@ class FutureMidiConvertM5(MidiConvert):
 
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
-        for track_no, track in enumerate(self.midi.tracks):
+        for track_no, track in enumerate(midi.tracks):
             microseconds = 0
             if not track:
                 continue
@@ -209,7 +215,7 @@ class FutureMidiConvertM5(MidiConvert):
 
             for msg in track:
                 if msg.time != 0:
-                    microseconds += msg.time * tempo / self.midi.ticks_per_beat / 1000
+                    microseconds += msg.time * tempo / midi.ticks_per_beat / 1000
 
                 if msg.is_meta:
                     if msg.type == "set_tempo":
@@ -257,6 +263,7 @@ class FutureMidiConvertM5(MidiConvert):
     # 神奇的偏移音
     def to_command_list_in_delay(
         self,
+        midi: mido.MidiFile,
         max_volume: float = 1.0,
         speed: float = 1.0,
         player_selector: str = "@a",
@@ -282,7 +289,9 @@ class FutureMidiConvertM5(MidiConvert):
             raise ZeroSpeedError("播放速度仅可为正实数")
         max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
-        self.to_music_channels()
+        self.to_music_channels(
+            midi=midi,
+        )
 
         tracks = {}
         InstID = -1
@@ -304,12 +313,12 @@ class FutureMidiConvertM5(MidiConvert):
                         InstID = msg[1]
 
                     elif msg[0] == "NoteS":
-                        soundID, _X = (
-                            inst_to_sould_with_deviation(
+                        soundID = (
+                            midi_inst_to_mc_sould(
                                 msg[1], MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
                             )
                             if SpecialBits
-                            else inst_to_sould_with_deviation(
+                            else midi_inst_to_mc_sould(
                                 InstID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
                             )
                         )
@@ -324,7 +333,7 @@ class FutureMidiConvertM5(MidiConvert):
                                 + (
                                     ""
                                     if SpecialBits
-                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                    else f"{2 ** ((msg[1] - 66) / 12)}"
                                 )
                             )
                         except KeyError:
@@ -334,7 +343,7 @@ class FutureMidiConvertM5(MidiConvert):
                                 + (
                                     ""
                                     if SpecialBits
-                                    else f"{2 ** ((msg[1] - 60 - _X) / 12)}"
+                                    else f"{2 ** ((msg[1] - 66) / 12)}"
                                 )
                             ]
 

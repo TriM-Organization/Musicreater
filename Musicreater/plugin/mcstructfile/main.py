@@ -72,7 +72,7 @@ def to_mcstructure_file_in_delay(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.mcstructure")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.mcstructure")
         ),
         "wb+",
     ) as f:
@@ -144,7 +144,7 @@ def to_mcstructure_file_in_score(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.mcstructure")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.mcstructure")
         ),
         "wb+",
     ) as f:
@@ -207,7 +207,7 @@ def to_mcstructure_file_in_repeater(
 
     with open(
         os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.midi_music_name}.mcstructure")
+            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.mcstructure")
         ),
         "wb+",
     ) as f:

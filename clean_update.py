@@ -13,7 +13,9 @@ def main():
             if file.endswith(".egg-info"):
                 egg_info.append(file)
                 console.print(file)
-    for file in track(["build", "dist", "logs", *egg_info], description="Deleting files"):
+    for file in track(
+        ["build", "dist", "logs", *egg_info], description="Deleting files"
+    ):
         if os.path.isdir(file) and os.access(file, os.W_OK):
             shutil.rmtree(file)
 
