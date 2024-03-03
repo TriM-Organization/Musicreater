@@ -18,7 +18,7 @@ Terms & Conditions: License.md in the root directory
 from typing import List
 
 from ..constants import x, y, z
-from ..subclass import SingleCommand
+from ..subclass import MineCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
 
 BDX_MOVE_KEY = {
@@ -123,7 +123,7 @@ def form_command_block_in_BDX_bytes(
 
 
 def commands_to_BDX_bytes(
-    commands_list: List[SingleCommand],
+    commands_list: List[MineCommand],
     max_height: int = 64,
 ):
     """

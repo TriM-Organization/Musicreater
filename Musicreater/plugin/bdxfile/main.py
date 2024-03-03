@@ -17,7 +17,7 @@ import os
 import brotli
 
 from ...main import MidiConvert
-from ...subclass import SingleCommand
+from ...subclass import MineCommand
 from ..bdx import (
     bdx_move,
     commands_to_BDX_bytes,
@@ -61,16 +61,14 @@ def to_BDX_file_in_score(
     """
 
     cmdlist, command_count, max_score = midi_cvt.to_command_list_in_score(
-        scoreboard_name, data_cfg.volume_ratio, data_cfg.speed_multiplier
+        scoreboard_name=scoreboard_name,
     )
 
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)
 
     with open(
-        os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
-        ),
+        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
         "w+",
     ) as f:
         f.write("BD@")
@@ -83,7 +81,7 @@ def to_BDX_file_in_score(
         midi_cvt.music_command_list
         + (
             [
-                SingleCommand(
+                MineCommand(
                     command="scoreboard players reset @a[scores={"
                     + scoreboard_name
                     + "="
@@ -118,9 +116,7 @@ def to_BDX_file_in_score(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
-        ),
+        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
@@ -157,18 +153,14 @@ def to_BDX_file_in_delay(
     """
 
     cmdlist, max_delay = midi_cvt.to_command_list_in_delay(
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
-        player,
+        player_selector=player,
     )[:2]
 
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)
 
     with open(
-        os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
-        ),
+        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
         "w+",
     ) as f:
         f.write("BD@")
@@ -216,9 +208,7 @@ def to_BDX_file_in_delay(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(
-            os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")
-        ),
+        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))

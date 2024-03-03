@@ -21,4 +21,8 @@ __all__ = [
 ]
 __author__ = (("金羿", "Eilles Wan"),)
 
-from .main import to_mcstructure_file_in_delay, to_mcstructure_file_in_repeater, to_mcstructure_file_in_score
+from .main import (
+    to_mcstructure_file_in_delay,
+    to_mcstructure_file_in_repeater,
+    to_mcstructure_file_in_score,
+)

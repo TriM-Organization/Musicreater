@@ -17,8 +17,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "1.8"
-__vername__ = "音调总体偏移的处理支持"
+__version__ = "2.0.0-alpha"
+__vername__ = "全新组织架构"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -31,7 +31,8 @@ __all__ = [
     "MidiConvert",
     # 附加类
     "SingleNote",
-    "SingleCommand",
+    "MineNote",
+    "MineCommand",
     "SingleNoteBox",
     # "TimeStamp", 未来功能
     # 默认值

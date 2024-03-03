@@ -56,7 +56,7 @@ def to_addon_pack_in_score(
     """
 
     cmdlist, maxlen, maxscore = midi_cvt.to_command_list_in_score(
-        scoreboard_name, data_cfg.volume_ratio, data_cfg.speed_multiplier
+        scoreboard_name=scoreboard_name,
     )
 
     # 当文件f夹{self.outputPath}/temp/functions存在时清空其下所有项目，然后创建
@@ -180,9 +180,7 @@ def to_addon_pack_in_delay(
     )
 
     command_list, max_delay = midi_cvt.to_command_list_in_delay(
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
-        player,
+        player_selector=player,
     )[:2]
 
     if not os.path.exists(data_cfg.dist_path):
@@ -377,9 +375,7 @@ def to_addon_pack_in_repeater(
     )
 
     command_list, max_delay, max_together = midi_cvt.to_command_list_in_delay(
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
-        player,
+        player_selector=player,
     )
 
     if not os.path.exists(data_cfg.dist_path):

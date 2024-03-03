@@ -21,7 +21,7 @@ from typing import List, Literal, Tuple
 from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
 
 from ..constants import x, y, z
-from ..subclass import SingleCommand
+from ..subclass import MineCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box
 
 
@@ -226,7 +226,7 @@ def form_command_block_in_NBT_struct(
 
 
 def commands_to_structure(
-    commands: List[SingleCommand],
+    commands: List[MineCommand],
     max_height: int = 64,
     compability_version_: int = COMPABILITY_VERSION_119,
 ):
@@ -313,7 +313,7 @@ def commands_to_structure(
 
 
 def commands_to_redstone_delay_structure(
-    commands: List[SingleCommand],
+    commands: List[MineCommand],
     delay_length: int,
     max_multicmd_length: int,
     base_block: str = "concrete",

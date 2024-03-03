@@ -18,10 +18,205 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from typing import Any
-from .types import Optional, Any, List, Mapping
+from .types import Optional, Any, List, Mapping, Tuple, Union
 
 from .constants import MC_PERCUSSION_INSTRUMENT_LIST
+
+
+@dataclass(init=False)
+class MineNote:
+    """存储单个音符的类"""
+
+    sound_name: str
+    """乐器ID"""
+
+    note_pitch: int
+    """midi音高"""
+
+    velocity: int
+    """响度(力度)"""
+
+    start_tick: int
+    """开始之时 命令刻"""
+
+    duration: int
+    """音符持续时间 命令刻"""
+
+    track_no: int
+    """音符所处的音轨"""
+
+    percussive: bool
+    """是否作为打击乐器启用"""
+
+    position_displacement: Tuple[float, float, float]
+    """声像位移"""
+
+    extra_info: Any
+    """你觉得放什么好？"""
+
+    def __init__(
+        self,
+        mc_sound_name: str,
+        midi_pitch: Optional[int],
+        midi_velocity: int,
+        start_time: int,
+        last_time: int,
+        track_number: int = 0,
+        is_percussion: Optional[bool] = None,
+        displacement: Optional[Tuple[float, float, float]] = None,
+        extra_information: Optional[Any] = None,
+    ):
+        """用于存储单个音符的类
+        :param mc_sound_name:`str` 《我的世界》声音ID
+        :param midi_pitch:`int` midi音高
+        :param midi_velocity:`int` midi响度(力度)
+        :param start_time:`int` 开始之时(命令刻)
+            注：此处的时间是用从乐曲开始到当前的毫秒数
+        :param last_time:`int` 音符延续时间(命令刻)
+        :param track_number:`int` 音轨编号
+        :param is_percussion:`bool` 是否作为打击乐器
+        :param displacement:`tuple[int,int,int]` 声像位移
+        :param extra_information:`Any` 附加信息"""
+        self.sound_name: str = mc_sound_name
+        """乐器ID"""
+        self.note_pitch: int = 66 if midi_pitch is None else midi_pitch
+        """midi音高"""
+        self.velocity: int = midi_velocity
+        """响度(力度)"""
+        self.start_tick: int = start_time
+        """开始之时 tick"""
+        self.duration: int = last_time
+        """音符持续时间 tick"""
+        self.track_no: int = track_number
+        """音符所处的音轨"""
+
+        self.percussive = (
+            (mc_sound_name in MC_PERCUSSION_INSTRUMENT_LIST)
+            if (is_percussion is None)
+            else is_percussion
+        )
+        """是否为打击乐器"""
+
+        self.position_displacement = (
+            (0, 0, 0) if (displacement is None) else displacement
+        )
+        """声像位移"""
+
+        self.extra_info = extra_information
+
+    # @property
+    # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
+    #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
+    #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+
+    def set_info(self, sth: Any):
+        """设置附加信息"""
+        self.extra_info = sth
+
+    def __str__(self, is_displacement: bool = False, is_track: bool = False):
+        return "{}Note(Instrument = {}, {}Velocity = {}, StartTick = {}, Duration = {}{}{})".format(
+            "Percussive" if self.percussive else "",
+            self.sound_name,
+            "" if self.percussive else "NotePitch = {}, ".format(self.note_pitch),
+            self.start_tick,
+            self.duration,
+            ", Track = {}".format(self.track_no) if is_track else "",
+            (
+                ", PositionDisplacement = {}".format(self.position_displacement)
+                if is_displacement
+                else ""
+            ),
+        )
+
+    def tuplize(self, is_displacement: bool = False, is_track: bool = False):
+        tuplized = self.__tuple__()
+        return (
+            tuplized[:-2]
+            + ((tuplized[-2],) if is_track else ())
+            + ((tuplized[-1],) if is_displacement else ())
+        )
+
+    def __list__(self) -> List:
+        return (
+            [
+                self.percussive,
+                self.sound_name,
+                self.velocity,
+                self.start_tick,
+                self.duration,
+                self.track_no,
+                self.position_displacement,
+            ]
+            if self.percussive
+            else [
+                self.percussive,
+                self.sound_name,
+                self.note_pitch,
+                self.velocity,
+                self.start_tick,
+                self.duration,
+                self.track_no,
+                self.position_displacement,
+            ]
+        )
+
+    def __tuple__(
+        self,
+    ) -> Union[
+        Tuple[bool, str, int, int, int, int, int, Tuple[float, float, float]],
+        Tuple[bool, str, int, int, int, int, Tuple[float, float, float]],
+    ]:
+        return (
+            (
+                self.percussive,
+                self.sound_name,
+                self.velocity,
+                self.start_tick,
+                self.duration,
+                self.track_no,
+                self.position_displacement,
+            )
+            if self.percussive
+            else (
+                self.percussive,
+                self.sound_name,
+                self.note_pitch,
+                self.velocity,
+                self.start_tick,
+                self.duration,
+                self.track_no,
+                self.position_displacement,
+            )
+        )
+
+    def __dict__(self):
+        return (
+            {
+                "Percussive": self.percussive,
+                "Instrument": self.sound_name,
+                "Velocity": self.velocity,
+                "StartTick": self.start_tick,
+                "Duration": self.duration,
+                "Track": self.track_no,
+                "PositionDisplacement": self.position_displacement,
+            }
+            if self.percussive
+            else {
+                "Percussive": self.percussive,
+                "Instrument": self.sound_name,
+                "Pitch": self.note_pitch,
+                "Velocity": self.velocity,
+                "StartTick": self.start_tick,
+                "Duration": self.duration,
+                "Track": self.track_no,
+                "PositionDisplacement": self.position_displacement,
+            }
+        )
+
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, self.__class__):
+            return False
+        return self.tuplize() == other.tuplize()
 
 
 @dataclass(init=False)
@@ -59,8 +254,8 @@ class SingleNote:
         velocity: int,
         startime: int,
         lastime: int,
+        is_percussion: bool,
         track_number: int = 0,
-        is_percussion: Optional[bool] = None,
         extra_information: Any = None,
     ):
         """用于存储单个音符的类
@@ -82,12 +277,7 @@ class SingleNote:
         """音符持续时间 ms"""
         self.track_no: int = track_number
         """音符所处的音轨"""
-
-        self.percussive = (
-            (is_percussion in MC_PERCUSSION_INSTRUMENT_LIST)
-            if (is_percussion is None)
-            else is_percussion
-        )
+        self.percussive: bool = is_percussion
         """是否为打击乐器"""
 
         self.extra_info = extra_information
@@ -176,7 +366,7 @@ class SingleNote:
 
 
 @dataclass(init=False)
-class SingleCommand:
+class MineCommand:
     """存储单个指令的类"""
 
     command_text: str
@@ -218,7 +408,7 @@ class SingleCommand:
         self.annotation_text = annotation
 
     def copy(self):
-        return SingleCommand(
+        return MineCommand(
             command=self.command_text,
             condition=self.conditional,
             tick_delay=self.delay,
@@ -398,4 +588,15 @@ NoteChannelType = Mapping[
 频道信息类型
 
 Dict[int,Dict[int,List[SingleNote,],],]
+"""
+
+
+MineNoteChannelType = Mapping[
+    int,
+    List[MineNote,],
+]
+"""
+我的世界频道信息类型
+
+Dict[int,Dict[int,List[MineNote,],],]
 """

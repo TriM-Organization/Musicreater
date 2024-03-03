@@ -414,28 +414,28 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
 
 # Midi对MC通用对照表
 
-MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[int, int]] = {
-    "note.harp": (42, 66),
-    "note.pling": (42, 66),
-    "note.guitar": (30, 54),
-    "note.iron_xylophone": (42, 66),
-    "note.bell": (66, 90),
-    "note.xylophone": (66, 90),
-    "note.chime": (66, 90),
-    "note.banjo": (42, 66),
-    "note.flute": (54, 78),
-    "note.bass": (18, 42),
-    "note.snare": (-1, 128),  # 实际上是 0~127
-    "note.didgeridoo": (18, 42),
-    "mob.zombie.wood": (-1, 128),
-    "note.bit": (42, 66),
-    "note.hat": (-1, 128),
-    "note.bd": (-1, 128),
-    "note.basedrum": (-1, 128),
-    "firework.blast": (-1, 128),
-    "firework.twinkle": (-1, 128),
-    "fire.ignite": (-1, 128),
-    "note.cow_bell": (54, 78),
+MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[Tuple[int, int], int]] = {
+    "note.harp": ((42, 66), 54),
+    "note.pling": ((42, 66), 54),
+    "note.guitar": ((30, 54), 42),
+    "note.iron_xylophone": ((42, 66), 54),
+    "note.bell": ((66, 90), 78),
+    "note.xylophone": ((66, 90), 78),
+    "note.chime": ((66, 90), 78),
+    "note.banjo": ((42, 66), 54),
+    "note.flute": ((54, 78), 66),
+    "note.bass": ((18, 42), 30),
+    "note.snare": ((-1, 128), 0),   # 实际上是 0~127
+    "note.didgeridoo": ((18, 42), 30),
+    "mob.zombie.wood": ((-1, 128), 0),
+    "note.bit": ((42, 66), 54),
+    "note.hat": ((-1, 128), 0),
+    "note.bd": ((-1, 128), 0),
+    "note.basedrum": ((-1, 128), 0),
+    "firework.blast": ((-1, 128), 0),
+    "firework.twinkle": ((-1, 128), 0),
+    "fire.ignite": ((-1, 128), 0),
+    "note.cow_bell": ((54, 78), 66),
 }
 """不同乐器的音域偏离对照表"""
 

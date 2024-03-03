@@ -23,16 +23,10 @@ from ..subclass import DEFAULT_PROGRESSBAR_STYLE, ProgressBarStyle
 
 
 @dataclass(init=False)
-class ConvertConfig:
+class ConvertConfig: # 必定要改
     """
     转换通用设置存储类
     """
-
-    volume_ratio: float
-    """音量比例"""
-
-    speed_multiplier: float
-    """速度倍率"""
 
     progressbar_style: Union[ProgressBarStyle, None]
     """进度条样式"""
@@ -43,8 +37,6 @@ class ConvertConfig:
     def __init__(
         self,
         output_path: str,
-        volume: float = 1.0,
-        speed: float = 1.0,
         progressbar: Union[bool, Tuple[str, Tuple[str, str]], ProgressBarStyle] = True,
         ignore_progressbar_param_error: bool = False,
     ):
@@ -66,12 +58,6 @@ class ConvertConfig:
 
         self.dist_path = output_path
         """输出目录"""
-
-        self.volume_ratio = volume
-        """音量比例"""
-
-        self.speed_multiplier = speed
-        """速度倍率"""
 
         if progressbar:
             # 此处是对于仅有 True 的参数和自定义参数的判断

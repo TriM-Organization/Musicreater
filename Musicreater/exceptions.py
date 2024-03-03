@@ -115,3 +115,11 @@ class ZeroSpeedError(ZeroDivisionError):
     def __init__(self, *args):
         """以0作为播放速度的错误"""
         super().__init__("播放速度为0", *args)
+
+
+class IllegalMinimumVolumeError(ValueError):
+    """最小播放音量有误的错误"""
+
+    def __init__(self, *args):
+        """最小播放音量错误"""
+        super().__init__("最小播放音量超出范围", *args)

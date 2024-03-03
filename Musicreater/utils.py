@@ -18,8 +18,8 @@ Terms & Conditions: License.md in the root directory
 import math
 import random
 
-from .constants import MM_INSTRUMENT_RANGE_TABLE, MC_INSTRUMENT_BLOCKS_TABLE
-from .subclass import SingleNote
+from .constants import MC_INSTRUMENT_BLOCKS_TABLE, MM_INSTRUMENT_RANGE_TABLE
+from .subclass import SingleNote, MineNote
 
 from .types import (
     Any,
@@ -74,23 +74,25 @@ def inst_to_sould_with_deviation(
     -------
     tuple(str我的世界乐器名, int转换算法中的X)
     """
-    return reference_table.get(
-        instrumentID,
-        default=default_instrument,
-    ), 6
+    return (
+        reference_table.get(
+            instrumentID,
+            default_instrument,
+        ),
+        6,
+    )
 
     # 明明已经走了
     # 凭什么还要在我心里留下缠绵缱绻
 
 
-def midi_inst_to_mc_sould(
+def midi_inst_to_mc_sound(
     instrumentID: int,
     reference_table: MidiInstrumentTableType,
     default_instrument: str = "note.flute",
 ) -> str:
     """
-    返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
-    2**( ( msg.note - 66 ) / 12 ) 即为MC的音高
+    返回midi的乐器ID对应的我的世界乐器名
 
     Parameters
     ----------
@@ -101,16 +103,12 @@ def midi_inst_to_mc_sould(
 
     Returns
     -------
-    tuple(str我的世界乐器名, int转换算法中的X)
+    str我的世界乐器名
     """
     return reference_table.get(
         instrumentID,
-        default=default_instrument,
+        default_instrument,
     )
-
-    # 明明已经走了
-    # 凭什么还要在我心里留下缠绵缱绻
-
 
 
 def natural_curve(
@@ -157,44 +155,167 @@ def straight_line(vol: float) -> float:
     return vol / -8 + 16
 
 
-def note_to_command_parameters(
-    note_: SingleNote,
-    reference_table: MidiInstrumentTableType,
-    deviation: int = 0,
-    volume_percentage: float = 1,
-    volume_processing_method: Callable[[float], float] = natural_curve,
+def minenote_to_command_paramaters(
+    note_: MineNote,
+    pitch_deviation: float = 0,
 ) -> Tuple[
     str,
-    float,
+    Tuple[float, float, float],
     float,
     Union[float, Literal[None]],
 ]:
     """
-    将音符转为播放的指令
+    将MineNote对象转为《我的世界》音符播放所需之参数
+    :param note_:MineNote 音符对象
+    :param deviation:float 音调偏移量
+
+    :return str[我的世界音符ID], Tuple[float,float,float]播放视角坐标, float[指令音量参数], float[指令音调参数]
+    """
+
+    return (
+        note_.sound_name,
+        note_.position_displacement,
+        note_.velocity / 127,
+        (
+            None
+            if note_.percussive
+            else 2 ** ((note_.note_pitch - 66 + pitch_deviation) / 12)
+        ),
+    )
+
+
+def single_note_to_command_parameters(
+    note_: SingleNote,
+    reference_table: MidiInstrumentTableType,
+    deviation: float = 0,
+    volume_processing_method: Callable[[float], float] = natural_curve,
+) -> Tuple[
+    str,
+    Tuple[float, float, float],
+    float,
+    Union[float, Literal[None]],
+]:
+    """
+    将音符转为播放的指令之参数
     :param note_:int 音符对象
     :param reference_table:Dict[int, str] 转换对照表
-    :param deviation:int 音调偏移量
-    :param volume_percentage:int 音量占比(0,1]
+    :param deviation:float 音调偏移量
     :param volume_proccessing_method:Callable[[float], float] 音量处理函数
 
-    :return str[我的世界音符ID], float[播放距离], float[指令音量参数], float[指令音调参数]
+    :return str[我的世界音符ID], Tuple[float,float,float]播放视角坐标, float[指令音量参数], float[指令音调参数]
     """
-    mc_sound_ID = midi_inst_to_mc_sould(
+
+    mc_sound_ID = midi_inst_to_mc_sound(
         note_.inst,
         reference_table,
         "note.bd" if note_.percussive else "note.flute",
     )
 
-    # delaytime_now = round(self.start_time / float(speed) / 50)
-    mc_pitch = None if note_.percussive else 2 ** ((note_.note - 66 + deviation) / 12)
+    mc_distance_volume = volume_processing_method(note_.velocity)
 
-    mc_distance_volume = volume_processing_method(note_.velocity * volume_percentage)
+    return (
+        mc_sound_ID,
+        (0, mc_distance_volume, 0),
+        note_.velocity / 127,
+        None if note_.percussive else 2 ** ((note_.pitch - 66 + deviation) / 12),
+    )
 
-    return mc_sound_ID, mc_distance_volume, volume_percentage, mc_pitch
+
+def midi_msgs_to_minenote(
+    inst_: int,  # 乐器编号
+    note_: int,
+    percussive_: bool,  # 是否作为打击乐器启用
+    velocity_: int,
+    start_time_: int,
+    duration_: int,
+    track_no_: int,
+    play_speed: float,
+    midi_reference_table: MidiInstrumentTableType,
+    volume_processing_method_: Callable[[float], float],
+) -> MineNote:
+    """
+    将Midi信息转为我的世界音符对象
+    :param inst_: int 乐器编号
+    :param note_: int 音高编号（音符编号）
+    :param percussive_: bool 是否作为打击乐器启用
+    :param velocity_: int 力度(响度)
+    :param start_time_: int 音符起始时间（毫秒数）
+    :param duration_: int 音符持续时间（毫秒数）
+    :param track_no_: int 音符所处音轨
+    :param play_speed: float 曲目播放速度
+    :param midi_reference_table: Dict[int, str] 转换对照表
+    :param volume_proccessing_method_: Callable[[float], float] 音量处理函数
+
+    :return MineNote我的世界音符对象
+    """
+    mc_sound_ID = midi_inst_to_mc_sound(
+        inst_,
+        midi_reference_table,
+        "note.bd" if percussive_ else "note.flute",
+    )
+
+    mc_distance_volume = volume_processing_method_(velocity_)
+
+    return MineNote(
+        mc_sound_ID,
+        note_,
+        velocity_,
+        round(start_time_ / float(play_speed) / 50),
+        round(duration_ / float(play_speed) / 50),
+        track_no_,
+        percussive_,
+        (0, mc_distance_volume, 0),
+    )
 
 
-def from_single_note(
-    note_: SingleNote, random_select: bool = False, default_block: str = "air"
+def single_note_to_minenote(
+    note_: SingleNote,
+    reference_table: MidiInstrumentTableType,
+    play_speed: float = 0,
+    volume_processing_method: Callable[[float], float] = natural_curve,
+) -> MineNote:
+    """
+    将音符转为我的世界音符对象
+    :param note_:SingleNote 音符对象
+    :param reference_table:Dict[int, str] 转换对照表
+    :param play_speed:float 播放速度
+    :param volume_proccessing_method:Callable[[float], float] 音量处理函数
+
+    :return MineNote我的世界音符对象
+    """
+    mc_sound_ID = midi_inst_to_mc_sound(
+        note_.inst,
+        reference_table,
+        "note.bd" if note_.percussive else "note.flute",
+    )
+
+    mc_distance_volume = volume_processing_method(note_.velocity)
+
+    return MineNote(
+        mc_sound_ID,
+        note_.pitch,
+        note_.velocity,
+        round(note_.start_time / float(play_speed) / 50),
+        round(note_.duration / float(play_speed) / 50),
+        note_.track_no,
+        note_.percussive,
+        (0, mc_distance_volume, 0),
+        note_.extra_info,
+    )
+
+
+def is_in_diapason(note_pitch: int, instrument: str) -> bool:
+    note_range = MM_INSTRUMENT_RANGE_TABLE.get(instrument, ((-1, 128), 0))[0]
+    return note_pitch >= note_range[0] and note_pitch <= note_range[1]
+
+
+def is_note_in_diapason(note_: MineNote) -> bool:
+    note_range = MM_INSTRUMENT_RANGE_TABLE.get(note_.sound_name, ((-1, 128), 0))[0]
+    return note_.note_pitch >= note_range[0] and note_.note_pitch <= note_range[1]
+
+
+def note_to_redstone_block(
+    note_: MineNote, random_select: bool = False, default_block: str = "air"
 ):
     """
     将我的世界乐器名改作音符盒所需的对应方块名称

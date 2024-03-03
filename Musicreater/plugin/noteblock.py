@@ -18,7 +18,7 @@ Terms & Conditions: License.md in the root directory
 
 from ..exceptions import NotDefineProgramError, ZeroSpeedError
 from ..main import MidiConvert
-from ..subclass import SingleCommand
+from ..subclass import MineCommand
 from ..utils import inst_to_sould_with_deviation, perc_inst_to_soundID_withX
 
 # 你以为写完了吗？其实并没有

@@ -15,7 +15,7 @@ setuptools.setup(
     version=Musicreater.__version__,
     author="Eilles Wan, bgArray",
     author_email="TriM-Organization@hotmail.com",
-    description="一款免费开源的 《我的世界》 mid音乐转换库。\n"
+    description="一款免费开源的针对《我的世界》音乐的支持库\n"
     "A free open-source python library used to convert midi into Minecraft.",
     long_description=long_description,
     long_description_content_type="text/markdown",

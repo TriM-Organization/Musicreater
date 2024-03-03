@@ -17,7 +17,7 @@ from typing import Literal
 # from ...exceptions import CommandFormatError
 from ...main import MidiConvert
 from ..main import ConvertConfig
-from ...subclass import SingleCommand
+from ...subclass import MineCommand
 from ..mcstructure import (
     COMPABILITY_VERSION_117,
     COMPABILITY_VERSION_119,
@@ -58,9 +58,7 @@ def to_mcstructure_file_in_delay(
     )
 
     cmd_list, max_delay = midi_cvt.to_command_list_in_delay(
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
-        player,
+        player_selector=player,
     )[:2]
 
     if not os.path.exists(data_cfg.dist_path):
@@ -116,18 +114,17 @@ def to_mcstructure_file_in_score(
     )
 
     cmd_list, cmd_count, max_delay = midi_cvt.to_command_list_in_score(
-        scoreboard_name,
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
+        scoreboard_name=scoreboard_name,
     )
 
     if not os.path.exists(data_cfg.dist_path):
         os.makedirs(data_cfg.dist_path)
 
     struct, size, end_pos = commands_to_structure(
-        midi_cvt.music_command_list+(
+        midi_cvt.music_command_list
+        + (
             [
-                SingleCommand(
+                MineCommand(
                     command="scoreboard players reset @a[scores={"
                     + scoreboard_name
                     + "="
@@ -139,7 +136,9 @@ def to_mcstructure_file_in_score(
             ]
             if auto_reset
             else []
-        ), max_height - 1, compability_version_=compability_ver
+        ),
+        max_height - 1,
+        compability_version_=compability_ver,
     )
 
     with open(
@@ -188,9 +187,7 @@ def to_mcstructure_file_in_repeater(
     )
 
     cmd_list, max_delay, max_multiple_cmd = midi_cvt.to_command_list_in_delay(
-        data_cfg.volume_ratio,
-        data_cfg.speed_multiplier,
-        player,
+        player_selector=player,
     )
 
     if not os.path.exists(data_cfg.dist_path):

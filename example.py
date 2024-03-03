@@ -80,11 +80,11 @@ else:
     # 提示语 检测函数 错误提示语
     for args in [
         (
-            f"输入音量：",
+            f"最小播放音量：",
             float,
         ),
         (
-            f"输入播放速度：",
+            f"播放速度：",
             float,
         ),
         (
@@ -118,21 +118,19 @@ else:
             if fileFormat == 1
             else (
                 (
-                    (
-                        "结构延展方向：",
-                        lambda a: isin(
-                            a,
-                            {
-                                "z+": ["z+", "Z+"],
-                                "x+": ["X+", "x+"],
-                                "z-": ["Z-", "z-"],
-                                "x-": ["x-", "X-"],
-                            },
-                        ),
-                    )
-                    if (playerFormat == 2 and fileFormat == 2)
-                    else ()
-                ),
+                    "结构延展方向：",
+                    lambda a: isin(
+                        a,
+                        {
+                            "z+": ["z+", "Z+"],
+                            "x+": ["X+", "x+"],
+                            "z-": ["Z-", "z-"],
+                            "x-": ["x-", "X-"],
+                        },
+                    ),
+                )
+                if (playerFormat == 2 and fileFormat == 2)
+                else ()
             )
         ),
         (
@@ -152,12 +150,17 @@ else:
         ),
     ]:
         if args:
-            prompts.append(args[1](input(args[0])))
+            try:
+                prompts.append(args[1](input(args[0])))
+            except Exception:
+                print(args)
 
 
 print(f"正在处理 {midi_path} ：")
-cvt_mid = Musicreater.MidiConvert.from_midi_file(midi_path, old_exe_format=False)
-cvt_cfg = ConvertConfig(out_path, *prompts[:3])
+cvt_mid = Musicreater.MidiConvert.from_midi_file(
+    midi_path, old_exe_format=False, min_volume=prompts[0], play_speed=prompts[1]
+)
+cvt_cfg = ConvertConfig(out_path, prompts[2])
 
 if fileFormat == 0:
     if playerFormat == 1:

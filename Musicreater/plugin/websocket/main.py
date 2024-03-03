@@ -13,17 +13,17 @@ Terms & Conditions: License.md in the root directory
 
 import fcwslib
 
-from ...main import MidiConvert
+# from ...main import MidiConvert
 
-from ..main import ConvertConfig
-from ...subclass import SingleCommand
+# from ..main import ConvertConfig
+# from ...subclass import MineCommand
 
 
-def open_websocket_server(
-    midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
-    player: str = "@a",
-    server_dist: str = "localhost",
-    server_port: int = 8000,
-):
-    wssever = fcwslib.Server(server=server_dist,port=server_port,debug_mode=False)
+# def open_websocket_server(
+#     midi_cvt: MidiConvert,
+#     data_cfg: ConvertConfig,
+#     player: str = "@a",
+#     server_dist: str = "localhost",
+#     server_port: int = 8000,
+# ):
+#     wssever = fcwslib.Server(server=server_dist,port=server_port,debug_mode=False)

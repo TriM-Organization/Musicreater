@@ -95,19 +95,13 @@ class FutureMidiConvertM4(MidiConvert):
 
     def to_command_list_in_delay(
         self,
-        max_volume: float = 1.0,
-        speed: float = 1.0,
         player_selector: str = "@a",
-    ) -> Tuple[List[SingleCommand], int, int]:
+    ) -> Tuple[List[MineCommand], int, int]:
         """
         将midi转换为我的世界命令列表，并输出每个音符之后的延迟
 
         Parameters
         ----------
-        max_volume: float
-            最大播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值，其原理为在距离玩家 (1 / volume -1) 的地方播放音频
-        speed: float
-            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
         player_selector: str
             玩家选择器，默认为`@a`
 
@@ -116,17 +110,13 @@ class FutureMidiConvertM4(MidiConvert):
         tuple( list[SingleCommand,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
-        if speed == 0:
-            raise ZeroSpeedError("播放速度仅可为(0,1]范围内的正实数")
-        max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
-
-        notes_list: List[SingleNote] = []
+        notes_list: List[MineNote] = []
 
         # 此处 我们把通道视为音轨
         for channel in self.channels.values():
             for note in channel:
                 note.set_info(
-                    note_to_command_parameters(
+                    single_note_to_note_parameters(
                         note,
                         (
                             self.percussion_note_referrence_table
@@ -160,7 +150,7 @@ class FutureMidiConvertM4(MidiConvert):
                 max_multi = max(max_multi, multi)
                 multi = 0
             self.music_command_list.append(
-                SingleCommand(
+                MineCommand(
                     self.execute_cmd_head.format(player_selector)
                     + r"playsound {} @s ^ ^ ^{} {} {}".format(*note.extra_info),
                     tick_delay=tickdelay,
@@ -173,8 +163,7 @@ class FutureMidiConvertM4(MidiConvert):
             )
             delaytime_previous = delaytime_now
 
-        self.music_tick_num = round(notes_list[-1].start_time / speed / 50)
-        return self.music_command_list, self.music_tick_num, max_multi + 1
+        return self.music_command_list, round(notes_list[-1].start_time / speed / 50), max_multi + 1
 
 
 class FutureMidiConvertM5(MidiConvert):
@@ -267,7 +256,7 @@ class FutureMidiConvertM5(MidiConvert):
         max_volume: float = 1.0,
         speed: float = 1.0,
         player_selector: str = "@a",
-    ) -> Tuple[List[SingleCommand], int]:
+    ) -> Tuple[List[MineCommand], int]:
         """
         使用金羿的转换思路，使用同刻偏移算法优化音感后，将midi转换为我的世界命令列表，并输出每个音符之后的延迟
 
@@ -314,11 +303,11 @@ class FutureMidiConvertM5(MidiConvert):
 
                     elif msg[0] == "NoteS":
                         soundID = (
-                            midi_inst_to_mc_sould(
+                            midi_inst_to_mc_sound(
                                 msg[1], MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE
                             )
                             if SpecialBits
-                            else midi_inst_to_mc_sould(
+                            else midi_inst_to_mc_sound(
                                 InstID, MM_CLASSIC_PITCHED_INSTRUMENT_TABLE
                             )
                         )
@@ -354,7 +343,7 @@ class FutureMidiConvertM5(MidiConvert):
         for i in range(len(all_ticks)):
             for j in range(len(tracks[all_ticks[i]])):
                 results.append(
-                    SingleCommand(
+                    MineCommand(
                         tracks[all_ticks[i]][j],
                         tick_delay=(
                             (
@@ -402,8 +391,7 @@ class FutureMidiConvertM5(MidiConvert):
                 )
 
         self.music_command_list = results
-        self.music_tick_num = max(all_ticks)
-        return results, self.music_tick_num
+        return results, max(all_ticks)
 
 
 class FutureMidiConvertM6(MidiConvert):
