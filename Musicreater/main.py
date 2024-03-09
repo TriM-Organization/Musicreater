@@ -70,13 +70,6 @@ tick * tempo / 1000000.0 / ticks_per_beat * 一秒多少游戏刻
 """
 
 
-# VoidMido = Union[mido.MidiFile, None]  # void mido
-# """
-# 空Midi类类型
-# """
-# 已经成为历史了
-
-
 @dataclass(init=False)
 class MusicSequence:
     """
@@ -92,23 +85,23 @@ class MusicSequence:
     total_note_count: int
     """音符总数"""
 
-    used_instrument: List[str]
+    note_count_per_instrument: Dict[str, int]
     """所使用的乐器"""
 
     minium_volume: float
     """乐曲最小音量"""
 
     music_deviation: float
-    """乐曲音调偏移"""
+    """全曲音调偏移"""
 
     def __init__(
         self,
         name_of_music: str,
         channels_of_notes: MineNoteChannelType,
         music_note_count: Optional[int] = None,
-        used_instrument_of_music: Optional[List[str]] = None,
+        note_used_per_instrument: Optional[Dict[str, int]] = None,
         minium_volume_of_music: float = 0.1,
-        deviation: Optional[float] = None,
+        deviation_value: Optional[float] = None,
     ) -> None:
         """
         《我的世界》音符序列类
@@ -135,26 +128,21 @@ class MusicSequence:
         self.channels = channels_of_notes
         self.minium_volume = minium_volume_of_music
 
-        if used_instrument_of_music is None or music_note_count is None:
+        if (note_used_per_instrument is None) or (music_note_count is None):
             kp = [i.sound_name for j in self.channels.values() for i in j]
             self.total_note_count = (
                 len(kp) if music_note_count is None else music_note_count
             )
-            self.used_instrument = (
-                list(set(kp))
-                if used_instrument_of_music is None
-                else used_instrument_of_music
+            self.note_count_per_instrument = (
+                dict([(it, kp.count(it)) for it in set(kp)])
+                if note_used_per_instrument is None
+                else note_used_per_instrument
             )
+        else:
+            self.total_note_count = music_note_count
+            self.note_count_per_instrument = note_used_per_instrument
 
-        self.music_deviation = (
-            self.guess_deviation(
-                self.total_note_count,
-                len(self.used_instrument),
-                music_channels=self.channels,
-            )
-            if deviation is None
-            else deviation
-        )
+        self.music_deviation = 0 if deviation_value is None else deviation_value
 
     @classmethod
     def from_mido(
@@ -168,35 +156,28 @@ class MusicSequence:
         minium_vol: float = 0.1,
         volume_processing_function: FittingFunctionType = natural_curve,
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
-        devation_guess_enabled: bool = True,
+        deviation: float = 0,
     ):
-        note_channels, note_count_total, inst_note_count, qualified_inst_note_count = (
-            cls.to_music_note_channels(
-                midi=mido_file,
-                speed=speed_multiplier,
-                pitched_note_rtable=pitched_note_referance_table,
-                percussion_note_rtable=percussion_note_referance_table,
-                default_tempo_value=default_tempo,
-                vol_processing_function=volume_processing_function,
-                ignore_mismatch_error=mismatch_error_ignorance,
-            )
+        (
+            note_channels,
+            note_count_total,
+            inst_note_count,  # qualified_inst_note_count,
+        ) = cls.to_music_note_channels(
+            midi=mido_file,
+            speed=speed_multiplier,
+            pitched_note_rtable=pitched_note_referance_table,
+            percussion_note_rtable=percussion_note_referance_table,
+            default_tempo_value=default_tempo,
+            vol_processing_function=volume_processing_function,
+            ignore_mismatch_error=mismatch_error_ignorance,
         )
         return cls(
             name_of_music=midi_music_name,
             channels_of_notes=note_channels,
             music_note_count=note_count_total,
-            used_instrument_of_music=list(inst_note_count.keys()),
+            note_used_per_instrument=inst_note_count,
             minium_volume_of_music=minium_vol,
-            deviation=(
-                cls.guess_deviation(
-                    note_count_total,
-                    len(inst_note_count),
-                    inst_note_count,
-                    qualified_inst_note_count,
-                )
-                if devation_guess_enabled
-                else 0
-            ),
+            deviation_value=deviation,
         )
 
     def set_min_volume(self, volume_value: int):
@@ -215,30 +196,31 @@ class MusicSequence:
             self.channels[channel_no].sort(key=lambda note: note.start_tick)
 
     @staticmethod
-    def guess_deviation(
+    def guess_deviation_wasted(
         total_note_count: int,
         total_instrument_count: int,
-        note_count_per_instruments: Optional[Dict[str, int]] = None,
-        qualified_note_count_per_instruments: Optional[Dict[str, int]] = None,
+        note_count_per_instrument: Optional[Dict[str, int]] = None,
+        qualified_note_count_per_instrument: Optional[Dict[str, int]] = None,
         music_channels: Optional[MineNoteChannelType] = None,
     ) -> float:
+        """已废弃"""
         if (
-            note_count_per_instruments is None
-            or qualified_note_count_per_instruments is None
+            note_count_per_instrument is None
+            or qualified_note_count_per_instrument is None
         ):
             if music_channels is None:
                 raise ValueError("参数不足，算逑！")
-            note_count_per_instruments = {}
-            qualified_note_count_per_instruments = {}
+            note_count_per_instrument = {}
+            qualified_note_count_per_instrument = {}
             for this_note in [k for j in music_channels.values() for k in j]:
-                if this_note.sound_name in note_count_per_instruments.keys():
-                    note_count_per_instruments[this_note.sound_name] += 1
-                    qualified_note_count_per_instruments[
+                if this_note.sound_name in note_count_per_instrument.keys():
+                    note_count_per_instrument[this_note.sound_name] += 1
+                    qualified_note_count_per_instrument[
                         this_note.sound_name
                     ] += is_note_in_diapason(this_note)
                 else:
-                    note_count_per_instruments[this_note.sound_name] = 1
-                    qualified_note_count_per_instruments[this_note.sound_name] = int(
+                    note_count_per_instrument[this_note.sound_name] = 1
+                    qualified_note_count_per_instrument[this_note.sound_name] = int(
                         is_note_in_diapason(this_note)
                     )
         return (
@@ -251,9 +233,9 @@ class MusicSequence:
                             / total_note_count
                             - MM_INSTRUMENT_RANGE_TABLE[inst][-1]
                         )
-                        * (note_count - qualified_note_count_per_instruments[inst])
+                        * (note_count - qualified_note_count_per_instrument[inst])
                     )
-                    for inst, note_count in note_count_per_instruments.items()
+                    for inst, note_count in note_count_per_instrument.items()
                 ]
             )
             / total_instrument_count
@@ -269,7 +251,7 @@ class MusicSequence:
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         vol_processing_function: FittingFunctionType = natural_curve,
-    ) -> Tuple[MineNoteChannelType, int, Dict[str, int], Dict[str, int]]:
+    ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:  # , Dict[str, int]]:
         """
         将midi解析并转换为频道音符字典
 
@@ -291,8 +273,8 @@ class MusicSequence:
         midi_channels: MineNoteChannelType = empty_midi_channels(staff=[])
         tempo = default_tempo_value
         note_count = 0
-        note_count_per_instruments: Dict[str, int] = {}
-        qualified_note_count_per_instruments: Dict[str, int] = {}
+        note_count_per_instrument: Dict[str, int] = {}
+        # qualified_note_count_per_instruments: Dict[str, int] = {}
 
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
@@ -382,19 +364,16 @@ class MusicSequence:
                                 )
                             )
                             note_count += 1
-                            if (
-                                that_note.sound_name
-                                in note_count_per_instruments.keys()
-                            ):
-                                note_count_per_instruments[that_note.sound_name] += 1
-                                qualified_note_count_per_instruments[
-                                    that_note.sound_name
-                                ] += is_note_in_diapason(that_note)
+                            if that_note.sound_name in note_count_per_instrument.keys():
+                                note_count_per_instrument[that_note.sound_name] += 1
+                            #     qualified_note_count_per_instruments[
+                            #         that_note.sound_name
+                            #     ] += is_note_in_diapason(that_note)
                             else:
-                                note_count_per_instruments[that_note.sound_name] = 1
-                                qualified_note_count_per_instruments[
-                                    that_note.sound_name
-                                ] = int(is_note_in_diapason(that_note))
+                                note_count_per_instrument[that_note.sound_name] = 1
+                            #     qualified_note_count_per_instruments[
+                            #         that_note.sound_name
+                            #     ] = int(is_note_in_diapason(that_note))
                         else:
                             if ignore_mismatch_error:
                                 print(
@@ -431,8 +410,8 @@ class MusicSequence:
         return (
             channels,
             note_count,
-            note_count_per_instruments,
-            qualified_note_count_per_instruments,
+            note_count_per_instrument,
+            # qualified_note_count_per_instruments,
         )
 
 
@@ -463,7 +442,7 @@ class MidiConvert(MusicSequence):
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        enable_devation_guess: bool = True,
+        # enable_devation_guess: bool = True,
         enable_old_exe_format: bool = False,
         minium_volume: float = 0.1,
         vol_processing_function: FittingFunctionType = natural_curve,
@@ -505,7 +484,7 @@ class MidiConvert(MusicSequence):
             minium_vol=minium_volume,
             volume_processing_function=vol_processing_function,
             default_tempo=default_tempo_value,
-            devation_guess_enabled=enable_devation_guess,
+            # devation_guess_enabled=enable_devation_guess,
             mismatch_error_ignorance=ignore_mismatch_error,
         )
 
@@ -518,7 +497,7 @@ class MidiConvert(MusicSequence):
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        devation_guess_enabled: bool = True,
+        # devation_guess_enabled: bool = True,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
         vol_processing_func: FittingFunctionType = natural_curve,
@@ -560,13 +539,13 @@ class MidiConvert(MusicSequence):
                 default_tempo_value=default_tempo,
                 pitched_note_rtable=pitched_note_table,
                 percussion_note_rtable=percussion_note_table,
-                enable_devation_guess=devation_guess_enabled,
+                # enable_devation_guess=devation_guess_enabled,
                 enable_old_exe_format=old_exe_format,
                 minium_volume=min_volume,
                 vol_processing_function=vol_processing_func,
             )
         except (ValueError, TypeError) as E:
-            raise MidiDestroyedError(f"文件{midi_file_path}损坏：{E}")
+            raise MidiDestroyedError(f"文件{midi_file_path}可能损坏：{E}")
         except FileNotFoundError as E:
             raise FileNotFoundError(f"文件{midi_file_path}不存在：{E}")
 
@@ -584,13 +563,13 @@ class MidiConvert(MusicSequence):
 
         Parameters
         ----------
-        maxscore: int
+        max_score: int
             midi的乐器ID
 
         scoreboard_name: str
             所使用的计分板名称
 
-        progressbar_style: tuple
+        progressbar_style: ProgressBarStyle
             此参数详见 ../docs/库的生成与功能文档.md#进度条自定义
 
         Returns
@@ -1003,6 +982,93 @@ class MidiConvert(MusicSequence):
             delaytime_previous = note.start_tick
 
         return self.music_command_list, notes_list[-1].start_tick, max_multi + 1
+
+    def to_command_list_in_delay_devided_by_instrument(
+        self,
+        player_selector: str = "@a",
+    ) -> Tuple[Dict[str, List[MineCommand]], int, Dict[str, int]]:
+        """
+        将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        Tuple[Dict[str, List[MineCommand]], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        """
+
+        notes_list: List[MineNote] = sorted(
+            [i for j in self.channels.values() for i in j],
+            key=lambda note: note.start_tick,
+        )
+
+        command_dict: Dict[str, List[MineCommand]] = dict(
+            [(inst, []) for inst in self.note_count_per_instrument.keys()]
+        )
+        multi: Dict[str, int] = dict(
+            [(inst, 0) for inst in self.note_count_per_instrument.keys()]
+        )
+        max_multi: Dict[str, int] = dict(
+            [(inst, 0) for inst in self.note_count_per_instrument.keys()]
+        )
+        delaytime_previous: Dict[str, int] = dict(
+            [(inst, 0) for inst in self.note_count_per_instrument.keys()]
+        )
+
+        for note in notes_list:
+            if (
+                tickdelay := (note.start_tick - delaytime_previous[note.sound_name])
+            ) == 0:
+                multi[note.sound_name] += 1
+            else:
+                max_multi[note.sound_name] = max(
+                    max_multi[note.sound_name], multi[note.sound_name]
+                )
+                multi[note.sound_name] = 0
+
+            (
+                mc_sound_ID,
+                relative_coordinates,
+                volume_percentage,
+                mc_pitch,
+            ) = minenote_to_command_paramaters(
+                note,
+                pitch_deviation=self.music_deviation,
+            )
+
+            command_dict[note.sound_name].append(
+                MineCommand(
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            mc_sound_ID,
+                            *relative_coordinates,
+                            volume_percentage,
+                            1.0 if note.percussive else mc_pitch,
+                            self.minium_volume,
+                        )
+                    ),
+                    annotation=(
+                        "在{}播放噪音{}".format(
+                            mctick2timestr(note.start_tick),
+                            mc_sound_ID,
+                        )
+                        if note.percussive
+                        else "在{}播放乐音{}".format(
+                            mctick2timestr(note.start_tick),
+                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                        )
+                    ),
+                    tick_delay=tickdelay,
+                ),
+            )
+            delaytime_previous[note.sound_name] = note.start_tick
+
+        self.music_command_list = [j for i in command_dict.values() for j in i]
+        return command_dict, notes_list[-1].start_tick, max_multi
 
     def copy_important(self):
         dst = MidiConvert.from_mido_obj(

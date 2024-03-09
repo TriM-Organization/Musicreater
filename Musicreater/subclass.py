@@ -118,6 +118,7 @@ class MineNote:
             "Percussive" if self.percussive else "",
             self.sound_name,
             "" if self.percussive else "NotePitch = {}, ".format(self.note_pitch),
+            self.velocity,
             self.start_tick,
             self.duration,
             ", Track = {}".format(self.track_no) if is_track else "",
@@ -553,6 +554,25 @@ class ProgressBarStyle:
         self.base_style = base_s
         self.to_play_style = to_play_s
         self.played_style = played_s
+
+    @classmethod
+    def from_tuple(cls, tuplized_style: Tuple[str, Tuple[str, str]]):
+        """自旧版进度条元组表示法读入数据（已不建议使用）"""
+        if isinstance(tuplized_style, tuple):
+            if isinstance(tuplized_style[0], str) and isinstance(
+                tuplized_style[1], tuple
+            ):
+                if isinstance(tuplized_style[1][0], str) and isinstance(
+                    tuplized_style[1][1], str
+                ):
+                    return cls(
+                        tuplized_style[0], tuplized_style[1][0], tuplized_style[1][1]
+                    )
+        raise ValueError(
+            "元组表示的进度条样式组 {} 格式错误，已不建议使用此功能，请尽快更换。".format(
+                tuplized_style
+            )
+        )
 
     def set_base_style(self, value: str):
         """设置基础样式"""

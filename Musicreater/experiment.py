@@ -47,12 +47,12 @@ class FutureMidiConvertM4(MidiConvert):
     # 临时用的插值计算函数
     @staticmethod
     def _linear_note(
-        _note: SingleNote,
-        _apply_time_division: float = 100,
-    ) -> List[SingleNote]:
-        """传入音符数据，返回以半秒为分割的插值列表
+        _note: MineNote,
+        _apply_time_division: float = 10,
+    ) -> List[MineNote]:
+        """传入音符数据，返回分割后的插值列表
         :param _note: SingleNote 音符
-        :param _apply_time_division: int 间隔毫秒数
+        :param _apply_time_division: int 间隔帧数
         :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]"""
 
         if _note.percussive:
@@ -63,21 +63,24 @@ class FutureMidiConvertM4(MidiConvert):
         totalCount = int(_note.duration / _apply_time_division)
 
         if totalCount == 0:
+            print(_note.extra_info)
             return [
                 _note,
             ]
         # print(totalCount)
 
-        result: List[SingleNote] = []
+        result: List[MineNote] = []
 
         for _i in range(totalCount):
             result.append(
-                SingleNote(
-                    instrument=_note.inst,
-                    pitch=_note.pitch,
-                    velocity=_note.velocity,
-                    startime=int(_note.start_time + _i * (_note.duration / totalCount)),
-                    lastime=int(_note.duration / totalCount),
+                MineNote(
+                    mc_sound_name=_note.sound_name,
+                    midi_pitch=_note.note_pitch,
+                    midi_velocity=_note.velocity,
+                    start_time=int(
+                        _note.start_tick + _i * (_note.duration / totalCount)
+                    ),
+                    last_time=int(_note.duration / totalCount),
                     track_number=_note.track_no,
                     is_percussion=_note.percussive,
                     extra_information=_note.extra_info,
@@ -116,54 +119,68 @@ class FutureMidiConvertM4(MidiConvert):
         for channel in self.channels.values():
             for note in channel:
                 note.set_info(
-                    single_note_to_note_parameters(
+                    minenote_to_command_paramaters(
                         note,
-                        (
-                            self.percussion_note_referrence_table
-                            if note.percussive
-                            else self.pitched_note_reference_table
-                        ),
-                        deviation=0,
-                        volume_percentage=(
-                            (max_volume) if note.track_no == 0 else (max_volume * 0.9)
-                        ),
-                        volume_processing_method=self.volume_processing_function,
+                        pitch_deviation=self.music_deviation,
                     )
                 )
 
                 if not note.percussive:
-                    notes_list.extend(self._linear_note(note, note.extra_info[3] * 500))
+                    notes_list.extend(self._linear_note(note,1 * note.extra_info[3]))
                 else:
                     notes_list.append(note)
 
-        notes_list.sort(key=lambda a: a.start_time)
+        notes_list.sort(key=lambda a: a.start_tick)
 
         self.music_command_list = []
         multi = max_multi = 0
         delaytime_previous = 0
 
         for note in notes_list:
-            delaytime_now = round(note.start_time / speed / 50)
-            if (tickdelay := (delaytime_now - delaytime_previous)) == 0:
+            if (tickdelay := (note.start_tick - delaytime_previous)) == 0:
                 multi += 1
             else:
                 max_multi = max(max_multi, multi)
                 multi = 0
+            (
+                mc_sound_ID,
+                relative_coordinates,
+                volume_percentage,
+                mc_pitch,
+            ) = note.extra_info
             self.music_command_list.append(
                 MineCommand(
-                    self.execute_cmd_head.format(player_selector)
-                    + r"playsound {} @s ^ ^ ^{} {} {}".format(*note.extra_info),
-                    tick_delay=tickdelay,
-                    annotation="在{}播放{}%的{}音".format(
-                        mctick2timestr(delaytime_now),
-                        max_volume * 100,
-                        "{}:{}".format(note.extra_info[0], note.extra_info[3]),
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            mc_sound_ID,
+                            *relative_coordinates,
+                            volume_percentage,
+                            1.0 if note.percussive else mc_pitch,
+                            self.minium_volume,
+                        )
                     ),
-                )
+                    annotation=(
+                        "在{}播放噪音{}".format(
+                            mctick2timestr(note.start_tick),
+                            mc_sound_ID,
+                        )
+                        if note.percussive
+                        else "在{}播放乐音{}".format(
+                            mctick2timestr(note.start_tick),
+                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                        )
+                    ),
+                    tick_delay=tickdelay,
+                ),
             )
-            delaytime_previous = delaytime_now
+            delaytime_previous = note.start_tick
 
-        return self.music_command_list, round(notes_list[-1].start_time / speed / 50), max_multi + 1
+        return (
+            self.music_command_list,
+            notes_list[-1].start_tick + notes_list[-1].duration,
+            max_multi + 1,
+        )
 
 
 class FutureMidiConvertM5(MidiConvert):

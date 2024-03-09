@@ -17,7 +17,8 @@ import os
 import brotli
 
 from ...main import MidiConvert
-from ...subclass import MineCommand
+from ...subclass import MineCommand, ProgressBarStyle
+from ...types import Optional
 from ..bdx import (
     bdx_move,
     commands_to_BDX_bytes,
@@ -26,12 +27,12 @@ from ..bdx import (
     y,
     z,
 )
-from ..main import ConvertConfig
 
 
 def to_BDX_file_in_score(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
+    dist_path: str,
+    progressbar_style: Optional[ProgressBarStyle],
     scoreboard_name: str = "mscplay",
     auto_reset: bool = False,
     author: str = "Eilles",
@@ -44,8 +45,10 @@ def to_BDX_file_in_score(
     ----------
     midi_cvt: MidiConvert 对象
         用于转换的MidiConvert对象
-    data_cfg: ConvertConfig 对象
-        部分转换通用参数
+    dist_path: str
+        转换结果输出的目标路径
+    progressbar_style: ProgressBarStyle 对象
+        进度条对象
     scoreboard_name: str
         我的世界的计分板名称
     auto_reset: bool
@@ -64,11 +67,11 @@ def to_BDX_file_in_score(
         scoreboard_name=scoreboard_name,
     )
 
-    if not os.path.exists(data_cfg.dist_path):
-        os.makedirs(data_cfg.dist_path)
+    if not os.path.exists(dist_path):
+        os.makedirs(dist_path)
 
     with open(
-        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
         "w+",
     ) as f:
         f.write("BD@")
@@ -97,11 +100,9 @@ def to_BDX_file_in_score(
         max_height - 1,
     )
 
-    if data_cfg.progressbar_style:
+    if progressbar_style:
         pgbBytes, pgbSize, pgbNowPos = commands_to_BDX_bytes(
-            midi_cvt.form_progress_bar(
-                max_score, scoreboard_name, data_cfg.progressbar_style
-            ),
+            midi_cvt.form_progress_bar(max_score, scoreboard_name, progressbar_style),
             max_height - 1,
         )
         _bytes += pgbBytes
@@ -116,7 +117,7 @@ def to_BDX_file_in_score(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
@@ -126,7 +127,8 @@ def to_BDX_file_in_score(
 
 def to_BDX_file_in_delay(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
+    dist_path: str,
+    progressbar_style: Optional[ProgressBarStyle],
     player: str = "@a",
     author: str = "Eilles",
     max_height: int = 64,
@@ -138,8 +140,10 @@ def to_BDX_file_in_delay(
     ----------
     midi_cvt: MidiConvert 对象
         用于转换的MidiConvert对象
-    data_cfg: ConvertConfig 对象
-        部分转换通用参数
+    dist_path: str
+        转换结果输出的目标路径
+    progressbar_style: ProgressBarStyle 对象
+        进度条对象
     player: str
         玩家选择器，默认为`@a`
     author: str
@@ -156,11 +160,11 @@ def to_BDX_file_in_delay(
         player_selector=player,
     )[:2]
 
-    if not os.path.exists(data_cfg.dist_path):
-        os.makedirs(data_cfg.dist_path)
+    if not os.path.exists(dist_path):
+        os.makedirs(dist_path)
 
     with open(
-        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
         "w+",
     ) as f:
         f.write("BD@")
@@ -171,7 +175,7 @@ def to_BDX_file_in_delay(
 
     cmdBytes, size, finalPos = commands_to_BDX_bytes(cmdlist, max_height - 1)
 
-    if data_cfg.progressbar_style:
+    if progressbar_style:
         scb_name = midi_cvt.music_name[:3] + "Pgb"
         _bytes += form_command_block_in_BDX_bytes(
             r"scoreboard objectives add {} dummy {}计".replace(r"{}", scb_name),
@@ -187,7 +191,7 @@ def to_BDX_file_in_delay(
         )
         _bytes += bdx_move(y, 1)
         pgbBytes, pgbSize, pgbNowPos = commands_to_BDX_bytes(
-            midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
+            midi_cvt.form_progress_bar(max_delay, scb_name, progressbar_style),
             max_height - 1,
         )
         _bytes += pgbBytes
@@ -208,7 +212,7 @@ def to_BDX_file_in_delay(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(os.path.join(data_cfg.dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))

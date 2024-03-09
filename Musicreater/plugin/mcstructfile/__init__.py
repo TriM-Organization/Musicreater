@@ -18,6 +18,7 @@ __all__ = [
     "to_mcstructure_file_in_delay",
     "to_mcstructure_file_in_repeater",
     "to_mcstructure_file_in_score",
+    "to_mcstructure_files_in_repeater_divided_by_instruments",
 ]
 __author__ = (("金羿", "Eilles Wan"),)
 
@@ -25,4 +26,5 @@ from .main import (
     to_mcstructure_file_in_delay,
     to_mcstructure_file_in_repeater,
     to_mcstructure_file_in_score,
+    to_mcstructure_files_in_repeater_divided_by_instruments,
 )

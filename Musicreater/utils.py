@@ -18,7 +18,12 @@ Terms & Conditions: License.md in the root directory
 import math
 import random
 
-from .constants import MC_INSTRUMENT_BLOCKS_TABLE, MM_INSTRUMENT_RANGE_TABLE
+from .constants import (
+    MC_INSTRUMENT_BLOCKS_TABLE,
+    MM_INSTRUMENT_DEVIATION_TABLE,
+    MC_PITCHED_INSTRUMENT_LIST,
+    MM_INSTRUMENT_RANGE_TABLE,
+)
 from .subclass import SingleNote, MineNote
 
 from .types import (
@@ -61,7 +66,7 @@ def inst_to_sould_with_deviation(
 ) -> Tuple[str, int]:
     """
     返回midi的乐器ID对应的我的世界乐器名，对于音域转换算法，如下：
-    2**( ( msg.note - 66 ) / 12 ) 即为MC的音高
+    2**( ( msg.note - 60 - X ) / 12 ) 即为MC的音高
 
     Parameters
     ----------
@@ -74,16 +79,17 @@ def inst_to_sould_with_deviation(
     -------
     tuple(str我的世界乐器名, int转换算法中的X)
     """
-    return (
-        reference_table.get(
-            instrumentID,
-            default_instrument,
-        ),
-        6,
+    sound_id = midi_inst_to_mc_sound(
+        instrumentID=instrumentID,
+        reference_table=reference_table,
+        default_instrument=default_instrument,
     )
-
-    # 明明已经走了
-    # 凭什么还要在我心里留下缠绵缱绻
+    return sound_id, MM_INSTRUMENT_DEVIATION_TABLE.get(
+        sound_id,
+        MM_INSTRUMENT_DEVIATION_TABLE.get(
+            default_instrument, 6 if sound_id in MC_PITCHED_INSTRUMENT_LIST else -1
+        ),
+    )
 
 
 def midi_inst_to_mc_sound(
@@ -179,7 +185,18 @@ def minenote_to_command_paramaters(
         (
             None
             if note_.percussive
-            else 2 ** ((note_.note_pitch - 66 + pitch_deviation) / 12)
+            else (
+                2
+                ** (
+                    (
+                        note_.note_pitch
+                        - 60
+                        - MM_INSTRUMENT_DEVIATION_TABLE.get(note_.sound_name, 6)
+                        + pitch_deviation
+                    )
+                    / 12
+                )
+            )
         ),
     )
 
@@ -205,7 +222,7 @@ def single_note_to_command_parameters(
     :return str[我的世界音符ID], Tuple[float,float,float]播放视角坐标, float[指令音量参数], float[指令音调参数]
     """
 
-    mc_sound_ID = midi_inst_to_mc_sound(
+    mc_sound_ID, _X = inst_to_sould_with_deviation(
         note_.inst,
         reference_table,
         "note.bd" if note_.percussive else "note.flute",
@@ -217,7 +234,7 @@ def single_note_to_command_parameters(
         mc_sound_ID,
         (0, mc_distance_volume, 0),
         note_.velocity / 127,
-        None if note_.percussive else 2 ** ((note_.pitch - 66 + deviation) / 12),
+        None if note_.percussive else 2 ** ((note_.pitch - 60 - _X + deviation) / 12),
     )
 
 

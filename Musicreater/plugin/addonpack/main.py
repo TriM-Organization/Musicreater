@@ -16,12 +16,12 @@ import os
 import shutil
 from typing import Tuple
 
-from TrimMCStruct import Structure
-
 from ...main import MidiConvert
 from ..archive import behavior_mcpack_manifest, compress_zipfile
-from ..main import ConvertConfig
+from ...subclass import ProgressBarStyle
+from ...types import Optional, Literal
 from ..mcstructure import (
+    Structure,
     COMPABILITY_VERSION_117,
     COMPABILITY_VERSION_119,
     commands_to_redstone_delay_structure,
@@ -32,7 +32,8 @@ from ..mcstructure import (
 
 def to_addon_pack_in_score(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
+    dist_path: str,
+    progressbar_style: Optional[ProgressBarStyle],
     scoreboard_name: str = "mscplay",
     auto_reset: bool = False,
 ) -> Tuple[int, int]:
@@ -43,8 +44,10 @@ def to_addon_pack_in_score(
     ----------
     midi_cvt: MidiConvert 对象
         用于转换的MidiConvert对象
-    data_cfg: ConvertConfig 对象
-        部分转换通用参数
+    dist_path: str
+        转换结果输出的目标路径
+    progressbar_style: ProgressBarStyle 对象
+        进度条对象
     scoreboard_name: str
         我的世界的计分板名称
     auto_reset: bool
@@ -60,12 +63,12 @@ def to_addon_pack_in_score(
     )
 
     # 当文件f夹{self.outputPath}/temp/functions存在时清空其下所有项目，然后创建
-    if os.path.exists(f"{data_cfg.dist_path}/temp/functions/"):
-        shutil.rmtree(f"{data_cfg.dist_path}/temp/functions/")
-    os.makedirs(f"{data_cfg.dist_path}/temp/functions/mscplay")
+    if os.path.exists(f"{dist_path}/temp/functions/"):
+        shutil.rmtree(f"{dist_path}/temp/functions/")
+    os.makedirs(f"{dist_path}/temp/functions/mscplay")
 
     # 写入manifest.json
-    with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
+    with open(f"{dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCFUNCTION(MCPACK) 计分播放器 - 由 音·创 生成",
@@ -78,18 +81,18 @@ def to_addon_pack_in_score(
 
     # 写入stop.mcfunction
     with open(
-        f"{data_cfg.dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
     ) as f:
         f.write("scoreboard players reset @a {}".format(scoreboard_name))
 
     # 将命令列表写入文件
     index_file = open(
-        f"{data_cfg.dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
     )
     for i in range(len(cmdlist)):
         index_file.write(f"function mscplay/track{i + 1}\n")
         with open(
-            f"{data_cfg.dist_path}/temp/functions/mscplay/track{i + 1}.mcfunction",
+            f"{dist_path}/temp/functions/mscplay/track{i + 1}.mcfunction",
             "w",
             encoding="utf-8",
         ) as f:
@@ -113,13 +116,13 @@ def to_addon_pack_in_score(
                 if auto_reset
                 else ""
             ),
-            f"function mscplay/progressShow\n" if data_cfg.progressbar_style else "",
+            f"function mscplay/progressShow\n" if progressbar_style else "",
         )
     )
 
-    if data_cfg.progressbar_style:
+    if progressbar_style:
         with open(
-            f"{data_cfg.dist_path}/temp/functions/mscplay/progressShow.mcfunction",
+            f"{dist_path}/temp/functions/mscplay/progressShow.mcfunction",
             "w",
             encoding="utf-8",
         ) as f:
@@ -128,7 +131,7 @@ def to_addon_pack_in_score(
                     [
                         single_cmd.cmd
                         for single_cmd in midi_cvt.form_progress_bar(
-                            maxscore, scoreboard_name, data_cfg.progressbar_style
+                            maxscore, scoreboard_name, progressbar_style
                         )
                     ]
                 )
@@ -136,21 +139,22 @@ def to_addon_pack_in_score(
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
+    if os.path.exists(f"{dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
-        f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/temp/",
+        f"{dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
-    shutil.rmtree(f"{data_cfg.dist_path}/temp/")
+    shutil.rmtree(f"{dist_path}/temp/")
 
     return maxlen, maxscore
 
 
 def to_addon_pack_in_delay(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
+    dist_path: str,
+    progressbar_style: Optional[ProgressBarStyle],
     player: str = "@a",
     max_height: int = 64,
 ) -> Tuple[int, int]:
@@ -161,8 +165,10 @@ def to_addon_pack_in_delay(
     ----------
     midi_cvt: MidiConvert 对象
         用于转换的MidiConvert对象
-    data_cfg: ConvertConfig 对象
-        部分转换通用参数
+    dist_path: str
+        转换结果输出的目标路径
+    progressbar_style: ProgressBarStyle 对象
+        进度条对象
     player: str
         玩家选择器，默认为`@a`
     max_height: int
@@ -183,17 +189,17 @@ def to_addon_pack_in_delay(
         player_selector=player,
     )[:2]
 
-    if not os.path.exists(data_cfg.dist_path):
-        os.makedirs(data_cfg.dist_path)
+    if not os.path.exists(dist_path):
+        os.makedirs(dist_path)
 
     # 当文件f夹{self.outputPath}/temp/存在时清空其下所有项目，然后创建
-    if os.path.exists(f"{data_cfg.dist_path}/temp/"):
-        shutil.rmtree(f"{data_cfg.dist_path}/temp/")
-    os.makedirs(f"{data_cfg.dist_path}/temp/functions/")
-    os.makedirs(f"{data_cfg.dist_path}/temp/structures/")
+    if os.path.exists(f"{dist_path}/temp/"):
+        shutil.rmtree(f"{dist_path}/temp/")
+    os.makedirs(f"{dist_path}/temp/functions/")
+    os.makedirs(f"{dist_path}/temp/structures/")
 
     # 写入manifest.json
-    with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
+    with open(f"{dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 延迟播放器 - 由 音·创 生成",
@@ -206,7 +212,7 @@ def to_addon_pack_in_delay(
 
     # 写入stop.mcfunction
     with open(
-        f"{data_cfg.dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
     ) as f:
         f.write(
             "gamerule commandblocksenabled false\ngamerule commandblocksenabled true"
@@ -214,7 +220,7 @@ def to_addon_pack_in_delay(
 
     # 将命令列表写入文件
     index_file = open(
-        f"{data_cfg.dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
     )
 
     struct, size, end_pos = commands_to_structure(
@@ -225,7 +231,7 @@ def to_addon_pack_in_delay(
     with open(
         os.path.abspath(
             os.path.join(
-                data_cfg.dist_path,
+                dist_path,
                 "temp/structures/",
                 f"{midi_cvt.music_name}_main.mcstructure",
             )
@@ -236,7 +242,7 @@ def to_addon_pack_in_delay(
 
     del struct
 
-    if data_cfg.progressbar_style:
+    if progressbar_style:
         scb_name = midi_cvt.music_name[:3] + "Pgb"
         index_file.write("scoreboard objectives add {0} dummy {0}计\n".format(scb_name))
 
@@ -257,7 +263,7 @@ def to_addon_pack_in_delay(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_start.mcstructure",
                 )
@@ -269,7 +275,7 @@ def to_addon_pack_in_delay(
         index_file.write(f"structure load {midi_cvt.music_name}_start ~ ~ ~1\n")
 
         pgb_struct, pgbSize, pgbNowPos = commands_to_structure(
-            midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
+            midi_cvt.form_progress_bar(max_delay, scb_name, progressbar_style),
             max_height - 1,
             compability_version_=compability_ver,
         )
@@ -277,7 +283,7 @@ def to_addon_pack_in_delay(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_pgb.mcstructure",
                 )
@@ -307,7 +313,7 @@ def to_addon_pack_in_delay(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_reset.mcstructure",
                 )
@@ -331,21 +337,22 @@ def to_addon_pack_in_delay(
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
+    if os.path.exists(f"{dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
-        f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/temp/",
+        f"{dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
-    shutil.rmtree(f"{data_cfg.dist_path}/temp/")
+    shutil.rmtree(f"{dist_path}/temp/")
 
     return len(command_list), max_delay
 
 
 def to_addon_pack_in_repeater(
     midi_cvt: MidiConvert,
-    data_cfg: ConvertConfig,
+    dist_path: str,
+    progressbar_style: Optional[ProgressBarStyle],
     player: str = "@a",
     max_height: int = 65,
 ) -> Tuple[int, int]:
@@ -356,8 +363,10 @@ def to_addon_pack_in_repeater(
     ----------
     midi_cvt: MidiConvert 对象
         用于转换的MidiConvert对象
-    data_cfg: ConvertConfig 对象
-        部分转换通用参数
+    dist_path: str
+        转换结果输出的目标路径
+    progressbar_style: ProgressBarStyle 对象
+        进度条对象
     player: str
         玩家选择器，默认为`@a`
     max_height: int
@@ -378,17 +387,17 @@ def to_addon_pack_in_repeater(
         player_selector=player,
     )
 
-    if not os.path.exists(data_cfg.dist_path):
-        os.makedirs(data_cfg.dist_path)
+    if not os.path.exists(dist_path):
+        os.makedirs(dist_path)
 
     # 当文件f夹{self.outputPath}/temp/存在时清空其下所有项目，然后创建
-    if os.path.exists(f"{data_cfg.dist_path}/temp/"):
-        shutil.rmtree(f"{data_cfg.dist_path}/temp/")
-    os.makedirs(f"{data_cfg.dist_path}/temp/functions/")
-    os.makedirs(f"{data_cfg.dist_path}/temp/structures/")
+    if os.path.exists(f"{dist_path}/temp/"):
+        shutil.rmtree(f"{dist_path}/temp/")
+    os.makedirs(f"{dist_path}/temp/functions/")
+    os.makedirs(f"{dist_path}/temp/structures/")
 
     # 写入manifest.json
-    with open(f"{data_cfg.dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
+    with open(f"{dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
@@ -401,7 +410,7 @@ def to_addon_pack_in_repeater(
 
     # 写入stop.mcfunction
     with open(
-        f"{data_cfg.dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
     ) as f:
         f.write(
             "gamerule commandblocksenabled false\ngamerule commandblocksenabled true"
@@ -409,7 +418,7 @@ def to_addon_pack_in_repeater(
 
     # 将命令列表写入文件
     index_file = open(
-        f"{data_cfg.dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+        f"{dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
     )
 
     struct, size, end_pos = commands_to_redstone_delay_structure(
@@ -421,7 +430,7 @@ def to_addon_pack_in_repeater(
     with open(
         os.path.abspath(
             os.path.join(
-                data_cfg.dist_path,
+                dist_path,
                 "temp/structures/",
                 f"{midi_cvt.music_name}_main.mcstructure",
             )
@@ -432,7 +441,7 @@ def to_addon_pack_in_repeater(
 
     del struct
 
-    if data_cfg.progressbar_style:
+    if progressbar_style:
         scb_name = midi_cvt.music_name[:3] + "Pgb"
         index_file.write("scoreboard objectives add {0} dummy {0}计\n".format(scb_name))
 
@@ -453,7 +462,7 @@ def to_addon_pack_in_repeater(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_start.mcstructure",
                 )
@@ -465,7 +474,7 @@ def to_addon_pack_in_repeater(
         index_file.write(f"structure load {midi_cvt.music_name}_start ~ ~ ~1\n")
 
         pgb_struct, pgbSize, pgbNowPos = commands_to_structure(
-            midi_cvt.form_progress_bar(max_delay, scb_name, data_cfg.progressbar_style),
+            midi_cvt.form_progress_bar(max_delay, scb_name, progressbar_style),
             max_height - 1,
             compability_version_=compability_ver,
         )
@@ -473,7 +482,7 @@ def to_addon_pack_in_repeater(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_pgb.mcstructure",
                 )
@@ -503,7 +512,7 @@ def to_addon_pack_in_repeater(
         with open(
             os.path.abspath(
                 os.path.join(
-                    data_cfg.dist_path,
+                    dist_path,
                     "temp/structures/",
                     f"{midi_cvt.music_name}_reset.mcstructure",
                 )
@@ -527,13 +536,128 @@ def to_addon_pack_in_repeater(
 
     index_file.close()
 
-    if os.path.exists(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack"):
-        os.remove(f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack")
+    if os.path.exists(f"{dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
-        f"{data_cfg.dist_path}/temp/",
-        f"{data_cfg.dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/temp/",
+        f"{dist_path}/{midi_cvt.music_name}.mcpack",
     )
 
-    shutil.rmtree(f"{data_cfg.dist_path}/temp/")
+    shutil.rmtree(f"{dist_path}/temp/")
 
     return len(command_list), max_delay
+
+
+def to_addon_pack_in_repeater_divided_by_instrument(
+    midi_cvt: MidiConvert,
+    dist_path: str,
+    player: str = "@a",
+    max_height: int = 65,
+    base_block: str = "concrete",
+) -> Tuple[int, int]:
+    """
+    将midi以中继器播放器形式转换为mcstructure结构文件后打包成附加包，并在附加包中生成相应地导入函数
+
+    Parameters
+    ----------
+    midi_cvt: MidiConvert 对象
+        用于转换的MidiConvert对象
+    dist_path: str
+        转换结果输出的目标路径
+    player: str
+        玩家选择器，默认为`@a`
+    max_height: int
+        生成结构最大高度
+
+    Returns
+    -------
+    tuple[int指令数量, int音乐总延迟]
+    """
+
+    compability_ver = (
+        COMPABILITY_VERSION_117
+        if midi_cvt.enable_old_exe_format
+        else COMPABILITY_VERSION_119
+    )
+
+    if not os.path.exists(dist_path):
+        os.makedirs(dist_path)
+
+    # 当文件f夹{self.outputPath}/temp/存在时清空其下所有项目，然后创建
+    if os.path.exists(f"{dist_path}/temp/"):
+        shutil.rmtree(f"{dist_path}/temp/")
+    os.makedirs(f"{dist_path}/temp/functions/")
+    os.makedirs(f"{dist_path}/temp/structures/")
+
+    # 写入manifest.json
+    with open(f"{dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
+        json.dump(
+            behavior_mcpack_manifest(
+                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
+                pack_name=midi_cvt.music_name + "播放",
+                modules_description=f"无 - 由 音·创 生成",
+            ),
+            fp=f,
+            indent=4,
+        )
+
+    # 写入stop.mcfunction
+    with open(
+        f"{dist_path}/temp/functions/stop.mcfunction", "w", encoding="utf-8"
+    ) as f:
+        f.write(
+            "gamerule commandblocksenabled false\ngamerule commandblocksenabled true"
+        )
+
+    # 将命令列表写入文件
+    index_file = open(
+        f"{dist_path}/temp/functions/index.mcfunction", "w", encoding="utf-8"
+    )
+
+    cmd_dict, max_delay, max_multiple_cmd_count = (
+        midi_cvt.to_command_list_in_delay_devided_by_instrument(
+            player_selector=player,
+        )
+    )
+
+    base_height = 0
+
+    for inst, cmd_list in cmd_dict.items():
+        struct, size, end_pos = commands_to_redstone_delay_structure(
+            cmd_list,
+            max_delay,
+            max_multiple_cmd_count[inst],
+            base_block,
+            "z+",
+            compability_version_=compability_ver,
+        )
+
+        bkn = "{}_{}".format(midi_cvt.music_name, inst.replace(".", "-"))
+
+        with open(
+            os.path.abspath(
+                os.path.join(
+                    dist_path,
+                    "temp/structures/",
+                    "{}_main.mcstructure".format(bkn),
+                )
+            ),
+            "wb+",
+        ) as f:
+            struct.dump(f)
+
+        index_file.write("structure load {}_main ~ ~{} ~3\n".format(bkn, base_height))
+        base_height += 2 + size[1]
+
+    index_file.close()
+
+    if os.path.exists(f"{dist_path}/{midi_cvt.music_name}.mcpack"):
+        os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
+    compress_zipfile(
+        f"{dist_path}/temp/",
+        f"{dist_path}/{midi_cvt.music_name}.mcpack",
+    )
+
+    shutil.rmtree(f"{dist_path}/temp/")
+
+    return midi_cvt.total_note_count, max_delay

@@ -19,7 +19,6 @@ Terms & Conditions: ./License.md
 import os
 
 import Musicreater
-from Musicreater.plugin import ConvertConfig
 from Musicreater.plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
@@ -160,7 +159,7 @@ print(f"正在处理 {midi_path} ：")
 cvt_mid = Musicreater.MidiConvert.from_midi_file(
     midi_path, old_exe_format=False, min_volume=prompts[0], play_speed=prompts[1]
 )
-cvt_cfg = ConvertConfig(out_path, prompts[2])
+
 
 if fileFormat == 0:
     if playerFormat == 1:
@@ -177,28 +176,62 @@ elif fileFormat == 2:
     elif playerFormat == 2:
         cvt_method = to_mcstructure_file_in_repeater
 
+# 测试
+
+# print(cvt_mid)
+
 
 print(
     "	指令总长：{}，最高延迟：{}".format(
-        *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
+        *(
+            cvt_method(
+                cvt_mid,
+                out_path,
+                Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None, # type: ignore
+                *prompts[3:],
+            )
+        )
     )
     if fileFormat == 0
     else (
         "	指令总长：{}，最高延迟：{}，结构大小{}，终点坐标{}".format(
             *(
-                to_BDX_file_in_score(cvt_mid, cvt_cfg, *prompts[3:])
+                to_BDX_file_in_score(
+                    cvt_mid,
+                    out_path,
+                    Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
+                    *prompts[3:],
+                )
                 if playerFormat == 1
-                else to_BDX_file_in_delay(cvt_mid, cvt_cfg, *prompts[3:])
+                else to_BDX_file_in_delay(
+                    cvt_mid,
+                    out_path,
+                    Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
+                    *prompts[3:],
+                )
             )
         )
         if fileFormat == 1
         else (
             "	结构大小：{}，延迟总数：{}，指令数量：{}".format(
-                *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
+                *(
+                    cvt_method(
+                        cvt_mid,
+                        out_path,
+                        *prompts[3:],
+                    )
+                )
             )
-            if playerFormat == 2
+            if playerFormat == 1
             else "	结构大小：{}，延迟总数：{}".format(
-                *(cvt_method(cvt_mid, cvt_cfg, *prompts[3:]))  # type: ignore
+                *(
+                    cvt_method(
+                        cvt_mid,
+                        out_path,
+                        # Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None, # type: ignore
+                        *prompts[3:],
+                    )
+                )
             )
         )
     )

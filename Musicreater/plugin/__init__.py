@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-存放非音·创本体的附加内容（插件？）
+存放非音·创本体的附加功能件
 
 版权所有 © 2024 音·创 开发者
 Copyright © 2024 all the developers of Musicreater
@@ -16,7 +16,7 @@ Terms & Conditions: License.md in the root directory
 
 __all__ = [
     # 通用
-    "ConvertConfig",
+    # "ConvertConfig",
     "bottem_side_length_of_smallest_square_bottom_box",
     # 打包
     "compress_zipfile",
@@ -43,7 +43,7 @@ __all__ = [
 ]
 __author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"))
 
-from .main import ConvertConfig
+# from .main import ConvertConfig
 
 from .archive import compress_zipfile, behavior_mcpack_manifest
 
