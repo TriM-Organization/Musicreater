@@ -157,7 +157,7 @@ class FutureMidiConvertM4(MidiConvert):
                             *relative_coordinates,
                             volume_percentage,
                             1.0 if note.percussive else mc_pitch,
-                            self.minium_volume,
+                            self.minimum_volume,
                         )
                     ),
                     annotation=(

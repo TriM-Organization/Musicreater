@@ -104,10 +104,124 @@ class MineNote:
 
         self.extra_info = extra_information
 
-    # @property
-    # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
-    #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
-    #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+    @classmethod
+    def decode(cls, code_buffer: bytes):
+        """自字节码析出MineNote类"""
+        group_1 = int.from_bytes(code_buffer[:6], "big")
+        percussive_ = bool(group_1 & 0b1)
+        duration_ = (group_1 := group_1 >> 1) & 0b11111111111111111
+        start_tick_ = (group_1 := group_1 >> 17) & 0b11111111111111111
+        note_pitch_ = (group_1 := group_1 >> 17) & 0b1111111
+        sound_name_length = group_1 >> 7
+
+        if code_buffer[6] & 0b1:
+            position_displacement_ = (
+                int.from_bytes(
+                    code_buffer[8 + sound_name_length : 10 + sound_name_length],
+                    "big",
+                )
+                / 1000,
+                int.from_bytes(
+                    code_buffer[10 + sound_name_length : 12 + sound_name_length],
+                    "big",
+                )
+                / 1000,
+                int.from_bytes(
+                    code_buffer[12 + sound_name_length : 14 + sound_name_length],
+                    "big",
+                )
+                / 1000,
+            )
+        else:
+            position_displacement_ = (0, 0, 0)
+
+        try:
+            return cls(
+                mc_sound_name=code_buffer[8 : 8 + sound_name_length].decode(
+                    encoding="utf-8"
+                ),
+                midi_pitch=note_pitch_,
+                midi_velocity=code_buffer[6] >> 1,
+                start_time=start_tick_,
+                last_time=duration_,
+                track_number=code_buffer[7],
+                is_percussion=percussive_,
+                displacement=position_displacement_,
+            )
+        except:
+            print(code_buffer, "\n", code_buffer[8 : 8 + sound_name_length])
+            raise
+
+    def encode(self, is_displacement_included: bool = True) -> bytes:
+        """
+        将数据打包为字节码
+        
+        :param is_displacement_included:`bool` 是否包含声像偏移数据，默认为**是**
+
+        :return bytes 打包好的字节码
+        """
+
+        # 字符串长度 6 位 支持到 63
+        # note_pitch 7 位 支持到 127
+        # start_tick 17 位 支持到 131071 即 109.22583 分钟 合 1.8204305 小时
+        # duration 17 位 支持到 131071 即 109.22583 分钟 合 1.8204305 小时
+        # percussive 长度 1 位 支持到 1
+        # 共 48 位 合 6 字节
+        # +++
+        # velocity 长度 7 位 支持到 127
+        # is_displacement_included 长度 1 位 支持到 1
+        # 共 8 位 合 1 字节
+        # +++
+        # track_no 长度 8 位 支持到 255 合 1 字节
+        # +++
+        # sound_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
+        # +++
+        # position_displacement 每个元素长 16 位 合 2 字节
+        # 共 48 位 合 6 字节 支持存储三位小数和两位整数，其值必须在 [0, 65.535] 之间
+
+        return (
+            (
+                (
+                    (
+                        (
+                            (
+                                (
+                                    (
+                                        (
+                                            len(
+                                                r := self.sound_name.encode(
+                                                    encoding="utf-8"
+                                                )
+                                            )
+                                            << 7
+                                        )
+                                        + self.note_pitch
+                                    )
+                                    << 17
+                                )
+                                + self.start_tick
+                            )
+                            << 17
+                        )
+                        + self.duration
+                    )
+                    << 1
+                )
+                + self.percussive
+            ).to_bytes(6, "big")
+            + ((self.velocity << 1) + is_displacement_included).to_bytes(1, "big")
+            + self.track_no.to_bytes(1, "big")
+            + r
+            + (
+                (
+                    round(self.position_displacement[0] * 1000).to_bytes(2, "big")
+                    + round(self.position_displacement[1] * 1000).to_bytes(2, "big")
+                    + round(self.position_displacement[2] * 1000).to_bytes(2, "big")
+                )
+                if is_displacement_included
+                else b""
+            )
+        )
 
     def set_info(self, sth: Any):
         """设置附加信息"""

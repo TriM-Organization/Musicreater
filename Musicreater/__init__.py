@@ -17,18 +17,19 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.0.0-beta"
+__version__ = "2.0.0"
 __vername__ = "全新组织架构"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
     ("偷吃不是Touch", "Touch"),
-    ("鸣凤鸽子", "MingFengPigeon"),
+    ("鱼旧梦", "ElapsingDreams"),
 )
 __all__ = [
     # 主要类
     "MusicSequence",
     "MidiConvert",
+    "MusicSave",
     # 附加类
     "SingleNote",
     "MineNote",

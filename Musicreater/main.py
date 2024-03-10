@@ -88,7 +88,7 @@ class MusicSequence:
     note_count_per_instrument: Dict[str, int]
     """所使用的乐器"""
 
-    minium_volume: float
+    minimum_volume: float
     """乐曲最小音量"""
 
     music_deviation: float
@@ -100,11 +100,11 @@ class MusicSequence:
         channels_of_notes: MineNoteChannelType,
         music_note_count: Optional[int] = None,
         note_used_per_instrument: Optional[Dict[str, int]] = None,
-        minium_volume_of_music: float = 0.1,
+        minimum_volume_of_music: float = 0.1,
         deviation_value: Optional[float] = None,
     ) -> None:
         """
-        《我的世界》音符序列类
+        音符序列类
 
         Paramaters
         ==========
@@ -112,21 +112,27 @@ class MusicSequence:
             乐曲名称
         channels_of_notes: MineNoteChannelType
             音乐音轨
-        minium_volume_of_music: float
+        music_note_count: int
+            总音符数
+        note_used_per_instrument: Dict[str, int]
+            全曲乐器使用统计
+        minimum_volume_of_music: float
             音乐最小音量(0,1]
+        deviation_value: float
+            全曲音调偏移值
         """
 
-        if minium_volume_of_music > 1 or minium_volume_of_music <= 0:
+        if minimum_volume_of_music > 1 or minimum_volume_of_music <= 0:
             raise IllegalMinimumVolumeError(
                 "自订的最小音量参数错误：{}，应在 (0,1] 范围内。".format(
-                    minium_volume_of_music
+                    minimum_volume_of_music
                 )
             )
         # max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
         self.music_name = name_of_music
         self.channels = channels_of_notes
-        self.minium_volume = minium_volume_of_music
+        self.minimum_volume = minimum_volume_of_music
 
         if (note_used_per_instrument is None) or (music_note_count is None):
             kp = [i.sound_name for j in self.channels.values() for i in j]
@@ -151,17 +157,43 @@ class MusicSequence:
         midi_music_name: str,
         mismatch_error_ignorance: bool = True,
         speed_multiplier: float = 1,
+        default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        minium_vol: float = 0.1,
+        minimum_vol: float = 0.1,
         volume_processing_function: FittingFunctionType = natural_curve,
-        default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         deviation: float = 0,
     ):
+        """
+        自mido对象导入一个音符序列类
+
+        Paramaters
+        ==========
+        mido_file: mido.MidiFile 对象
+            需要处理的midi对象
+        midi_music_name: str
+            音乐名称
+        mismatch_error_ignorance bool
+            是否在导入时忽略音符不匹配错误
+        speed_multiplier: float
+            音乐播放速度倍数
+        default_tempo: int
+            默认的MIDI TEMPO值
+        pitched_note_referance_table: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_referance_table: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
+        minimum_vol: float
+            播放的最小音量 应为 (0,1] 范围内的小数
+        volume_processing_function: Callable[[float], float]
+            声像偏移拟合函数
+        deviation: float
+            全曲音调偏移值
+        """
         (
             note_channels,
             note_count_total,
-            inst_note_count,  # qualified_inst_note_count,
+            inst_note_count,
         ) = cls.to_music_note_channels(
             midi=mido_file,
             speed=speed_multiplier,
@@ -176,22 +208,34 @@ class MusicSequence:
             channels_of_notes=note_channels,
             music_note_count=note_count_total,
             note_used_per_instrument=inst_note_count,
-            minium_volume_of_music=minium_vol,
+            minimum_volume_of_music=minimum_vol,
             deviation_value=deviation,
         )
 
     def set_min_volume(self, volume_value: int):
-        self.minium_volume = volume_value
+        """重新设置全曲最小音量"""
+        if volume_value > 1 or volume_value <= 0:
+            raise IllegalMinimumVolumeError(
+                "自订的最小音量参数错误：{}，应在 (0,1] 范围内。".format(volume_value)
+            )
+        self.minimum_volume = volume_value
 
     def set_deviation(self, deviation_value: int):
+        """重新设置全曲音调偏移"""
         self.music_deviation = deviation_value
 
     def rename_music(self, new_name: str):
+        """重命名此音乐"""
         self.music_name = new_name
 
     def add_note(self, channel_no: int, note: MineNote, is_sort: bool = False):
+        """在指定通道添加一个音符"""
         self.channels[channel_no].append(note)
         self.total_note_count += 1
+        if note.sound_name in self.note_count_per_instrument.keys():
+            self.note_count_per_instrument[note.sound_name] += 1
+        else:
+            self.note_count_per_instrument[note.sound_name] = 1
         if is_sort:
             self.channels[channel_no].sort(key=lambda note: note.start_tick)
 
@@ -247,34 +291,45 @@ class MusicSequence:
         midi: mido.MidiFile,
         ignore_mismatch_error: bool = True,
         speed: float = 1.0,
+        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         vol_processing_function: FittingFunctionType = natural_curve,
-    ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:  # , Dict[str, int]]:
+    ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
         """
         将midi解析并转换为频道音符字典
 
+        Parameters
+        ----------
+        midi: mido.MidiFile 对象
+            需要处理的midi对象
+        ignore_mismatch_error： bool
+            是否在导入时忽略音符不匹配错误
+        speed: float
+            音乐播放速度倍数
+        default_tempo_value: int
+            默认的MIDI TEMPO值
+        pitched_note_rtable: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_rtable: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
+        vol_processing_function: Callable[[float], float]
+            声像偏移拟合函数
+
         Returns
         -------
-        以频道作为分割的Midi音符列表字典:
-        Dict[int,List[SingleNote,]]
+        以频道作为分割的Midi音符列表字典, 音符总数, 乐器使用统计:
+        Tuple[MineNoteChannelType, int, Dict[str, int]]
         """
 
         if speed == 0:
             raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
-
-        # if midi is None:
-        #     raise MidiUnboundError(
-        #         "Midi参量为空。你是否正在使用的是一个由 copy_important 生成的MidiConvert对象？这是不可复用的。"
-        #     )
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: MineNoteChannelType = empty_midi_channels(staff=[])
         tempo = default_tempo_value
         note_count = 0
         note_count_per_instrument: Dict[str, int] = {}
-        # qualified_note_count_per_instruments: Dict[str, int] = {}
 
         # 我们来用通道统计音乐信息
         # 但是是用分轨的思路的
@@ -366,14 +421,8 @@ class MusicSequence:
                             note_count += 1
                             if that_note.sound_name in note_count_per_instrument.keys():
                                 note_count_per_instrument[that_note.sound_name] += 1
-                            #     qualified_note_count_per_instruments[
-                            #         that_note.sound_name
-                            #     ] += is_note_in_diapason(that_note)
                             else:
                                 note_count_per_instrument[that_note.sound_name] = 1
-                            #     qualified_note_count_per_instruments[
-                            #         that_note.sound_name
-                            #     ] = int(is_note_in_diapason(that_note))
                         else:
                             if ignore_mismatch_error:
                                 print(
@@ -411,7 +460,6 @@ class MusicSequence:
             channels,
             note_count,
             note_count_per_instrument,
-            # qualified_note_count_per_instruments,
         )
 
 
@@ -442,9 +490,8 @@ class MidiConvert(MusicSequence):
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        # enable_devation_guess: bool = True,
         enable_old_exe_format: bool = False,
-        minium_volume: float = 0.1,
+        minimum_volume: float = 0.1,
         vol_processing_function: FittingFunctionType = natural_curve,
     ):
         """
@@ -454,14 +501,24 @@ class MidiConvert(MusicSequence):
         ----------
         midi_obj: mido.MidiFile 对象
             需要处理的midi对象
-        midi_name: MIDI乐曲名称
-            此音乐之名
-        enable_old_exe_format: bool
-            是否启用旧版(≤1.19)指令格式，默认为否
+        midi_name: str
+            此音乐之名称
+        ignore_mismatch_error： bool
+            是否在导入时忽略音符不匹配错误
+        playment_speed: float
+            音乐播放速度倍数
+        default_tempo_value: int
+            默认的MIDI TEMPO值
         pitched_note_rtable: Dict[int, Tuple[str, int]]
             乐音乐器Midi-MC对照表
         percussion_note_rtable: Dict[int, Tuple[str, int]]
             打击乐器Midi-MC对照表
+        enable_old_exe_format: bool
+            是否启用旧版(≤1.19)指令格式，默认为否
+        minimum_volume: float
+            最小播放音量
+        vol_processing_function: Callable[[float], float]
+            声像偏移拟合函数
         """
 
         cls.enable_old_exe_format: bool = enable_old_exe_format
@@ -481,10 +538,9 @@ class MidiConvert(MusicSequence):
             speed_multiplier=playment_speed,
             pitched_note_referance_table=pitched_note_rtable,
             percussion_note_referance_table=percussion_note_rtable,
-            minium_vol=minium_volume,
+            minimum_vol=minimum_volume,
             volume_processing_function=vol_processing_function,
             default_tempo=default_tempo_value,
-            # devation_guess_enabled=enable_devation_guess,
             mismatch_error_ignorance=ignore_mismatch_error,
         )
 
@@ -497,7 +553,6 @@ class MidiConvert(MusicSequence):
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        # devation_guess_enabled: bool = True,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
         vol_processing_func: FittingFunctionType = natural_curve,
@@ -509,17 +564,22 @@ class MidiConvert(MusicSequence):
         ----------
         midi_file_path: str
             midi文件地址
-
-        speed: float
-            速度，注意：这里的速度指的是播放倍率，其原理为在播放音频的时候，每个音符的播放时间除以 speed
+        mismatch_error_ignorance bool
+            是否在导入时忽略音符不匹配错误
+        play_speed: float
+            音乐播放速度倍数
+        default_tempo: int
+            默认的MIDI TEMPO值
         pitched_note_table: Dict[int, Tuple[str, int]]
             乐音乐器Midi-MC对照表
         percussion_note_table: Dict[int, Tuple[str, int]]
             打击乐器Midi-MC对照表
-        enable_old_exe_format: bool
+        old_exe_format: bool
             是否启用旧版(≤1.19)指令格式，默认为否
         min_volume: float
-            最小播放音量，注意：这里的音量范围为(0,1]，如果超出将被处理为正确值
+            最小播放音量
+        vol_processing_func: Callable[[float], float]
+            声像偏移拟合函数
         """
 
         midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(
@@ -539,18 +599,14 @@ class MidiConvert(MusicSequence):
                 default_tempo_value=default_tempo,
                 pitched_note_rtable=pitched_note_table,
                 percussion_note_rtable=percussion_note_table,
-                # enable_devation_guess=devation_guess_enabled,
                 enable_old_exe_format=old_exe_format,
-                minium_volume=min_volume,
+                minimum_volume=min_volume,
                 vol_processing_function=vol_processing_func,
             )
         except (ValueError, TypeError) as E:
             raise MidiDestroyedError(f"文件{midi_file_path}可能损坏：{E}")
         except FileNotFoundError as E:
             raise FileNotFoundError(f"文件{midi_file_path}不存在：{E}")
-
-        # ……真的那么重要吗
-        # 我又几曾何时，知道祂真的会抛下我
 
     def form_progress_bar(
         self,
@@ -564,17 +620,15 @@ class MidiConvert(MusicSequence):
         Parameters
         ----------
         max_score: int
-            midi的乐器ID
-
+            最大的积分值
         scoreboard_name: str
             所使用的计分板名称
-
         progressbar_style: ProgressBarStyle
             此参数详见 ../docs/库的生成与功能文档.md#进度条自定义
 
         Returns
         -------
-        list[SingleCommand,]
+        list[MineCommand,]
         """
         pgs_style = progressbar_style.base_style
         """用于被替换的进度条原始样式"""
@@ -664,10 +718,6 @@ class MidiConvert(MusicSequence):
                     annotation="计算百分比",
                 )
             )
-
-        # 那是假的
-        # 一切都并未留下痕迹啊
-        # 那梦又是多么的真实……
 
         if r"%%t" in pgs_style:
             result.append(
@@ -841,7 +891,7 @@ class MidiConvert(MusicSequence):
 
         Returns
         -------
-        tuple( list[list[SingleCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        tuple( list[list[MineCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
         """
 
         command_channels = []
@@ -884,7 +934,7 @@ class MidiConvert(MusicSequence):
                                 *relative_coordinates,
                                 volume_percentage,
                                 1.0 if note.percussive else mc_pitch,
-                                self.minium_volume,
+                                self.minimum_volume,
                             )
                         ),
                         annotation=(
@@ -923,7 +973,7 @@ class MidiConvert(MusicSequence):
 
         Returns
         -------
-        tuple( list[SingleCommand,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        tuple( list[MineCommand指令,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
         notes_list: List[MineNote] = sorted(
@@ -962,7 +1012,7 @@ class MidiConvert(MusicSequence):
                             *relative_coordinates,
                             volume_percentage,
                             1.0 if note.percussive else mc_pitch,
-                            self.minium_volume,
+                            self.minimum_volume,
                         )
                     ),
                     annotation=(
@@ -997,7 +1047,7 @@ class MidiConvert(MusicSequence):
 
         Returns
         -------
-        Tuple[Dict[str, List[MineCommand]], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        Tuple[Dict[str, List[MineCommand指令]], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
         notes_list: List[MineNote] = sorted(
@@ -1048,7 +1098,7 @@ class MidiConvert(MusicSequence):
                             *relative_coordinates,
                             volume_percentage,
                             1.0 if note.percussive else mc_pitch,
-                            self.minium_volume,
+                            self.minimum_volume,
                         )
                     ),
                     annotation=(
@@ -1082,3 +1132,72 @@ class MidiConvert(MusicSequence):
         dst.music_command_list = [i.copy() for i in self.music_command_list]
         dst.progress_bar_command = [i.copy() for i in self.progress_bar_command]
         return dst
+
+
+class MusicSave(MusicSequence):
+
+    @classmethod
+    def load_decode(
+        cls,
+        bytes_buffer_in: bytes,
+    ):
+        """从字节码导入音乐序列"""
+
+        group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
+        music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
+            "utf-8"
+        )
+        channels_: MineNoteChannelType = empty_midi_channels(staff=[])
+        for channel_index in channels_.keys():
+            for i in range(
+                int.from_bytes(
+                    bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
+                )
+            ):
+                try:
+                    end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
+                    channels_[channel_index].append(
+                        MineNote.decode(bytes_buffer_in[stt_index:end_index])
+                    )
+                    stt_index = end_index
+                except:
+                    print(channels_)
+                    raise
+
+        return cls(
+            name_of_music=music_name_,
+            channels_of_notes=channels_,
+            minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+            deviation_value=int.from_bytes(bytes_buffer_in[6:8], "big", signed=True)
+            / 1000,
+        )
+
+    def encode_dump(
+        self,
+    ) -> bytes:
+        """将音乐序列转为二进制字节码"""
+
+        # 音乐名称长度 6 位 支持到 63
+        # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 总音调偏移 music_deviation 16 位 最大支持 -32768 ~ 32767 即 三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 音乐名称 music_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
+        bytes_buffer = (
+            b"MSQ#"
+            + (
+                (len(r := self.music_name.encode("utf-8")) << 10)
+                + round(self.minimum_volume * 1000)
+            ).to_bytes(2, "big")
+            + round(self.music_deviation * 1000).to_bytes(2, "big", signed=True)
+            + r
+        )
+
+        for channel_index, note_list in self.channels.items():
+            bytes_buffer += len(note_list).to_bytes(4, "big")
+            for note_ in note_list:
+                bytes_buffer += note_.encode()
+
+        return bytes_buffer

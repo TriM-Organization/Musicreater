@@ -74,10 +74,12 @@ def inst_to_sould_with_deviation(
         midi的乐器ID
     reference_table: Dict[int, Tuple[str, int]]
         转换乐器参照表
+    default_instrument: str
+        查无此乐器时的替换乐器
 
     Returns
     -------
-    tuple(str我的世界乐器名, int转换算法中的X)
+    tuple(str我的世界乐器名, int转换算法中的偏移量)
     """
     sound_id = midi_inst_to_mc_sound(
         instrumentID=instrumentID,
@@ -106,6 +108,8 @@ def midi_inst_to_mc_sound(
         midi的乐器ID
     reference_table: Dict[int, Tuple[str, int]]
         转换乐器参照表
+    default_instrument: str
+        查无此乐器时的替换乐器
 
     Returns
     -------
@@ -274,14 +278,14 @@ def midi_msgs_to_minenote(
     mc_distance_volume = volume_processing_method_(velocity_)
 
     return MineNote(
-        mc_sound_ID,
-        note_,
-        velocity_,
-        round(start_time_ / float(play_speed) / 50),
-        round(duration_ / float(play_speed) / 50),
-        track_no_,
-        percussive_,
-        (0, mc_distance_volume, 0),
+        mc_sound_name=mc_sound_ID,
+        midi_pitch=note_,
+        midi_velocity=velocity_,
+        start_time=round(start_time_ / float(play_speed) / 50),
+        last_time=round(duration_ / float(play_speed) / 50),
+        track_number=track_no_,
+        is_percussion=percussive_,
+        displacement=(0, mc_distance_volume, 0),
     )
 
 
