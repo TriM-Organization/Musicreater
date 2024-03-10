@@ -212,6 +212,72 @@ class MusicSequence:
             deviation_value=deviation,
         )
 
+    @classmethod
+    def load_decode(
+        cls,
+        bytes_buffer_in: bytes,
+    ):
+        """从字节码导入音乐序列"""
+
+        group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
+        music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
+            "utf-8"
+        )
+        channels_: MineNoteChannelType = empty_midi_channels(staff=[])
+        for channel_index in channels_.keys():
+            for i in range(
+                int.from_bytes(
+                    bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
+                )
+            ):
+                try:
+                    end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
+                    channels_[channel_index].append(
+                        MineNote.decode(bytes_buffer_in[stt_index:end_index])
+                    )
+                    stt_index = end_index
+                except:
+                    print(channels_)
+                    raise
+
+        return cls(
+            name_of_music=music_name_,
+            channels_of_notes=channels_,
+            minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+            deviation_value=int.from_bytes(bytes_buffer_in[6:8], "big", signed=True)
+            / 1000,
+        )
+
+    def encode_dump(
+        self,
+    ) -> bytes:
+        """将音乐序列转为二进制字节码"""
+
+        # 音乐名称长度 6 位 支持到 63
+        # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 总音调偏移 music_deviation 16 位 最大支持 -32768 ~ 32767 即 三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 音乐名称 music_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
+        bytes_buffer = (
+            b"MSQ#"
+            + (
+                (len(r := self.music_name.encode("utf-8")) << 10)
+                + round(self.minimum_volume * 1000)
+            ).to_bytes(2, "big")
+            + round(self.music_deviation * 1000).to_bytes(2, "big", signed=True)
+            + r
+        )
+
+        for channel_index, note_list in self.channels.items():
+            bytes_buffer += len(note_list).to_bytes(4, "big")
+            for note_ in note_list:
+                bytes_buffer += note_.encode()
+
+        return bytes_buffer
+
     def set_min_volume(self, volume_value: int):
         """重新设置全曲最小音量"""
         if volume_value > 1 or volume_value <= 0:
@@ -1132,72 +1198,3 @@ class MidiConvert(MusicSequence):
         dst.music_command_list = [i.copy() for i in self.music_command_list]
         dst.progress_bar_command = [i.copy() for i in self.progress_bar_command]
         return dst
-
-
-class MusicSave(MusicSequence):
-
-    @classmethod
-    def load_decode(
-        cls,
-        bytes_buffer_in: bytes,
-    ):
-        """从字节码导入音乐序列"""
-
-        group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
-        music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
-            "utf-8"
-        )
-        channels_: MineNoteChannelType = empty_midi_channels(staff=[])
-        for channel_index in channels_.keys():
-            for i in range(
-                int.from_bytes(
-                    bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
-                )
-            ):
-                try:
-                    end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
-                    channels_[channel_index].append(
-                        MineNote.decode(bytes_buffer_in[stt_index:end_index])
-                    )
-                    stt_index = end_index
-                except:
-                    print(channels_)
-                    raise
-
-        return cls(
-            name_of_music=music_name_,
-            channels_of_notes=channels_,
-            minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
-            deviation_value=int.from_bytes(bytes_buffer_in[6:8], "big", signed=True)
-            / 1000,
-        )
-
-    def encode_dump(
-        self,
-    ) -> bytes:
-        """将音乐序列转为二进制字节码"""
-
-        # 音乐名称长度 6 位 支持到 63
-        # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
-        # 共 16 位 合 2 字节
-        # +++
-        # 总音调偏移 music_deviation 16 位 最大支持 -32768 ~ 32767 即 三位小数
-        # 共 16 位 合 2 字节
-        # +++
-        # 音乐名称 music_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
-        bytes_buffer = (
-            b"MSQ#"
-            + (
-                (len(r := self.music_name.encode("utf-8")) << 10)
-                + round(self.minimum_volume * 1000)
-            ).to_bytes(2, "big")
-            + round(self.music_deviation * 1000).to_bytes(2, "big", signed=True)
-            + r
-        )
-
-        for channel_index, note_list in self.channels.items():
-            bytes_buffer += len(note_list).to_bytes(4, "big")
-            for note_ in note_list:
-                bytes_buffer += note_.encode()
-
-        return bytes_buffer

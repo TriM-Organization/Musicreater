@@ -29,7 +29,6 @@ __all__ = [
     # 主要类
     "MusicSequence",
     "MidiConvert",
-    "MusicSave",
     # 附加类
     "SingleNote",
     "MineNote",
