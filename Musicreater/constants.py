@@ -459,16 +459,16 @@ MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[Tuple[int, int], int]] = {
 MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
     "note.harp": 6,
     "note.pling": 6,
-    "note.guitar": 7,
+    "note.guitar": -6,
     "note.iron_xylophone": 6,
-    "note.bell": 4,
-    "note.xylophone": 4,
-    "note.chime": 4,
+    "note.bell": 30,
+    "note.xylophone": 30,
+    "note.chime": 30,
     "note.banjo": 6,
-    "note.flute": 5,
-    "note.bass": 8,
+    "note.flute": 18,
+    "note.bass": -18,
     "note.snare": -1,
-    "note.didgeridoo": 8,
+    "note.didgeridoo": -18,
     "mob.zombie.wood": -1,
     "note.bit": 6,
     "note.hat": -1,
@@ -476,7 +476,7 @@ MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
     "firework.blast": -1,
     "firework.twinkle": -1,
     "fire.ignite": -1,
-    "note.cow_bell": 5,
+    "note.cow_bell": 6,
 }
 """不同乐器的音调偏离对照表"""
 
