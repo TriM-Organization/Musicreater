@@ -40,18 +40,19 @@
 ## 安装 🔳
 
 - 使用 pypi
-
+  
   ```bash
   pip install --upgrade Musicreater
   ```
 
 - 如果无法更新最新，可以尝试：
-
+  
   ```bash
   pip install --upgrade -i https://pypi.python.org/simple Musicreater
   ```
 
 - 克隆仓库并安装（最新版本但**不推荐**）
+  
   ```bash
   git clone https://gitee.com/TriM-Organization/Musicreater.git
   cd Musicreater
@@ -91,7 +92,7 @@
 - <table><tr><td>感谢 **油炸**\<QQ2836146704\> 激励我们不断开发新的内容。</td><td><img height="50" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg"></td></tr></table>
 
 >     感谢广大群友为此库提供的测试和建议等
->
+>     
 >     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！
 
 ## 联系 📞

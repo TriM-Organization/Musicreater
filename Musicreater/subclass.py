@@ -155,7 +155,7 @@ class MineNote:
     def encode(self, is_displacement_included: bool = True) -> bytes:
         """
         将数据打包为字节码
-        
+
         :param is_displacement_included:`bool` 是否包含声像偏移数据，默认为**是**
 
         :return bytes 打包好的字节码
@@ -662,9 +662,21 @@ class ProgressBarStyle:
 
     def __init__(self, base_s: str, to_play_s: str, played_s: str):
         """用于存储进度条样式的类
+
+        | 标识符   | 指定的可变量     |
+        |---------|----------------|
+        | `%%N`   | 乐曲名(即传入的文件名)|
+        | `%%s`   | 当前计分板值     |
+        | `%^s`   | 计分板最大值     |
+        | `%%t`   | 当前播放时间     |
+        | `%^t`   | 曲目总时长       |
+        | `%%%`   | 当前进度比率     |
+        | `_`     | 用以表示进度条占位|
+
         :param base_s 基础样式，用以定义进度条整体
         :param to_play_s 进度条样式：尚未播放的样子
-        :param played_s 已经播放的样子"""
+        :param played_s 已经播放的样子
+        """
         self.base_style = base_s
         self.to_play_style = to_play_s
         self.played_style = played_s
@@ -704,11 +716,47 @@ class ProgressBarStyle:
         dst = ProgressBarStyle(self.base_style, self.to_play_style, self.played_style)
         return dst
 
+    def play_output(
+        self,
+        played_delays: int,
+        total_delays: int,
+        music_name: str = "无题",
+    ) -> str:
+        """
+        直接依照此格式输出一个进度条
+
+        :param played_delays: int 当前播放进度积分值
+        :param total_delays: int  乐器总延迟数（积分数）
+        :param music_name: str    曲名
+        """
+
+        return (
+            self.base_style.replace(r"%%N", music_name)
+            .replace(r"%%s", str(played_delays))
+            .replace(r"%^s", str(total_delays))
+            .replace(r"%%t", mctick2timestr(played_delays))
+            .replace(r"%^t", mctick2timestr(total_delays))
+            .replace(r"%%%", str(int(10000 * played_delays / total_delays) / 100) + "%")
+            .replace(
+                "_",
+                self.played_style,
+                (played_delays * self.base_style.count("_") // total_delays) + 1,
+            )
+            .replace("_", self.to_play_style)
+        )
+
+
+def mctick2timestr(mc_tick: int) -> str:
+    """
+    将《我的世界》的游戏刻计转为表示时间的字符串
+    """
+    return "{:0>2d}:{:0>2d}".format(mc_tick // 1200, (mc_tick // 20) % 60)
+
 
 DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
-    r"▶ %%N [ %%s/%^s %%% __________ %%t|%^t ]",
-    r"§e=§r",
-    r"§7=§r",
+    r"▶ %%N [ %%s/%^s %%% §e__________§r %%t|%^t ]",
+    r"§7=",
+    r"=",
 )
 """
 默认的进度条样式

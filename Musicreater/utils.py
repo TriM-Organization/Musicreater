@@ -24,7 +24,7 @@ from .constants import (
     MC_PITCHED_INSTRUMENT_LIST,
     MM_INSTRUMENT_RANGE_TABLE,
 )
-from .subclass import SingleNote, MineNote
+from .subclass import SingleNote, MineNote, mctick2timestr
 
 from .types import (
     Any,
@@ -37,12 +37,6 @@ from .types import (
     MidiInstrumentTableType,
 )
 
-
-def mctick2timestr(mc_tick: int) -> str:
-    """
-    将《我的世界》的游戏刻计转为表示时间的字符串
-    """
-    return str(int(int(mc_tick / 20) / 60)) + ":" + str(int(int(mc_tick / 20) % 60))
 
 
 def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, Any]:

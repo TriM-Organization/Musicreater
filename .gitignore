@@ -23,6 +23,7 @@ RES.txt
 /Packer/*.MPK
 /Packer/checksum.txt
 /bgArrayLib
+/fcwslib
 
 # Byte-compiled / optimized
 __pycache__/

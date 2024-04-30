@@ -7,9 +7,9 @@
 5. Apache2.0 协议的英文原文副本可见下文
 
 >  The English Translation of the TERMS AND CONDITIONS above is listed below
->
+> 
 >  This translated version is for reference only and has no legal effect.
->
+> 
 >  The version with legal effect is the Chinese version above.
 
 **Note, The TERMS AND CONDITIONS below should and must be above all others in this project**
@@ -22,7 +22,6 @@
    2. Explicitly stated license.
    3. Apache 2.0 License.
 5. A copy of the original Apache Lisence 2.0 can be found below.
-
 
 ```text
                                  Apache License
