@@ -87,28 +87,33 @@ def to_websocket_server(
                 if music_to_play in musics.keys():
                     self.check_play = True
                     delay_of_now = 0
-                    for cmd in musics[music_to_play][0]:
+                    now_played_cmd = 0
+                    _time = time.time()
+                    for i in range(musics[music_to_play][1]):
                         if not self.check_play:
                             break
+                        await asyncio.sleep((0.05 - (time.time() - _time)) % 0.05)
                         _time = time.time()
                         if progressbar_style:
                             await self.send_command(
                                 "title {} actionbar {}".format(
                                     whom_to_play,
                                     progressbar_style.play_output(
-                                        played_delays=delay_of_now,
+                                        played_delays=i,
                                         total_delays=musics[music_to_play][1],
                                         music_name=music_to_play,
                                     ),
                                 ),
                                 callback=self.cmd_feedback,
                             )
-                        await self.send_command(
-                            cmd.command_text.replace(replacement, whom_to_play),
-                            callback=self.cmd_feedback,
-                        )
-                        delay_of_now += cmd.delay
-                        await asyncio.sleep((time.time() - _time) + cmd.delay / 20)
+                        delay_of_now += 1
+                        if delay_of_now >= (cmd := musics[music_to_play][0][now_played_cmd]).delay:
+                            await self.send_command(
+                                cmd.command_text.replace(replacement, whom_to_play),
+                                callback=self.cmd_feedback,
+                            )
+                            now_played_cmd += 1
+                            delay_of_now = 0
 
                 else:
                     await self.send_command(
@@ -124,6 +129,11 @@ def to_websocket_server(
                 ("。停止播放", ".stopplay", ".stoplay")
             ):
                 self.check_play = False
+
+            elif response["body"]["message"].startswith(
+                ("。终止连接", ".terminate", ".endconnection")
+            ):
+                await self.disconnect()
 
     server = fcwslib.Server(server=server_dist, port=server_port, debug_mode=True)
     server.add_plugin(Plugin)

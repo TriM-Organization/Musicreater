@@ -153,7 +153,7 @@ class MusicSequence:
     @classmethod
     def from_mido(
         cls,
-        mido_file: mido.MidiFile,
+        mido_file: Optional[mido.MidiFile],
         midi_music_name: str,
         mismatch_error_ignorance: bool = True,
         speed_multiplier: float = 1,
@@ -190,19 +190,24 @@ class MusicSequence:
         deviation: float
             全曲音调偏移值
         """
-        (
-            note_channels,
-            note_count_total,
-            inst_note_count,
-        ) = cls.to_music_note_channels(
-            midi=mido_file,
-            speed=speed_multiplier,
-            pitched_note_rtable=pitched_note_referance_table,
-            percussion_note_rtable=percussion_note_referance_table,
-            default_tempo_value=default_tempo,
-            vol_processing_function=volume_processing_function,
-            ignore_mismatch_error=mismatch_error_ignorance,
-        )
+        if mido_file:
+            (
+                note_channels,
+                note_count_total,
+                inst_note_count,
+            ) = cls.to_music_note_channels(
+                midi=mido_file,
+                speed=speed_multiplier,
+                pitched_note_rtable=pitched_note_referance_table,
+                percussion_note_rtable=percussion_note_referance_table,
+                default_tempo_value=default_tempo,
+                vol_processing_function=volume_processing_function,
+                ignore_mismatch_error=mismatch_error_ignorance,
+            )
+        else:
+            note_channels = {}
+            note_count_total = 0
+            inst_note_count = {}
         return cls(
             name_of_music=midi_music_name,
             channels_of_notes=note_channels,
@@ -549,7 +554,7 @@ class MidiConvert(MusicSequence):
     @classmethod
     def from_mido_obj(
         cls,
-        midi_obj: mido.MidiFile,
+        midi_obj: Optional[mido.MidiFile],
         midi_name: str,
         ignore_mismatch_error: bool = True,
         playment_speed: float = 1,

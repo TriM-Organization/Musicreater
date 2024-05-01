@@ -3,7 +3,7 @@
 </h1>
 
 <p align="center">
-    <img width="128" height="128" src="https://gitee.com/TriM-Organization/Musicreater/raw/master/resources/msctIcon.ico">
+    <img width="128" height="128" src="https://gitee.com/TriM-Organization/Musicreater/raw/master/resources/msctIcon.png">
     </img>
 </p>
 
@@ -69,9 +69,9 @@
 
 ## 作者 ✒
 
-**金羿 Eilles**：我的世界基岩版指令师，个人开发者，B 站不知名 UP 主，江西在校高中生。
+**金羿 Eilles**：我的世界基岩版指令作者，个人开发者，B 站不知名 UP 主，江西老表。
 
-**诸葛亮与八卦阵 bgArray**：我的世界基岩版玩家，喜欢编程和音乐，深圳初二学生。
+**诸葛亮与八卦阵 bgArray**：我的世界基岩版玩家，喜欢编程和音乐，深圳学生。
 
 **偷吃不是Touch Touch**：我的世界基岩版指令师，提供 BDX 导入测试支持
 

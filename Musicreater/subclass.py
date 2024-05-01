@@ -736,7 +736,7 @@ class ProgressBarStyle:
             .replace(r"%^s", str(total_delays))
             .replace(r"%%t", mctick2timestr(played_delays))
             .replace(r"%^t", mctick2timestr(total_delays))
-            .replace(r"%%%", str(int(10000 * played_delays / total_delays) / 100) + "%")
+            .replace(r"%%%", "{:0>5.2f}%".format(int(10000 * played_delays / total_delays) / 100))
             .replace(
                 "_",
                 self.played_style,
