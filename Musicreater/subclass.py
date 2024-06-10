@@ -42,8 +42,8 @@ class MineNote:
     duration: int
     """音符持续时间 命令刻"""
 
-    track_no: int
-    """音符所处的音轨"""
+    high_precision_time: int
+    """高精度开始时间偏量 1/1250 秒"""
 
     percussive: bool
     """是否作为打击乐器启用"""
@@ -61,7 +61,7 @@ class MineNote:
         midi_velocity: int,
         start_time: int,
         last_time: int,
-        track_number: int = 0,
+        mass_precision_time: int = 0,
         is_percussion: Optional[bool] = None,
         displacement: Optional[Tuple[float, float, float]] = None,
         extra_information: Optional[Any] = None,
@@ -73,7 +73,7 @@ class MineNote:
         :param start_time:`int` 开始之时(命令刻)
             注：此处的时间是用从乐曲开始到当前的毫秒数
         :param last_time:`int` 音符延续时间(命令刻)
-        :param track_number:`int` 音轨编号
+        :param mass_precision_time:`int` 高精度的开始时间偏移量(1/1250秒)
         :param is_percussion:`bool` 是否作为打击乐器
         :param displacement:`tuple[int,int,int]` 声像位移
         :param extra_information:`Any` 附加信息"""
@@ -87,8 +87,8 @@ class MineNote:
         """开始之时 tick"""
         self.duration: int = last_time
         """音符持续时间 tick"""
-        self.track_no: int = track_number
-        """音符所处的音轨"""
+        self.high_precision_time: int = mass_precision_time
+        """高精度开始时间偏量 0.4 毫秒"""
 
         self.percussive = (
             (mc_sound_name in MC_PERCUSSION_INSTRUMENT_LIST)
@@ -105,7 +105,7 @@ class MineNote:
         self.extra_info = extra_information
 
     @classmethod
-    def decode(cls, code_buffer: bytes):
+    def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
         """自字节码析出MineNote类"""
         group_1 = int.from_bytes(code_buffer[:6], "big")
         percussive_ = bool(group_1 & 0b1)
@@ -117,17 +117,31 @@ class MineNote:
         if code_buffer[6] & 0b1:
             position_displacement_ = (
                 int.from_bytes(
-                    code_buffer[8 + sound_name_length : 10 + sound_name_length],
+                    (
+                        code_buffer[8 + sound_name_length : 10 + sound_name_length]
+                        if is_high_time_precision
+                        else code_buffer[7 + sound_name_length : 9 + sound_name_length]
+                    ),
                     "big",
                 )
                 / 1000,
                 int.from_bytes(
-                    code_buffer[10 + sound_name_length : 12 + sound_name_length],
+                    (
+                        code_buffer[10 + sound_name_length : 12 + sound_name_length]
+                        if is_high_time_precision
+                        else code_buffer[9 + sound_name_length : 11 + sound_name_length]
+                    ),
                     "big",
                 )
                 / 1000,
                 int.from_bytes(
-                    code_buffer[12 + sound_name_length : 14 + sound_name_length],
+                    (
+                        code_buffer[12 + sound_name_length : 14 + sound_name_length]
+                        if is_high_time_precision
+                        else code_buffer[
+                            11 + sound_name_length : 13 + sound_name_length
+                        ]
+                    ),
                     "big",
                 )
                 / 1000,
@@ -137,22 +151,28 @@ class MineNote:
 
         try:
             return cls(
-                mc_sound_name=code_buffer[8 : 8 + sound_name_length].decode(
-                    encoding="utf-8"
-                ),
+                mc_sound_name=(
+                    o := (
+                        code_buffer[8 : 8 + sound_name_length]
+                        if is_high_time_precision
+                        else code_buffer[7 : 7 + sound_name_length]
+                    )
+                ).decode(encoding="GB18030"),
                 midi_pitch=note_pitch_,
                 midi_velocity=code_buffer[6] >> 1,
                 start_time=start_tick_,
                 last_time=duration_,
-                track_number=code_buffer[7],
+                mass_precision_time=code_buffer[7] if is_high_time_precision else 0,
                 is_percussion=percussive_,
                 displacement=position_displacement_,
             )
         except:
-            print(code_buffer, "\n", code_buffer[8 : 8 + sound_name_length])
+            print(code_buffer, "\n", o)
             raise
 
-    def encode(self, is_displacement_included: bool = True) -> bytes:
+    def encode(
+        self, is_displacement_included: bool = True, is_high_time_precision: bool = True
+    ) -> bytes:
         """
         将数据打包为字节码
 
@@ -172,9 +192,14 @@ class MineNote:
         # is_displacement_included 长度 1 位 支持到 1
         # 共 8 位 合 1 字节
         # +++
+        # （在第二版中已舍弃）
         # track_no 长度 8 位 支持到 255 合 1 字节
+        # （在第二版中新增）
+        # high_time_precision（可选）长度 8 位 支持到 255 合 1 字节 支持 1/1250 秒
         # +++
-        # sound_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
+        # sound_name 长度最多 63 支持到 31 个中文字符 或 63 个西文字符
+        # 第一版编码： UTF-8
+        # 第二版编码： GB18030
         # +++
         # position_displacement 每个元素长 16 位 合 2 字节
         # 共 48 位 合 6 字节 支持存储三位小数和两位整数，其值必须在 [0, 65.535] 之间
@@ -190,7 +215,7 @@ class MineNote:
                                         (
                                             len(
                                                 r := self.sound_name.encode(
-                                                    encoding="utf-8"
+                                                    encoding="GB18030"
                                                 )
                                             )
                                             << 7
@@ -210,7 +235,12 @@ class MineNote:
                 + self.percussive
             ).to_bytes(6, "big")
             + ((self.velocity << 1) + is_displacement_included).to_bytes(1, "big")
-            + self.track_no.to_bytes(1, "big")
+            # + self.track_no.to_bytes(1, "big")
+            + (
+                self.high_precision_time.to_bytes(1, "big")
+                if is_high_time_precision
+                else b""
+            )
             + r
             + (
                 (
@@ -227,7 +257,7 @@ class MineNote:
         """设置附加信息"""
         self.extra_info = sth
 
-    def __str__(self, is_displacement: bool = False, is_track: bool = False):
+    def __str__(self, is_displacement: bool = False):
         return "{}Note(Instrument = {}, {}Velocity = {}, StartTick = {}, Duration = {}{}{})".format(
             "Percussive" if self.percussive else "",
             self.sound_name,
@@ -235,7 +265,6 @@ class MineNote:
             self.velocity,
             self.start_tick,
             self.duration,
-            ", Track = {}".format(self.track_no) if is_track else "",
             (
                 ", PositionDisplacement = {}".format(self.position_displacement)
                 if is_displacement
@@ -243,13 +272,9 @@ class MineNote:
             ),
         )
 
-    def tuplize(self, is_displacement: bool = False, is_track: bool = False):
+    def tuplize(self, is_displacement: bool = False):
         tuplized = self.__tuple__()
-        return (
-            tuplized[:-2]
-            + ((tuplized[-2],) if is_track else ())
-            + ((tuplized[-1],) if is_displacement else ())
-        )
+        return tuplized[:-2] + ((tuplized[-1],) if is_displacement else ())
 
     def __list__(self) -> List:
         return (
@@ -259,7 +284,6 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.track_no,
                 self.position_displacement,
             ]
             if self.percussive
@@ -270,7 +294,6 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.track_no,
                 self.position_displacement,
             ]
         )
@@ -278,8 +301,8 @@ class MineNote:
     def __tuple__(
         self,
     ) -> Union[
-        Tuple[bool, str, int, int, int, int, int, Tuple[float, float, float]],
         Tuple[bool, str, int, int, int, int, Tuple[float, float, float]],
+        Tuple[bool, str, int, int, int, Tuple[float, float, float]],
     ]:
         return (
             (
@@ -288,7 +311,6 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.track_no,
                 self.position_displacement,
             )
             if self.percussive
@@ -299,7 +321,6 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.track_no,
                 self.position_displacement,
             )
         )
@@ -312,7 +333,6 @@ class MineNote:
                 "Velocity": self.velocity,
                 "StartTick": self.start_tick,
                 "Duration": self.duration,
-                "Track": self.track_no,
                 "PositionDisplacement": self.position_displacement,
             }
             if self.percussive
@@ -323,7 +343,6 @@ class MineNote:
                 "Velocity": self.velocity,
                 "StartTick": self.start_tick,
                 "Duration": self.duration,
-                "Track": self.track_no,
                 "PositionDisplacement": self.position_displacement,
             }
         )
@@ -334,150 +353,150 @@ class MineNote:
         return self.tuplize() == other.tuplize()
 
 
-@dataclass(init=False)
-class SingleNote:
-    """存储单个音符的类"""
+# @dataclass(init=False)
+# class SingleNote:
+#     """存储单个音符的类"""
 
-    instrument: int
-    """乐器编号"""
+#     instrument: int
+#     """乐器编号"""
 
-    note: int
-    """音符编号"""
+#     note: int
+#     """音符编号"""
 
-    velocity: int
-    """力度/响度"""
+#     velocity: int
+#     """力度/响度"""
 
-    start_time: int
-    """开始之时 ms"""
+#     start_time: int
+#     """开始之时 ms"""
 
-    duration: int
-    """音符持续时间 ms"""
+#     duration: int
+#     """音符持续时间 ms"""
 
-    track_no: int
-    """音符所处的音轨"""
+#     track_no: int
+#     """音符所处的音轨"""
 
-    percussive: bool
-    """是否为打击乐器"""
+#     percussive: bool
+#     """是否为打击乐器"""
 
-    extra_info: Any
-    """你觉得放什么好？"""
+#     extra_info: Any
+#     """你觉得放什么好？"""
 
-    def __init__(
-        self,
-        instrument: int,
-        pitch: int,
-        velocity: int,
-        startime: int,
-        lastime: int,
-        is_percussion: bool,
-        track_number: int = 0,
-        extra_information: Any = None,
-    ):
-        """用于存储单个音符的类
-        :param instrument 乐器编号
-        :param pitch 音符编号
-        :param velocity 力度/响度
-        :param startTime 开始之时(ms)
-            注：此处的时间是用从乐曲开始到当前的毫秒数
-        :param lastTime 音符延续时间(ms)"""
-        self.instrument: int = instrument
-        """乐器编号"""
-        self.note: int = pitch
-        """音符编号"""
-        self.velocity: int = velocity
-        """力度/响度"""
-        self.start_time: int = startime
-        """开始之时 ms"""
-        self.duration: int = lastime
-        """音符持续时间 ms"""
-        self.track_no: int = track_number
-        """音符所处的音轨"""
-        self.percussive: bool = is_percussion
-        """是否为打击乐器"""
+#     def __init__(
+#         self,
+#         instrument: int,
+#         pitch: int,
+#         velocity: int,
+#         startime: int,
+#         lastime: int,
+#         is_percussion: bool,
+#         track_number: int = 0,
+#         extra_information: Any = None,
+#     ):
+#         """用于存储单个音符的类
+#         :param instrument 乐器编号
+#         :param pitch 音符编号
+#         :param velocity 力度/响度
+#         :param startTime 开始之时(ms)
+#             注：此处的时间是用从乐曲开始到当前的毫秒数
+#         :param lastTime 音符延续时间(ms)"""
+#         self.instrument: int = instrument
+#         """乐器编号"""
+#         self.note: int = pitch
+#         """音符编号"""
+#         self.velocity: int = velocity
+#         """力度/响度"""
+#         self.start_time: int = startime
+#         """开始之时 ms"""
+#         self.duration: int = lastime
+#         """音符持续时间 ms"""
+#         self.track_no: int = track_number
+#         """音符所处的音轨"""
+#         self.percussive: bool = is_percussion
+#         """是否为打击乐器"""
 
-        self.extra_info = extra_information
+#         self.extra_info = extra_information
 
-    @property
-    def inst(self) -> int:
-        """乐器编号"""
-        return self.instrument
+#     @property
+#     def inst(self) -> int:
+#         """乐器编号"""
+#         return self.instrument
 
-    @inst.setter
-    def inst(self, inst_: int):
-        self.instrument = inst_
+#     @inst.setter
+#     def inst(self, inst_: int):
+#         self.instrument = inst_
 
-    @property
-    def pitch(self) -> int:
-        """音符编号"""
-        return self.note
+#     @property
+#     def pitch(self) -> int:
+#         """音符编号"""
+#         return self.note
 
-    # @property
-    # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
-    #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
-    #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
+#     # @property
+#     # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
+#     #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
+#     #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
 
-    def set_info(self, sth: Any):
-        """设置附加信息"""
-        self.extra_info = sth
+#     def set_info(self, sth: Any):
+#         """设置附加信息"""
+#         self.extra_info = sth
 
-    def __str__(self, is_track: bool = False):
-        return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {}{})".format(
-            "Percussive" if self.percussive else "",
-            self.inst,
-            "" if self.percussive else "Pitch = {}, ".format(self.pitch),
-            self.start_time,
-            self.duration,
-            ", Track = {}".format(self.track_no) if is_track else "",
-        )
+#     def __str__(self, is_track: bool = False):
+#         return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {}{})".format(
+#             "Percussive" if self.percussive else "",
+#             self.inst,
+#             "" if self.percussive else "Pitch = {}, ".format(self.pitch),
+#             self.start_time,
+#             self.duration,
+#             ", Track = {}".format(self.track_no) if is_track else "",
+#         )
 
-    def __tuple__(self):
-        return (
-            (
-                self.percussive,
-                self.inst,
-                self.velocity,
-                self.start_time,
-                self.duration,
-                self.track_no,
-            )
-            if self.percussive
-            else (
-                self.percussive,
-                self.inst,
-                self.note,
-                self.velocity,
-                self.start_time,
-                self.duration,
-                self.track_no,
-            )
-        )
+#     def __tuple__(self):
+#         return (
+#             (
+#                 self.percussive,
+#                 self.inst,
+#                 self.velocity,
+#                 self.start_time,
+#                 self.duration,
+#                 self.track_no,
+#             )
+#             if self.percussive
+#             else (
+#                 self.percussive,
+#                 self.inst,
+#                 self.note,
+#                 self.velocity,
+#                 self.start_time,
+#                 self.duration,
+#                 self.track_no,
+#             )
+#         )
 
-    def __dict__(self):
-        return (
-            {
-                "Percussive": self.percussive,
-                "Instrument": self.inst,
-                "Velocity": self.velocity,
-                "StartTime": self.start_time,
-                "Duration": self.duration,
-                "Track": self.track_no,
-            }
-            if self.percussive
-            else {
-                "Percussive": self.percussive,
-                "Instrument": self.inst,
-                "Pitch": self.note,
-                "Velocity": self.velocity,
-                "StartTime": self.start_time,
-                "Duration": self.duration,
-                "Track": self.track_no,
-            }
-        )
+#     def __dict__(self):
+#         return (
+#             {
+#                 "Percussive": self.percussive,
+#                 "Instrument": self.inst,
+#                 "Velocity": self.velocity,
+#                 "StartTime": self.start_time,
+#                 "Duration": self.duration,
+#                 "Track": self.track_no,
+#             }
+#             if self.percussive
+#             else {
+#                 "Percussive": self.percussive,
+#                 "Instrument": self.inst,
+#                 "Pitch": self.note,
+#                 "Velocity": self.velocity,
+#                 "StartTime": self.start_time,
+#                 "Duration": self.duration,
+#                 "Track": self.track_no,
+#             }
+#         )
 
-    def __eq__(self, other) -> bool:
-        if not isinstance(other, self.__class__):
-            return False
-        return self.__str__() == other.__str__()
+#     def __eq__(self, other) -> bool:
+#         if not isinstance(other, self.__class__):
+#             return False
+#         return self.__str__() == other.__str__()
 
 
 @dataclass(init=False)
@@ -736,7 +755,10 @@ class ProgressBarStyle:
             .replace(r"%^s", str(total_delays))
             .replace(r"%%t", mctick2timestr(played_delays))
             .replace(r"%^t", mctick2timestr(total_delays))
-            .replace(r"%%%", "{:0>5.2f}%".format(int(10000 * played_delays / total_delays) / 100))
+            .replace(
+                r"%%%",
+                "{:0>5.2f}%".format(int(10000 * played_delays / total_delays) / 100),
+            )
             .replace(
                 "_",
                 self.played_style,
@@ -762,15 +784,15 @@ DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
 默认的进度条样式
 """
 
-NoteChannelType = Mapping[
-    int,
-    List[SingleNote,],
-]
-"""
-频道信息类型
+# NoteChannelType = Mapping[
+#     int,
+#     List[SingleNote,],
+# ]
+# """
+# 频道信息类型
 
-Dict[int,Dict[int,List[SingleNote,],],]
-"""
+# Dict[int,Dict[int,List[SingleNote,],],]
+# """
 
 
 MineNoteChannelType = Mapping[

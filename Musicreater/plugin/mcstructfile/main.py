@@ -272,3 +272,27 @@ def to_mcstructure_files_in_repeater_divided_by_instruments(
             struct.dump(f)
 
     return max_delay
+
+
+def to_mcstructure_file_in_blocks(
+    midi_cvt: MidiConvert,
+    dist_path: str,
+    player: str = "@a",
+):
+    """
+    将midi以方块形式转换为mcstructure结构文件
+    
+    Parameters
+    ----------
+    midi_cvt: MidiConvert 对象
+        用于转换的MidiConvert对象
+    dist_path: str
+        转换结果输出的目标路径
+    player: str
+        玩家选择器，默认为`@a`
+
+    Returns
+    -------
+    int音乐总延迟
+    """
+    pass

@@ -17,20 +17,20 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.1.0.1"
-__vername__ = "Websocket支持"
+__version__ = "2.2.0"
+__vername__ = "高精度时间支持"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),
-    ("偷吃不是Touch", "Touch"),
     ("鱼旧梦", "ElapsingDreams"),
+    ("偷吃不是Touch", "Touch"),
 )
 __all__ = [
     # 主要类
     "MusicSequence",
     "MidiConvert",
     # 附加类
-    "SingleNote",
+    # "SingleNote",
     "MineNote",
     "MineCommand",
     "SingleNoteBox",

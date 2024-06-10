@@ -51,7 +51,7 @@ class FutureMidiConvertM4(MidiConvert):
         _apply_time_division: float = 10,
     ) -> List[MineNote]:
         """传入音符数据，返回分割后的插值列表
-        :param _note: SingleNote 音符
+        :param _note: MineNote 音符
         :param _apply_time_division: int 间隔帧数
         :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]"""
 
@@ -81,7 +81,7 @@ class FutureMidiConvertM4(MidiConvert):
                         _note.start_tick + _i * (_note.duration / totalCount)
                     ),
                     last_time=int(_note.duration / totalCount),
-                    track_number=_note.track_no,
+                    # track_number=_note.track_no,
                     is_percussion=_note.percussive,
                     extra_information=_note.extra_info,
                 )
@@ -126,7 +126,7 @@ class FutureMidiConvertM4(MidiConvert):
                 )
 
                 if not note.percussive:
-                    notes_list.extend(self._linear_note(note,1 * note.extra_info[3]))
+                    notes_list.extend(self._linear_note(note, 1 * note.extra_info[3]))
                 else:
                     notes_list.append(note)
 

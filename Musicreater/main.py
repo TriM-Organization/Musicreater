@@ -38,7 +38,7 @@ from .utils import *
 
 """
 学习笔记：
-tempo:  microseconds per quarter note 毫秒每四分音符，换句话说就是一拍占多少毫秒
+tempo:  microseconds per quarter note 毫秒每四分音符，换句话说就是一拍占多少微秒
 tick:  midi帧
 ticks_per_beat:  帧每拍，即一拍多少帧
 
@@ -46,11 +46,11 @@ ticks_per_beat:  帧每拍，即一拍多少帧
 
 tick / ticks_per_beat => amount_of_beats 拍数(四分音符数)
 
-tempo * amount_of_beats => 毫秒数
+tempo * amount_of_beats => 微秒数
 
 所以：
 
-tempo * tick / ticks_per_beat => 毫秒数
+tempo * tick / ticks_per_beat => 微秒数
 
 ###########
 
@@ -60,7 +60,7 @@ seconds per tick:
 seconds:
 tick * tempo / 1000000.0 / ticks_per_beat
 
-microseconds:
+milliseconds:
 tick * tempo / 1000.0 / ticks_per_beat
 
 gameticks:
@@ -225,8 +225,13 @@ class MusicSequence:
         """从字节码导入音乐序列"""
 
         group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
+        group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
+
+        high_quantity = bool(group_2 & 0b1000000000000000)
+        # print(group_2, high_quantity)
+
         music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
-            "utf-8"
+            "GB18030"
         )
         channels_: MineNoteChannelType = empty_midi_channels(staff=[])
         for channel_index in channels_.keys():
@@ -236,9 +241,17 @@ class MusicSequence:
                 )
             ):
                 try:
-                    end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
+                    end_index = (
+                        stt_index
+                        + 13
+                        + high_quantity
+                        + (bytes_buffer_in[stt_index] >> 2)
+                    )
                     channels_[channel_index].append(
-                        MineNote.decode(bytes_buffer_in[stt_index:end_index])
+                        MineNote.decode(
+                            code_buffer=bytes_buffer_in[stt_index:end_index],
+                            is_high_time_precision=high_quantity,
+                        )
                     )
                     stt_index = end_index
                 except:
@@ -249,15 +262,21 @@ class MusicSequence:
             name_of_music=music_name_,
             channels_of_notes=channels_,
             minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
-            deviation_value=int.from_bytes(bytes_buffer_in[6:8], "big", signed=True)
-            / 1000,
+            deviation_value=(
+                (-1 if group_2 & 0b100000000000000 else 1)
+                * (group_2 & 0b11111111111111)
+                / 1000
+            ),
         )
 
     def encode_dump(
         self,
+        high_time_precision: bool = True,
     ) -> bytes:
         """将音乐序列转为二进制字节码"""
 
+        # 第一版的码头： MSQ#  字串编码： UTF-8
+        # 第一版格式
         # 音乐名称长度 6 位 支持到 63
         # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
         # 共 16 位 合 2 字节
@@ -266,20 +285,59 @@ class MusicSequence:
         # 共 16 位 合 2 字节
         # +++
         # 音乐名称 music_name 长度最多63 支持到 21 个中文字符 或 63 个西文字符
+
+        # bytes_buffer = (
+        #     b"MSQ#"
+        #     + (
+        #         (len(r := self.music_name.encode("utf-8")) << 10)
+        #         + round(self.minimum_volume * 1000)
+        #     ).to_bytes(2, "big")
+        #     + round(self.music_deviation * 1000).to_bytes(2, "big", signed=True)
+        #     + r
+        # )
+
+        # for channel_index, note_list in self.channels.items():
+        #     bytes_buffer += len(note_list).to_bytes(4, "big")
+        #     for note_ in note_list:
+        #         bytes_buffer += note_.encode()
+
+        # 第二版的码头： MSQ@  字串编码： GB18030
+
+        # 音乐名称长度 6 位 支持到 63
+        # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 是否启用“高精度”音符时间控制 1 位
+        # 总音调偏移 music_deviation 15 位 最大支持 -16383 ~ 16383 即 三位小数
+        # 共 16 位 合 2 字节
+        # +++
+        # 音乐名称 music_name 长度最多63 支持到 31 个中文字符 或 63 个西文字符
+
         bytes_buffer = (
-            b"MSQ#"
+            b"MSQ@"
             + (
-                (len(r := self.music_name.encode("utf-8")) << 10)
+                (len(r := self.music_name.encode("GB18030")) << 10)
                 + round(self.minimum_volume * 1000)
             ).to_bytes(2, "big")
-            + round(self.music_deviation * 1000).to_bytes(2, "big", signed=True)
+            + (
+                (
+                    (
+                        (high_time_precision << 1)
+                        + (1 if (k := round(self.music_deviation * 1000)) < 0 else 0)
+                    )
+                    << 14
+                )
+                + abs(k)
+            ).to_bytes(2, "big", signed=False)
             + r
         )
 
+        # 若启用“高精度”，则在每个音符前添加一个字节，用于存储音符时间控制精度偏移
+        # 此值每增加 1，则音符向后播放时长增加 1/1250 秒
         for channel_index, note_list in self.channels.items():
             bytes_buffer += len(note_list).to_bytes(4, "big")
             for note_ in note_list:
-                bytes_buffer += note_.encode()
+                bytes_buffer += note_.encode(is_high_time_precision=high_time_precision)
 
         return bytes_buffer
 
@@ -374,8 +432,6 @@ class MusicSequence:
         ----------
         midi: mido.MidiFile 对象
             需要处理的midi对象
-        ignore_mismatch_error： bool
-            是否在导入时忽略音符不匹配错误
         speed: float
             音乐播放速度倍数
         default_tempo_value: int
@@ -398,115 +454,110 @@ class MusicSequence:
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: MineNoteChannelType = empty_midi_channels(staff=[])
+        channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
         tempo = default_tempo_value
         note_count = 0
         note_count_per_instrument: Dict[str, int] = {}
+        microseconds = 0
 
-        # 我们来用通道统计音乐信息
-        # 但是是用分轨的思路的
-        for track_no, track in enumerate(midi.tracks):
-            microseconds = 0
-            if not track:
-                continue
+        note_queue_A: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(staff=[])
+        note_queue_B: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(staff=[])
 
-            note_queue_A: Dict[
-                int,
-                List[
-                    Tuple[
-                        int,
-                        int,
-                    ]
-                ],
-            ] = empty_midi_channels(staff=[])
-            note_queue_B: Dict[
-                int,
-                List[
-                    Tuple[
-                        int,
-                        int,
-                    ]
-                ],
-            ] = empty_midi_channels(staff=[])
+        # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
+        # 采用的时遍历信息思路
+        for msg in midi.merged_track:
+            if msg.time != 0:
+                # 微秒
+                microseconds += msg.time * tempo / midi.ticks_per_beat
 
-            channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
+            # 简化
+            if msg.type == "set_tempo":
+                tempo = msg.tempo
+            else:
+                if msg.type == "program_change":
+                    channel_program[msg.channel] = msg.program
 
-            for msg in track:
-                if msg.time != 0:
-                    microseconds += msg.time * tempo / midi.ticks_per_beat / 1000
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    note_queue_A[msg.channel].append(
+                        (msg.note, channel_program[msg.channel])
+                    )
+                    note_queue_B[msg.channel].append((msg.velocity, microseconds))
 
-                if msg.is_meta:
-                    if msg.type == "set_tempo":
-                        tempo = msg.tempo
-                else:
-                    if msg.type == "program_change":
-                        channel_program[msg.channel] = msg.program
-
-                    elif msg.type == "note_on" and msg.velocity != 0:
-                        note_queue_A[msg.channel].append(
-                            (msg.note, channel_program[msg.channel])
-                        )
-                        note_queue_B[msg.channel].append((msg.velocity, microseconds))
-
-                    elif (msg.type == "note_off") or (
-                        msg.type == "note_on" and msg.velocity == 0
-                    ):
-                        if (msg.note, channel_program[msg.channel]) in note_queue_A[
-                            msg.channel
-                        ]:
-                            _velocity, _ms = note_queue_B[msg.channel][
-                                note_queue_A[msg.channel].index(
-                                    (msg.note, channel_program[msg.channel])
-                                )
-                            ]
-                            note_queue_A[msg.channel].remove(
+                elif (msg.type == "note_off") or (
+                    msg.type == "note_on" and msg.velocity == 0
+                ):
+                    if (msg.note, channel_program[msg.channel]) in note_queue_A[
+                        msg.channel
+                    ]:
+                        _velocity, _ms = note_queue_B[msg.channel][
+                            note_queue_A[msg.channel].index(
                                 (msg.note, channel_program[msg.channel])
                             )
-                            note_queue_B[msg.channel].remove((_velocity, _ms))
+                        ]
+                        note_queue_A[msg.channel].remove(
+                            (msg.note, channel_program[msg.channel])
+                        )
+                        note_queue_B[msg.channel].remove((_velocity, _ms))
 
-                            midi_channels[msg.channel].append(
-                                that_note := midi_msgs_to_minenote(
-                                    inst_=(
-                                        msg.note
-                                        if msg.channel == 9
-                                        else channel_program[msg.channel]
-                                    ),
-                                    note_=(
-                                        channel_program[msg.channel]
-                                        if msg.channel == 9
-                                        else msg.note
-                                    ),
-                                    velocity_=_velocity,
-                                    start_time_=_ms,
-                                    duration_=microseconds - _ms,
-                                    track_no_=track_no,
-                                    percussive_=(msg.channel == 9),
-                                    play_speed=speed,
-                                    midi_reference_table=(
-                                        percussion_note_rtable
-                                        if msg.channel == 9
-                                        else pitched_note_rtable
-                                    ),
-                                    volume_processing_method_=vol_processing_function,
+                        midi_channels[msg.channel].append(
+                            that_note := midi_msgs_to_minenote(
+                                inst_=(
+                                    msg.note
+                                    if msg.channel == 9
+                                    else channel_program[msg.channel]
+                                ),
+                                note_=(
+                                    channel_program[msg.channel]
+                                    if msg.channel == 9
+                                    else msg.note
+                                ),
+                                velocity_=_velocity,
+                                start_time_=_ms,  # 微秒
+                                duration_=microseconds - _ms,  # 微秒
+                                percussive_=(msg.channel == 9),
+                                play_speed=speed,
+                                midi_reference_table=(
+                                    percussion_note_rtable
+                                    if msg.channel == 9
+                                    else pitched_note_rtable
+                                ),
+                                volume_processing_method_=vol_processing_function,
+                            )
+                        )
+                        note_count += 1
+                        if that_note.sound_name in note_count_per_instrument.keys():
+                            note_count_per_instrument[that_note.sound_name] += 1
+                        else:
+                            note_count_per_instrument[that_note.sound_name] = 1
+                    else:
+                        if ignore_mismatch_error:
+                            print(
+                                "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                    msg
                                 )
                             )
-                            note_count += 1
-                            if that_note.sound_name in note_count_per_instrument.keys():
-                                note_count_per_instrument[that_note.sound_name] += 1
-                            else:
-                                note_count_per_instrument[that_note.sound_name] = 1
                         else:
-                            if ignore_mismatch_error:
-                                print(
-                                    "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
-                                        msg
-                                    )
-                                )
-                            else:
-                                raise NoteOnOffMismatchError(
-                                    "当前的MIDI很可能有损坏之嫌……",
-                                    msg,
-                                    "无法在上文中找到与之匹配的音符开音消息。",
-                                )
+                            raise NoteOnOffMismatchError(
+                                "当前的MIDI很可能有损坏之嫌……",
+                                msg,
+                                "无法在上文中找到与之匹配的音符开音消息。",
+                            )
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
