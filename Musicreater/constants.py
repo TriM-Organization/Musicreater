@@ -5,8 +5,8 @@
 """
 
 """
-版权所有 © 2024 音·创 开发者
-Copyright © 2024 all the developers of Musicreater
+版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+Copyright © 2024 EillesWan & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -1041,7 +1041,7 @@ MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
 
 # 金羿ELS 音符方块对照表
 
-MN_EILLES_NOTE_TABLE: Dict[int, str] = {
+MN_EILLES_NOTE_BLOCK_TABLE: Dict[int, str] = {
     0: "C",
     1: "C#",
     2: "D",

@@ -5,8 +5,8 @@
 """
 
 """
-版权所有 © 2024 音·创 开发者
-Copyright © 2024 all the developers of Musicreater
+版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+Copyright © 2024 EillesWan & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -353,152 +353,6 @@ class MineNote:
         return self.tuplize() == other.tuplize()
 
 
-# @dataclass(init=False)
-# class SingleNote:
-#     """存储单个音符的类"""
-
-#     instrument: int
-#     """乐器编号"""
-
-#     note: int
-#     """音符编号"""
-
-#     velocity: int
-#     """力度/响度"""
-
-#     start_time: int
-#     """开始之时 ms"""
-
-#     duration: int
-#     """音符持续时间 ms"""
-
-#     track_no: int
-#     """音符所处的音轨"""
-
-#     percussive: bool
-#     """是否为打击乐器"""
-
-#     extra_info: Any
-#     """你觉得放什么好？"""
-
-#     def __init__(
-#         self,
-#         instrument: int,
-#         pitch: int,
-#         velocity: int,
-#         startime: int,
-#         lastime: int,
-#         is_percussion: bool,
-#         track_number: int = 0,
-#         extra_information: Any = None,
-#     ):
-#         """用于存储单个音符的类
-#         :param instrument 乐器编号
-#         :param pitch 音符编号
-#         :param velocity 力度/响度
-#         :param startTime 开始之时(ms)
-#             注：此处的时间是用从乐曲开始到当前的毫秒数
-#         :param lastTime 音符延续时间(ms)"""
-#         self.instrument: int = instrument
-#         """乐器编号"""
-#         self.note: int = pitch
-#         """音符编号"""
-#         self.velocity: int = velocity
-#         """力度/响度"""
-#         self.start_time: int = startime
-#         """开始之时 ms"""
-#         self.duration: int = lastime
-#         """音符持续时间 ms"""
-#         self.track_no: int = track_number
-#         """音符所处的音轨"""
-#         self.percussive: bool = is_percussion
-#         """是否为打击乐器"""
-
-#         self.extra_info = extra_information
-
-#     @property
-#     def inst(self) -> int:
-#         """乐器编号"""
-#         return self.instrument
-
-#     @inst.setter
-#     def inst(self, inst_: int):
-#         self.instrument = inst_
-
-#     @property
-#     def pitch(self) -> int:
-#         """音符编号"""
-#         return self.note
-
-#     # @property
-#     # def get_mc_pitch(self,table: Dict[int, Tuple[str, int]]) -> float:
-#     #     self.mc_sound_ID, _X =  inst_to_sould_with_deviation(self.inst,table,"note.bd" if self.percussive else "note.flute",)
-#     #     return -1 if self.percussive else 2 ** ((self.note - 60 - _X) / 12)
-
-#     def set_info(self, sth: Any):
-#         """设置附加信息"""
-#         self.extra_info = sth
-
-#     def __str__(self, is_track: bool = False):
-#         return "{}Note(Instrument = {}, {}Velocity = {}, StartTime = {}, Duration = {}{})".format(
-#             "Percussive" if self.percussive else "",
-#             self.inst,
-#             "" if self.percussive else "Pitch = {}, ".format(self.pitch),
-#             self.start_time,
-#             self.duration,
-#             ", Track = {}".format(self.track_no) if is_track else "",
-#         )
-
-#     def __tuple__(self):
-#         return (
-#             (
-#                 self.percussive,
-#                 self.inst,
-#                 self.velocity,
-#                 self.start_time,
-#                 self.duration,
-#                 self.track_no,
-#             )
-#             if self.percussive
-#             else (
-#                 self.percussive,
-#                 self.inst,
-#                 self.note,
-#                 self.velocity,
-#                 self.start_time,
-#                 self.duration,
-#                 self.track_no,
-#             )
-#         )
-
-#     def __dict__(self):
-#         return (
-#             {
-#                 "Percussive": self.percussive,
-#                 "Instrument": self.inst,
-#                 "Velocity": self.velocity,
-#                 "StartTime": self.start_time,
-#                 "Duration": self.duration,
-#                 "Track": self.track_no,
-#             }
-#             if self.percussive
-#             else {
-#                 "Percussive": self.percussive,
-#                 "Instrument": self.inst,
-#                 "Pitch": self.note,
-#                 "Velocity": self.velocity,
-#                 "StartTime": self.start_time,
-#                 "Duration": self.duration,
-#                 "Track": self.track_no,
-#             }
-#         )
-
-#     def __eq__(self, other) -> bool:
-#         if not isinstance(other, self.__class__):
-#             return False
-#         return self.__str__() == other.__str__()
-
-
 @dataclass(init=False)
 class MineCommand:
     """存储单个指令的类"""
@@ -783,16 +637,6 @@ DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
 """
 默认的进度条样式
 """
-
-# NoteChannelType = Mapping[
-#     int,
-#     List[SingleNote,],
-# ]
-# """
-# 频道信息类型
-
-# Dict[int,Dict[int,List[SingleNote,],],]
-# """
 
 
 MineNoteChannelType = Mapping[

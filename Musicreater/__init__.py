@@ -5,11 +5,16 @@
 Musicreater(音·创)
 A free open source library used for convert midi file into formats that is suitable for **Minecraft**.
 
-版权所有 © 2024 音·创 开发者
-Copyright © 2024 all the developers of Musicreater
+版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+Copyright © 2024 EillesWan & bgArray
 
-开源相关声明请见 仓库根目录下的 License.md
-Terms & Conditions: License.md in the root directory
+音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
+The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
+
+本项目根据 第一版 汉钰律许可协议（“本协议”）授权。
+任何人皆可从以下地址获得本协议副本：https://gitee.com/EillesWan/YulvLicenses。
+若非因法律要求或经过了特殊准许，此作品在根据本协议“原样”提供的基础上，不予提供任何形式的担保、任何明示、任何暗示或类似承诺。也就是说，用户将自行承担因此作品的质量或性能问题而产生的全部风险。
+详细的准许和限制条款请见原协议文本。
 """
 
 # 睿乐组织 开发交流群 861684859

@@ -13,7 +13,7 @@ with open("README_EN.md", "r", encoding="utf-8") as fh:
 setuptools.setup(
     name="Musicreater",
     version=Musicreater.__version__,
-    author="Eilles Wan, bgArray",
+    author="金羿Eilles, bgArray, 鱼旧梦ElapsingDreams",
     author_email="TriM-Organization@hotmail.com",
     description="一款免费开源的针对《我的世界》音乐的支持库\n"
     "A free open-source python library used to convert midi into Minecraft.",

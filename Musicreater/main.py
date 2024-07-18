@@ -7,11 +7,16 @@
 Musicreater (音·创)
 A free open source library used for **Minecraft** musics.
 
-版权所有 © 2024 音·创 开发者
-Copyright © 2024 all the developers of Musicreater
+版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+Copyright © 2024 EillesWan & bgArray
 
-开源相关声明请见 仓库根目录下的 License.md
-Terms & Conditions: License.md in the root directory
+音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
+The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
+
+本项目根据 第一版 汉钰律许可协议（“本协议”）授权。
+任何人皆可从以下地址获得本协议副本：https://gitee.com/EillesWan/YulvLicenses。
+若非因法律要求或经过了特殊准许，此作品在根据本协议“原样”提供的基础上，不予提供任何形式的担保、任何明示、任何暗示或类似承诺。也就是说，用户将自行承担因此作品的质量或性能问题而产生的全部风险。
+详细的准许和限制条款请见原协议文本。
 """
 
 # 音·创 开发交流群 861684859
@@ -367,53 +372,6 @@ class MusicSequence:
             self.note_count_per_instrument[note.sound_name] = 1
         if is_sort:
             self.channels[channel_no].sort(key=lambda note: note.start_tick)
-
-    @staticmethod
-    def guess_deviation_wasted(
-        total_note_count: int,
-        total_instrument_count: int,
-        note_count_per_instrument: Optional[Dict[str, int]] = None,
-        qualified_note_count_per_instrument: Optional[Dict[str, int]] = None,
-        music_channels: Optional[MineNoteChannelType] = None,
-    ) -> float:
-        """已废弃"""
-        if (
-            note_count_per_instrument is None
-            or qualified_note_count_per_instrument is None
-        ):
-            if music_channels is None:
-                raise ValueError("参数不足，算逑！")
-            note_count_per_instrument = {}
-            qualified_note_count_per_instrument = {}
-            for this_note in [k for j in music_channels.values() for k in j]:
-                if this_note.sound_name in note_count_per_instrument.keys():
-                    note_count_per_instrument[this_note.sound_name] += 1
-                    qualified_note_count_per_instrument[
-                        this_note.sound_name
-                    ] += is_note_in_diapason(this_note)
-                else:
-                    note_count_per_instrument[this_note.sound_name] = 1
-                    qualified_note_count_per_instrument[this_note.sound_name] = int(
-                        is_note_in_diapason(this_note)
-                    )
-        return (
-            sum(
-                [
-                    (
-                        (
-                            MM_INSTRUMENT_RANGE_TABLE[inst][-1]
-                            * note_count
-                            / total_note_count
-                            - MM_INSTRUMENT_RANGE_TABLE[inst][-1]
-                        )
-                        * (note_count - qualified_note_count_per_instrument[inst])
-                    )
-                    for inst, note_count in note_count_per_instrument.items()
-                ]
-            )
-            / total_instrument_count
-            / total_note_count
-        )
 
     @staticmethod
     def to_music_note_channels(
@@ -998,6 +956,34 @@ class MidiConvert(MusicSequence):
 
         self.progress_bar_command = result
         return result
+
+    def redefine_execute_format(self, is_old_exe_cmd_using: bool = False):
+        """
+        根据是否使用旧版执行命令格式，重新定义执行命令的起始格式。
+
+        此方法用于处理 Minecraft 中的执行命令的格式差异。在 Minecraft 的命令系统中，
+        "execute" 命令的用法在不同版本间有所变化。此方法允许动态选择使用旧版还是新版
+        的命令格式，以便适应不同的 Minecraft 版本。
+
+        Parameters
+        ----------
+        is_old_exe_cmd_using: bool
+            是否使用旧版执行命令格式。
+
+        Returns
+        -------
+        MidiConvert修改后的实例，允许链式调用
+        """
+
+        # 根据 is_old_exe_cmd_using 的值选择合适的执行命令头格式
+        self.execute_cmd_head = (
+            "execute {} ~ ~ ~ "  # 旧版执行命令格式
+            if is_old_exe_cmd_using
+            else "execute as {} at @s positioned ~ ~ ~ run "  # 新版执行命令格式
+        )
+
+        # 返回修改后的实例，支持链式调用
+        return self
 
     def to_command_list_in_score(
         self,
