@@ -90,6 +90,7 @@ This list is not in any order.
 - Thank **雷霆**\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
 - Thank **小埋**\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
 - <table><tr><td>Thank **油炸**\<QQ2836146704\> for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
+- Thank **雨**\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
 
 > Thanks for the support and help of a lot of groupmates
 >
