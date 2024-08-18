@@ -74,6 +74,10 @@ def to_addon_pack_in_score(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCFUNCTION(MCPACK) 计分播放器 - 由 音·创 生成",
                 pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
+                format_version=1 if midi_cvt.enable_old_exe_format else 2,
+                pack_engine_version=(
+                    None if midi_cvt.enable_old_exe_format else [1, 19, 50]
+                ),
             ),
             fp=f,
             indent=4,
@@ -205,9 +209,14 @@ def to_addon_pack_in_delay(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 延迟播放器 - 由 音·创 生成",
                 pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
+                format_version=1 if midi_cvt.enable_old_exe_format else 2,
+                pack_engine_version=(
+                    None if midi_cvt.enable_old_exe_format else [1, 19, 50]
+                ),
             ),
             fp=f,
             indent=4,
+            ensure_ascii=False,
         )
 
     # 写入stop.mcfunction
@@ -354,6 +363,8 @@ def to_addon_pack_in_repeater(
     dist_path: str,
     progressbar_style: Optional[ProgressBarStyle],
     player: str = "@a",
+    axis_side: Literal["z+", "z-", "Z+", "Z-", "x+", "x-", "X+", "X-"] = "z+",
+    basement_block: str = "concrete",
     max_height: int = 65,
 ) -> Tuple[int, int]:
     """
@@ -403,6 +414,10 @@ def to_addon_pack_in_repeater(
                 pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
                 pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
+                format_version=1 if midi_cvt.enable_old_exe_format else 2,
+                pack_engine_version=(
+                    None if midi_cvt.enable_old_exe_format else [1, 19, 50]
+                ),
             ),
             fp=f,
             indent=4,
@@ -422,9 +437,11 @@ def to_addon_pack_in_repeater(
     )
 
     struct, size, end_pos = commands_to_redstone_delay_structure(
-        command_list,
-        max_delay,
-        max_together,
+        commands=command_list,
+        delay_length=max_delay,
+        max_multicmd_length=max_together,
+        base_block=basement_block,
+        axis_=axis_side,
         compability_version_=compability_ver,
     )
     with open(
@@ -554,6 +571,7 @@ def to_addon_pack_in_repeater_divided_by_instrument(
     player: str = "@a",
     max_height: int = 65,
     base_block: str = "concrete",
+    axis_side: Literal["z+", "z-", "Z+", "Z-", "x+", "x-", "X+", "X-"] = "z+",
 ) -> Tuple[int, int]:
     """
     将midi以中继器播放器形式转换为mcstructure结构文件后打包成附加包，并在附加包中生成相应地导入函数
@@ -593,9 +611,13 @@ def to_addon_pack_in_repeater_divided_by_instrument(
     with open(f"{dist_path}/temp/manifest.json", "w", encoding="utf-8") as f:
         json.dump(
             behavior_mcpack_manifest(
-                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器 - 由 音·创 生成",
+                pack_description=f"{midi_cvt.music_name} 音乐播放包，MCSTRUCTURE(MCPACK) 中继器播放器(拆分) - 由 音·创 生成",
                 pack_name=midi_cvt.music_name + "播放",
                 modules_description=f"无 - 由 音·创 生成",
+                format_version=1 if midi_cvt.enable_old_exe_format else 2,
+                pack_engine_version=(
+                    None if midi_cvt.enable_old_exe_format else [1, 19, 50]
+                ),
             ),
             fp=f,
             indent=4,
@@ -628,7 +650,7 @@ def to_addon_pack_in_repeater_divided_by_instrument(
             max_delay,
             max_multiple_cmd_count[inst],
             base_block,
-            "z+",
+            axis_=axis_side,
             compability_version_=compability_ver,
         )
 

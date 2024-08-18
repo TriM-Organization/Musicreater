@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 """一个简单的我的世界音频转换库
 音·创 (Musicreater)
-是一款免费开源的针对《我的世界》的midi音乐转换库
+是一款免费开源的《我的世界》数字音频支持库。
 Musicreater(音·创)
-A free open source library used for convert midi file into formats that is suitable for **Minecraft**.
+A free open source library used for dealing with **Minecraft** digital musics.
 
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
 Copyright © 2024 EillesWan & bgArray
@@ -22,8 +22,8 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.2.0"
-__vername__ = "高精度时间支持"
+__version__ = "2.2.1"
+__vername__ = "部分API小幅度新增内容"
 __author__ = (
     ("金羿", "Eilles Wan"),
     ("诸葛亮与八卦阵", "bgArray"),

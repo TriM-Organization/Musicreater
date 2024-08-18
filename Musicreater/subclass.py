@@ -414,8 +414,8 @@ class MineCommand:
         """
         转为我的世界函数文件格式（包含注释）
         """
-        return "#[{cdt}]<{delay}> {ant}\n{cmd}".format(
-            cdt="CDT" if self.conditional else "",
+        return "# {cdt}<{delay}> {ant}\n{cmd}".format(
+            cdt="[CDT]" if self.conditional else "",
             delay=self.delay,
             ant=self.annotation_text,
             cmd=self.command_text,

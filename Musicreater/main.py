@@ -3,9 +3,9 @@
 
 """
 音·创 (Musicreater)
-一款免费开源的针对《我的世界》音乐的支持库
+是一款免费开源的《我的世界》数字音频支持库。
 Musicreater (音·创)
-A free open source library used for **Minecraft** musics.
+A free open source library used for dealing with **Minecraft** digital musics.
 
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
 Copyright © 2024 EillesWan & bgArray

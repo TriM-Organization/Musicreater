@@ -46,10 +46,12 @@ def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
 
 
 def behavior_mcpack_manifest(
+    format_version: Union[Literal[1], Literal[2]] = 1,
     pack_description: str = "",
     pack_version: Union[List[int], Literal[None]] = None,
     pack_name: str = "",
     pack_uuid: Union[str, Literal[None]] = None,
+    pack_engine_version: Union[List[int], None] = None,
     modules_description: str = "",
     modules_version: List[int] = [0, 0, 1],
     modules_uuid: Union[str, Literal[None]] = None,
@@ -64,8 +66,8 @@ def behavior_mcpack_manifest(
             now_date.month * 100 + now_date.day,
             now_date.hour * 100 + now_date.minute,
         ]
-    return {
-        "format_version": 1,
+    result = {
+        "format_version": format_version,
         "header": {
             "description": pack_description,
             "version": pack_version,
@@ -81,3 +83,6 @@ def behavior_mcpack_manifest(
             }
         ],
     }
+    if pack_engine_version:
+        result["header"]["min_engine_version"] = pack_engine_version
+    return result

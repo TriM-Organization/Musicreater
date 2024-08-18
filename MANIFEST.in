@@ -1,0 +1,13 @@
+recursive-include *.md
+include LICENSE.md
+exclude fcwslib/*
+exclude bgArrayLib/*
+exclude Packer/*
+exclude ./*.mid
+exclude ./*.MSQ
+exclude ./MSCT_Packer.py
+exclude resources/poem.md
+exclude resources/*
+include requirements.txt
+include README_EN.md
+include README.md

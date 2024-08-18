@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 import setuptools
-import Musicreater
+import os
+from Musicreater import __version__
 
-with open("requirements.txt", "r", encoding="utf-8") as fh:
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+with open("./requirements.txt", "r", encoding="utf-8") as fh:
     dependences = fh.read().strip().split("\n")
 
-with open("README_EN.md", "r", encoding="utf-8") as fh:
+with open("./README_EN.md", "r", encoding="utf-8") as fh:
     long_description = fh.read().replace(
         "./docs/", "https://github.com/TriM-Organization/Musicreater/blob/master/docs/"
     )
 
 setuptools.setup(
     name="Musicreater",
-    version=Musicreater.__version__,
+    version=__version__,
     author="金羿Eilles, bgArray, 鱼旧梦ElapsingDreams",
     author_email="TriM-Organization@hotmail.com",
-    description="一款免费开源的针对《我的世界》音乐的支持库\n"
-    "A free open-source python library used to convert midi into Minecraft.",
+    description="一款开源《我的世界》数字音频支持库。\n"
+    "A free open source library used for dealing with **Minecraft** digital musics.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TriM-Organization/Musicreater",
@@ -24,15 +27,15 @@ setuptools.setup(
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: Chinese (Simplified)",
-        "License :: OSI Approved :: Apache Software License",
+        # "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
         "Topic :: Software Development :: Libraries",
         "Programming Language :: Python",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.8",
-        "Programming Language :: Python :: 3.9",
-        "Programming Language :: Python :: 3.10",
+        "Topic :: Multimedia",
+        "Topic :: Multimedia :: Sound/Audio :: MIDI",
     ],
     # 需要安装的依赖
     install_requires=dependences,
+    python_requires=">=3.8",
 )
