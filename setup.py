@@ -18,8 +18,7 @@ setuptools.setup(
     version=__version__,
     author="金羿Eilles, bgArray, 鱼旧梦ElapsingDreams",
     author_email="TriM-Organization@hotmail.com",
-    description="一款开源《我的世界》数字音频支持库。\n"
-    "A free open source library used for dealing with **Minecraft** digital musics.",
+    description="A free open source library used for dealing with **Minecraft** digital musics.\n一款开源《我的世界》数字音频支持库。",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/TriM-Organization/Musicreater",
