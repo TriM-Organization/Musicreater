@@ -147,7 +147,7 @@ def to_addon_pack_in_score(
         os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{dist_path}/temp/",
-        f"{dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/{midi_cvt.music_name}[score].mcpack",
     )
 
     shutil.rmtree(f"{dist_path}/temp/")
@@ -350,7 +350,7 @@ def to_addon_pack_in_delay(
         os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{dist_path}/temp/",
-        f"{dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/{midi_cvt.music_name}[delay].mcpack",
     )
 
     shutil.rmtree(f"{dist_path}/temp/")
@@ -557,7 +557,7 @@ def to_addon_pack_in_repeater(
         os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{dist_path}/temp/",
-        f"{dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/{midi_cvt.music_name}[repeater].mcpack",
     )
 
     shutil.rmtree(f"{dist_path}/temp/")
@@ -677,7 +677,7 @@ def to_addon_pack_in_repeater_divided_by_instrument(
         os.remove(f"{dist_path}/{midi_cvt.music_name}.mcpack")
     compress_zipfile(
         f"{dist_path}/temp/",
-        f"{dist_path}/{midi_cvt.music_name}.mcpack",
+        f"{dist_path}/{midi_cvt.music_name}[repeater-div].mcpack",
     )
 
     shutil.rmtree(f"{dist_path}/temp/")

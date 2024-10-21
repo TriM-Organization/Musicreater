@@ -67,7 +67,7 @@ def to_mcstructure_file_in_delay(
     )
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.mcstructure")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[delay].mcstructure")),
         "wb+",
     ) as f:
         struct.dump(f)
@@ -138,7 +138,7 @@ def to_mcstructure_file_in_score(
     )
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.mcstructure")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[score].mcstructure")),
         "wb+",
     ) as f:
         struct.dump(f)
@@ -197,7 +197,7 @@ def to_mcstructure_file_in_repeater(
     )
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.mcstructure")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[repeater].mcstructure")),
         "wb+",
     ) as f:
         struct.dump(f)
@@ -262,7 +262,7 @@ def to_mcstructure_files_in_repeater_divided_by_instruments(
             os.path.abspath(
                 os.path.join(
                     dist_path,
-                    "{}_{}.mcstructure".format(
+                    "{}[repeater-div]_{}.mcstructure".format(
                         midi_cvt.music_name, inst.replace(".", "-")
                     ),
                 )

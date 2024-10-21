@@ -117,7 +117,7 @@ def to_BDX_file_in_score(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[score].bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))
@@ -212,7 +212,7 @@ def to_BDX_file_in_delay(
     _bytes += cmdBytes
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[delay].bdx")),
         "ab+",
     ) as f:
         f.write(brotli.compress(_bytes + b"XE"))

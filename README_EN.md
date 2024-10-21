@@ -69,11 +69,11 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 ### Authors ✒
 
-**Eilles (金羿)**：A senior high school student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
+**Eilles (金羿)**：A student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
 
-**bgArray (诸葛亮与八卦阵)**: A junior high school student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
+**bgArray (诸葛亮与八卦阵)**: A student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
 
-**Touch (偷吃不是Touch)**: A man who is used to use command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
+**Touch (偷吃不是Touch)**: A man who is good at using command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
 
 ## Acknowledgements 🙏
 
@@ -118,9 +118,9 @@ NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
 
 此项目亦不隶属或关联于 网易 相关
 
-“Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为引用性使用
+“Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为必要的介绍性使用
 
-- 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易网络科技发展有限公司
+- 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
 
 [Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
 [Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
