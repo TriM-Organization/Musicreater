@@ -71,7 +71,7 @@ def to_BDX_file_in_score(
         os.makedirs(dist_path)
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[score].bdx")),
         "w+",
     ) as f:
         f.write("BD@")
@@ -164,7 +164,7 @@ def to_BDX_file_in_delay(
         os.makedirs(dist_path)
 
     with open(
-        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}.bdx")),
+        os.path.abspath(os.path.join(dist_path, f"{midi_cvt.music_name}[delay].bdx")),
         "w+",
     ) as f:
         f.write("BD@")
