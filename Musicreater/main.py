@@ -321,23 +321,23 @@ class MusicSequence:
         bytes_buffer = (
             b"MSQ@"
             + (
-                (len(r := self.music_name.encode("GB18030")) << 10)
-                + round(self.minimum_volume * 1000)
+                (len(r := self.music_name.encode("GB18030")) << 10) # 音乐名称长度
+                + round(self.minimum_volume * 1000) # 最小音量
             ).to_bytes(2, "big")
             + (
                 (
                     (
-                        (high_time_precision << 1)
-                        + (1 if (k := round(self.music_deviation * 1000)) < 0 else 0)
+                        (high_time_precision << 1)  # 是否启用“高精度”音符时间控制
+                        + (1 if (k := round(self.music_deviation * 1000)) < 0 else 0)   # 总音调偏移的正负位
                     )
                     << 14
                 )
-                + abs(k)
+                + abs(k)    # 总音调偏移
             ).to_bytes(2, "big", signed=False)
             + r
         )
 
-        # 若启用“高精度”，则在每个音符前添加一个字节，用于存储音符时间控制精度偏移
+        # 若启用“高精度”，则每个音符皆添加一个字节，用于存储音符时间控制精度偏移
         # 此值每增加 1，则音符向后播放时长增加 1/1250 秒
         for channel_index, note_list in self.channels.items():
             bytes_buffer += len(note_list).to_bytes(4, "big")

@@ -38,24 +38,24 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
 
 ## Installation 🔳
 
-- Via pypi
+-   Via pypi
 
-  ```bash
-  pip install Musicreater --upgrade
-  ```
+    ```bash
+    pip install Musicreater --upgrade
+    ```
 
-- If above command cannot fetch latest version, try:
+-   If above command cannot fetch latest version, try:
 
-  ```bash
-  pip install -i https://pypi.python.org/simple Musicreater --upgrade
-  ```
+    ```bash
+    pip install -i https://pypi.python.org/simple Musicreater --upgrade
+    ```
 
-- Clone repo and Install (Latest but **NOT RECOMMANDED**):
-  ```bash
-  git clone https://github.com/TriM-Organization/Musicreater.git
-  cd Musicreater
-  python setup.py install
-  ```
+-   Clone repo and Install (Latest but **NOT RECOMMANDED**):
+    ```bash
+    git clone https://github.com/TriM-Organization/Musicreater.git
+    cd Musicreater
+    python setup.py install
+    ```
 
 Commands such as `python`、`pip` could be changed to some like `python3` or `pip3` according to the difference of platforms.
 
@@ -73,24 +73,24 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 **bgArray (诸葛亮与八卦阵)**: A student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
 
-**Touch (偷吃不是Touch)**: A man who is good at using command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
+**Touch (偷吃不是 Touch)**: A man who is good at using command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
 
 ## Acknowledgements 🙏
 
 This list is not in any order.
 
-- Thank _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
-- Thank _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
-- Thank _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
-- Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project.
-- Thank _Mono_\<QQ738893087\> for reporting problems while installing
-- Thank _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
-- Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
-- Thank **指令师\_苦力怕 playjuice123**\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
-- Thank **雷霆**\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
-- Thank **小埋**\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
-- <table><tr><td>Thank **油炸**\<QQ2836146704\> for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
-- Thank **雨**\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
+-   Thank _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
+-   Thank _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
+-   Thank _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
+-   Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project.
+-   Thank _Mono_\<QQ738893087\> for reporting problems while installing
+-   Thank _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
+-   Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
+-   Thank _指令师\_苦力怕 “playjuice123”_\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
+-   Thank _雷霆_\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
+-   Thank _小埋_\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
+-   <table><tr><td>Thank <i>油炸</i> &lt;QQ2836146704&gt; for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
+-   Thank _雨_\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
 
 > Thanks for the support and help of a lot of groupmates
 >
@@ -120,7 +120,7 @@ NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
 
 “Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为必要的介绍性使用
 
-- 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
+-   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
 
 [Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
 [Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
