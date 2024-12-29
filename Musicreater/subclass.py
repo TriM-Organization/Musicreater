@@ -534,7 +534,10 @@ class ProgressBarStyle:
     """已播放之样式"""
 
     def __init__(
-        self, base_s: Optional[str], to_play_s: Optional[str], played_s: Optional[str]
+        self,
+        base_s: Optional[str] = None,
+        to_play_s: Optional[str] = None,
+        played_s: Optional[str] = None,
     ):
         """用于存储进度条样式的类
 
