@@ -533,7 +533,9 @@ class ProgressBarStyle:
     played_style: str
     """已播放之样式"""
 
-    def __init__(self, base_s: str, to_play_s: str, played_s: str):
+    def __init__(
+        self, base_s: Optional[str], to_play_s: Optional[str], played_s: Optional[str]
+    ):
         """用于存储进度条样式的类
 
         | 标识符   | 指定的可变量     |
@@ -550,13 +552,24 @@ class ProgressBarStyle:
         :param to_play_s 进度条样式：尚未播放的样子
         :param played_s 已经播放的样子
         """
-        self.base_style = base_s
-        self.to_play_style = to_play_s
-        self.played_style = played_s
+
+        self.base_style = (
+            base_s if base_s else r"▶ %%N [ %%s/%^s %%% §e__________§r %%t|%^t ]"
+        )
+        self.to_play_style = to_play_s if to_play_s else r"§7="
+        self.played_style = played_s if played_s else r"="
 
     @classmethod
-    def from_tuple(cls, tuplized_style: Tuple[str, Tuple[str, str]]):
+    def from_tuple(cls, tuplized_style: Optional[Tuple[str, Tuple[str, str]]]):
         """自旧版进度条元组表示法读入数据（已不建议使用）"""
+
+        if tuplized_style is None:
+            return cls(
+                r"▶ %%N [ %%s/%^s %%% §e__________§r %%t|%^t ]",
+                r"§7=",
+                r"=",
+            )
+
         if isinstance(tuplized_style, tuple):
             if isinstance(tuplized_style[0], str) and isinstance(
                 tuplized_style[1], tuple
