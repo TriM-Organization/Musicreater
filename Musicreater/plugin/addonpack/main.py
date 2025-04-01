@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory

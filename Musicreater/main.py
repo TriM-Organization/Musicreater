@@ -8,7 +8,7 @@ Musicreater (音·创)
 A free open source library used for dealing with **Minecraft** digital musics.
 
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
 The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
@@ -30,10 +30,11 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 # 赶快呼叫 程序员！Let's Go！          直ぐに呼びましょプログラマ レッツゴー！  Hurry to call the programmer! Let's Go!
 
 
-import math
 import os
+import math
 
 import mido
+from xxhash import xxh3_64, xxh3_128
 
 from .constants import *
 from .exceptions import *
@@ -203,6 +204,7 @@ class MusicSequence:
             ) = cls.to_music_note_channels(
                 midi=mido_file,
                 speed=speed_multiplier,
+                default_program_value=-1,  # TODO 默认音色可调
                 pitched_note_rtable=pitched_note_referance_table,
                 percussion_note_rtable=percussion_note_referance_table,
                 default_tempo_value=default_tempo,
@@ -226,6 +228,7 @@ class MusicSequence:
     def load_decode(
         cls,
         bytes_buffer_in: bytes,
+        verify: bool = True,
     ):
         """从字节码导入音乐序列"""
 
@@ -238,8 +241,16 @@ class MusicSequence:
         music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
             "GB18030"
         )
-        channels_: MineNoteChannelType = empty_midi_channels(staff=[])
+        channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        total_note_count = 0
+        if verify:
+            _header_index = stt_index
+            _total_verify_code = 0
+
         for channel_index in channels_.keys():
+            channel_note_count = 0
+            _channel_start_index = stt_index
+
             for i in range(
                 int.from_bytes(
                     bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
@@ -258,10 +269,70 @@ class MusicSequence:
                             is_high_time_precision=high_quantity,
                         )
                     )
+                    channel_note_count += 1
                     stt_index = end_index
-                except:
+                except Exception as _err:
                     print(channels_)
-                    raise
+                    raise MusicSequenceDecodeError(_err)
+            if verify:
+                if (
+                    _count_verify := xxh3_64(
+                        channel_note_count.to_bytes(4, "big", signed=False),
+                        seed=3,
+                    )
+                ).digest() != (
+                    _original_code := bytes_buffer_in[stt_index : stt_index + 8]
+                ):
+                    raise MusicSequenceVerificationFailed(
+                        "通道 {} 音符数量校验失败：{} -> `{}`；原始为 `{}`".format(
+                            channel_index,
+                            channel_note_count,
+                            _count_verify.digest(),
+                            _original_code,
+                        )
+                    )
+                if (
+                    _channel_verify := xxh3_64(
+                        bytes_buffer_in[_channel_start_index:stt_index],
+                        seed=channel_note_count,
+                    )
+                ).digest() != (
+                    _original_code := bytes_buffer_in[stt_index + 8 : stt_index + 16]
+                ):
+                    raise MusicSequenceVerificationFailed(
+                        "通道 {} 音符数据校验失败：`{}`；原始为 `{}`".format(
+                            channel_index,
+                            _channel_verify.digest(),
+                            _original_code,
+                        )
+                    )
+                _total_verify_code ^= (
+                    _count_verify.intdigest() ^ _channel_verify.intdigest()
+                )
+            total_note_count += channel_note_count
+            stt_index += 16
+
+        if verify:
+            if (
+                _total_verify_res := xxh3_128(
+                    _total_verify := (
+                        xxh3_64(
+                            bytes_buffer_in[0:_header_index],
+                            seed=total_note_count,
+                        ).intdigest()
+                        ^ _total_verify_code
+                    ).to_bytes(8, "big"),
+                    seed=total_note_count,
+                ).digest()
+            ) != (_original_code := bytes_buffer_in[stt_index:]):
+                raise MusicSequenceVerificationFailed(
+                    "全曲最终校验失败。全曲音符数：{}，全曲校验码异或和：`{}` -> `{}`；原始为 `{}`".format(
+                        total_note_count,
+                        _total_verify,
+                        _total_verify_res,
+                        _original_code,
+                    )
+                )
 
         return cls(
             name_of_music=music_name_,
@@ -280,6 +351,7 @@ class MusicSequence:
     ) -> bytes:
         """将音乐序列转为二进制字节码"""
 
+        # （已废弃）
         # 第一版的码头： MSQ#  字串编码： UTF-8
         # 第一版格式
         # 音乐名称长度 6 位 支持到 63
@@ -306,7 +378,10 @@ class MusicSequence:
         #     for note_ in note_list:
         #         bytes_buffer += note_.encode()
 
+        # （已废弃）
         # 第二版的码头： MSQ@  字串编码： GB18030
+
+        # 第三版的码头： MSQ!  字串编码： GB18030  大端字节序
 
         # 音乐名称长度 6 位 支持到 63
         # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
@@ -316,33 +391,73 @@ class MusicSequence:
         # 总音调偏移 music_deviation 15 位 最大支持 -16383 ~ 16383 即 三位小数
         # 共 16 位 合 2 字节
         # +++
-        # 音乐名称 music_name 长度最多63 支持到 31 个中文字符 或 63 个西文字符
+        # 音乐名称 music_name 长度最多 63 支持到 31 个中文字符 或 63 个西文字符
 
         bytes_buffer = (
-            b"MSQ@"
+            b"MSQ!"
             + (
-                (len(r := self.music_name.encode("GB18030")) << 10) # 音乐名称长度
-                + round(self.minimum_volume * 1000) # 最小音量
+                (len(r := self.music_name.encode("GB18030")) << 10)  # 音乐名称长度
+                + round(self.minimum_volume * 1000)  # 最小音量
             ).to_bytes(2, "big")
             + (
                 (
                     (
                         (high_time_precision << 1)  # 是否启用“高精度”音符时间控制
-                        + (1 if (k := round(self.music_deviation * 1000)) < 0 else 0)   # 总音调偏移的正负位
+                        + (
+                            1 if (k := round(self.music_deviation * 1000)) < 0 else 0
+                        )  # 总音调偏移的正负位
                     )
                     << 14
                 )
-                + abs(k)    # 总音调偏移
+                + abs(k)  # 总音调偏移
             ).to_bytes(2, "big", signed=False)
             + r
         )
 
+        # 此上是音符序列的元信息，接下来是多通道的音符序列
+
+        # 每个通道的开头是 32 位的 序列长度 共 4 字节
+        # 接下来根据这个序列的长度来读取音符数据
+
         # 若启用“高精度”，则每个音符皆添加一个字节，用于存储音符时间控制精度偏移
         # 此值每增加 1，则音符向后播放时长增加 1/1250 秒
+        # 高精度功能在 MineNote 类实现
+
+        # （第三版新增）每个通道结尾包含一个 128 位的 XXHASH 校验值，用以标识该通道结束
+        # 在这 128 位里，前 64 位是该通道音符数的 XXHASH64 校验值，以 3 作为种子值
+        # 后 64 位是整个通道全部字节串的 XXHASH64 校验值（包括通道开头的音符数），以 该通道音符数 作为种子值
+        _final_hash_codec = xxh3_64(
+            bytes_buffer, seed=self.total_note_count
+        ).intdigest()
+
         for channel_index, note_list in self.channels.items():
-            bytes_buffer += len(note_list).to_bytes(4, "big")
+            channel_buffer = len_buffer = len(note_list).to_bytes(
+                4, "big", signed=False
+            )
             for note_ in note_list:
-                bytes_buffer += note_.encode(is_high_time_precision=high_time_precision)
+                channel_buffer += note_.encode(
+                    is_high_time_precision=high_time_precision
+                )
+            _now_hash_codec_spliter = xxh3_64(len_buffer, seed=3)
+            _now_hash_codec_verifier = xxh3_64(
+                channel_buffer, seed=int.from_bytes(len_buffer, "big", signed=False)
+            )
+
+            bytes_buffer += channel_buffer
+            bytes_buffer += (
+                _now_hash_codec_spliter.digest() + _now_hash_codec_verifier.digest()
+            )
+
+            _final_hash_codec ^= (
+                _now_hash_codec_spliter.intdigest()
+                ^ _now_hash_codec_verifier.intdigest()
+            )
+
+        # 在所有音符通道表示完毕之后，由一个 128 位的 XXHASH 校验值，用以标识文件结束并校验
+        # 该 128 位的校验值是对于前述所有校验值的异或所得值之 XXHASH128 校验值，以 全曲音符总数 作为种子值
+        bytes_buffer += xxh3_128(
+            _final_hash_codec.to_bytes(8, "big"), seed=self.total_note_count
+        ).digest()
 
         return bytes_buffer
 
@@ -378,6 +493,7 @@ class MusicSequence:
         midi: mido.MidiFile,
         ignore_mismatch_error: bool = True,
         speed: float = 1.0,
+        default_program_value: int = -1,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
@@ -392,8 +508,10 @@ class MusicSequence:
             需要处理的midi对象
         speed: float
             音乐播放速度倍数
+        default_program_value: int
+            默认的 MIDI 乐器值
         default_tempo_value: int
-            默认的MIDI TEMPO值
+            默认的 MIDI TEMPO 值
         pitched_note_rtable: Dict[int, Tuple[str, int]]
             乐音乐器Midi-MC对照表
         percussion_note_rtable: Dict[int, Tuple[str, int]]
@@ -411,8 +529,10 @@ class MusicSequence:
             raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: MineNoteChannelType = empty_midi_channels(staff=[])
-        channel_program: Dict[int, int] = empty_midi_channels(staff=-1)
+        midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        channel_program: Dict[int, int] = empty_midi_channels(
+            default_staff=default_program_value
+        )
         tempo = default_tempo_value
         note_count = 0
         note_count_per_instrument: Dict[str, int] = {}
@@ -426,7 +546,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = empty_midi_channels(staff=[])
+        ] = empty_midi_channels(default_staff=[])
         note_queue_B: Dict[
             int,
             List[
@@ -435,7 +555,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = empty_midi_channels(staff=[])
+        ] = empty_midi_channels(default_staff=[])
 
         # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
         # 采用的时遍历信息思路
@@ -957,7 +1077,9 @@ class MidiConvert(MusicSequence):
         self.progress_bar_command = result
         return result
 
-    def redefine_execute_format(self, is_old_exe_cmd_using: bool = False):
+    def redefine_execute_format(
+        self, is_old_exe_cmd_using: bool = False
+    ) -> "MidiConvert":
         """
         根据是否使用旧版执行命令格式，重新定义执行命令的起始格式。
 

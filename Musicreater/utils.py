@@ -5,7 +5,7 @@
 
 """
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -38,7 +38,9 @@ from .types import (
 )
 
 
-def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, Any]:
+def empty_midi_channels(
+    channel_count: int = 17, default_staff: Any = {}
+) -> Dict[int, Any]:
     """
     空MIDI通道字典
     """
@@ -46,7 +48,11 @@ def empty_midi_channels(channel_count: int = 17, staff: Any = {}) -> Dict[int, A
     return dict(
         (
             i,
-            (staff.copy() if isinstance(staff, (dict, list)) else staff),
+            (
+                default_staff.copy()
+                if isinstance(default_staff, (dict, list))
+                else default_staff
+            ),
         )  # 这告诉我们，你不能忽略任何一个复制的序列，因为它真的，我哭死，折磨我一整天，全在这个bug上了
         for i in range(channel_count)
     )

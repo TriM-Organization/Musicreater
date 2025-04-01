@@ -1,9 +1,10 @@
 # sth. can't open
 /msctPkgver/secrets/*.py
 /msctPkgver/secrets/*.c
-
+/fool/
 
 # mystuff
+/*.zip
 /.vscode
 /*.mid
 /*.midi

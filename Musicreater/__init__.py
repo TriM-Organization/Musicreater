@@ -6,7 +6,7 @@ Musicreater(音·创)
 A free open source library used for dealing with **Minecraft** digital musics.
 
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
 The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
@@ -22,10 +22,10 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.2.2.2"
-__vername__ = "接口小兼容"
+__version__ = "2.2.3"
+__vername__ = "Java版欲适配、初步MSQ流式适配"
 __author__ = (
-    ("金羿", "Eilles Wan"),
+    ("金羿", "Eilles"),
     ("诸葛亮与八卦阵", "bgArray"),
     ("鱼旧梦", "ElapsingDreams"),
     ("偷吃不是Touch", "Touch"),

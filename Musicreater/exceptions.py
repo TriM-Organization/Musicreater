@@ -6,7 +6,7 @@
 
 """
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -58,6 +58,7 @@ class MidiDestroyedError(MSCTBaseException):
 #         super().__init__("未定义MidiFile对象：你甚至没有对象就想要生孩子？", *args)
 # 此错误在本版本内已经不再使用
 
+
 class CommandFormatError(RuntimeError):
     """指令格式与目标格式不匹配而引起的错误"""
 
@@ -75,6 +76,10 @@ class CommandFormatError(RuntimeError):
 # 这TM是什么错误？
 # 我什么时候写的这玩意？
 # 我哪知道这说的是啥？
+# ！！！
+# 我知道这是什么了 —— 金羿 2025 0401
+# 两个其他属性相同的音符在同一个通道，出现连续两个开音信息和连续两个停止信息
+# 那么这两个音符的音长无法判断。这是个好问题，但是不是我现在能解决的，也不是我们现在想解决的问题
 
 
 class NotDefineTempoError(MidiFormatException):
@@ -109,7 +114,7 @@ class NoteOnOffMismatchError(MidiFormatException):
         super().__init__("音符不匹配", *args)
 
 
-class ZeroSpeedError(ZeroDivisionError):
+class ZeroSpeedError(MSCTBaseException, ZeroDivisionError):
     """以0作为播放速度的错误"""
 
     def __init__(self, *args):
@@ -117,9 +122,26 @@ class ZeroSpeedError(ZeroDivisionError):
         super().__init__("播放速度为0", *args)
 
 
-class IllegalMinimumVolumeError(ValueError):
+class IllegalMinimumVolumeError(MSCTBaseException, ValueError):
     """最小播放音量有误的错误"""
 
     def __init__(self, *args):
         """最小播放音量错误"""
         super().__init__("最小播放音量超出范围", *args)
+
+
+class MusicSequenceDecodeError(MSCTBaseException):
+    """音乐序列解码错误"""
+
+    def __init__(self, *args):
+        """音乐序列无法正确解码的错误"""
+        super().__init__("解码音符序列文件时出现问题", *args)
+
+
+class MusicSequenceVerificationFailed(MusicSequenceDecodeError):
+    """音乐序列校验失败"""
+
+    def __init__(self, *args):
+        """音符序列文件与其校验值不一致"""
+        super().__init__("音符序列文件校验失败", *args)
+

@@ -6,7 +6,7 @@
 
 """
 版权所有 © 2024 金羿 & 诸葛亮与八卦阵
-Copyright © 2024 EillesWan & bgArray
+Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -27,6 +27,359 @@ from .main import (
     mido,
 )
 from .types import Tuple, List, Dict, ChannelType
+
+
+class FutureMidiConvertJavaE(MidiConvert):
+
+    def form_java_progress_bar(
+        self,
+        max_score: int,
+        scoreboard_name: str,
+        progressbar_style: ProgressBarStyle = DEFAULT_PROGRESSBAR_STYLE,
+    ) -> List[MineCommand]:
+        """
+        生成进度条
+
+        Parameters
+        ----------
+        max_score: int
+            最大的积分值
+        scoreboard_name: str
+            所使用的计分板名称
+        progressbar_style: ProgressBarStyle
+            此参数详见 ../docs/库的生成与功能文档.md#进度条自定义
+
+        Returns
+        -------
+        list[MineCommand,]
+        """
+        pgs_style = progressbar_style.base_style
+        """用于被替换的进度条原始样式"""
+
+        """
+        | 标识符   | 指定的可变量     |
+        |---------|----------------|
+        | `%%N`   | 乐曲名(即传入的文件名)|
+        | `%%s`   | 当前计分板值     |
+        | `%^s`   | 计分板最大值     |
+        | `%%t`   | 当前播放时间     |
+        | `%^t`   | 曲目总时长       |
+        | `%%%`   | 当前进度比率     |
+        | `_`     | 用以表示进度条占位|
+        """
+        perEach = max_score / pgs_style.count("_")
+        """每个进度条代表的分值"""
+
+        result: List[MineCommand] = []
+
+        if r"%^s" in pgs_style:
+            pgs_style = pgs_style.replace(r"%^s", str(max_score))
+
+        if r"%^t" in pgs_style:
+            pgs_style = pgs_style.replace(r"%^t", mctick2timestr(max_score))
+
+        sbn_pc = scoreboard_name[:2]
+        if r"%%%" in pgs_style:
+            result.append(
+                MineCommand(
+                    'scoreboard objectives add {}PercT dummy "百分比计算"'.format(
+                        sbn_pc
+                    ),
+                    annotation="新增临时百分比变量",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players set MaxScore {} {}".format(
+                        scoreboard_name, max_score
+                    ),
+                    annotation="设定音乐最大延迟分数",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players set n100 {} 100".format(scoreboard_name),
+                    annotation="设置常量100",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[scores_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} = @s {}".format(
+                        sbn_pc + "PercT", scoreboard_name
+                    ),
+                    annotation="赋值临时百分比",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} *= n100 {}".format(
+                        sbn_pc + "PercT", scoreboard_name
+                    ),
+                    annotation="转换临时百分比之单位至%（扩大精度）",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} /= MaxScore {}".format(
+                        sbn_pc + "PercT", scoreboard_name
+                    ),
+                    annotation="计算百分比",
+                )
+            )
+
+        if r"%%t" in pgs_style:
+            result.append(
+                MineCommand(
+                    'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(
+                        sbn_pc
+                    ),
+                    annotation="新增临时分变量",
+                )
+            )
+            result.append(
+                MineCommand(
+                    'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(
+                        sbn_pc
+                    ),
+                    annotation="新增临时秒变量",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players set n20 {} 20".format(scoreboard_name),
+                    annotation="设置常量20",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players set n60 {} 60".format(scoreboard_name),
+                    annotation="设置常量60",
+                )
+            )
+
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} = @s {}".format(
+                        sbn_pc + "TMinT", scoreboard_name
+                    ),
+                    annotation="赋值临时分",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} /= n20 {}".format(
+                        sbn_pc + "TMinT", scoreboard_name
+                    ),
+                    annotation="转换临时分之单位为秒（缩减精度）",
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} = @s {}".format(
+                        sbn_pc + "TSecT", sbn_pc + "TMinT"
+                    ),
+                    annotation="赋值临时秒",
+                )
+            )
+
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} /= n60 {}".format(
+                        sbn_pc + "TMinT", scoreboard_name
+                    ),
+                    annotation="转换临时分之单位为分（缩减精度）",
+                )
+            )
+
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        "@a[score_" + scoreboard_name + "_min=1]"
+                    )
+                    + "scoreboard players operation @s {} %= n60 {}".format(
+                        sbn_pc + "TSecT", scoreboard_name
+                    ),
+                    annotation="确定临时秒（框定精度区间）",
+                )
+            )
+
+        for i in range(pgs_style.count("_")):
+            npg_stl = (
+                pgs_style.replace("_", progressbar_style.played_style, i + 1)
+                .replace("_", progressbar_style.to_play_style)
+                .replace(r"%%N", self.music_name)
+                .replace(
+                    r"%%s",
+                    '"},{"score":{"name":"*","objective":"'
+                    + scoreboard_name
+                    + '"}},{"text":"',
+                )
+                .replace(
+                    r"%%%",
+                    r'"},{"score":{"name":"*","objective":"'
+                    + sbn_pc
+                    + r'PercT"}},{"text":"%',
+                )
+                .replace(
+                    r"%%t",
+                    r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
+                    r'{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
+                        r"{-}", sbn_pc
+                    ),
+                )
+            )
+            result.append(
+                MineCommand(
+                    self.execute_cmd_head.format(
+                        f"@a[score_{scoreboard_name}_min={int(i * perEach)},score_{scoreboard_name}={math.ceil((i + 1) * perEach)}]"
+                    )
+                    + r'titleraw @s actionbar {"rawtext":[{"text":"'
+                    + npg_stl
+                    + r'"}]}',
+                    annotation="进度条显示",
+                )
+            )
+
+        if r"%%%" in pgs_style:
+            result.append(
+                MineCommand(
+                    "scoreboard objectives remove {}PercT".format(sbn_pc),
+                    annotation="移除临时百分比变量",
+                )
+            )
+        if r"%%t" in pgs_style:
+            result.append(
+                MineCommand(
+                    "scoreboard objectives remove {}TMinT".format(sbn_pc),
+                    annotation="移除临时分变量",
+                )
+            )
+            result.append(
+                MineCommand(
+                    "scoreboard objectives remove {}TSecT".format(sbn_pc),
+                    annotation="移除临时秒变量",
+                )
+            )
+
+        self.progress_bar_command = result
+        return result
+
+    def to_command_list_in_java_score(
+        self,
+        scoreboard_name: str = "mscplay",
+        source_of_sound: str = "ambient",
+    ) -> Tuple[List[List[MineCommand]], int, int]:
+        """
+        将midi转换为 Java 1.12.2 版我的世界命令列表
+
+        Parameters
+        ----------
+        scoreboard_name: str
+            我的世界的计分板名称
+
+        Returns
+        -------
+        tuple( list[list[MineCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        """
+
+        command_channels = []
+        command_amount = 0
+        max_score = 0
+
+        # 此处 我们把通道视为音轨
+        for channel in self.channels.values():
+            # 如果当前通道为空 则跳过
+            if not channel:
+                continue
+
+            this_channel = []
+
+            for note in channel:
+                max_score = max(max_score, note.start_tick)
+
+                (
+                    mc_sound_ID,
+                    relative_coordinates,
+                    volume_percentage,
+                    mc_pitch,
+                ) = minenote_to_command_paramaters(
+                    note,
+                    pitch_deviation=self.music_deviation,
+                )
+
+                this_channel.append(
+                    MineCommand(
+                        (
+                            self.execute_cmd_head.format(
+                                "@a[score_{0}_min={1},score_{0}={1}]".format(
+                                    scoreboard_name, note.start_tick
+                                )
+                                .replace("(", r"{")
+                                .replace(")", r"}")
+                            )
+                            + "playsound minecraft:block.{} {} @s ~{} ~{} ~{} {} {} {}".format(
+                                mc_sound_ID,
+                                source_of_sound,
+                                *relative_coordinates,
+                                volume_percentage,
+                                1.0 if note.percussive else mc_pitch,
+                                self.minimum_volume,
+                            )
+                        ),
+                        annotation=(
+                            "在{}播放噪音{}".format(
+                                mctick2timestr(note.start_tick),
+                                mc_sound_ID,
+                            )
+                            if note.percussive
+                            else "在{}播放乐音{}".format(
+                                mctick2timestr(note.start_tick),
+                                "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                            )
+                        ),
+                    ),
+                )
+
+                command_amount += 1
+
+            if this_channel:
+                self.music_command_list.extend(this_channel)
+                command_channels.append(this_channel)
+
+        return command_channels, command_amount, max_score
 
 
 class FutureMidiConvertRSNB(MidiConvert):
@@ -217,7 +570,7 @@ class FutureMidiConvertM5(MidiConvert):
             if not track:
                 continue
 
-            note_queue = empty_midi_channels(staff=[])
+            note_queue = empty_midi_channels(default_staff=[])
 
             for msg in track:
                 if msg.time != 0:
