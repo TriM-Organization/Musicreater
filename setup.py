@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import setuptools
 import os
-from Musicreater import __version__
+
+# from Musicreater import __version__
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
@@ -15,7 +16,7 @@ with open("./README_EN.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="Musicreater",
-    version=__version__,
+    version="2.2.4",
     author="金羿Eilles, bgArray, 鱼旧梦ElapsingDreams",
     author_email="TriM-Organization@hotmail.com",
     description="A free open source library used for dealing with **Minecraft** digital musics.\n一款开源《我的世界》数字音频支持库。",
@@ -37,4 +38,5 @@ setuptools.setup(
     # 需要安装的依赖
     install_requires=dependences,
     python_requires=">=3.8",
+    license=open("./LICENSE.md", "r", encoding="utf-8").read(),
 )
