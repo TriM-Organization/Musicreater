@@ -187,7 +187,7 @@ print(
             cvt_method(
                 cvt_mid,
                 out_path,
-                Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None, # type: ignore
+                Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,  # type: ignore
                 *prompts[3:],
             )
         )

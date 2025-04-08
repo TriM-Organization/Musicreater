@@ -6,10 +6,6 @@ Copyright © 2025 Eilles & bgArray
 Terms & Conditions: License.md in the root directory
 """
 
-
-
-
-
 import os
 import shutil
 
@@ -130,6 +126,15 @@ print(
             input("midi路径："),
             play_speed=float(input("播放速度：")),
             old_exe_format=True,
+            note_table_replacement={
+                "note.iron_xylophone": "note.xylophone",
+                "note.cow_bell": "note.xylophone",
+                "note.didgeridoo": "note.guitar",
+                "note.bit": "note.harp",
+                "note.banjo": "note.flute",
+                "note.pling": "note.harp",
+            },
+            # pitched_note_table=Musicreater.MM_NBS_PITCHED_INSTRUMENT_TABLE,
         ),
         input("输出路径："),
         Musicreater.experiment.ProgressBarStyle(),

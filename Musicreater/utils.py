@@ -18,6 +18,22 @@ Terms & Conditions: License.md in the root directory
 import math
 import random
 
+# from io import BytesIO
+from typing import (
+    Any,
+    Dict,
+    Tuple,
+    Optional,
+    Callable,
+    Literal,
+    Union,
+    List,
+    Generator,
+    BinaryIO,
+)
+
+from xxhash import xxh3_64, xxh3_128
+
 from .constants import (
     MC_INSTRUMENT_BLOCKS_TABLE,
     MM_INSTRUMENT_DEVIATION_TABLE,
@@ -26,16 +42,9 @@ from .constants import (
 )
 from .subclass import MineNote, mctick2timestr
 
-from .types import (
-    Any,
-    Dict,
-    Tuple,
-    Optional,
-    Callable,
-    Literal,
-    Union,
-    MidiInstrumentTableType,
-)
+from .types import MidiInstrumentTableType, MineNoteChannelType
+
+from .exceptions import MusicSequenceDecodeError
 
 
 def empty_midi_channels(
@@ -251,6 +260,7 @@ def midi_msgs_to_minenote(
     play_speed: float,
     midi_reference_table: MidiInstrumentTableType,
     volume_processing_method_: Callable[[float], float],
+    note_table_replacement: Dict[str, str] = {},
 ) -> MineNote:
     """
     将Midi信息转为我的世界音符对象
@@ -275,7 +285,7 @@ def midi_msgs_to_minenote(
     mc_distance_volume = volume_processing_method_(velocity_)
 
     return MineNote(
-        mc_sound_name=mc_sound_ID,
+        mc_sound_name=note_table_replacement.get(mc_sound_ID, mc_sound_ID),
         midi_pitch=note_,
         midi_velocity=velocity_,
         start_time=(tk := int(start_time_ / float(play_speed) / 50000)),
@@ -378,3 +388,291 @@ def soundID_to_blockID(
         return random.choice(MC_INSTRUMENT_BLOCKS_TABLE.get(sound_id, (default_block,)))
     else:
         return MC_INSTRUMENT_BLOCKS_TABLE.get(sound_id, (default_block,))[0]
+
+
+def load_decode_msq_metainfo(
+    buffer_in: BinaryIO,
+) -> Tuple[str, float, float, bool, int]:
+    """
+    以流的方式解码MSQ音乐序列元信息
+
+    Parameters
+    ----------
+    buffer_in: BytesIO
+        MSQ格式的字节流
+
+    Returns
+    -------
+    Tuple[str, float, float, bool, int]
+        音乐名称，最小音量，音调偏移，是否启用高精度，最后的流指针位置
+
+    """
+    buffer_in.seek(4, 0)
+    group_1 = int.from_bytes(buffer_in.read(2), "big")
+    group_2 = int.from_bytes(buffer_in.read(2), "big", signed=False)
+
+    # high_quantity = bool(group_2 & 0b1000000000000000)
+    # print(group_2, high_quantity)
+
+    music_name_ = buffer_in.read(stt_index := (group_1 >> 10)).decode("GB18030")
+
+    return (
+        music_name_,
+        (group_1 & 0b1111111111) / 1000,
+        (
+            (-1 if group_2 & 0b100000000000000 else 1)
+            * (group_2 & 0b11111111111111)
+            / 1000
+        ),
+        bool(group_2 & 0b1000000000000000),
+        stt_index + 8,
+    )
+
+
+def load_decode_msq_flush_release(
+    buffer_in: BinaryIO,
+    starter_index: int,
+    high_quantity_note: bool,
+) -> Generator[Tuple[int, MineNote], Any, None]:
+    """以流的方式解码MSQ音乐序列的音符序列并流式返回
+
+    Parameters
+    ----------
+    buffer_in : BytesIO
+        输入的MSQ格式二进制字节流
+    starter_index : int
+        字节流中，音符序列的起始索引
+    high_quantity_note : bool
+        是否启用高精度音符解析
+
+    Returns
+    -------
+    Generator[Tuple[int, MineNote], Any, None]
+        以流的方式返回解码后的音符序列
+
+    Raises
+    ------
+    MusicSequenceDecodeError
+        当解码过程中出现错误，抛出异常
+
+    """
+
+    # _total_verify = xxh3_64(buffer_in.read(starter_index), seed=total_note_count)
+
+    # buffer_in.seek(starter_index, 0)
+    buffer_in.seek(starter_index)
+    _bytes_buffer_in = buffer_in.read()
+    # int.from_bytes(_bytes_buffer_in[0 : 4], "big")
+
+    _now_channel_starter_index = 0
+
+    _total_note_count = 1
+
+    _channel_infos = empty_midi_channels(
+        default_staff={"NOW_INDEX": 0, "NOTE_COUNT": 0, "HAVE_READ": 0, "END_INDEX": -1}
+    )
+
+    for __channel_index in _channel_infos.keys():
+        # _channel_note_count = 0
+
+        _now_channel_ender_sign = xxh3_64(
+            _bytes_buffer_in[
+                _now_channel_starter_index : _now_channel_starter_index + 4
+            ],
+            seed=3,
+        ).digest()
+
+        # print(
+        #     "[DEBUG] 索引取得：",
+        #     _bytes_buffer_in[
+        #         _now_channel_starter_index : _now_channel_starter_index + 4
+        #     ],
+        #     "校验索引",
+        #     _now_channel_ender_sign,
+        # )
+
+        _now_channel_ender_index = _bytes_buffer_in.find(_now_channel_ender_sign)
+
+        # print("[DEBUG] 索引取得：", _now_channel_ender_index,)
+
+        _channel_note_count = int.from_bytes(
+            _bytes_buffer_in[
+                _now_channel_starter_index : _now_channel_starter_index + 4
+            ],
+            "big",
+        )
+
+        if _channel_note_count == 0:
+            continue
+
+        while (
+            xxh3_64(
+                _bytes_buffer_in[_now_channel_starter_index:_now_channel_ender_index],
+                seed=_channel_note_count,
+            ).digest()
+            != _bytes_buffer_in[
+                _now_channel_ender_index + 8 : _now_channel_ender_index + 16
+            ]
+        ):
+            _now_channel_ender_index += 8 + _bytes_buffer_in[
+                _now_channel_ender_index + 8 :
+            ].find(_now_channel_ender_sign)
+
+            # print(
+            #     "[WARNING] XXHASH 无法匹配，当前序列",
+            #     __channel_index,
+            #     "当前全部序列字节串",
+            #     _bytes_buffer_in[
+            #             _now_channel_starter_index:_now_channel_ender_index
+            #         ],
+            #         "校验值",
+            #     xxh3_64(
+            #         _bytes_buffer_in[
+            #             _now_channel_starter_index:_now_channel_ender_index
+            #         ],
+            #         seed=_channel_note_count,
+            #     ).digest(),
+            #     _bytes_buffer_in[
+            #         _now_channel_ender_index + 8 : _now_channel_ender_index + 16
+            #     ],
+            #     "改变结尾索引",
+            #     _now_channel_ender_index,
+            # )
+
+        _channel_infos[__channel_index]["NOW_INDEX"] = _now_channel_starter_index + 4
+        _channel_infos[__channel_index]["END_INDEX"] = _now_channel_ender_index
+        _channel_infos[__channel_index]["NOTE_COUNT"] = _channel_note_count
+
+        # print(
+        #     "[DEBUG] 当前序列", __channel_index, "值", _channel_infos[__channel_index]
+        # )
+
+        _total_note_count += _channel_note_count
+
+        _now_channel_starter_index = _now_channel_ender_index + 16
+        # for i in range(
+        #     int.from_bytes(
+        #         bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
+        #     )
+        # ):
+    _to_yield_note_list: List[Tuple[MineNote, int]] = []
+
+    # {"NOW_INDEX": 0, "NOTE_COUNT": 0, "HAVE_READ": 0, "END_INDEX": -1}
+
+    while _total_note_count:
+        _read_in_note_list: List[Tuple[MineNote, int]] = []
+        for __channel_index in _channel_infos.keys():
+            if (
+                _channel_infos[__channel_index]["HAVE_READ"]
+                < _channel_infos[__channel_index]["NOTE_COUNT"]
+            ):
+                # print("当前已读", _channel_infos[__channel_index]["HAVE_READ"])
+                try:
+                    _end_index = (
+                        (_stt_index := _channel_infos[__channel_index]["NOW_INDEX"])
+                        + 13
+                        + high_quantity_note
+                        + (_bytes_buffer_in[_stt_index] >> 2)
+                    )
+                    # print("读取音符字节串", _bytes_buffer_in[_stt_index:_end_index])
+                    _read_in_note_list.append(
+                        (
+                            MineNote.decode(
+                                code_buffer=_bytes_buffer_in[_stt_index:_end_index],
+                                is_high_time_precision=high_quantity_note,
+                            ),
+                            __channel_index,
+                        )
+                    )
+                    _channel_infos[__channel_index]["HAVE_READ"] += 1
+                    _channel_infos[__channel_index]["NOW_INDEX"] = _end_index
+                    _total_note_count -= 1
+                except Exception as _err:
+                    # print(channels_)
+                    raise MusicSequenceDecodeError("难以定位的解码错误", _err)
+        if not _read_in_note_list:
+            break
+            # _note_list.append
+        min_stt_note: MineNote = min(_read_in_note_list, key=lambda x: x[0].start_tick)[
+            0
+        ]
+        for i in range(len(_to_yield_note_list)):
+            __note, __channel_index = _to_yield_note_list[i]
+            if __note.start_tick >= min_stt_note.start_tick:
+                break
+            else:
+                yield __channel_index, __note
+                _to_yield_note_list.pop(i)
+
+        _to_yield_note_list.extend(_read_in_note_list)
+        _to_yield_note_list.sort(key=lambda x: x[0].start_tick)
+
+    for __note, __channel_index in sorted(
+        _to_yield_note_list, key=lambda x: x[0].start_tick
+    ):
+        yield __channel_index, __note
+    # 俺寻思能用
+
+
+def guess_deviation(
+    total_note_count: int,
+    total_instrument_count: int,
+    note_count_per_instrument: Optional[Dict[str, int]] = None,
+    qualified_note_count_per_instrument: Optional[Dict[str, int]] = None,
+    music_channels: Optional[MineNoteChannelType] = None,
+) -> float:
+    """
+    通过乐器权重来计算一首歌的音调偏移
+    这个方法未经验证，但理论有效，金羿首创
+
+    Parameters
+    ----------
+    total_note_count: int
+        歌曲总音符数
+    total_instrument_count: int
+        歌曲乐器总数
+    note_count_per_instrument: Dict[str, int]
+        乐器名称与乐器音符数对照表
+    qualified_note_count_per_instrument: Dict[str, int]
+        每个乐器中，符合该乐器的音调范围的音符数
+    music_channels: MineNoteChannelType
+        MusicSequence类的音乐通道字典
+
+    Returns
+    -------
+    float估测的音调偏移值
+    """
+    if note_count_per_instrument is None or qualified_note_count_per_instrument is None:
+        if music_channels is None:
+            raise ValueError("参数不足，算逑！")
+        note_count_per_instrument = {}
+        qualified_note_count_per_instrument = {}
+        for this_note in [k for j in music_channels.values() for k in j]:
+            if this_note.sound_name in note_count_per_instrument.keys():
+                note_count_per_instrument[this_note.sound_name] += 1
+                qualified_note_count_per_instrument[
+                    this_note.sound_name
+                ] += is_note_in_diapason(this_note)
+            else:
+                note_count_per_instrument[this_note.sound_name] = 1
+                qualified_note_count_per_instrument[this_note.sound_name] = int(
+                    is_note_in_diapason(this_note)
+                )
+    return (
+        sum(
+            [
+                (
+                    (
+                        MM_INSTRUMENT_RANGE_TABLE[inst][-1]
+                        * note_count
+                        / total_note_count
+                        - MM_INSTRUMENT_RANGE_TABLE[inst][-1]
+                    )
+                    * (note_count - qualified_note_count_per_instrument[inst])
+                )
+                for inst, note_count in note_count_per_instrument.items()
+            ]
+        )
+        / total_instrument_count
+        / total_note_count
+    )

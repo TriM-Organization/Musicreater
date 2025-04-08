@@ -92,11 +92,17 @@ ADD XXH64(seq_2_note_count, 3)
 ADD XXH64(note_seq_2, seq_2_note_count)
 ADD XXH128(
         XOR(
-            XXH64(meta_info, note_count),
             XOR(
-                XXH64(seq_1_note_count, 3),
-                XXH64(note_seq_1, seq_1_note_count)
+                XXH64(meta_info, note_count),
+                XOR(
+                    XXH64(seq_1_note_count, 3),
+                    XXH64(note_seq_1, seq_1_note_count)
+                ),
             ),
+            XOR(
+                XXH64(seq_2_note_count, 3),
+                XXH64(note_seq_2, seq_2_note_count),
+            )
         ),
         note_count
     )

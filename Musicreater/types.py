@@ -17,18 +17,16 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 from typing import (
-    Any,
     Dict,
     List,
     Literal,
-    Optional,
     Tuple,
     Union,
-    Iterable,
-    Sequence,
     Mapping,
     Callable,
 )
+
+from .subclass import MineNote
 
 
 MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
@@ -63,4 +61,15 @@ ChannelType = Dict[
 以字典所标记的频道信息类型（已弃用）
 
 Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
+"""
+
+
+MineNoteChannelType = Mapping[
+    int,
+    List[MineNote,],
+]
+"""
+我的世界频道信息类型
+
+Dict[int,Dict[int,List[MineNote,],],]
 """

@@ -16,7 +16,8 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from .types import Dict, List, Tuple, MidiInstrumentTableType, MidiNoteNameTableType
+# from .types import Dict, List, Tuple, MidiInstrumentTableType, MidiNoteNameTableType
+from typing import Dict, List, Tuple
 
 x = "x"
 """
@@ -478,7 +479,12 @@ MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
     "fire.ignite": 0,
     "note.cow_bell": 6,
 }
-"""不同乐器的音调偏离对照表"""
+"""
+不同乐器的音调偏离对照表  
+*注意* 该表中的单位是对于 Midi Pitch 音调（整数）的低音偏移。  
+也就是说，该数值越高，则在 Midi Pitch 中的值域越低  
+默认的偏移量为 6 ，因为在计算音高时候少减去了 6 个 Pitch 单位
+"""
 
 # Midi乐器对MC乐器对照表
 
@@ -853,6 +859,8 @@ MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
 """“偷吃”打击乐器对照表"""
 
 # Dislink “断联” 音色对照表
+# https://github.com/Dislink/midi2bdx/blob/main/index.html
+
 
 MM_DISLINK_PITCHED_INSTRUMENT_TABLE: Dict[int, str] = {
     0: "note.harp",
@@ -1036,6 +1044,210 @@ MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
     80: "note.bd",
 }
 """“断联”打击乐器对照表"""
+
+# NoteBlockStudio “NBS”音色对照表
+# https://github.com/OpenNBS/NoteBlockStudio/blob/main/scripts/midi_instruments/midi_instruments.gml
+
+MM_NBS_PITCHED_INSTRUMENT_TABLE: Dict[int, str] = {
+    0: "note.harp",
+    1: "note.pling",
+    2: "note.harp",
+    3: "note.pling",
+    4: "note.harp",
+    5: "note.harp",
+    6: "note.guitar",
+    7: "note.banjo",
+    8: "note.bell",
+    9: "note.bell",
+    10: "note.bell",
+    11: "note.iron_xylophone",
+    12: "note.iron_xylophone",
+    13: "note.xylophone",
+    14: "note.bell",
+    15: "note.iron_xylophone",
+    16: "note.flute",
+    17: "note.flute",
+    18: "note.flute",
+    19: "note.flute",
+    20: "note.flute",
+    21: "note.flute",
+    22: "note.flute",
+    23: "note.flute",
+    24: "note.guitar",
+    25: "note.guitar",
+    26: "note.guitar",
+    27: "note.bass",
+    28: "note.guitar",
+    29: "note.guitar",
+    30: "note.bass",
+    31: "note.bass",
+    32: "note.bass",
+    33: "note.guitar",
+    34: "note.guitar",
+    35: "note.bass",
+    36: "note.pling",
+    37: "note.flute",
+    38: "note.flute",
+    39: "note.flute",
+    40: "note.flute",
+    41: "note.flute",
+    42: "note.didgeridoo",
+    43: "note.flute",
+    44: "note.didgeridoo",
+    45: "note.flute",
+    46: "note.flute",
+    47: "note.flute",
+    48: "note.flute",
+    49: "note.flute",
+    50: "note.flute",
+    51: "note.flute",
+    52: "note.flute",
+    53: "note.flute",
+    54: "note.flute",
+    55: "note.flute",
+    56: "note.flute",
+    57: "note.flute",
+    58: "note.flute",
+    59: "note.flute",
+    60: "note.bit",
+    61: "note.flute",
+    62: "note.flute",
+    63: "note.flute",
+    64: "note.flute",
+    65: "note.guitar",
+    66: "note.flute",
+    67: "note.flute",
+    68: "note.flute",
+    69: "note.bell",
+    70: "note.flute",
+    71: "note.flute",
+    72: "note.flute",
+    73: "note.flute",
+    74: "note.chime",
+    75: "note.flute",
+    76: "note.flute",
+    77: "note.guitar",
+    78: "note.pling",
+    79: "note.flute",
+    80: "note.guitar",
+    81: "note.banjo",
+    82: "note.banjo",
+    83: "note.banjo",
+    84: "note.guitar",
+    85: "note.iron_xylophone",
+    86: "note.flute",
+    87: "note.flute",
+    88: "note.chime",
+    89: "note.cow_bell",
+    90: "note.iron_xylophone",
+    91: "note.xylophone",
+    92: "note.basedrum",
+    93: "note.snare",
+    94: "note.snare",
+    95: "note.basedrum",
+    96: "note.snare",
+    97: "note.hat",
+    98: "note.snare",
+    99: "note.hat",
+    100: "note.basedrum",
+    101: "note.hat",
+    102: "note.basedrum",
+    103: "note.hat",
+    104: "note.basedrum",
+    105: "note.snare",
+    106: "note.snare",
+    107: "note.snare",
+    108: "note.cow_bell",
+    109: "note.snare",
+    110: "note.hat",
+    111: "note.snare",
+    112: "note.hat",
+    113: "note.hat",
+    114: "note.hat",
+    115: "note.hat",
+    116: "note.hat",
+    117: "note.chime",
+    118: "note.hat",
+    119: "note.snare",
+    120: "note.hat",
+    121: "note.hat",
+    122: "note.hat",
+    123: "note.hat",
+    124: "note.hat",
+    125: "note.snare",
+    126: "note.basedrum",
+    127: "note.basedrum",
+}
+"""“NBS”乐音乐器对照表"""
+
+
+MM_NBS_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
+    24: "note.bit",
+    25: "note.snare",
+    26: "note.hat",
+    27: "note.snare",
+    28: "note.snare",
+    29: "note.hat",
+    30: "note.hat",
+    31: "note.hat",
+    32: "note.hat",
+    33: "note.hat",
+    34: "note.chime",
+    35: "note.basedrum",
+    36: "note.basedrum",
+    37: "note.hat",
+    38: "note.snare",
+    39: "note.hat",
+    40: "note.snare",
+    41: "note.basedrum",
+    42: "note.snare",
+    43: "note.basedrum",
+    44: "note.snare",
+    45: "note.basedrum",
+    46: "note.basedrum",
+    47: "note.snare",
+    48: "note.snare",
+    49: "note.snare",
+    50: "note.snare",
+    51: "note.snare",
+    52: "note.snare",
+    53: "note.hat",
+    54: "note.snare",
+    55: "note.snare",
+    56: "note.cow_bell",
+    57: "note.snare",
+    58: "note.hat",
+    59: "note.snare",
+    60: "note.hat",
+    61: "note.hat",
+    62: "note.hat",
+    63: "note.basedrum",
+    64: "note.basedrum",
+    65: "note.snare",
+    66: "note.snare",
+    67: "note.xylophone",
+    68: "note.xylophone",
+    69: "note.hat",
+    70: "note.hat",
+    71: "note.flute",
+    72: "note.flute",
+    73: "note.hat",
+    74: "note.hat",
+    75: "note.hat",
+    76: "note.hat",
+    77: "note.hat",
+    78: "note.didgeridoo",
+    79: "note.didgeridoo",
+    80: "note.hat",
+    81: "note.chime",
+    82: "note.hat",
+    83: "note.chime",
+    84: "note.chime",
+    85: "note.hat",
+    86: "note.basedrum",
+    87: "note.basedrum",
+}
+"""“NBS”打击乐器对照表"""
 
 # Midi音高对MC方块对照表
 

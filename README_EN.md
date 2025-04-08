@@ -1,3 +1,10 @@
+[Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
+[Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
+[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
+[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
+
 <h1 align="center">
     音·创 Musicreater
 </h1>
@@ -91,10 +98,11 @@ This list is not in any order.
 -   Thank _小埋_\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
 -   <table><tr><td>Thank <i>油炸</i> &lt;QQ2836146704&gt; for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
 -   Thank _雨_\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
+- Thank _梦幻duang_\<QQ13753593\> for providing us with his knowlodeg of the command format in Minecraft: Java Edition Version 1.12.2.
+- Thank [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio)'s Project for giving us the power and energy of continual developing.
 
-> Thanks for the support and help of a lot of groupmates
->
-> If you have given contributions but have not been in the list, please contact us!
+> Thanks for the support and help of a lot of groupmates  
+> If you have given contributions but have not been in the list, please contact us!  
 
 ## Contact Us 📞
 
@@ -122,9 +130,3 @@ NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
 
 -   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
 
-[Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
-[Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
-[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
-[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
-[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge

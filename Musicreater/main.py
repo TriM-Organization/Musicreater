@@ -34,7 +34,6 @@ import os
 import math
 
 import mido
-from xxhash import xxh3_64, xxh3_128
 
 from .constants import *
 from .exceptions import *
@@ -169,6 +168,7 @@ class MusicSequence:
         minimum_vol: float = 0.1,
         volume_processing_function: FittingFunctionType = natural_curve,
         deviation: float = 0,
+        note_referance_table_replacement: Dict[str, str] = {},
     ):
         """
         自mido对象导入一个音符序列类
@@ -210,6 +210,7 @@ class MusicSequence:
                 default_tempo_value=default_tempo,
                 vol_processing_function=volume_processing_function,
                 ignore_mismatch_error=mismatch_error_ignorance,
+                note_rtable_replacement=note_referance_table_replacement,
             )
         else:
             note_channels = {}
@@ -241,6 +242,7 @@ class MusicSequence:
         music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
             "GB18030"
         )
+
         channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
         total_note_count = 0
         if verify:
@@ -477,8 +479,11 @@ class MusicSequence:
         """重命名此音乐"""
         self.music_name = new_name
 
-    def add_note(self, channel_no: int, note: MineNote, is_sort: bool = False):
-        """在指定通道添加一个音符"""
+    def add_note(self, channel_no: int, note: MineNote, is_sort: bool = True):
+        """
+        在指定通道添加一个音符
+        值得注意：在版本 2.2.3 及之前 is_sort 参数默认为 False ；在此之后为 True
+        """
         self.channels[channel_no].append(note)
         self.total_note_count += 1
         if note.sound_name in self.note_count_per_instrument.keys():
@@ -498,6 +503,7 @@ class MusicSequence:
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         vol_processing_function: FittingFunctionType = natural_curve,
+        note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
         """
         将midi解析并转换为频道音符字典
@@ -616,6 +622,7 @@ class MusicSequence:
                                     else pitched_note_rtable
                                 ),
                                 volume_processing_method_=vol_processing_function,
+                                note_table_replacement=note_rtable_replacement,
                             )
                         )
                         note_count += 1
@@ -693,6 +700,7 @@ class MidiConvert(MusicSequence):
         enable_old_exe_format: bool = False,
         minimum_volume: float = 0.1,
         vol_processing_function: FittingFunctionType = natural_curve,
+        note_rtable_replacement: Dict[str, str] = {},
     ):
         """
         简单的midi转换类，将midi对象转换为我的世界结构或者包
@@ -742,6 +750,7 @@ class MidiConvert(MusicSequence):
             volume_processing_function=vol_processing_function,
             default_tempo=default_tempo_value,
             mismatch_error_ignorance=ignore_mismatch_error,
+            note_referance_table_replacement=note_rtable_replacement,
         )
 
     @classmethod
@@ -756,6 +765,7 @@ class MidiConvert(MusicSequence):
         old_exe_format: bool = False,
         min_volume: float = 0.1,
         vol_processing_func: FittingFunctionType = natural_curve,
+        note_table_replacement: Dict[str, str] = {},
     ):
         """
         直接输入文件地址，将midi文件读入
@@ -802,6 +812,7 @@ class MidiConvert(MusicSequence):
                 enable_old_exe_format=old_exe_format,
                 minimum_volume=min_volume,
                 vol_processing_function=vol_processing_func,
+                note_rtable_replacement=note_table_replacement,
             )
         except (ValueError, TypeError) as E:
             raise MidiDestroyedError(f"文件{midi_file_path}可能损坏：{E}")

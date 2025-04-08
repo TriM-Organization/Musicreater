@@ -18,9 +18,9 @@ Terms & Conditions: License.md in the root directory
 
 
 from dataclasses import dataclass
-from .types import Optional, Any, List, Mapping, Tuple, Union
+from typing import Optional, Any, List, Tuple, Union
 
-from .constants import MC_PERCUSSION_INSTRUMENT_LIST
+from .constants import MC_PITCHED_INSTRUMENT_LIST
 
 
 @dataclass(init=False)
@@ -91,7 +91,7 @@ class MineNote:
         """高精度开始时间偏量 0.4 毫秒"""
 
         self.percussive = (
-            (mc_sound_name in MC_PERCUSSION_INSTRUMENT_LIST)
+            (mc_sound_name not in MC_PITCHED_INSTRUMENT_LIST)
             if (is_percussion is None)
             else is_percussion
         )
@@ -463,7 +463,7 @@ class SingleNoteBox:
         self.annotation_text = annotation
         """音符注释"""
         if percussion is None:
-            self.is_percussion = percussion in MC_PERCUSSION_INSTRUMENT_LIST
+            self.is_percussion = percussion not in MC_PITCHED_INSTRUMENT_LIST
         else:
             self.is_percussion = percussion
 
@@ -652,15 +652,4 @@ DEFAULT_PROGRESSBAR_STYLE = ProgressBarStyle(
 )
 """
 默认的进度条样式
-"""
-
-
-MineNoteChannelType = Mapping[
-    int,
-    List[MineNote,],
-]
-"""
-我的世界频道信息类型
-
-Dict[int,Dict[int,List[MineNote,],],]
 """

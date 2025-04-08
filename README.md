@@ -1,6 +1,12 @@
-<h1 align="center">
-    音·创 Musicreater
-</h1>
+[Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
+[Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
+[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
+[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
+[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
+
+
+<h1 align="center">音·创 Musicreater </h1>
 
 <p align="center">
     <img width="128" height="128" src="https://gitee.com/TriM-Organization/Musicreater/raw/master/resources/msctIcon.png">
@@ -92,10 +98,10 @@
 - <table><tr><td>感谢 **油炸**&lt;QQ2836146704&gt;  激励我们不断开发新的内容。</td><td><img height="50" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg"></td></tr></table>
 - 感谢 **雨**\<QQ237667809\> 反馈在新版本的指令格式下，计分板播放器的附加包无法播放的问题。
 - 感谢 **梦幻duang**\<QQ13753593\> 为我们提供 Java 1.12.2 版本命令格式参考。
+- 感谢 [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio) 项目的开发为我们提供持续的追赶动力。
 
->     感谢广大群友为此库提供的测试和建议等
->     
->     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！
+>     感谢广大群友为此库提供的测试和建议等  
+>     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！  
 
 ## 联系 📞
 
@@ -122,10 +128,3 @@ NOT AN OFFICIAL MINECRAFT PRODUCT.
 NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT.
 
 NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
-
-[Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
-[Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
-[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
-[python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
-[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
