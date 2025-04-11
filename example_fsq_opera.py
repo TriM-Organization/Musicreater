@@ -8,7 +8,7 @@ from rich.pretty import pprint
 
 msc_seq = Musicreater.MusicSequence.from_mido(
     Musicreater.mido.MidiFile(
-        "./resource/测试片段.mid",
+        "./resources/测试片段.mid",
     ),
     "TEST-测试片段",
 )

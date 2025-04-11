@@ -434,7 +434,29 @@ def load_decode_fsq_flush_release(
     starter_index: int,
     high_quantity_note: bool,
 ) -> Generator[MineNote, Any, None]:
-    """ """
+    """
+    以流的方式解码FSQ音乐序列的音符序列并流式返回
+
+    Parameters
+    ----------
+    buffer_in : BytesIO
+        输入的MSQ格式二进制字节流
+    starter_index : int
+        字节流中，音符序列的起始索引
+    high_quantity_note : bool
+        是否启用高精度音符解析
+
+    Returns
+    -------
+    Generator[MineNote, Any, None]
+        以流的方式返回解码后的音符序列，每次返回一个元组
+        元组中包含两个元素，第一个元素为音符所在通道的索引，第二个元素为音符对象
+
+    Raises
+    ------
+    MusicSequenceDecodeError
+        当解码过程中出现错误，抛出异常
+    """
 
     if buffer_in.tell() != starter_index:
         buffer_in.seek(starter_index, 0)
