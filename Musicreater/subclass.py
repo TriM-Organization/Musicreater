@@ -177,6 +177,7 @@ class MineNote:
         将数据打包为字节码
 
         :param is_displacement_included:`bool` 是否包含声像偏移数据，默认为**是**
+        :param is_high_time_precision:`bool` 是否启用高精度，默认为**是**
 
         :return bytes 打包好的字节码
         """

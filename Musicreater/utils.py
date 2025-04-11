@@ -32,7 +32,7 @@ from typing import (
     BinaryIO,
 )
 
-from xxhash import xxh3_64, xxh3_128
+from xxhash import xxh32, xxh3_64, xxh3_128
 
 from .constants import (
     MC_INSTRUMENT_BLOCKS_TABLE,
@@ -390,11 +390,11 @@ def soundID_to_blockID(
         return MC_INSTRUMENT_BLOCKS_TABLE.get(sound_id, (default_block,))[0]
 
 
-def load_decode_msq_metainfo(
+def load_decode_musicsequence_metainfo(
     buffer_in: BinaryIO,
 ) -> Tuple[str, float, float, bool, int]:
     """
-    以流的方式解码MSQ音乐序列元信息
+    以流的方式解码音乐序列元信息
 
     Parameters
     ----------
@@ -429,6 +429,44 @@ def load_decode_msq_metainfo(
     )
 
 
+def load_decode_fsq_flush_release(
+    buffer_in: BinaryIO,
+    starter_index: int,
+    high_quantity_note: bool,
+) -> Generator[MineNote, Any, None]:
+    """ """
+
+    if buffer_in.tell() != starter_index:
+        buffer_in.seek(starter_index, 0)
+
+    total_note_count = int.from_bytes(
+        buffer_in.read(5),
+        "big",
+        signed=False,
+    )
+
+    for i in range(total_note_count):
+        if (i % 100 == 0) and i:
+            buffer_in.read(4)
+
+        try:
+            _note_bytes_length = (
+                12 + high_quantity_note + ((_first_byte := (buffer_in.read(1)))[0] >> 2)
+            )
+
+            yield MineNote.decode(
+                code_buffer=_first_byte + buffer_in.read(_note_bytes_length),
+                is_high_time_precision=high_quantity_note,
+            )
+        except Exception as _err:
+            # print(bytes_buffer_in[stt_index:end_index])
+            raise MusicSequenceDecodeError(
+                _err,
+                "所截取的音符码之首个字节：",
+                _first_byte,
+            )
+
+
 def load_decode_msq_flush_release(
     buffer_in: BinaryIO,
     starter_index: int,
@@ -448,7 +486,8 @@ def load_decode_msq_flush_release(
     Returns
     -------
     Generator[Tuple[int, MineNote], Any, None]
-        以流的方式返回解码后的音符序列
+        以流的方式返回解码后的音符序列，每次返回一个元组
+        元组中包含两个元素，第一个元素为音符所在通道的索引，第二个元素为音符对象
 
     Raises
     ------
@@ -460,7 +499,8 @@ def load_decode_msq_flush_release(
     # _total_verify = xxh3_64(buffer_in.read(starter_index), seed=total_note_count)
 
     # buffer_in.seek(starter_index, 0)
-    buffer_in.seek(starter_index)
+    if buffer_in.tell() != starter_index:
+        buffer_in.seek(starter_index, 0)
     _bytes_buffer_in = buffer_in.read()
     # int.from_bytes(_bytes_buffer_in[0 : 4], "big")
 

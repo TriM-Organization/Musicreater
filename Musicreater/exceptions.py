@@ -138,10 +138,17 @@ class MusicSequenceDecodeError(MSCTBaseException):
         super().__init__("解码音符序列文件时出现问题", *args)
 
 
+class MusicSequenceTypeError(MSCTBaseException):
+    """音乐序列类型错误"""
+
+    def __init__(self, *args):
+        """无法识别音符序列字节码的类型"""
+        super().__init__("错误的音符序列字节类型", *args)
+
+
 class MusicSequenceVerificationFailed(MusicSequenceDecodeError):
     """音乐序列校验失败"""
 
     def __init__(self, *args):
         """音符序列文件与其校验值不一致"""
         super().__init__("音符序列文件校验失败", *args)
-

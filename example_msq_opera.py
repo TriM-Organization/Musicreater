@@ -1,5 +1,8 @@
 import Musicreater
-from Musicreater.utils import load_decode_msq_flush_release, load_decode_msq_metainfo
+from Musicreater.utils import (
+    load_decode_msq_flush_release,
+    load_decode_musicsequence_metainfo,
+)
 
 from rich.pretty import pprint
 
@@ -25,7 +28,7 @@ pprint(msc_seq_r)
 
 with open("test.msq", "rb") as f:
     pprint("流式 MSQ 元数据：")
-    pprint(metas := load_decode_msq_metainfo(f))
+    pprint(metas := load_decode_musicsequence_metainfo(f))
     pprint("流式 MSQ 音符序列：")
     for i in load_decode_msq_flush_release(f, metas[-1], metas[-2]):
         pprint(i)

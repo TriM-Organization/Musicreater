@@ -32,6 +32,7 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 
 import os
 import math
+from itertools import chain
 
 import mido
 
@@ -231,33 +232,197 @@ class MusicSequence:
         bytes_buffer_in: bytes,
         verify: bool = True,
     ):
-        """从字节码导入音乐序列"""
+        """
+        从字节码导入音乐序列，目前支持 MSQ 第二、三版和 FSQ 第一版。
 
-        group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
-        group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
+        Paramaters
+        ==========
+        bytes_buffer_in: bytes
+            字节码
+        verify: bool
+            是否进行校验（仅支持第三版 MSQ 格式 及 第一版 FSQ 格式）
 
-        high_quantity = bool(group_2 & 0b1000000000000000)
-        # print(group_2, high_quantity)
+        """
 
-        music_name_ = bytes_buffer_in[8 : (stt_index := 8 + (group_1 >> 10))].decode(
-            "GB18030"
-        )
+        if bytes_buffer_in[:4] == b"MSQ!":
 
-        channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
-        total_note_count = 0
-        if verify:
-            _header_index = stt_index
-            _total_verify_code = 0
+            group_1 = int.from_bytes(bytes_buffer_in[4:6], "big", signed=False)
+            group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
 
-        for channel_index in channels_.keys():
-            channel_note_count = 0
-            _channel_start_index = stt_index
+            high_quantity = bool(group_2 & 0b1000000000000000)
+            # print(group_2, high_quantity)
 
-            for i in range(
-                int.from_bytes(
-                    bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
-                )
-            ):
+            music_name_ = bytes_buffer_in[
+                8 : (stt_index := 8 + (group_1 >> 10))
+            ].decode("GB18030")
+
+            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            total_note_count = 0
+            if verify:
+                _header_index = stt_index
+                _total_verify_code = 0
+
+            for channel_index in channels_.keys():
+                channel_note_count = 0
+                _channel_start_index = stt_index
+
+                for i in range(
+                    int.from_bytes(
+                        bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
+                    )
+                ):
+                    try:
+                        end_index = (
+                            stt_index
+                            + 13
+                            + high_quantity
+                            + (bytes_buffer_in[stt_index] >> 2)
+                        )
+                        channels_[channel_index].append(
+                            MineNote.decode(
+                                code_buffer=bytes_buffer_in[stt_index:end_index],
+                                is_high_time_precision=high_quantity,
+                            )
+                        )
+                        channel_note_count += 1
+                        stt_index = end_index
+                    except Exception as _err:
+                        # print(channels_)
+                        raise MusicSequenceDecodeError(
+                            _err, "当前全部通道数据：", channels_
+                        )
+                if verify:
+                    if (
+                        _count_verify := xxh3_64(
+                            channel_note_count.to_bytes(4, "big", signed=False),
+                            seed=3,
+                        )
+                    ).digest() != (
+                        _original_code := bytes_buffer_in[stt_index : stt_index + 8]
+                    ):
+                        raise MusicSequenceVerificationFailed(
+                            "通道 {} 音符数量校验失败：{} -> `{}`；原始为 `{}`".format(
+                                channel_index,
+                                channel_note_count,
+                                _count_verify.digest(),
+                                _original_code,
+                            )
+                        )
+                    if (
+                        _channel_verify := xxh3_64(
+                            bytes_buffer_in[_channel_start_index:stt_index],
+                            seed=channel_note_count,
+                        )
+                    ).digest() != (
+                        _original_code := bytes_buffer_in[
+                            stt_index + 8 : stt_index + 16
+                        ]
+                    ):
+                        raise MusicSequenceVerificationFailed(
+                            "通道 {} 音符数据校验失败：`{}`；原始为 `{}`".format(
+                                channel_index,
+                                _channel_verify.digest(),
+                                _original_code,
+                            )
+                        )
+                    _total_verify_code ^= (
+                        _count_verify.intdigest() ^ _channel_verify.intdigest()
+                    )
+                total_note_count += channel_note_count
+                stt_index += 16
+
+            if verify:
+                if (
+                    _total_verify_res := xxh3_128(
+                        _total_verify := (
+                            xxh3_64(
+                                bytes_buffer_in[0:_header_index],
+                                seed=total_note_count,
+                            ).intdigest()
+                            ^ _total_verify_code
+                        ).to_bytes(8, "big"),
+                        seed=total_note_count,
+                    ).digest()
+                ) != (_original_code := bytes_buffer_in[stt_index:]):
+                    raise MusicSequenceVerificationFailed(
+                        "全曲最终校验失败。全曲音符数：{}，全曲校验码异或结果：`{}` -> `{}`；原始为 `{}`".format(
+                            total_note_count,
+                            _total_verify,
+                            _total_verify_res,
+                            _original_code,
+                        )
+                    )
+
+            return cls(
+                name_of_music=music_name_,
+                channels_of_notes=channels_,
+                music_note_count=total_note_count,
+                minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+                deviation_value=(
+                    (-1 if group_2 & 0b100000000000000 else 1)
+                    * (group_2 & 0b11111111111111)
+                    / 1000
+                ),
+            )
+
+        elif bytes_buffer_in[:4] == b"FSQ!":
+
+            group_1 = int.from_bytes(bytes_buffer_in[4:6], "big", signed=False)
+            group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
+
+            high_quantity = bool(group_2 & 0b1000000000000000)
+            # print(group_2, high_quantity)
+
+            music_name_ = bytes_buffer_in[
+                8 : (stt_index := 8 + (group_1 >> 10))
+            ].decode("GB18030")
+
+            total_note_count = int.from_bytes(
+                bytes_buffer_in[stt_index : (stt_index := stt_index + 5)],
+                "big",
+                signed=False,
+            )
+
+            if verify:
+                _total_verify_code = xxh3_64(
+                    bytes_buffer_in[0:stt_index],
+                    seed=total_note_count,
+                ).intdigest()
+                _t6_buffer = _t2_buffer = 0
+
+            _channel_inst_chart: Dict[str, Dict[str, int]] = {}
+            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+
+            for i in range(total_note_count):
+                if verify:
+                    if (
+                        i % 100 == 0
+                    ) and i:  # 每 100 个音符之后的。也就是 0~99 后的开始，100~199 后开始……
+                        if (
+                            _now_vf := xxh32(
+                                _t6_buffer.to_bytes(1, "big", signed=False),
+                                seed=_t2_buffer,
+                            )
+                        ).digest() != (
+                            _original_code := bytes_buffer_in[
+                                stt_index : (stt_index := stt_index + 4)
+                            ]
+                        ):
+                            raise MusicSequenceVerificationFailed(
+                                "音符数据校验失败，当前进度： {} 当前校验为：`{}`；原始为 `{}`".format(
+                                    i,
+                                    _now_vf.digest(),
+                                    _original_code,
+                                )
+                            )
+                        _total_verify_code ^= _now_vf.intdigest()
+                        _t6_buffer = _t2_buffer = 0
+                    _t6_buffer ^= bytes_buffer_in[stt_index + 5]
+                    _t2_buffer ^= bytes_buffer_in[stt_index + 1]
+                else:
+                    if (i % 100 == 0) and i:
+                        stt_index += 4
+
                 try:
                     end_index = (
                         stt_index
@@ -265,96 +430,173 @@ class MusicSequence:
                         + high_quantity
                         + (bytes_buffer_in[stt_index] >> 2)
                     )
-                    channels_[channel_index].append(
-                        MineNote.decode(
-                            code_buffer=bytes_buffer_in[stt_index:end_index],
-                            is_high_time_precision=high_quantity,
-                        )
+                    _read_note = MineNote.decode(
+                        code_buffer=bytes_buffer_in[stt_index:end_index],
+                        is_high_time_precision=high_quantity,
                     )
-                    channel_note_count += 1
                     stt_index = end_index
                 except Exception as _err:
-                    print(channels_)
-                    raise MusicSequenceDecodeError(_err)
+                    # print(bytes_buffer_in[stt_index:end_index])
+                    raise MusicSequenceDecodeError(
+                        _err, "所截取的音符码：", bytes_buffer_in[stt_index:end_index]
+                    )
+
+                if _read_note.sound_name in _channel_inst_chart:
+                    _channel_inst_chart[_read_note.sound_name]["CNT"] += 1
+                else:
+                    if len(_channel_inst_chart) >= 16:
+                        _channel_inst_chart[_read_note.sound_name] = min(
+                            _channel_inst_chart.values(), key=lambda x: x["CNT"]
+                        )  # 此处是指针式内存引用
+                    _channel_inst_chart[_read_note.sound_name] = {
+                        "CNT": 1,
+                        "INDEX": len(_channel_inst_chart),
+                    }
+                channels_[_channel_inst_chart[_read_note.sound_name]["INDEX"]].append(
+                    _read_note
+                )
             if verify:
                 if (
-                    _count_verify := xxh3_64(
-                        channel_note_count.to_bytes(4, "big", signed=False),
-                        seed=3,
-                    )
-                ).digest() != (
-                    _original_code := bytes_buffer_in[stt_index : stt_index + 8]
-                ):
+                    _total_verify_res := xxh3_128(
+                        (_total_verify := _total_verify_code.to_bytes(8, "big")),
+                        seed=total_note_count,
+                    ).digest()
+                ) != (_original_code := bytes_buffer_in[stt_index:]):
                     raise MusicSequenceVerificationFailed(
-                        "通道 {} 音符数量校验失败：{} -> `{}`；原始为 `{}`".format(
-                            channel_index,
-                            channel_note_count,
-                            _count_verify.digest(),
+                        "全曲最终校验失败。全曲音符数：{}，全曲校验码异或结果：`{}` -> `{}`；原始为 `{}`".format(
+                            total_note_count,
+                            _total_verify,
+                            _total_verify_res,
                             _original_code,
                         )
                     )
-                if (
-                    _channel_verify := xxh3_64(
-                        bytes_buffer_in[_channel_start_index:stt_index],
-                        seed=channel_note_count,
+
+            return cls(
+                name_of_music=music_name_,
+                channels_of_notes=channels_,
+                music_note_count=total_note_count,
+                minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+                deviation_value=(
+                    (-1 if group_2 & 0b100000000000000 else 1)
+                    * (group_2 & 0b11111111111111)
+                    / 1000
+                ),
+            )
+
+        elif bytes_buffer_in[:4] == b"MSQ@":
+
+            group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
+            group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
+
+            high_quantity = bool(group_2 & 0b1000000000000000)
+            # print(group_2, high_quantity)
+
+            music_name_ = bytes_buffer_in[
+                8 : (stt_index := 8 + (group_1 >> 10))
+            ].decode("GB18030")
+            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            for channel_index in channels_.keys():
+                for i in range(
+                    int.from_bytes(
+                        bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
                     )
-                ).digest() != (
-                    _original_code := bytes_buffer_in[stt_index + 8 : stt_index + 16]
                 ):
-                    raise MusicSequenceVerificationFailed(
-                        "通道 {} 音符数据校验失败：`{}`；原始为 `{}`".format(
-                            channel_index,
-                            _channel_verify.digest(),
-                            _original_code,
+                    try:
+                        end_index = (
+                            stt_index
+                            + 13
+                            + high_quantity
+                            + (bytes_buffer_in[stt_index] >> 2)
                         )
-                    )
-                _total_verify_code ^= (
-                    _count_verify.intdigest() ^ _channel_verify.intdigest()
-                )
-            total_note_count += channel_note_count
-            stt_index += 16
+                        channels_[channel_index].append(
+                            MineNote.decode(
+                                code_buffer=bytes_buffer_in[stt_index:end_index],
+                                is_high_time_precision=high_quantity,
+                            )
+                        )
+                        stt_index = end_index
+                    except:
+                        print(channels_)
+                        raise
 
-        if verify:
-            if (
-                _total_verify_res := xxh3_128(
-                    _total_verify := (
-                        xxh3_64(
-                            bytes_buffer_in[0:_header_index],
-                            seed=total_note_count,
-                        ).intdigest()
-                        ^ _total_verify_code
-                    ).to_bytes(8, "big"),
-                    seed=total_note_count,
-                ).digest()
-            ) != (_original_code := bytes_buffer_in[stt_index:]):
-                raise MusicSequenceVerificationFailed(
-                    "全曲最终校验失败。全曲音符数：{}，全曲校验码异或和：`{}` -> `{}`；原始为 `{}`".format(
-                        total_note_count,
-                        _total_verify,
-                        _total_verify_res,
-                        _original_code,
-                    )
-                )
+            return cls(
+                name_of_music=music_name_,
+                channels_of_notes=channels_,
+                minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+                deviation_value=(
+                    (-1 if group_2 & 0b100000000000000 else 1)
+                    * (group_2 & 0b11111111111111)
+                    / 1000
+                ),
+            )
 
-        return cls(
-            name_of_music=music_name_,
-            channels_of_notes=channels_,
-            minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
-            deviation_value=(
-                (-1 if group_2 & 0b100000000000000 else 1)
-                * (group_2 & 0b11111111111111)
-                / 1000
-            ),
-        )
+        elif bytes_buffer_in[:4] == b"MSQ#":
+
+            group_1 = int.from_bytes(bytes_buffer_in[4:6], "big")
+
+            music_name_ = bytes_buffer_in[
+                8 : (stt_index := 8 + (group_1 >> 10))
+            ].decode("utf-8")
+            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            for channel_index in channels_.keys():
+                for i in range(
+                    int.from_bytes(
+                        bytes_buffer_in[stt_index : (stt_index := stt_index + 4)], "big"
+                    )
+                ):
+                    try:
+                        end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
+                        channels_[channel_index].append(
+                            MineNote.decode(bytes_buffer_in[stt_index:end_index])
+                        )
+                        stt_index = end_index
+                    except:
+                        print(channels_)
+                        raise
+
+            return cls(
+                name_of_music=music_name_,
+                channels_of_notes=channels_,
+                minimum_volume_of_music=(group_1 & 0b1111111111) / 1000,
+                deviation_value=int.from_bytes(bytes_buffer_in[6:8], "big", signed=True)
+                / 1000,
+            )
+
+        else:
+            raise MusicSequenceTypeError(
+                "输入的二进制字节码不是合法的音符序列格式，无法解码，码头前 10 字节为：",
+                bytes_buffer_in[:10],
+            )
 
     def encode_dump(
         self,
+        flowing_codec_support: bool = False,
+        include_displacement: bool = True,
         high_time_precision: bool = True,
     ) -> bytes:
-        """将音乐序列转为二进制字节码"""
+        """
+        将音乐序列转为二进制字节码
+
+        Parameters
+        ==========
+
+        flowing_codec_support: bool
+            流式编解码支持，默认为不启用（当启用时，其编码格式应为 FSQ 格式，否则应为 MSQ 格式）
+            请注意，非对流式有特殊要求的情况下，请不要启用此格式项；
+            FSQ 格式会损失通道信息，不应作为 MusicSequence 的基本存储格式使用。
+        include_displacement: bool
+            是否包含声像位移，默认包含
+        high_time_precision: bool
+            是否使用高精度时间，默认使用
+
+        Returns
+        =======
+        转换的字节码数据:
+        bytes
+        """
 
         # （已废弃）
-        # 第一版的码头： MSQ#  字串编码： UTF-8
+        # 第一版 MSQ 的码头： MSQ#  字串编码： UTF-8
         # 第一版格式
         # 音乐名称长度 6 位 支持到 63
         # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
@@ -381,9 +623,10 @@ class MusicSequence:
         #         bytes_buffer += note_.encode()
 
         # （已废弃）
-        # 第二版的码头： MSQ@  字串编码： GB18030
+        # 第二版 MSQ 的码头： MSQ@  字串编码： GB18030
 
-        # 第三版的码头： MSQ!  字串编码： GB18030  大端字节序
+        # 第三版 MSQ 的码头： MSQ!  字串编码： GB18030  大端字节序
+        # 第一版 FSQ 的码头： FSQ!
 
         # 音乐名称长度 6 位 支持到 63
         # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
@@ -396,11 +639,11 @@ class MusicSequence:
         # 音乐名称 music_name 长度最多 63 支持到 31 个中文字符 或 63 个西文字符
 
         bytes_buffer = (
-            b"MSQ!"
+            (b"FSQ!" if flowing_codec_support else b"MSQ!")
             + (
                 (len(r := self.music_name.encode("GB18030")) << 10)  # 音乐名称长度
                 + round(self.minimum_volume * 1000)  # 最小音量
-            ).to_bytes(2, "big")
+            ).to_bytes(2, "big", signed=False)
             + (
                 (
                     (
@@ -416,44 +659,83 @@ class MusicSequence:
             + r
         )
 
-        # 此上是音符序列的元信息，接下来是多通道的音符序列
+        if flowing_codec_support:
+            # FSQ 在 MSQ 第三版的基础上增加了一个占 5 字节的全曲音符总数
+            bytes_buffer += self.total_note_count.to_bytes(5, "big", signed=False)
 
-        # 每个通道的开头是 32 位的 序列长度 共 4 字节
-        # 接下来根据这个序列的长度来读取音符数据
-
-        # 若启用“高精度”，则每个音符皆添加一个字节，用于存储音符时间控制精度偏移
-        # 此值每增加 1，则音符向后播放时长增加 1/1250 秒
-        # 高精度功能在 MineNote 类实现
-
-        # （第三版新增）每个通道结尾包含一个 128 位的 XXHASH 校验值，用以标识该通道结束
-        # 在这 128 位里，前 64 位是该通道音符数的 XXHASH64 校验值，以 3 作为种子值
-        # 后 64 位是整个通道全部字节串的 XXHASH64 校验值（包括通道开头的音符数），以 该通道音符数 作为种子值
         _final_hash_codec = xxh3_64(
             bytes_buffer, seed=self.total_note_count
         ).intdigest()
 
-        for channel_index, note_list in self.channels.items():
-            channel_buffer = len_buffer = len(note_list).to_bytes(
-                4, "big", signed=False
-            )
-            for note_ in note_list:
-                channel_buffer += note_.encode(
-                    is_high_time_precision=high_time_precision
+        if flowing_codec_support:
+            # 此上是音符序列的元信息，接下来是音符序列
+            __counting = 0
+            _t6_buffer = 0
+            _t2_buffer = 0
+
+            # 流式音符序列，单通道序列，FSQ 文件格式
+            for _note in sorted(
+                chain(*self.channels.values()), key=lambda x: x.start_tick
+            ):
+                if __counting >= 100:
+                    _now_hash_codec_verifier = xxh32(
+                        _t6_buffer.to_bytes(1, "big", signed=False),
+                        seed=_t2_buffer,
+                    )
+                    bytes_buffer += _now_hash_codec_verifier.digest()
+                    _final_hash_codec ^= _now_hash_codec_verifier.intdigest()
+
+                    _t6_buffer = 0
+                    _t2_buffer = 0
+                    __counting = 0
+
+                bytes_buffer += (
+                    __single_buffer := _note.encode(
+                        is_displacement_included=include_displacement,
+                        is_high_time_precision=high_time_precision,
+                    )
                 )
-            _now_hash_codec_spliter = xxh3_64(len_buffer, seed=3)
-            _now_hash_codec_verifier = xxh3_64(
-                channel_buffer, seed=int.from_bytes(len_buffer, "big", signed=False)
-            )
+                _t6_buffer ^= __single_buffer[5]
+                _t2_buffer ^= __single_buffer[1]
+                __counting += 1
 
-            bytes_buffer += channel_buffer
-            bytes_buffer += (
-                _now_hash_codec_spliter.digest() + _now_hash_codec_verifier.digest()
-            )
+        else:
 
-            _final_hash_codec ^= (
-                _now_hash_codec_spliter.intdigest()
-                ^ _now_hash_codec_verifier.intdigest()
-            )
+            # 常规序列，多通道，MSQ 文件格式
+
+            # 每个通道的开头是 32 位的 序列长度 共 4 字节
+            # 接下来根据这个序列的长度来读取音符数据
+
+            # 若启用“高精度”，则每个音符皆添加一个字节，用于存储音符时间控制精度偏移
+            # 此值每增加 1，则音符向后播放时长增加 1/1250 秒
+            # 高精度功能在 MineNote 类实现
+
+            # （第三版新增）每个通道结尾包含一个 128 位的 XXHASH 校验值，用以标识该通道结束
+            # 在这 128 位里，前 64 位是该通道音符数的 XXHASH64 校验值，以 3 作为种子值
+            # 后 64 位是整个通道全部字节串的 XXHASH64 校验值（包括通道开头的音符数），以 该通道音符数 作为种子值
+            for channel_index, note_list in self.channels.items():
+                channel_buffer = len_buffer = len(note_list).to_bytes(
+                    4, "big", signed=False
+                )
+                for note_ in note_list:
+                    channel_buffer += note_.encode(
+                        is_displacement_included=include_displacement,
+                        is_high_time_precision=high_time_precision,
+                    )
+                _now_hash_codec_spliter = xxh3_64(len_buffer, seed=3)
+                _now_hash_codec_verifier = xxh3_64(
+                    channel_buffer, seed=int.from_bytes(len_buffer, "big", signed=False)
+                )
+
+                bytes_buffer += channel_buffer
+                bytes_buffer += (
+                    _now_hash_codec_spliter.digest() + _now_hash_codec_verifier.digest()
+                )
+
+                _final_hash_codec ^= (
+                    _now_hash_codec_spliter.intdigest()
+                    ^ _now_hash_codec_verifier.intdigest()
+                )
 
         # 在所有音符通道表示完毕之后，由一个 128 位的 XXHASH 校验值，用以标识文件结束并校验
         # 该 128 位的校验值是对于前述所有校验值的异或所得值之 XXHASH128 校验值，以 全曲音符总数 作为种子值
