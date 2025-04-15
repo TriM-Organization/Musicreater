@@ -20,7 +20,7 @@ __all__ = [
     "to_addon_pack_in_repeater",
     "to_addon_pack_in_repeater_divided_by_instrument",
 ]
-__author__ = (("金羿", "Eilles Wan"),)
+__author__ = (("金羿", "Eilles"),)
 
 from .main import (
     to_addon_pack_in_delay,

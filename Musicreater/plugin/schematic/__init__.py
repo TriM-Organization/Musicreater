@@ -16,7 +16,7 @@ Terms & Conditions: License.md in the root directory
 
 __all__ = [
 ]
-__author__ = (("金羿", "Eilles Wan"),)
+__author__ = (("金羿", "Eilles"),)
 
 from .main import *
 

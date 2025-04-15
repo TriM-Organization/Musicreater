@@ -13,12 +13,12 @@ Terms & Conditions: License.md in the root directory
 
 
 import os
+from typing import Optional
 
 import brotli
 
 from ...main import MidiConvert
 from ...subclass import MineCommand, ProgressBarStyle
-from ...types import Optional
 from ..bdx import (
     bdx_move,
     commands_to_BDX_bytes,

@@ -12,7 +12,7 @@
 
 # 音·创 开发交流群 861684859
 # Email TriM-Organization@hotmail.com
-# 版权所有 金羿("Eilles Wan") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
+# 版权所有 金羿("Eilles") & 诸葛亮与八卦阵("bgArray") & 鸣凤鸽子("MingFengPigeon")
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
@@ -183,6 +183,7 @@ if __name__ == "__main__":
 
 # ============================
 from typing import Literal
+
 from ..constants import x, y, z
 
 
@@ -198,7 +199,7 @@ def delay_to_note_blocks(
     :return 是否生成成功
     """
 
-    from TrimMCStruct import Structure, Block
+    from TrimMCStruct import Block, Structure
 
     struct = Structure(
         (_sideLength, max_height, _sideLength),  # 声明结构大小

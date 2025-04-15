@@ -8,9 +8,7 @@ Terms & Conditions: License.md in the root directory
 
 import os
 import shutil
-
 from typing import Optional, Tuple
-
 
 import Musicreater.experiment
 from Musicreater.plugin.archive import compress_zipfile

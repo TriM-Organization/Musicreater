@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+
 # 定义对数函数
 def q_function1(vol):
     # return -23.65060754864053*((x+508.2130392724084)**0.8433764630986903) + 7.257078620637543 * (x+407.86870598508153) + 1585.6201108739122

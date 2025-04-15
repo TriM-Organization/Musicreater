@@ -14,16 +14,15 @@ Terms & Conditions: License.md in the root directory
 import json
 import os
 import shutil
-from typing import Tuple
+from typing import Literal, Optional, Tuple
 
 from ...main import MidiConvert
-from ..archive import behavior_mcpack_manifest, compress_zipfile
 from ...subclass import ProgressBarStyle
-from ...types import Optional, Literal
+from ..archive import behavior_mcpack_manifest, compress_zipfile
 from ..mcstructure import (
-    Structure,
     COMPABILITY_VERSION_117,
     COMPABILITY_VERSION_119,
+    Structure,
     commands_to_redstone_delay_structure,
     commands_to_structure,
     form_command_block_in_NBT_struct,

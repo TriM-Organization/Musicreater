@@ -11,7 +11,7 @@ A free open source library used for dealing with **Minecraft** digital musics.
 Copyright © 2025 Eilles & bgArray
 
 音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
-The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
+The Licensor of Musicreater("this project") is Eilles, bgArray.
 
 本项目根据 第一版 汉钰律许可协议（“本协议”）授权。
 任何人皆可从以下地址获得本协议副本：https://gitee.com/EillesWan/YulvLicenses。
@@ -30,8 +30,8 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 # 赶快呼叫 程序员！Let's Go！          直ぐに呼びましょプログラマ レッツゴー！  Hurry to call the programmer! Let's Go!
 
 
-import os
 import math
+import os
 from itertools import chain
 
 import mido

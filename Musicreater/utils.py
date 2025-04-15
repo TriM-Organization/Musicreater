@@ -21,30 +21,28 @@ import random
 # from io import BytesIO
 from typing import (
     Any,
-    Dict,
-    Tuple,
-    Optional,
-    Callable,
-    Literal,
-    Union,
-    List,
-    Generator,
     BinaryIO,
+    Callable,
+    Dict,
+    Generator,
+    List,
+    Literal,
+    Optional,
+    Tuple,
+    Union,
 )
 
-from xxhash import xxh32, xxh3_64, xxh3_128
+from xxhash import xxh3_64, xxh3_128, xxh32
 
 from .constants import (
     MC_INSTRUMENT_BLOCKS_TABLE,
-    MM_INSTRUMENT_DEVIATION_TABLE,
     MC_PITCHED_INSTRUMENT_LIST,
+    MM_INSTRUMENT_DEVIATION_TABLE,
     MM_INSTRUMENT_RANGE_TABLE,
 )
-from .subclass import MineNote, mctick2timestr
-
-from .types import MidiInstrumentTableType, MineNoteChannelType
-
 from .exceptions import MusicSequenceDecodeError
+from .subclass import MineNote, mctick2timestr
+from .types import MidiInstrumentTableType, MineNoteChannelType
 
 
 def empty_midi_channels(

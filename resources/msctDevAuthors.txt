@@ -9,7 +9,7 @@ zh-CN 金羿
 zh-TW 金羿
 zh-ME 金羿羿喵
 zh-HK 金 羿
-en-GB Eilles Wan
+en-GB Eilles
 en-US EillesWan
 
 启诸葛亮与八卦阵

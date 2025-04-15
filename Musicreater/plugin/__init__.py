@@ -41,7 +41,7 @@ __all__ = [
     # BDX 常量
     "BDX_MOVE_KEY",
 ]
-__author__ = (("金羿", "Eilles Wan"), ("诸葛亮与八卦阵", "bgArray"))
+__author__ = (("金羿", "Eilles"), ("诸葛亮与八卦阵", "bgArray"))
 
 # from .main import ConvertConfig
 

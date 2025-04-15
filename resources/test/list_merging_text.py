@@ -1,6 +1,6 @@
+import random
 import time
 from itertools import chain
-import random
 
 print("生成序列中")
 

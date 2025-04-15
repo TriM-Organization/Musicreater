@@ -12,16 +12,15 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-import fcwslib
 import asyncio
-import uuid
 import time
+import uuid
+from typing import List, Literal, Optional, Tuple
+
+import fcwslib
 
 from ...main import MidiConvert
-from ...subclass import ProgressBarStyle
-from ...types import Optional, Literal, Tuple, List
-
-from ...subclass import MineCommand
+from ...subclass import MineCommand, ProgressBarStyle
 
 
 def to_websocket_server(
@@ -107,7 +106,10 @@ def to_websocket_server(
                                 callback=self.cmd_feedback,
                             )
                         delay_of_now += 1
-                        if delay_of_now >= (cmd := musics[music_to_play][0][now_played_cmd]).delay:
+                        if (
+                            delay_of_now
+                            >= (cmd := musics[music_to_play][0][now_played_cmd]).delay
+                        ):
                             await self.send_command(
                                 cmd.command_text.replace(replacement, whom_to_play),
                                 callback=self.cmd_feedback,

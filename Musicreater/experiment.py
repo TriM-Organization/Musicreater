@@ -18,15 +18,15 @@ Terms & Conditions: License.md in the root directory
 
 
 from .exceptions import *
-from .subclass import *
-from .utils import *
 from .main import (
-    MidiConvert,
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MidiConvert,
     mido,
 )
-from .types import Tuple, List, Dict, ChannelType
+from .subclass import *
+from .types import ChannelType, Dict, List, Tuple
+from .utils import *
 
 
 class FutureMidiConvertJavaE(MidiConvert):

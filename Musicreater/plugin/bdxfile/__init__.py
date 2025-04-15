@@ -15,6 +15,6 @@ Terms & Conditions: License.md in the root directory
 
 
 __all__ = ["to_BDX_file_in_score", "to_BDX_file_in_delay"]
-__author__ = (("金羿", "Eilles Wan"),)
+__author__ = (("金羿", "Eilles"),)
 
 from .main import to_BDX_file_in_delay, to_BDX_file_in_score

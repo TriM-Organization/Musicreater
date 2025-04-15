@@ -1,10 +1,11 @@
+import random
 import time
 from itertools import chain
-import random
+from multiprocessing import Pool, Process, freeze_support
+
 from rich.console import Console
 from rich.progress import Progress
 from rich.table import Table
-from multiprocessing import freeze_support, Pool, Process
 
 console = Console()
 
