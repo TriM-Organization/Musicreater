@@ -1,2 +1,93 @@
+[project]
+    name = "Musicreater"
+    dynamic = ["version"]
+    requires-python = ">= 3.8, < 4.0"
+    dependencies = [
+        "mido >= 1.3",
+        "xxhash >= 3",
+    ]
+
+    authors = [
+        { name = "金羿Eilles" },
+        { name = "玉衡Alioth" },
+        { name = "鱼旧梦ElapsingDreams" },
+        { name = "睿乐组织 TriMO", email = "TriM-Organization@hotmail.com" },
+    ]
+    maintainers = [
+        { name = "金羿Eilles", email = "EillesWan@outlook.com" },
+    ]
+
+    description = "A free open source library used for dealing with **Minecraft** digital musics."
+    readme      = "README_EN.md"
+    license     = { file = "LICENSE.md" }
+
+    keywords = ["midi", "minecraft", "minecraft: bedrock edition"]
+    classifiers = [
+        "Intended Audience :: Developers",
+        "Natural Language :: Chinese (Simplified)",
+        "Operating System :: OS Independent",
+        "Topic :: Software Development :: Libraries",
+        "Programming Language :: Python",
+        "Programming Language :: Python :: 3",
+        "Topic :: Multimedia",
+        "Topic :: Multimedia :: Sound/Audio :: MIDI",
+    ]
+
+
+[project.urls]
+    # Homepage = "https://example.com"
+    # Documentation = "https://readthedocs.org"
+    Repository        = "https://gitee.com/TriM-Organization/Musicreater"
+    Issues            = "https://gitee.com/TriM-Organization/Musicreater/issues"
+    Mirror-Repository = "https://github.com/TriM-Organization/Musicreater"
+    Mirror-Issues     = "https://github.com/TriM-Organization/Musicreater/issues"
+
+
+[project.optional-dependencies]
+    full = [
+        "TrimMCStruct <= 0.0.5.9",
+        "brotli >= 1.0.0",
+    ]
+    dev = [
+        "TrimMCStruct <= 0.0.5.9",
+        "brotli >= 1.0.0",
+        "rich",
+        "pyinstaller",
+        "twine",
+    ]
+
+
 [build-system]
-requires = ["setuptools", "wheel",]
+    requires      = ["pdm-backend"]
+    build-backend = "pdm.backend"
+
+# https://backend.pdm-project.org/build_config/#build-configurations
+[tool.pdm.build]
+    # includes = [
+    #     # "README_EN.md",
+    #     # "README.md",
+    #     # "LICENSE.md",
+    #     # "Musicreater/",
+    #     # "docs/",
+    # ]
+    source-includes = [
+        "README_EN.md",
+        "README.md",
+        "LICENSE.md",
+    ]
+    excludes = [
+        "fcwslib/",
+        "bgArrayLib/",
+        "Packer/",
+        "resources/",
+        "./*.mid",
+        "./*.msq",
+        "./*.fsq",
+        "./MSCT_Packer.py",
+        "resources/poem.md",
+    ]
+
+
+[tool.pdm.version]
+    source = "file"
+    path   = "Musicreater/__init__.py"

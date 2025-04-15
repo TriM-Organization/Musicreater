@@ -745,7 +745,7 @@ class MusicSequence:
 
         return bytes_buffer
 
-    def set_min_volume(self, volume_value: int):
+    def set_min_volume(self, volume_value: float):
         """重新设置全曲最小音量"""
         if volume_value > 1 or volume_value <= 0:
             raise IllegalMinimumVolumeError(
@@ -753,7 +753,7 @@ class MusicSequence:
             )
         self.minimum_volume = volume_value
 
-    def set_deviation(self, deviation_value: int):
+    def set_deviation(self, deviation_value: float):
         """重新设置全曲音调偏移"""
         self.music_deviation = deviation_value
 
@@ -1025,13 +1025,14 @@ class MidiConvert(MusicSequence):
         return cls.from_mido(
             mido_file=midi_obj,
             midi_music_name=midi_name,
+            mismatch_error_ignorance=ignore_mismatch_error,
             speed_multiplier=playment_speed,
+            default_tempo=default_tempo_value,
             pitched_note_referance_table=pitched_note_rtable,
             percussion_note_referance_table=percussion_note_rtable,
             minimum_vol=minimum_volume,
             volume_processing_function=vol_processing_function,
-            default_tempo=default_tempo_value,
-            mismatch_error_ignorance=ignore_mismatch_error,
+            deviation=0,    # 加么？感觉不加也没问题……？
             note_referance_table_replacement=note_rtable_replacement,
         )
 
@@ -1644,14 +1645,19 @@ class MidiConvert(MusicSequence):
         return command_dict, notes_list[-1].start_tick, max_multi
 
     def copy_important(self):
-        dst = MidiConvert.from_mido_obj(
-            midi_obj=mido.MidiFile(),
-            midi_name=self.music_name,
-            enable_old_exe_format=self.enable_old_exe_format,
-            pitched_note_rtable={},
-            percussion_note_rtable={},
-            vol_processing_function=lambda a: a,
+        dst = MidiConvert(
+            name_of_music=self.music_name,
+            channels_of_notes={},
+            music_note_count=0,
+            note_used_per_instrument={},
+            minimum_volume_of_music=self.minimum_volume,
+            deviation_value=self.music_deviation,
+            # enable_old_exe_format=self.enable_old_exe_format,
+            # pitched_note_rtable={},
+            # percussion_note_rtable={},
+            # vol_processing_function=lambda a: a,
         )
+        dst.enable_old_exe_format = self.enable_old_exe_format
         dst.music_command_list = [i.copy() for i in self.music_command_list]
         dst.progress_bar_command = [i.copy() for i in self.progress_bar_command]
         return dst

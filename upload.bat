@@ -1,7 +1,7 @@
-python -m build
+uv build
 python -m twine check dist/*
 pause
-python -m twine upload dist/* --verbose
+uv publish
 pause
 python clean_update.py
 pause

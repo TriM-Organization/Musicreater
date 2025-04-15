@@ -331,12 +331,14 @@ def midi_msgs_to_minenote(
 #     )
 
 
-def is_in_diapason(note_pitch: int, instrument: str) -> bool:
+def is_in_diapason(note_pitch: float, instrument: str) -> bool:
     note_range = MM_INSTRUMENT_RANGE_TABLE.get(instrument, ((-1, 128), 0))[0]
     return note_pitch >= note_range[0] and note_pitch <= note_range[1]
 
 
-def is_note_in_diapason(note_: MineNote) -> bool:
+def is_note_in_diapason(
+    note_: MineNote,
+) -> bool:
     note_range = MM_INSTRUMENT_RANGE_TABLE.get(note_.sound_name, ((-1, 128), 0))[0]
     return note_.note_pitch >= note_range[0] and note_.note_pitch <= note_range[1]
 

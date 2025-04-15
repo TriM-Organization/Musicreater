@@ -22,7 +22,7 @@ The Licensor of Musicreater("this project") is Eilles Wan, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.3.0"
+__version__ = "2.3.0.1"
 __vername__ = "FSQ完全流式音符读写适配"
 __author__ = (
     ("金羿", "Eilles"),

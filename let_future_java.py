@@ -14,6 +14,7 @@ from typing import Optional, Tuple
 
 import Musicreater.experiment
 from Musicreater.plugin.archive import compress_zipfile
+from Musicreater.utils import guess_deviation, is_in_diapason
 
 
 def to_zip_pack_in_score(
@@ -120,27 +121,52 @@ def to_zip_pack_in_score(
     return maxlen, maxscore
 
 
-print(
-    to_zip_pack_in_score(
-        Musicreater.experiment.FutureMidiConvertJavaE.from_midi_file(
-            input("midi路径："),
-            play_speed=float(input("播放速度：")),
-            old_exe_format=True,
-            note_table_replacement={
-                "note.iron_xylophone": "note.xylophone",
-                "note.cow_bell": "note.xylophone",
-                "note.didgeridoo": "note.guitar",
-                "note.bit": "note.harp",
-                "note.banjo": "note.flute",
-                "note.pling": "note.harp",
-            },
-            # pitched_note_table=Musicreater.MM_NBS_PITCHED_INSTRUMENT_TABLE,
-        ),
-        input("输出路径："),
-        Musicreater.experiment.ProgressBarStyle(),
-        # Musicreater.plugin.ConvertConfig(input("输出路径:"),),
-        scoreboard_name=input("计分板名称："),
-        sound_source=input("发音源："),
-        auto_reset=True,
+msc_cvt = Musicreater.experiment.FutureMidiConvertJavaE.from_midi_file(
+    input("midi路径："),
+    play_speed=float(input("播放速度：")),
+    old_exe_format=True,
+    note_table_replacement={
+        "note.iron_xylophone": "note.xylophone",
+        "note.cow_bell": "note.xylophone",
+        "note.didgeridoo": "note.guitar",
+        "note.bit": "note.harp",
+        "note.banjo": "note.flute",
+        "note.pling": "note.harp",
+    },
+    # pitched_note_table=Musicreater.MM_NBS_PITCHED_INSTRUMENT_TABLE,
+)
+
+msc_cvt.set_deviation(
+    guess_deviation(
+        msc_cvt.total_note_count,
+        len(msc_cvt.note_count_per_instrument),
+        msc_cvt.note_count_per_instrument,
+        music_channels=msc_cvt.channels,
     )
+)
+
+in_diapason_count = 0
+for this_note in [k for j in msc_cvt.channels.values() for k in j]:
+    if is_in_diapason(
+        this_note.note_pitch + msc_cvt.music_deviation, this_note.sound_name
+    ):
+        in_diapason_count += 1
+
+
+zip_res = to_zip_pack_in_score(
+    msc_cvt,
+    input("输出路径："),
+    Musicreater.experiment.ProgressBarStyle(),
+    # Musicreater.plugin.ConvertConfig(input("输出路径:"),),
+    scoreboard_name=input("计分板名称："),
+    sound_source=input("发音源："),
+    auto_reset=True,
+)
+print(
+    "符合音符播放音高的音符数量：{}/{}({:.2f}%)".format(
+        in_diapason_count,
+        msc_cvt.total_note_count,
+        in_diapason_count * 100 / msc_cvt.total_note_count,
+    ),
+    "\n指令数量：{}；音乐总延迟：{}".format(*zip_res),
 )
