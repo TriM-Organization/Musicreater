@@ -163,6 +163,7 @@ class MusicSequence:
         midi_music_name: str,
         mismatch_error_ignorance: bool = True,
         speed_multiplier: float = 1,
+        default_midi_program: int = MIDI_DEFAULT_PROGRAM_VALUE,
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
@@ -184,6 +185,8 @@ class MusicSequence:
             是否在导入时忽略音符不匹配错误
         speed_multiplier: float
             音乐播放速度倍数
+        default_midi_program: int
+            默认的MIDI Program值
         default_tempo: int
             默认的MIDI TEMPO值
         pitched_note_referance_table: Dict[int, Tuple[str, int]]
@@ -196,7 +199,10 @@ class MusicSequence:
             声像偏移拟合函数
         deviation: float
             全曲音调偏移值
+        note_referance_table_replacement: Dict[str, str]
+            MC 音符乐器替换表，如果在不希望使用某种 MC 乐器的时候进行替换
         """
+
         if mido_file:
             (
                 note_channels,
@@ -205,9 +211,9 @@ class MusicSequence:
             ) = cls.to_music_note_channels(
                 midi=mido_file,
                 speed=speed_multiplier,
-                default_program_value=-1,  # TODO 默认音色可调
                 pitched_note_rtable=pitched_note_referance_table,
                 percussion_note_rtable=percussion_note_referance_table,
+                default_program_value=default_midi_program,
                 default_tempo_value=default_tempo,
                 vol_processing_function=volume_processing_function,
                 ignore_mismatch_error=mismatch_error_ignorance,
@@ -806,6 +812,8 @@ class MusicSequence:
             打击乐器Midi-MC对照表
         vol_processing_function: Callable[[float], float]
             声像偏移拟合函数
+        note_rtable_replacement: Dict[str, str]
+            音符名称替换表，此表用于对 Minecraft 乐器名称进行替换，而非 Midi Program 的替换
 
         Returns
         -------
@@ -976,12 +984,14 @@ class MidiConvert(MusicSequence):
         midi_name: str,
         ignore_mismatch_error: bool = True,
         playment_speed: float = 1,
+        default_midi_program_value: int = MIDI_DEFAULT_PROGRAM_VALUE,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         enable_old_exe_format: bool = False,
         minimum_volume: float = 0.1,
         vol_processing_function: FittingFunctionType = natural_curve,
+        pitch_deviation: float = 0,
         note_rtable_replacement: Dict[str, str] = {},
     ):
         """
@@ -993,12 +1003,14 @@ class MidiConvert(MusicSequence):
             需要处理的midi对象
         midi_name: str
             此音乐之名称
-        ignore_mismatch_error： bool
+        ignore_mismatch_error: bool
             是否在导入时忽略音符不匹配错误
         playment_speed: float
             音乐播放速度倍数
+        default_midi_program_value: int
+            默认的 MIDI Program 值，当 Midi 文件没有指定 Program 值时，使用此值
         default_tempo_value: int
-            默认的MIDI TEMPO值
+            默认的 MIDI TEMPO 值，同上理
         pitched_note_rtable: Dict[int, Tuple[str, int]]
             乐音乐器Midi-MC对照表
         percussion_note_rtable: Dict[int, Tuple[str, int]]
@@ -1009,6 +1021,10 @@ class MidiConvert(MusicSequence):
             最小播放音量
         vol_processing_function: Callable[[float], float]
             声像偏移拟合函数
+        pitch_deviation: float
+            音调偏移量，手动指定全曲音调偏移量
+        note_rtable_replacement: Dict[str, str]
+            Minecraft 音符 ID 替换表，可在不希望使用某些乐器的时候进行替换
         """
 
         cls.enable_old_exe_format: bool = enable_old_exe_format
@@ -1027,12 +1043,13 @@ class MidiConvert(MusicSequence):
             midi_music_name=midi_name,
             mismatch_error_ignorance=ignore_mismatch_error,
             speed_multiplier=playment_speed,
+            default_midi_program=default_midi_program_value,
             default_tempo=default_tempo_value,
             pitched_note_referance_table=pitched_note_rtable,
             percussion_note_referance_table=percussion_note_rtable,
             minimum_vol=minimum_volume,
             volume_processing_function=vol_processing_function,
-            deviation=0,    # 加么？感觉不加也没问题……？
+            deviation=pitch_deviation,
             note_referance_table_replacement=note_rtable_replacement,
         )
 
@@ -1042,25 +1059,29 @@ class MidiConvert(MusicSequence):
         midi_file_path: str,
         mismatch_error_ignorance: bool = True,
         play_speed: float = 1,
+        default_midi_program: int = MIDI_DEFAULT_PROGRAM_VALUE,
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
         vol_processing_func: FittingFunctionType = natural_curve,
+        music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},
     ):
         """
-        直接输入文件地址，将midi文件读入
+        直接输入文件地址，将 midi 文件读入
 
         Parameters
         ----------
         midi_file_path: str
             midi文件地址
-        mismatch_error_ignorance bool
+        mismatch_error_ignorance: bool
             是否在导入时忽略音符不匹配错误
         play_speed: float
             音乐播放速度倍数
+        default_midi_program: int
+            默认的 MIDI Program 值，当 Midi 文件没有指定 Program 值时，使用此值
         default_tempo: int
             默认的MIDI TEMPO值
         pitched_note_table: Dict[int, Tuple[str, int]]
@@ -1073,6 +1094,10 @@ class MidiConvert(MusicSequence):
             最小播放音量
         vol_processing_func: Callable[[float], float]
             声像偏移拟合函数
+        music_pitch_deviation: float
+            全曲音符的音调偏移量
+        note_table_replacement: Dict[str, str]
+            音符 ID 替换表，用于在不希望使用某些 Minecraft 乐器的时候替换之
         """
 
         midi_music_name = os.path.splitext(os.path.basename(midi_file_path))[0].replace(
@@ -1089,12 +1114,14 @@ class MidiConvert(MusicSequence):
                 midi_name=midi_music_name,
                 ignore_mismatch_error=mismatch_error_ignorance,
                 playment_speed=play_speed,
+                default_midi_program_value=default_midi_program,
                 default_tempo_value=default_tempo,
                 pitched_note_rtable=pitched_note_table,
                 percussion_note_rtable=percussion_note_table,
                 enable_old_exe_format=old_exe_format,
                 minimum_volume=min_volume,
                 vol_processing_function=vol_processing_func,
+                pitch_deviation=music_pitch_deviation,
                 note_rtable_replacement=note_table_replacement,
             )
         except (ValueError, TypeError) as E:
@@ -1138,7 +1165,7 @@ class MidiConvert(MusicSequence):
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
         """
-        perEach = max_score / pgs_style.count("_")
+        per_value_in_each = max_score / pgs_style.count("_")
         """每个进度条代表的分值"""
 
         result: List[MineCommand] = []
@@ -1337,7 +1364,7 @@ class MidiConvert(MusicSequence):
                     self.execute_cmd_head.format(
                         r"@a[scores={"
                         + scoreboard_name
-                        + f"={int(i * perEach)}..{math.ceil((i + 1) * perEach)}"
+                        + f"={int(i * per_value_in_each)}..{math.ceil((i + 1) * per_value_in_each)}"
                         + r"}]"
                     )
                     + r'titleraw @s actionbar {"rawtext":[{"text":"'

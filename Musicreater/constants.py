@@ -37,6 +37,10 @@ z
 
 # Midi用对照表
 
+MIDI_DEFAULT_PROGRAM_VALUE: int = (
+    74  # 当 Midi 本身与用户皆未指定音色时，默认 Flute 长笛
+)
+
 MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     0: "C",
     1: "C#",
@@ -429,6 +433,33 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "mob.zombie.wood": ("sand",),
 }
 """MC乐器对音符盒下垫方块对照表"""
+
+MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
+    "note.iron_xylophone": "note.xylophone",
+    "note.cow_bell": "note.xylophone",
+    "note.didgeridoo": "note.guitar",
+    "note.bit": "note.harp",
+    "note.banjo": "note.flute",
+    "note.pling": "note.harp",
+}
+"""在 Minecraft JE 1.12 ~ JE 1.14 的版本中，部分乐器是没有的，这是金羿的乐器替换表"""
+
+MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
+    # lt je 12
+    "note.bell": "note.harp",
+    "note.flute": "note.harp",
+    "note.chime": "note.harp",
+    "note.guitar": "note.bass",
+    "note.xylophone": "note.hat",
+    # rt je 12
+    "note.iron_xylophone": "note.hat",
+    "note.cow_bell": "note.ha",
+    "note.didgeridoo": "note.bass",
+    "note.bit": "note.harp",
+    "note.banjo": "note.harp",
+    "note.pling": "note.harp",
+}
+"""在 Minecraft JE Beta1.2 / BE 0.13.0 ~ JE 1.12 / BE 1.13.0 的版本中，部分乐器是没有的，这是金羿的乐器替换表"""
 
 # Midi对MC通用对照表
 

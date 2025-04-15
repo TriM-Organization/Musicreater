@@ -271,6 +271,7 @@ def midi_msgs_to_minenote(
     :param play_speed: float 曲目播放速度
     :param midi_reference_table: Dict[int, str] 转换对照表
     :param volume_proccessing_method_: Callable[[float], float] 音量处理函数
+    :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
 
     :return MineNote我的世界音符对象
     """

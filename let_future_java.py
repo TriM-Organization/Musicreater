@@ -123,14 +123,7 @@ msc_cvt = Musicreater.experiment.FutureMidiConvertJavaE.from_midi_file(
     input("midi路径："),
     play_speed=float(input("播放速度：")),
     old_exe_format=True,
-    note_table_replacement={
-        "note.iron_xylophone": "note.xylophone",
-        "note.cow_bell": "note.xylophone",
-        "note.didgeridoo": "note.guitar",
-        "note.bit": "note.harp",
-        "note.banjo": "note.flute",
-        "note.pling": "note.harp",
-    },
+    note_table_replacement=Musicreater.MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE,
     # pitched_note_table=Musicreater.MM_NBS_PITCHED_INSTRUMENT_TABLE,
 )
 

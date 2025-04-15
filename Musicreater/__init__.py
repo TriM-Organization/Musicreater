@@ -22,8 +22,8 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.3.0.2"
-__vername__ = "FSQ 完全流式音符读写适配，修复插件的兼容性问题"
+__version__ = "2.3.1"
+__vername__ = "新增部分新可指定的默认值"
 __author__ = (
     ("金羿", "Eilles"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -42,6 +42,7 @@ __all__ = [
     "ProgressBarStyle",
     # "TimeStamp", 未来功能
     # 默认值
+    "MIDI_DEFAULT_PROGRAM_VALUE",
     "DEFAULT_PROGRESSBAR_STYLE",
     "MM_INSTRUMENT_RANGE_TABLE",
     "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
