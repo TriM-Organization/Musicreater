@@ -16,17 +16,351 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+from typing import Dict, List, Tuple
 
 from .exceptions import *
 from .main import (
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
     MidiConvert,
     mido,
 )
 from .subclass import *
-from .types import ChannelType, Dict, List, Tuple
+from .types import ChannelType, FittingFunctionType
 from .utils import *
+
+
+class FutureMidiConvertKamiRES(MidiConvert):
+    """
+    神羽资源包之测试支持
+    """
+    @staticmethod
+    def to_music_note_channels(
+        midi: mido.MidiFile,
+        ignore_mismatch_error: bool = True,
+        speed: float = 1.0,
+        default_program_value: int = -1,
+        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
+        pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_function: FittingFunctionType = natural_curve,
+        note_rtable_replacement: Dict[str, str] = {},
+    ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
+        """
+        将midi解析并转换为频道音符字典
+
+        Parameters
+        ----------
+        midi: mido.MidiFile 对象
+            需要处理的midi对象
+        speed: float
+            音乐播放速度倍数
+        default_program_value: int
+            默认的 MIDI 乐器值
+        default_tempo_value: int
+            默认的 MIDI TEMPO 值
+        pitched_note_rtable: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_rtable: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
+        vol_processing_function: Callable[[float], float]
+            声像偏移拟合函数
+        note_rtable_replacement: Dict[str, str]
+            音符名称替换表，此表用于对 Minecraft 乐器名称进行替换，而非 Midi Program 的替换
+
+        Returns
+        -------
+        以频道作为分割的Midi音符列表字典, 音符总数, 乐器使用统计:
+        Tuple[MineNoteChannelType, int, Dict[str, int]]
+        """
+
+        if speed == 0:
+            raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
+
+        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
+        midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        channel_program: Dict[int, int] = empty_midi_channels(
+            default_staff=default_program_value
+        )
+        tempo = default_tempo_value
+        note_count = 0
+        note_count_per_instrument: Dict[str, int] = {}
+        microseconds = 0
+
+        note_queue_A: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(default_staff=[])
+        note_queue_B: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(default_staff=[])
+
+        # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
+        # 采用的时遍历信息思路
+        for msg in midi.merged_track:
+            if msg.time != 0:
+                # 微秒
+                microseconds += msg.time * tempo / midi.ticks_per_beat
+
+            # 简化
+            if msg.type == "set_tempo":
+                tempo = msg.tempo
+            else:
+                if msg.type == "program_change":
+                    channel_program[msg.channel] = msg.program
+
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    note_queue_A[msg.channel].append(
+                        (msg.note, channel_program[msg.channel])
+                    )
+                    note_queue_B[msg.channel].append((msg.velocity, microseconds))
+
+                elif (msg.type == "note_off") or (
+                    msg.type == "note_on" and msg.velocity == 0
+                ):
+                    if (msg.note, channel_program[msg.channel]) in note_queue_A[
+                        msg.channel
+                    ]:
+                        _velocity, _ms = note_queue_B[msg.channel][
+                            note_queue_A[msg.channel].index(
+                                (msg.note, channel_program[msg.channel])
+                            )
+                        ]
+                        note_queue_A[msg.channel].remove(
+                            (msg.note, channel_program[msg.channel])
+                        )
+                        note_queue_B[msg.channel].remove((_velocity, _ms))
+
+                        midi_channels[msg.channel].append(
+                            that_note := midi_msgs_to_minenote_using_kami_respack(
+                                inst_=(
+                                    msg.note
+                                    if msg.channel == 9
+                                    else channel_program[msg.channel]
+                                ),
+                                note_=(
+                                    channel_program[msg.channel]
+                                    if msg.channel == 9
+                                    else msg.note
+                                ),
+                                percussive_=(msg.channel == 9),
+                                velocity_=_velocity,
+                                start_time_=_ms,  # 微秒
+                                duration_=microseconds - _ms,  # 微秒
+                                play_speed=speed,
+                                midi_reference_table=(
+                                    percussion_note_rtable
+                                    if msg.channel == 9
+                                    else pitched_note_rtable
+                                ),
+                                volume_processing_method_=vol_processing_function,
+                                note_table_replacement=note_rtable_replacement,
+                            )
+                        )
+                        note_count += 1
+                        if that_note.sound_name in note_count_per_instrument.keys():
+                            note_count_per_instrument[that_note.sound_name] += 1
+                        else:
+                            note_count_per_instrument[that_note.sound_name] = 1
+                    else:
+                        if ignore_mismatch_error:
+                            print(
+                                "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                    msg
+                                )
+                            )
+                        else:
+                            raise NoteOnOffMismatchError(
+                                "当前的MIDI很可能有损坏之嫌……",
+                                msg,
+                                "无法在上文中找到与之匹配的音符开音消息。",
+                            )
+
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+        del tempo
+        channels = dict(
+            [
+                (channel_no, sorted(channel_notes, key=lambda note: note.start_tick))
+                for channel_no, channel_notes in midi_channels.items()
+            ]
+        )
+
+        return (
+            channels,
+            note_count,
+            note_count_per_instrument,
+        )
+
+
+    def to_command_list_in_score(
+        self,
+        scoreboard_name: str = "mscplay",
+    ) -> Tuple[List[List[MineCommand]], int, int]:
+        """
+        将midi转换为我的世界命令列表
+
+        Parameters
+        ----------
+        scoreboard_name: str
+            我的世界的计分板名称
+
+        Returns
+        -------
+        tuple( list[list[MineCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        """
+
+        command_channels = []
+        command_amount = 0
+        max_score = 0
+
+        # 此处 我们把通道视为音轨
+        for channel in self.channels.values():
+            # 如果当前通道为空 则跳过
+            if not channel:
+                continue
+
+            this_channel = []
+
+            for note in channel:
+                max_score = max(max_score, note.start_tick)
+
+                (
+                    mc_sound_ID,
+                    relative_coordinates,
+                    volume_percentage,
+                    mc_pitch,
+                ) = minenote_to_command_paramaters(
+                    note,
+                    pitch_deviation=self.music_deviation,
+                )
+
+                this_channel.append(
+                    MineCommand(
+                        (
+                            self.execute_cmd_head.format(
+                                "@a[scores=({}={})]".format(
+                                    scoreboard_name, note.start_tick
+                                )
+                                .replace("(", r"{")
+                                .replace(")", r"}")
+                            )
+                            + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                                mc_sound_ID,
+                                *relative_coordinates,
+                                volume_percentage,
+                                1.0,
+                                self.minimum_volume,
+                            )
+                        ),
+                        annotation=(
+                            "在{}播放{}".format(
+                                mctick2timestr(note.start_tick),
+                                mc_sound_ID,
+                            )
+                        ),
+                    ),
+                )
+
+                command_amount += 1
+
+            if this_channel:
+                self.music_command_list.extend(this_channel)
+                command_channels.append(this_channel)
+
+        return command_channels, command_amount, max_score
+
+    def to_command_list_in_delay(
+        self,
+        player_selector: str = "@a",
+    ) -> Tuple[List[MineCommand], int, int]:
+        """
+        将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[MineCommand指令,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        """
+
+        notes_list: List[MineNote] = sorted(
+            [i for j in self.channels.values() for i in j],
+            key=lambda note: note.start_tick,
+        )
+
+        # 此处 我们把通道视为音轨
+        self.music_command_list = []
+        multi = max_multi = 0
+        delaytime_previous = 0
+
+        for note in notes_list:
+            if (tickdelay := (note.start_tick - delaytime_previous)) == 0:
+                multi += 1
+            else:
+                max_multi = max(max_multi, multi)
+                multi = 0
+
+            (
+                mc_sound_ID,
+                relative_coordinates,
+                volume_percentage,
+                mc_pitch,
+            ) = minenote_to_command_paramaters(
+                note,
+                pitch_deviation=self.music_deviation,
+            )
+
+            self.music_command_list.append(
+                MineCommand(
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            mc_sound_ID,
+                            *relative_coordinates,
+                            volume_percentage,
+                            1.0,
+                            self.minimum_volume,
+                        )
+                    ),
+                    annotation=(
+                        "在{}播放音{}".format(
+                            mctick2timestr(note.start_tick),
+                            mc_sound_ID,
+                        )
+                    ),
+                    tick_delay=tickdelay,
+                ),
+            )
+            delaytime_previous = note.start_tick
+
+        return self.music_command_list, notes_list[-1].start_tick, max_multi + 1
+
 
 
 class FutureMidiConvertJavaE(MidiConvert):

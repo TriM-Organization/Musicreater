@@ -16,18 +16,9 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from typing import (
-    Dict,
-    List,
-    Literal,
-    Tuple,
-    Union,
-    Mapping,
-    Callable,
-)
+from typing import Callable, Dict, List, Literal, Mapping, Tuple, Union
 
 from .subclass import MineNote
-
 
 MidiNoteNameTableType = Mapping[int, Tuple[str, ...]]
 """

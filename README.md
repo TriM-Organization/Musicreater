@@ -3,8 +3,7 @@
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-Apache-228B22?style=for-the-badge
-
+[license]: https://img.shields.io/badge/Licence-%E6%B1%89%E9%92%B0%E5%BE%8B%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE-228B22?style=for-the-badge
 
 <h1 align="center">音·创 Musicreater </h1>
 
@@ -45,25 +44,25 @@
 
 ## 安装 🔳
 
-- 使用 pypi
-  
-  ```bash
-  pip install --upgrade Musicreater
-  ```
+-   使用 pypi
 
-- 如果无法更新最新，可以尝试：
-  
-  ```bash
-  pip install --upgrade -i https://pypi.python.org/simple Musicreater
-  ```
+    ```bash
+    pip install --upgrade Musicreater
+    ```
 
-- 克隆仓库并安装（最新版本但**不推荐**）
-  
-  ```bash
-  git clone https://gitee.com/TriM-Organization/Musicreater.git
-  cd Musicreater
-  python setup.py install
-  ```
+-   如果无法更新最新，可以尝试：
+
+    ```bash
+    pip install --upgrade -i https://pypi.python.org/simple Musicreater
+    ```
+
+-   克隆仓库并安装（最新版本但**不推荐**）
+
+    ```bash
+    git clone https://gitee.com/TriM-Organization/Musicreater.git
+    cd Musicreater
+    python setup.py install
+    ```
 
 以上命令中 `python`、`pip` 请依照各个环境不同灵活更换，可能为`python3`或`pip3`之类。
 
@@ -85,23 +84,23 @@
 
 本致谢列表排名无顺序。
 
-- 感谢 **昀梦**\<QQ1515399885\> 找出指令生成错误 bug 并指正
-- 感谢由 **Charlie_Ping “查理平”** 带来的 BDX 文件转换参考，以及 MIDI-我的世界对应乐器 参考表格
-- 感谢由 **[CMA_2401PT](https://github.com/CMA2401PT)** 为我们的软件开发的一些方面进行指导，同时我们参考了他的 BDXworkshop 作为 BDX 结构编辑的参考
-- 感谢由 **[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”**\<QQ1600515314\> 带来的 midi 音色解析以及转换指令的算法，我们将其改编并应用；同时，感谢他的[网页版转换器](https://dislink.github.io/midi2bdx/)给我们的开发与更新带来巨大的压力和动力，让我们在原本一骑绝尘的摸鱼道路上转向开发。
-- 感谢 **Mono**\<QQ738893087\> 反馈安装时的问题，辅助我们找到了视窗操作系统下的兼容性问题；感谢其反馈延迟播放器出现的重大问题，让我们得以修改全部延迟播放错误；尤其感谢他对于我们的软件的大力宣传
-- 感谢 **Ammelia “艾米利亚”**\<QQ2838334637\> 敦促我们进行新的功能开发，并为新功能提出了非常优秀的大量建议，以及提供的 BDX 导入测试支持，为我们的新结构生成算法提供了大量的实际理论支持
-- 感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
-- 感谢 **指令师\_苦力怕 playjuice123**\<QQ240667197\> 为我们的程序找出错误，并提醒我们修复一个一直存在的大 bug。
-- 感谢 **雷霆**\<QQ3555268519\> 用他那令所有开发者都大为光火的操作方法为我们的程序找出错误，并提醒修复 bug。
-- 感谢 **小埋**\<QQ2039310975\> 反馈附加包生成时缺少描述和标题的问题。
-- <table><tr><td>感谢 **油炸**&lt;QQ2836146704&gt;  激励我们不断开发新的内容。</td><td><img height="50" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg"></td></tr></table>
-- 感谢 **雨**\<QQ237667809\> 反馈在新版本的指令格式下，计分板播放器的附加包无法播放的问题。
-- 感谢 **梦幻duang**\<QQ13753593\> 为我们提供 Java 1.12.2 版本命令格式参考。
-- 感谢 [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio) 项目的开发为我们提供持续的追赶动力。
+-   感谢 **昀梦**\<QQ1515399885\> 找出指令生成错误 bug 并指正
+-   感谢由 **Charlie_Ping “查理平”** 带来的 BDX 文件转换参考，以及 MIDI-我的世界对应乐器 参考表格
+-   感谢由 **[CMA_2401PT](https://github.com/CMA2401PT)** 为我们的软件开发的一些方面进行指导，同时我们参考了他的 BDXworkshop 作为 BDX 结构编辑的参考
+-   感谢由 **[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”**\<QQ1600515314\> 带来的 midi 音色解析以及转换指令的算法，我们将其改编并应用；同时，感谢他的[网页版转换器](https://dislink.github.io/midi2bdx/)给我们的开发与更新带来巨大的压力和动力，让我们在原本一骑绝尘的摸鱼道路上转向开发。
+-   感谢 **Mono**\<QQ738893087\> 反馈安装时的问题，辅助我们找到了视窗操作系统下的兼容性问题；感谢其反馈延迟播放器出现的重大问题，让我们得以修改全部延迟播放错误；尤其感谢他对于我们的软件的大力宣传
+-   感谢 **Ammelia “艾米利亚”**\<QQ2838334637\> 敦促我们进行新的功能开发，并为新功能提出了非常优秀的大量建议，以及提供的 BDX 导入测试支持，为我们的新结构生成算法提供了大量的实际理论支持
+-   感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
+-   感谢 **指令师\_苦力怕 playjuice123**\<QQ240667197\> 为我们的程序找出错误，并提醒我们修复一个一直存在的大 bug。
+-   感谢 **雷霆**\<QQ3555268519\> 用他那令所有开发者都大为光火的操作方法为我们的程序找出错误，并提醒修复 bug。
+-   感谢 **小埋**\<QQ2039310975\> 反馈附加包生成时缺少描述和标题的问题。
+-   <table><tr><td>感谢 **油炸**&lt;QQ2836146704&gt;  激励我们不断开发新的内容。</td><td><img height="50" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg"></td></tr></table>
+-   感谢 **雨**\<QQ237667809\> 反馈在新版本的指令格式下，计分板播放器的附加包无法播放的问题。
+-   感谢 **梦幻duang**\<QQ13753593\> 为我们提供 Java 1.12.2 版本命令格式参考。
+-   感谢 [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio) 项目的开发为我们提供持续的追赶动力。
 
->     感谢广大群友为此库提供的测试和建议等  
->     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！  
+>     感谢广大群友为此库提供的测试和建议等
+>     若您对我们有所贡献但您的名字没有出现在此列表中，请联系我们！
 
 ## 联系 📞
 
@@ -121,7 +120,7 @@
 
 “Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为必要的介绍性使用
 
-- 上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
+-   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
 
 NOT AN OFFICIAL MINECRAFT PRODUCT.
 

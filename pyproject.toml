@@ -51,6 +51,7 @@
     dev = [
         "TrimMCStruct <= 0.0.5.9",
         "brotli >= 1.0.0",
+        "dill",
         "rich",
         "pyinstaller",
         "twine",
@@ -91,3 +92,4 @@
 [tool.pdm.version]
     source = "file"
     path   = "Musicreater/__init__.py"
+

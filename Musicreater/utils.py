@@ -295,6 +295,69 @@ def midi_msgs_to_minenote(
     )
 
 
+def midi_msgs_to_minenote_using_kami_respack(
+    inst_: int,  # 乐器编号
+    note_: int,
+    percussive_: bool,  # 是否作为打击乐器启用
+    velocity_: int,
+    start_time_: int,
+    duration_: int,
+    play_speed: float,
+    midi_reference_table: MidiInstrumentTableType,
+    volume_processing_method_: Callable[[float], float],
+    note_table_replacement: Dict[str, str] = {},
+) -> MineNote:
+    """
+    将Midi信息转为我的世界音符对象
+    :param inst_: int 乐器编号
+    :param note_: int 音高编号（音符编号）
+    :param percussive_: bool 是否作为打击乐器启用
+    :param velocity_: int 力度(响度)
+    :param start_time_: int 音符起始时间（微秒）
+    :param duration_: int 音符持续时间（微秒）
+    :param play_speed: float 曲目播放速度
+    :param midi_reference_table: Dict[int, str] 转换对照表
+    :param volume_proccessing_method_: Callable[[float], float] 音量处理函数
+    :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
+
+    :return MineNote我的世界音符对象
+    """
+
+    using_original = False
+    if not percussive_ and (0 <= inst_ <= 119):
+        mc_sound_ID = "{}{}.{}".format(
+            # inst_, "d" if duration_ < 500_000 else "c", note_
+            inst_, "d", note_
+        )
+    elif percussive_ and (27 <= inst_ <= 87):
+        mc_sound_ID = "-1d.{}".format(inst_)
+    else:
+        using_original = True
+        mc_sound_ID = midi_inst_to_mc_sound(
+            inst_,
+            midi_reference_table,
+            "note.bd" if percussive_ else "note.flute",
+        )
+
+    mc_distance_volume = volume_processing_method_(velocity_)
+
+    return MineNote(
+        mc_sound_name=note_table_replacement.get(mc_sound_ID, mc_sound_ID),
+        midi_pitch=note_ if using_original else 1,
+        midi_velocity=velocity_,
+        start_time=(tk := int(start_time_ / float(play_speed) / 50000)),
+        last_time=round(duration_ / float(play_speed) / 50000),
+        mass_precision_time=round((start_time_ / float(play_speed) - tk * 50000) / 800),
+        is_percussion=percussive_,
+        displacement=(0, mc_distance_volume, 0),
+        extra_information={
+            "USING_ORIGINAL_SOUND": using_original,  # 判断 extra_information 中是否有 USING_ORIGINAL_SOUND 键是判断是否使用神羽资源包解析的一个显著方法
+            "INST_VALUE": note_ if percussive_ else inst_,
+            "NOTE_VALUE": inst_ if percussive_ else note_,
+        },
+    )
+
+
 # def single_note_to_minenote(
 #     note_: SingleNote,
 #     reference_table: MidiInstrumentTableType,
