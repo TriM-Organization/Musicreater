@@ -16,17 +16,200 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+from typing import Dict, List, Tuple
 
 from .exceptions import *
 from .main import (
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
     MidiConvert,
     mido,
 )
 from .subclass import *
-from .types import ChannelType, Dict, List, Tuple
+from .types import ChannelType, FittingFunctionType
 from .utils import *
+
+
+class FutureMidiConvertKamiRES(MidiConvert):
+    @staticmethod
+    def to_music_note_channels(
+        midi: mido.MidiFile,
+        ignore_mismatch_error: bool = True,
+        speed: float = 1.0,
+        default_program_value: int = -1,
+        default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
+        pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        vol_processing_function: FittingFunctionType = natural_curve,
+        note_rtable_replacement: Dict[str, str] = {},
+    ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
+        """
+        将midi解析并转换为频道音符字典
+
+        Parameters
+        ----------
+        midi: mido.MidiFile 对象
+            需要处理的midi对象
+        speed: float
+            音乐播放速度倍数
+        default_program_value: int
+            默认的 MIDI 乐器值
+        default_tempo_value: int
+            默认的 MIDI TEMPO 值
+        pitched_note_rtable: Dict[int, Tuple[str, int]]
+            乐音乐器Midi-MC对照表
+        percussion_note_rtable: Dict[int, Tuple[str, int]]
+            打击乐器Midi-MC对照表
+        vol_processing_function: Callable[[float], float]
+            声像偏移拟合函数
+        note_rtable_replacement: Dict[str, str]
+            音符名称替换表，此表用于对 Minecraft 乐器名称进行替换，而非 Midi Program 的替换
+
+        Returns
+        -------
+        以频道作为分割的Midi音符列表字典, 音符总数, 乐器使用统计:
+        Tuple[MineNoteChannelType, int, Dict[str, int]]
+        """
+
+        if speed == 0:
+            raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
+
+        # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
+        midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        channel_program: Dict[int, int] = empty_midi_channels(
+            default_staff=default_program_value
+        )
+        tempo = default_tempo_value
+        note_count = 0
+        note_count_per_instrument: Dict[str, int] = {}
+        microseconds = 0
+
+        note_queue_A: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(default_staff=[])
+        note_queue_B: Dict[
+            int,
+            List[
+                Tuple[
+                    int,
+                    int,
+                ]
+            ],
+        ] = empty_midi_channels(default_staff=[])
+
+        # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
+        # 采用的时遍历信息思路
+        for msg in midi.merged_track:
+            if msg.time != 0:
+                # 微秒
+                microseconds += msg.time * tempo / midi.ticks_per_beat
+
+            # 简化
+            if msg.type == "set_tempo":
+                tempo = msg.tempo
+            else:
+                if msg.type == "program_change":
+                    channel_program[msg.channel] = msg.program
+
+                elif msg.type == "note_on" and msg.velocity != 0:
+                    note_queue_A[msg.channel].append(
+                        (msg.note, channel_program[msg.channel])
+                    )
+                    note_queue_B[msg.channel].append((msg.velocity, microseconds))
+
+                elif (msg.type == "note_off") or (
+                    msg.type == "note_on" and msg.velocity == 0
+                ):
+                    if (msg.note, channel_program[msg.channel]) in note_queue_A[
+                        msg.channel
+                    ]:
+                        _velocity, _ms = note_queue_B[msg.channel][
+                            note_queue_A[msg.channel].index(
+                                (msg.note, channel_program[msg.channel])
+                            )
+                        ]
+                        note_queue_A[msg.channel].remove(
+                            (msg.note, channel_program[msg.channel])
+                        )
+                        note_queue_B[msg.channel].remove((_velocity, _ms))
+
+                        midi_channels[msg.channel].append(
+                            that_note := midi_msgs_to_minenote_using_kami_respack(
+                                inst_=(
+                                    msg.note
+                                    if msg.channel == 9
+                                    else channel_program[msg.channel]
+                                ),
+                                note_=(
+                                    channel_program[msg.channel]
+                                    if msg.channel == 9
+                                    else msg.note
+                                ),
+                                percussive_=(msg.channel == 9),
+                                velocity_=_velocity,
+                                start_time_=_ms,  # 微秒
+                                duration_=microseconds - _ms,  # 微秒
+                                play_speed=speed,
+                                midi_reference_table=(
+                                    percussion_note_rtable
+                                    if msg.channel == 9
+                                    else pitched_note_rtable
+                                ),
+                                volume_processing_method_=vol_processing_function,
+                                note_table_replacement=note_rtable_replacement,
+                            )
+                        )
+                        note_count += 1
+                        if that_note.sound_name in note_count_per_instrument.keys():
+                            note_count_per_instrument[that_note.sound_name] += 1
+                        else:
+                            note_count_per_instrument[that_note.sound_name] = 1
+                    else:
+                        if ignore_mismatch_error:
+                            print(
+                                "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                    msg
+                                )
+                            )
+                        else:
+                            raise NoteOnOffMismatchError(
+                                "当前的MIDI很可能有损坏之嫌……",
+                                msg,
+                                "无法在上文中找到与之匹配的音符开音消息。",
+                            )
+
+        """整合后的音乐通道格式
+        每个通道包括若干消息元素其中逃不过这三种：
+
+        1 切换乐器消息
+        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
+
+        2 音符开始消息
+        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
+
+        3 音符结束消息
+        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+        del tempo
+        channels = dict(
+            [
+                (channel_no, sorted(channel_notes, key=lambda note: note.start_tick))
+                for channel_no, channel_notes in midi_channels.items()
+            ]
+        )
+
+        return (
+            channels,
+            note_count,
+            note_count_per_instrument,
+        )
 
 
 class FutureMidiConvertJavaE(MidiConvert):

@@ -1,10 +1,10 @@
+from rich.pretty import pprint
+
 import Musicreater
 from Musicreater.utils import (
     load_decode_msq_flush_release,
     load_decode_musicsequence_metainfo,
 )
-
-from rich.pretty import pprint
 
 msc_seq = Musicreater.MusicSequence.from_mido(
     Musicreater.mido.MidiFile(

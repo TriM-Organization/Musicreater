@@ -1,26 +1,23 @@
 import Musicreater
 import Musicreater.experiment
-import Musicreater.previous
-
 import Musicreater.plugin
-
+# import Musicreater.previous
 from Musicreater.plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
     to_addon_pack_in_score,
 )
+from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
 from Musicreater.plugin.mcstructfile import (
     to_mcstructure_file_in_delay,
     to_mcstructure_file_in_repeater,
     to_mcstructure_file_in_score,
 )
 
-from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
-
 MSCT_MAIN = (
     Musicreater,
     Musicreater.experiment,
-    Musicreater.previous,
+    # Musicreater.previous,
 )
 
 MSCT_PLUGIN = (Musicreater.plugin,)
@@ -38,8 +35,8 @@ MSCT_PLUGIN_FUNCTION = (
 
 import hashlib
 
-import dill
 import brotli
+import dill
 
 
 def enpack_msct_pack(sth, to_dist: str):
