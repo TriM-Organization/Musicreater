@@ -33,6 +33,9 @@ from .utils import *
 
 
 class FutureMidiConvertKamiRES(MidiConvert):
+    """
+    神羽资源包之测试支持
+    """
     @staticmethod
     def to_music_note_channels(
         midi: mido.MidiFile,
@@ -210,6 +213,154 @@ class FutureMidiConvertKamiRES(MidiConvert):
             note_count,
             note_count_per_instrument,
         )
+
+
+    def to_command_list_in_score(
+        self,
+        scoreboard_name: str = "mscplay",
+    ) -> Tuple[List[List[MineCommand]], int, int]:
+        """
+        将midi转换为我的世界命令列表
+
+        Parameters
+        ----------
+        scoreboard_name: str
+            我的世界的计分板名称
+
+        Returns
+        -------
+        tuple( list[list[MineCommand指令,... ],... ], int指令数量, int音乐时长游戏刻 )
+        """
+
+        command_channels = []
+        command_amount = 0
+        max_score = 0
+
+        # 此处 我们把通道视为音轨
+        for channel in self.channels.values():
+            # 如果当前通道为空 则跳过
+            if not channel:
+                continue
+
+            this_channel = []
+
+            for note in channel:
+                max_score = max(max_score, note.start_tick)
+
+                (
+                    mc_sound_ID,
+                    relative_coordinates,
+                    volume_percentage,
+                    mc_pitch,
+                ) = minenote_to_command_paramaters(
+                    note,
+                    pitch_deviation=self.music_deviation,
+                )
+
+                this_channel.append(
+                    MineCommand(
+                        (
+                            self.execute_cmd_head.format(
+                                "@a[scores=({}={})]".format(
+                                    scoreboard_name, note.start_tick
+                                )
+                                .replace("(", r"{")
+                                .replace(")", r"}")
+                            )
+                            + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                                mc_sound_ID,
+                                *relative_coordinates,
+                                volume_percentage,
+                                1.0,
+                                self.minimum_volume,
+                            )
+                        ),
+                        annotation=(
+                            "在{}播放{}".format(
+                                mctick2timestr(note.start_tick),
+                                mc_sound_ID,
+                            )
+                        ),
+                    ),
+                )
+
+                command_amount += 1
+
+            if this_channel:
+                self.music_command_list.extend(this_channel)
+                command_channels.append(this_channel)
+
+        return command_channels, command_amount, max_score
+
+    def to_command_list_in_delay(
+        self,
+        player_selector: str = "@a",
+    ) -> Tuple[List[MineCommand], int, int]:
+        """
+        将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[MineCommand指令,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        """
+
+        notes_list: List[MineNote] = sorted(
+            [i for j in self.channels.values() for i in j],
+            key=lambda note: note.start_tick,
+        )
+
+        # 此处 我们把通道视为音轨
+        self.music_command_list = []
+        multi = max_multi = 0
+        delaytime_previous = 0
+
+        for note in notes_list:
+            if (tickdelay := (note.start_tick - delaytime_previous)) == 0:
+                multi += 1
+            else:
+                max_multi = max(max_multi, multi)
+                multi = 0
+
+            (
+                mc_sound_ID,
+                relative_coordinates,
+                volume_percentage,
+                mc_pitch,
+            ) = minenote_to_command_paramaters(
+                note,
+                pitch_deviation=self.music_deviation,
+            )
+
+            self.music_command_list.append(
+                MineCommand(
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            mc_sound_ID,
+                            *relative_coordinates,
+                            volume_percentage,
+                            1.0,
+                            self.minimum_volume,
+                        )
+                    ),
+                    annotation=(
+                        "在{}播放音{}".format(
+                            mctick2timestr(note.start_tick),
+                            mc_sound_ID,
+                        )
+                    ),
+                    tick_delay=tickdelay,
+                ),
+            )
+            delaytime_previous = note.start_tick
+
+        return self.music_command_list, notes_list[-1].start_tick, max_multi + 1
+
 
 
 class FutureMidiConvertJavaE(MidiConvert):
