@@ -34,8 +34,21 @@ z = "z"
 z
 """
 
+MIDI_PROGRAM = "program"
+"""Midi乐器编号"""
+
+MIDI_VOLUME = "volume"
+"""Midi通道音量"""
+
+MIDI_PAN = "pan"
+"""Midi通道立体声场偏移"""
+
 
 # Midi用对照表
+
+MIDI_DEFAULT_VOLUME_VALUE: int = (
+    64  # Midi默认音量，当用户未指定时，默认使用折中默认音量
+)
 
 MIDI_DEFAULT_PROGRAM_VALUE: int = (
     74  # 当 Midi 本身与用户皆未指定音色时，默认 Flute 长笛

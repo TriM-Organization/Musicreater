@@ -12,8 +12,8 @@ print(
     "乐器使用情况",
 )
 
-for name in set(
-    sorted(
+for name in sorted(
+    set(
         [
             n.split(".")[0].replace("c", "").replace("d", "")
             for n in msct.note_count_per_instrument.keys()

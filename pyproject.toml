@@ -93,3 +93,6 @@
     source = "file"
     path   = "Musicreater/__init__.py"
 
+
+[tool.pyright]
+    typeCheckingMode = "basic"

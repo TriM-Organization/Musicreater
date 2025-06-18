@@ -32,7 +32,7 @@ Midi乐器对照表类型
 
 FittingFunctionType = Callable[[float], float]
 """
-声像偏移音量拟合函数类型
+拟合函数类型
 """
 
 ChannelType = Dict[

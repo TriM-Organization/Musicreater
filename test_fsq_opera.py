@@ -31,7 +31,7 @@ with open("test.fsq", "rb") as f:
     pprint(metas := load_decode_musicsequence_metainfo(f))
     pprint("流式 FSQ 音符序列：")
     cnt = 0
-    for i in load_decode_fsq_flush_release(f, metas[-1], metas[-2]):
+    for i in load_decode_fsq_flush_release(f, metas[-2], metas[-3], metas[-1]):
         pprint(
             i,
         )
