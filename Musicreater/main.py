@@ -1671,6 +1671,9 @@ class MidiConvert(MusicSequence):
         self.music_command_list = [j for i in command_dict.values() for j in i]
         return command_dict, notes_list[-1].start_tick, max_multi
 
+    def to_blockflow_construct(self):
+        pass
+
     def copy_important(self):
         dst = MidiConvert(
             name_of_music=self.music_name,
