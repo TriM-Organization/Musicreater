@@ -22,8 +22,8 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.3.2"
-__vername__ = "支持神羽资源包"
+__version__ = "2.4.0"
+__vername__ = "全景声支持、音量调节修复"
 __author__ = (
     ("金羿", "Eilles"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -42,7 +42,11 @@ __all__ = [
     "ProgressBarStyle",
     # "TimeStamp", 未来功能
     # 默认值
+    "MIDI_PROGRAM",
+    "MIDI_VOLUME",
+    "MIDI_PAN",
     "MIDI_DEFAULT_PROGRAM_VALUE",
+    "MIDI_DEFAULT_VOLUME_VALUE",
     "DEFAULT_PROGRESSBAR_STYLE",
     "MM_INSTRUMENT_RANGE_TABLE",
     "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
@@ -56,6 +60,8 @@ __all__ = [
     # 操作性函数
     "natural_curve",
     "straight_line",
+    "panning_2_rotation_linear",
+    "panning_2_rotation_trigonometric",
     "load_decode_musicsequence_metainfo",
     "load_decode_msq_flush_release",
     "load_decode_fsq_flush_release",

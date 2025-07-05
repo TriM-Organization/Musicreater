@@ -27,6 +27,8 @@ from .main import (
     MidiConvert,
     mido,
 )
+
+from .constants import MIDI_PAN, MIDI_PROGRAM, MIDI_VOLUME
 from .subclass import *
 from .types import ChannelType, FittingFunctionType
 from .utils import *
@@ -36,16 +38,19 @@ class FutureMidiConvertKamiRES(MidiConvert):
     """
     神羽资源包之测试支持
     """
+
     @staticmethod
     def to_music_note_channels(
         midi: mido.MidiFile,
         ignore_mismatch_error: bool = True,
         speed: float = 1.0,
         default_program_value: int = -1,
+        default_volume_value: int = 64,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         vol_processing_function: FittingFunctionType = natural_curve,
+        pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
         """
@@ -59,6 +64,8 @@ class FutureMidiConvertKamiRES(MidiConvert):
             音乐播放速度倍数
         default_program_value: int
             默认的 MIDI 乐器值
+        default_volume_value: int
+            默认的通道音量值
         default_tempo_value: int
             默认的 MIDI TEMPO 值
         pitched_note_rtable: Dict[int, Tuple[str, int]]
@@ -66,7 +73,9 @@ class FutureMidiConvertKamiRES(MidiConvert):
         percussion_note_rtable: Dict[int, Tuple[str, int]]
             打击乐器Midi-MC对照表
         vol_processing_function: Callable[[float], float]
-            声像偏移拟合函数
+            音量对播放距离的拟合函数
+        pan_processing_function: Callable[[float], float]
+            声像偏移对播放旋转角度的拟合函数
         note_rtable_replacement: Dict[str, str]
             音符名称替换表，此表用于对 Minecraft 乐器名称进行替换，而非 Midi Program 的替换
 
@@ -81,9 +90,15 @@ class FutureMidiConvertKamiRES(MidiConvert):
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
-        channel_program: Dict[int, int] = empty_midi_channels(
-            default_staff=default_program_value
+
+        channel_controler: Dict[int, Dict[str, int]] = empty_midi_channels(
+            default_staff={
+                MIDI_PROGRAM: default_program_value,
+                MIDI_VOLUME: default_volume_value,
+                MIDI_PAN: 64,
+            }
         )
+
         tempo = default_tempo_value
         note_count = 0
         note_count_per_instrument: Dict[str, int] = {}
@@ -118,76 +133,84 @@ class FutureMidiConvertKamiRES(MidiConvert):
             # 简化
             if msg.type == "set_tempo":
                 tempo = msg.tempo
-            else:
-                if msg.type == "program_change":
-                    channel_program[msg.channel] = msg.program
+            elif msg.type == "program_change":
+                channel_controler[msg.channel][MIDI_PROGRAM] = msg.program
 
-                elif msg.type == "note_on" and msg.velocity != 0:
-                    note_queue_A[msg.channel].append(
-                        (msg.note, channel_program[msg.channel])
+            elif msg.is_cc(7):
+                channel_controler[msg.channel][MIDI_VOLUME] = msg.value
+            elif msg.is_cc(10):
+                channel_controler[msg.channel][MIDI_PAN] = msg.value
+
+            elif msg.type == "note_on" and msg.velocity != 0:
+                note_queue_A[msg.channel].append(
+                    (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
+                )
+                note_queue_B[msg.channel].append((msg.velocity, microseconds))
+
+            elif (msg.type == "note_off") or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                if (
+                    msg.note,
+                    channel_controler[msg.channel][MIDI_PROGRAM],
+                ) in note_queue_A[msg.channel]:
+                    _velocity, _ms = note_queue_B[msg.channel][
+                        note_queue_A[msg.channel].index(
+                            (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
+                        )
+                    ]
+                    note_queue_A[msg.channel].remove(
+                        (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
                     )
-                    note_queue_B[msg.channel].append((msg.velocity, microseconds))
+                    note_queue_B[msg.channel].remove((_velocity, _ms))
 
-                elif (msg.type == "note_off") or (
-                    msg.type == "note_on" and msg.velocity == 0
-                ):
-                    if (msg.note, channel_program[msg.channel]) in note_queue_A[
-                        msg.channel
-                    ]:
-                        _velocity, _ms = note_queue_B[msg.channel][
-                            note_queue_A[msg.channel].index(
-                                (msg.note, channel_program[msg.channel])
-                            )
-                        ]
-                        note_queue_A[msg.channel].remove(
-                            (msg.note, channel_program[msg.channel])
+                    midi_channels[msg.channel].append(
+                        that_note := midi_msgs_to_minenote_using_kami_respack(
+                            inst_=(
+                                msg.note
+                                if msg.channel == 9
+                                else channel_controler[msg.channel][MIDI_PROGRAM]
+                            ),
+                            note_=(
+                                channel_controler[msg.channel][MIDI_PROGRAM]
+                                if msg.channel == 9
+                                else msg.note
+                            ),
+                            percussive_=(msg.channel == 9),
+                            volume_=channel_controler[msg.channel][MIDI_VOLUME],
+                            velocity_=_velocity,
+                            panning_=channel_controler[msg.channel][MIDI_PAN],
+                            start_time_=_ms,  # 微秒
+                            duration_=microseconds - _ms,  # 微秒
+                            play_speed=speed,
+                            midi_reference_table=(
+                                percussion_note_rtable
+                                if msg.channel == 9
+                                else pitched_note_rtable
+                            ),
+                            volume_processing_method_=vol_processing_function,
+                            panning_processing_method_=pan_processing_function,
+                            note_table_replacement=note_rtable_replacement,
                         )
-                        note_queue_B[msg.channel].remove((_velocity, _ms))
-
-                        midi_channels[msg.channel].append(
-                            that_note := midi_msgs_to_minenote_using_kami_respack(
-                                inst_=(
-                                    msg.note
-                                    if msg.channel == 9
-                                    else channel_program[msg.channel]
-                                ),
-                                note_=(
-                                    channel_program[msg.channel]
-                                    if msg.channel == 9
-                                    else msg.note
-                                ),
-                                percussive_=(msg.channel == 9),
-                                velocity_=_velocity,
-                                start_time_=_ms,  # 微秒
-                                duration_=microseconds - _ms,  # 微秒
-                                play_speed=speed,
-                                midi_reference_table=(
-                                    percussion_note_rtable
-                                    if msg.channel == 9
-                                    else pitched_note_rtable
-                                ),
-                                volume_processing_method_=vol_processing_function,
-                                note_table_replacement=note_rtable_replacement,
-                            )
-                        )
-                        note_count += 1
-                        if that_note.sound_name in note_count_per_instrument.keys():
-                            note_count_per_instrument[that_note.sound_name] += 1
-                        else:
-                            note_count_per_instrument[that_note.sound_name] = 1
+                    )
+                    note_count += 1
+                    if that_note.sound_name in note_count_per_instrument.keys():
+                        note_count_per_instrument[that_note.sound_name] += 1
                     else:
-                        if ignore_mismatch_error:
-                            print(
-                                "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
-                                    msg
-                                )
+                        note_count_per_instrument[that_note.sound_name] = 1
+                else:
+                    if ignore_mismatch_error:
+                        print(
+                            "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                msg
                             )
-                        else:
-                            raise NoteOnOffMismatchError(
-                                "当前的MIDI很可能有损坏之嫌……",
-                                msg,
-                                "无法在上文中找到与之匹配的音符开音消息。",
-                            )
+                        )
+                    else:
+                        raise NoteOnOffMismatchError(
+                            "当前的MIDI很可能有损坏之嫌……",
+                            msg,
+                            "无法在上文中找到与之匹配的音符开音消息。",
+                        )
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -213,7 +236,6 @@ class FutureMidiConvertKamiRES(MidiConvert):
             note_count,
             note_count_per_instrument,
         )
-
 
     def to_command_list_in_score(
         self,
@@ -360,7 +382,6 @@ class FutureMidiConvertKamiRES(MidiConvert):
             delaytime_previous = note.start_tick
 
         return self.music_command_list, notes_list[-1].start_tick, max_multi + 1
-
 
 
 class FutureMidiConvertJavaE(MidiConvert):

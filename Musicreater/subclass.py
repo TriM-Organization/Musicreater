@@ -16,9 +16,9 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-
+from math import sin, cos, asin, radians, degrees, sqrt, atan
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple, Union
+from typing import Optional, Any, List, Tuple, Union, Dict
 
 from .constants import MC_PITCHED_INSTRUMENT_LIST
 
@@ -34,7 +34,7 @@ class MineNote:
     """midi音高"""
 
     velocity: int
-    """响度(力度)"""
+    """力度"""
 
     start_tick: int
     """开始之时 命令刻"""
@@ -48,8 +48,11 @@ class MineNote:
     percussive: bool
     """是否作为打击乐器启用"""
 
-    position_displacement: Tuple[float, float, float]
-    """声像位移"""
+    sound_distance: float
+    """声源距离"""
+
+    sound_azimuth: Tuple[float, float]
+    """声源方位"""
 
     extra_info: Any
     """你觉得放什么好？"""
@@ -63,19 +66,26 @@ class MineNote:
         last_time: int,
         mass_precision_time: int = 0,
         is_percussion: Optional[bool] = None,
-        displacement: Optional[Tuple[float, float, float]] = None,
-        extra_information: Optional[Any] = None,
+        distance: Optional[float] = None,
+        azimuth: Optional[Tuple[float, float]] = None,
+        extra_information: Optional[Dict[str, Any]] = None,
     ):
         """用于存储单个音符的类
+
         :param mc_sound_name:`str` 《我的世界》声音ID
         :param midi_pitch:`int` midi音高
         :param midi_velocity:`int` midi响度(力度)
         :param start_time:`int` 开始之时(命令刻)
-            注：此处的时间是用从乐曲开始到当前的毫秒数
+            注：此处的时间是用从乐曲开始到当前的刻数
         :param last_time:`int` 音符延续时间(命令刻)
         :param mass_precision_time:`int` 高精度的开始时间偏移量(1/1250秒)
         :param is_percussion:`bool` 是否作为打击乐器
-        :param displacement:`tuple[int,int,int]` 声像位移
+        :param distance: `float` 发声源距离玩家的距离（半径 `r`）
+            注：距离越近，音量越高，默认为 0。此参数可以与音量成某种函数关系。
+        :param azimuth:`tuple[float, float]` 声源方位
+            注：此参数为tuple，包含两个元素，分别表示：
+            `rV`  发声源在竖直（上下）轴上，从玩家视角正前方开始，向顺时针旋转的角度
+            `rH`  发声源在水平（左右）轴上，从玩家视角正前方开始，向上（到达玩家正上方顶点后变为向下，以此类推的旋转）旋转的角度
         :param extra_information:`Any` 附加信息"""
         self.sound_name: str = mc_sound_name
         """乐器ID"""
@@ -97,12 +107,84 @@ class MineNote:
         )
         """是否为打击乐器"""
 
-        self.position_displacement = (
-            (0, 0, 0) if (displacement is None) else displacement
+        self.sound_distance = (
+            (16 if distance > 16 else (distance if distance > 0 else 0))
+            if distance
+            else 0
         )
-        """声像位移"""
+        """声源距离"""
+
+        self.sound_azimuth = (azimuth[0] % 360, azimuth[1] % 360) if azimuth else (0, 0)
+        """声源方位"""
 
         self.extra_info = extra_information
+
+    @classmethod
+    def from_traditional(
+        cls,
+        mc_sound_name: str,
+        midi_pitch: Optional[int],
+        midi_velocity: int,
+        start_time: int,
+        last_time: int,
+        mass_precision_time: int = 0,
+        is_percussion: Optional[bool] = None,
+        displacement: Optional[Tuple[float, float, float]] = None,
+        extra_information: Optional[Any] = None,
+    ):
+        """用于存储单个音符的类
+        :param mc_sound_name:`str` 《我的世界》声音ID
+        :param midi_pitch:`int` midi音高
+        :param midi_velocity:`int` midi响度(力度)
+        :param start_time:`int` 开始之时(命令刻)
+            注：此处的时间是用从乐曲开始到当前的刻数
+        :param last_time:`int` 音符延续时间(命令刻)
+        :param mass_precision_time:`int` 高精度的开始时间偏移量(1/1250秒)
+        :param is_percussion:`bool` 是否作为打击乐器
+        :param displacement:`tuple[float,float,float]` 声像位移
+        :param extra_information:`Any` 附加信息"""
+
+        if displacement is None:
+            displacement = (0, 0, 0)
+            r = 0
+            alpha_v = 0
+            beta_h = 0
+        else:
+            r = sqrt(displacement[0] ** 2 + displacement[1] ** 2 + displacement[2] ** 2)
+            if r == 0:
+                alpha_v = 0
+                beta_h = 0
+            else:
+                beta_h = round(degrees(asin(displacement[1] / r)), 8)
+                if displacement[2] == 0:
+                    alpha_v = -90 if displacement[0] > 0 else 90
+                else:
+                    alpha_v = round(
+                        degrees(atan(-displacement[0] / displacement[2])), 8
+                    )
+
+        return cls(
+            mc_sound_name=mc_sound_name,
+            midi_pitch=midi_pitch,
+            midi_velocity=midi_velocity,
+            start_time=start_time,
+            last_time=last_time,
+            mass_precision_time=mass_precision_time,
+            is_percussion=is_percussion,
+            distance=r,
+            azimuth=(alpha_v, beta_h),
+            extra_information=extra_information,
+        )
+
+    @property
+    def position_displacement(self) -> Tuple[float, float, float]:
+        """声像位移"""
+        dk1 = self.sound_distance * round(cos(radians(self.sound_azimuth[1])), 8)
+        return (
+            -dk1 * round(sin(radians(self.sound_azimuth[0])), 8),
+            self.sound_distance * round(sin(radians(self.sound_azimuth[1])), 8),
+            dk1 * round(cos(radians(self.sound_azimuth[0])), 8),
+        )
 
     @classmethod
     def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
@@ -115,39 +197,25 @@ class MineNote:
         sound_name_length = group_1 >> 7
 
         if code_buffer[6] & 0b1:
-            position_displacement_ = (
-                int.from_bytes(
-                    (
-                        code_buffer[8 + sound_name_length : 10 + sound_name_length]
-                        if is_high_time_precision
-                        else code_buffer[7 + sound_name_length : 9 + sound_name_length]
-                    ),
-                    "big",
-                )
-                / 1000,
-                int.from_bytes(
-                    (
-                        code_buffer[10 + sound_name_length : 12 + sound_name_length]
-                        if is_high_time_precision
-                        else code_buffer[9 + sound_name_length : 11 + sound_name_length]
-                    ),
-                    "big",
-                )
-                / 1000,
-                int.from_bytes(
-                    (
-                        code_buffer[12 + sound_name_length : 14 + sound_name_length]
-                        if is_high_time_precision
-                        else code_buffer[
-                            11 + sound_name_length : 13 + sound_name_length
-                        ]
-                    ),
-                    "big",
-                )
-                / 1000,
+            distance_ = (
+                code_buffer[8 + sound_name_length]
+                if is_high_time_precision
+                else code_buffer[7 + sound_name_length]
+            ) / 15
+
+            group_2 = int.from_bytes(
+                (
+                    code_buffer[9 + sound_name_length : 14 + sound_name_length]
+                    if is_high_time_precision
+                    else code_buffer[8 + sound_name_length : 13 + sound_name_length]
+                ),
+                "big",
             )
+            azimuth_ = ((group_2 >> 20) / 2912, (group_2 & 0xFFFFF) / 2912)
+
         else:
-            position_displacement_ = (0, 0, 0)
+            distance_ = 0
+            azimuth_ = (0, 0)
 
         try:
             return cls(
@@ -164,7 +232,8 @@ class MineNote:
                 last_time=duration_,
                 mass_precision_time=code_buffer[7] if is_high_time_precision else 0,
                 is_percussion=percussive_,
-                displacement=position_displacement_,
+                distance=distance_,
+                azimuth=azimuth_,
             )
         except:
             print(code_buffer, "\n", o)
@@ -181,6 +250,8 @@ class MineNote:
 
         :return bytes 打包好的字节码
         """
+
+        # MineNote 的字节码共有三个顺次版本分别如下
 
         # 字符串长度 6 位 支持到 63
         # note_pitch 7 位 支持到 127
@@ -202,8 +273,12 @@ class MineNote:
         # 第一版编码： UTF-8
         # 第二版编码： GB18030
         # +++
+        # （在第三版中已废弃）
         # position_displacement 每个元素长 16 位 合 2 字节
         # 共 48 位 合 6 字节 支持存储三位小数和两位整数，其值必须在 [0, 65.535] 之间
+        # （在第三版中新增）
+        # sound_distance 8 位 支持到 255 即 16 格 合 1 字节（按值放大 15 倍存储，精度可达 1 / 15）
+        # sound_azimuth 每个元素长 20 位 共 40 位 合 5 字节。每个值放大 2912 倍存储，即支持到 360.08756868131866 度，精度同理
 
         return (
             (
@@ -245,9 +320,11 @@ class MineNote:
             + r
             + (
                 (
-                    round(self.position_displacement[0] * 1000).to_bytes(2, "big")
-                    + round(self.position_displacement[1] * 1000).to_bytes(2, "big")
-                    + round(self.position_displacement[2] * 1000).to_bytes(2, "big")
+                    round(self.sound_distance * 15).to_bytes(1, "big")
+                    + (
+                        (round(self.sound_azimuth[0] * 2912) << 20)
+                        + round(self.sound_azimuth[1] * 2912)
+                    ).to_bytes(5, "big")
                 )
                 if is_displacement_included
                 else b""
@@ -258,24 +335,32 @@ class MineNote:
         """设置附加信息"""
         self.extra_info = sth
 
-    def __str__(self, is_displacement: bool = False):
-        return "{}Note(Instrument = {}, {}Velocity = {}, StartTick = {}, Duration = {}{}{})".format(
-            "Percussive" if self.percussive else "",
-            self.sound_name,
-            "" if self.percussive else "NotePitch = {}, ".format(self.note_pitch),
-            self.velocity,
-            self.start_tick,
-            self.duration,
-            (
-                ", PositionDisplacement = {}".format(self.position_displacement)
-                if is_displacement
+    def stringize(
+        self, include_displacement: bool = False, include_extra_data: bool = False
+    ) -> str:
+        return (
+            "{}Note(Instrument = {}, {}Velocity = {}, StartTick = {}, Duration = {}{}".format(
+                "Percussive" if self.percussive else "",
+                self.sound_name,
+                "" if self.percussive else "NotePitch = {}, ".format(self.note_pitch),
+                self.velocity,
+                self.start_tick,
+                self.duration,
+            )
+            + (
+                ", SoundDistance = `r`{}, SoundAzimuth = (`αV`{}, `βH`{})".format(
+                    self.sound_distance, *self.sound_azimuth
+                )
+                if include_displacement
                 else ""
-            ),
+            )
+            + (", ExtraData = {}".format(self.extra_info) if include_extra_data else "")
+            + ")"
         )
 
     def tuplize(self, is_displacement: bool = False):
         tuplized = self.__tuple__()
-        return tuplized[:-2] + ((tuplized[-1],) if is_displacement else ())
+        return tuplized[:-2] + (tuplized[-2:] if is_displacement else ())
 
     def __list__(self) -> List:
         return (
@@ -285,7 +370,8 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.position_displacement,
+                self.sound_distance,
+                self.sound_azimuth,
             ]
             if self.percussive
             else [
@@ -295,15 +381,16 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.position_displacement,
+                self.sound_distance,
+                self.sound_azimuth,
             ]
         )
 
     def __tuple__(
         self,
     ) -> Union[
-        Tuple[bool, str, int, int, int, int, Tuple[float, float, float]],
-        Tuple[bool, str, int, int, int, Tuple[float, float, float]],
+        Tuple[bool, str, int, int, int, int, float, Tuple[float, float]],
+        Tuple[bool, str, int, int, int, float, Tuple[float, float]],
     ]:
         return (
             (
@@ -312,7 +399,8 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.position_displacement,
+                self.sound_distance,
+                self.sound_azimuth,
             )
             if self.percussive
             else (
@@ -322,7 +410,8 @@ class MineNote:
                 self.velocity,
                 self.start_tick,
                 self.duration,
-                self.position_displacement,
+                self.sound_distance,
+                self.sound_azimuth,
             )
         )
 
@@ -334,7 +423,9 @@ class MineNote:
                 "Velocity": self.velocity,
                 "StartTick": self.start_tick,
                 "Duration": self.duration,
-                "PositionDisplacement": self.position_displacement,
+                "SoundDistance": self.sound_distance,
+                "SoundAzimuth": self.sound_azimuth,
+                "ExtraData": self.extra_info,
             }
             if self.percussive
             else {
@@ -344,7 +435,9 @@ class MineNote:
                 "Velocity": self.velocity,
                 "StartTick": self.start_tick,
                 "Duration": self.duration,
-                "PositionDisplacement": self.position_displacement,
+                "SoundDistance": self.sound_distance,
+                "SoundAzimuth": self.sound_azimuth,
+                "ExtraData": self.extra_info,
             }
         )
 

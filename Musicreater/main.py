@@ -164,11 +164,13 @@ class MusicSequence:
         mismatch_error_ignorance: bool = True,
         speed_multiplier: float = 1,
         default_midi_program: int = MIDI_DEFAULT_PROGRAM_VALUE,
+        default_midi_volume: int = MIDI_DEFAULT_VOLUME_VALUE,
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         minimum_vol: float = 0.1,
         volume_processing_function: FittingFunctionType = natural_curve,
+        panning_processing_function: FittingFunctionType = panning_2_rotation_linear,
         deviation: float = 0,
         note_referance_table_replacement: Dict[str, str] = {},
     ):
@@ -177,7 +179,7 @@ class MusicSequence:
 
         Paramaters
         ==========
-        mido_file: mido.MidiFile 对象
+        mido_file: mido.MidiFile
             需要处理的midi对象
         midi_music_name: str
             音乐名称
@@ -186,7 +188,9 @@ class MusicSequence:
         speed_multiplier: float
             音乐播放速度倍数
         default_midi_program: int
-            默认的MIDI Program值
+            默认的 MIDI Program值
+        default_midi_volume: int
+            默认的 MIDI 音量
         default_tempo: int
             默认的MIDI TEMPO值
         pitched_note_referance_table: Dict[int, Tuple[str, int]]
@@ -196,7 +200,9 @@ class MusicSequence:
         minimum_vol: float
             播放的最小音量 应为 (0,1] 范围内的小数
         volume_processing_function: Callable[[float], float]
-            声像偏移拟合函数
+            音量对播放距离的拟合函数
+        panning_processing_function: Callable[[float], float]
+            声像偏移对播放旋转角度的拟合函数
         deviation: float
             全曲音调偏移值
         note_referance_table_replacement: Dict[str, str]
@@ -210,13 +216,15 @@ class MusicSequence:
                 inst_note_count,
             ) = cls.to_music_note_channels(
                 midi=mido_file,
+                ignore_mismatch_error=mismatch_error_ignorance,
                 speed=speed_multiplier,
+                default_program_value=default_midi_program,
+                default_volume_value=default_midi_volume,
+                default_tempo_value=default_tempo,
                 pitched_note_rtable=pitched_note_referance_table,
                 percussion_note_rtable=percussion_note_referance_table,
-                default_program_value=default_midi_program,
-                default_tempo_value=default_tempo,
                 vol_processing_function=volume_processing_function,
-                ignore_mismatch_error=mismatch_error_ignorance,
+                pan_processing_function=panning_processing_function,
                 note_rtable_replacement=note_referance_table_replacement,
             )
         else:
@@ -239,7 +247,7 @@ class MusicSequence:
         verify: bool = True,
     ):
         """
-        从字节码导入音乐序列，目前支持 MSQ 第二、三版和 FSQ 第一版。
+        从字节码导入音乐序列，目前支持 MSQ 第二、三、四版和 FSQ 第一、二版。
 
         Paramaters
         ==========
@@ -250,7 +258,9 @@ class MusicSequence:
 
         """
 
-        if bytes_buffer_in[:4] == b"MSQ!":
+        if bytes_buffer_in[:4] in (b"MSQ!", b"MSQ$"):
+
+            note_format_v3 = bytes_buffer_in[0] == b"MSQ$"
 
             group_1 = int.from_bytes(bytes_buffer_in[4:6], "big", signed=False)
             group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
@@ -287,6 +297,11 @@ class MusicSequence:
                         channels_[channel_index].append(
                             MineNote.decode(
                                 code_buffer=bytes_buffer_in[stt_index:end_index],
+                                is_high_time_precision=high_quantity,
+                            )
+                            if note_format_v3
+                            else decode_note_bytes_v2(
+                                bytes_buffer_in[stt_index:end_index],
                                 is_high_time_precision=high_quantity,
                             )
                         )
@@ -371,7 +386,9 @@ class MusicSequence:
                 ),
             )
 
-        elif bytes_buffer_in[:4] == b"FSQ!":
+        elif bytes_buffer_in[:4] in (b"FSQ!", b"FSQ$"):
+
+            note_format_v3 = bytes_buffer_in[:4] == b"FSQ$"
 
             group_1 = int.from_bytes(bytes_buffer_in[4:6], "big", signed=False)
             group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
@@ -436,9 +453,16 @@ class MusicSequence:
                         + high_quantity
                         + (bytes_buffer_in[stt_index] >> 2)
                     )
-                    _read_note = MineNote.decode(
-                        code_buffer=bytes_buffer_in[stt_index:end_index],
-                        is_high_time_precision=high_quantity,
+                    _read_note = (
+                        MineNote.decode(
+                            code_buffer=bytes_buffer_in[stt_index:end_index],
+                            is_high_time_precision=high_quantity,
+                        )
+                        if note_format_v3
+                        else decode_note_bytes_v2(
+                            code_buffer_bytes=bytes_buffer_in[stt_index:end_index],
+                            is_high_time_precision=high_quantity,
+                        )
                     )
                     stt_index = end_index
                 except Exception as _err:
@@ -515,8 +539,8 @@ class MusicSequence:
                             + (bytes_buffer_in[stt_index] >> 2)
                         )
                         channels_[channel_index].append(
-                            MineNote.decode(
-                                code_buffer=bytes_buffer_in[stt_index:end_index],
+                            decode_note_bytes_v2(
+                                code_buffer_bytes=bytes_buffer_in[stt_index:end_index],
                                 is_high_time_precision=high_quantity,
                             )
                         )
@@ -553,7 +577,7 @@ class MusicSequence:
                     try:
                         end_index = stt_index + 14 + (bytes_buffer_in[stt_index] >> 2)
                         channels_[channel_index].append(
-                            MineNote.decode(bytes_buffer_in[stt_index:end_index])
+                            decode_note_bytes_v1(bytes_buffer_in[stt_index:end_index])
                         )
                         stt_index = end_index
                     except:
@@ -631,8 +655,12 @@ class MusicSequence:
         # （已废弃）
         # 第二版 MSQ 的码头： MSQ@  字串编码： GB18030
 
+        #
         # 第三版 MSQ 的码头： MSQ!  字串编码： GB18030  大端字节序
         # 第一版 FSQ 的码头： FSQ!
+        # 第四版 MSQ 和 第二版 FSQ 的码头分别为 MSQ$ 和 FSQ$
+        # 其序列存储格式与第三版一致，但在每个音频的识别上做了调整
+        # 音频内容的调整见 subclass.py
 
         # 音乐名称长度 6 位 支持到 63
         # 最小音量 minimum_volume 10 位 最大支持 1023 即三位小数
@@ -786,11 +814,13 @@ class MusicSequence:
         midi: mido.MidiFile,
         ignore_mismatch_error: bool = True,
         speed: float = 1.0,
-        default_program_value: int = -1,
+        default_program_value: int = MIDI_DEFAULT_PROGRAM_VALUE,
+        default_volume_value: int = MIDI_DEFAULT_VOLUME_VALUE,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         vol_processing_function: FittingFunctionType = natural_curve,
+        pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
         """
@@ -804,6 +834,8 @@ class MusicSequence:
             音乐播放速度倍数
         default_program_value: int
             默认的 MIDI 乐器值
+        default_volume_value: int
+            默认的通道音量值
         default_tempo_value: int
             默认的 MIDI TEMPO 值
         pitched_note_rtable: Dict[int, Tuple[str, int]]
@@ -811,7 +843,9 @@ class MusicSequence:
         percussion_note_rtable: Dict[int, Tuple[str, int]]
             打击乐器Midi-MC对照表
         vol_processing_function: Callable[[float], float]
-            声像偏移拟合函数
+            音量对播放距离的拟合函数
+        pan_processing_function: Callable[[float], float]
+            声像偏移对播放旋转角度的拟合函数
         note_rtable_replacement: Dict[str, str]
             音符名称替换表，此表用于对 Minecraft 乐器名称进行替换，而非 Midi Program 的替换
 
@@ -826,9 +860,15 @@ class MusicSequence:
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
-        channel_program: Dict[int, int] = empty_midi_channels(
-            default_staff=default_program_value
+
+        channel_controler: Dict[int, Dict[str, int]] = empty_midi_channels(
+            default_staff={
+                MIDI_PROGRAM: default_program_value,
+                MIDI_VOLUME: default_volume_value,
+                MIDI_PAN: 64,
+            }
         )
+
         tempo = default_tempo_value
         note_count = 0
         note_count_per_instrument: Dict[str, int] = {}
@@ -863,76 +903,84 @@ class MusicSequence:
             # 简化
             if msg.type == "set_tempo":
                 tempo = msg.tempo
-            else:
-                if msg.type == "program_change":
-                    channel_program[msg.channel] = msg.program
+            elif msg.type == "program_change":
+                channel_controler[msg.channel][MIDI_PROGRAM] = msg.program
 
-                elif msg.type == "note_on" and msg.velocity != 0:
-                    note_queue_A[msg.channel].append(
-                        (msg.note, channel_program[msg.channel])
+            elif msg.is_cc(7):
+                channel_controler[msg.channel][MIDI_VOLUME] = msg.value
+            elif msg.is_cc(10):
+                channel_controler[msg.channel][MIDI_PAN] = msg.value
+
+            elif msg.type == "note_on" and msg.velocity != 0:
+                note_queue_A[msg.channel].append(
+                    (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
+                )
+                note_queue_B[msg.channel].append((msg.velocity, microseconds))
+
+            elif (msg.type == "note_off") or (
+                msg.type == "note_on" and msg.velocity == 0
+            ):
+                if (
+                    msg.note,
+                    channel_controler[msg.channel][MIDI_PROGRAM],
+                ) in note_queue_A[msg.channel]:
+                    _velocity, _ms = note_queue_B[msg.channel][
+                        note_queue_A[msg.channel].index(
+                            (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
+                        )
+                    ]
+                    note_queue_A[msg.channel].remove(
+                        (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
                     )
-                    note_queue_B[msg.channel].append((msg.velocity, microseconds))
+                    note_queue_B[msg.channel].remove((_velocity, _ms))
 
-                elif (msg.type == "note_off") or (
-                    msg.type == "note_on" and msg.velocity == 0
-                ):
-                    if (msg.note, channel_program[msg.channel]) in note_queue_A[
-                        msg.channel
-                    ]:
-                        _velocity, _ms = note_queue_B[msg.channel][
-                            note_queue_A[msg.channel].index(
-                                (msg.note, channel_program[msg.channel])
-                            )
-                        ]
-                        note_queue_A[msg.channel].remove(
-                            (msg.note, channel_program[msg.channel])
+                    midi_channels[msg.channel].append(
+                        that_note := midi_msgs_to_minenote(
+                            inst_=(
+                                msg.note
+                                if msg.channel == 9
+                                else channel_controler[msg.channel][MIDI_PROGRAM]
+                            ),
+                            note_=(
+                                channel_controler[msg.channel][MIDI_PROGRAM]
+                                if msg.channel == 9
+                                else msg.note
+                            ),
+                            percussive_=(msg.channel == 9),
+                            volume_=channel_controler[msg.channel][MIDI_VOLUME],
+                            velocity_=_velocity,
+                            panning_=channel_controler[msg.channel][MIDI_PAN],
+                            start_time_=_ms,  # 微秒
+                            duration_=microseconds - _ms,  # 微秒
+                            play_speed=speed,
+                            midi_reference_table=(
+                                percussion_note_rtable
+                                if msg.channel == 9
+                                else pitched_note_rtable
+                            ),
+                            volume_processing_method_=vol_processing_function,
+                            panning_processing_method_=pan_processing_function,
+                            note_table_replacement=note_rtable_replacement,
                         )
-                        note_queue_B[msg.channel].remove((_velocity, _ms))
-
-                        midi_channels[msg.channel].append(
-                            that_note := midi_msgs_to_minenote(
-                                inst_=(
-                                    msg.note
-                                    if msg.channel == 9
-                                    else channel_program[msg.channel]
-                                ),
-                                note_=(
-                                    channel_program[msg.channel]
-                                    if msg.channel == 9
-                                    else msg.note
-                                ),
-                                velocity_=_velocity,
-                                start_time_=_ms,  # 微秒
-                                duration_=microseconds - _ms,  # 微秒
-                                percussive_=(msg.channel == 9),
-                                play_speed=speed,
-                                midi_reference_table=(
-                                    percussion_note_rtable
-                                    if msg.channel == 9
-                                    else pitched_note_rtable
-                                ),
-                                volume_processing_method_=vol_processing_function,
-                                note_table_replacement=note_rtable_replacement,
-                            )
-                        )
-                        note_count += 1
-                        if that_note.sound_name in note_count_per_instrument.keys():
-                            note_count_per_instrument[that_note.sound_name] += 1
-                        else:
-                            note_count_per_instrument[that_note.sound_name] = 1
+                    )
+                    note_count += 1
+                    if that_note.sound_name in note_count_per_instrument.keys():
+                        note_count_per_instrument[that_note.sound_name] += 1
                     else:
-                        if ignore_mismatch_error:
-                            print(
-                                "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
-                                    msg
-                                )
+                        note_count_per_instrument[that_note.sound_name] = 1
+                else:
+                    if ignore_mismatch_error:
+                        print(
+                            "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
+                                msg
                             )
-                        else:
-                            raise NoteOnOffMismatchError(
-                                "当前的MIDI很可能有损坏之嫌……",
-                                msg,
-                                "无法在上文中找到与之匹配的音符开音消息。",
-                            )
+                        )
+                    else:
+                        raise NoteOnOffMismatchError(
+                            "当前的MIDI很可能有损坏之嫌……",
+                            msg,
+                            "无法在上文中找到与之匹配的音符开音消息。",
+                        )
 
         """整合后的音乐通道格式
         每个通道包括若干消息元素其中逃不过这三种：
@@ -985,12 +1033,14 @@ class MidiConvert(MusicSequence):
         ignore_mismatch_error: bool = True,
         playment_speed: float = 1,
         default_midi_program_value: int = MIDI_DEFAULT_PROGRAM_VALUE,
+        default_midi_volume_value: int = MIDI_DEFAULT_VOLUME_VALUE,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         enable_old_exe_format: bool = False,
         minimum_volume: float = 0.1,
         vol_processing_function: FittingFunctionType = natural_curve,
+        pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         pitch_deviation: float = 0,
         note_rtable_replacement: Dict[str, str] = {},
     ):
@@ -1009,6 +1059,8 @@ class MidiConvert(MusicSequence):
             音乐播放速度倍数
         default_midi_program_value: int
             默认的 MIDI Program 值，当 Midi 文件没有指定 Program 值时，使用此值
+        default_midi_volume_value: int
+            默认的 MIDI 音量值，当 Midi 文件没有指定此值时，使用此值
         default_tempo_value: int
             默认的 MIDI TEMPO 值，同上理
         pitched_note_rtable: Dict[int, Tuple[str, int]]
@@ -1020,7 +1072,9 @@ class MidiConvert(MusicSequence):
         minimum_volume: float
             最小播放音量
         vol_processing_function: Callable[[float], float]
-            声像偏移拟合函数
+            音量对播放距离的拟合函数
+        pan_processing_function: Callable[[float], float]
+            声像偏移对播放旋转角度的拟合函数
         pitch_deviation: float
             音调偏移量，手动指定全曲音调偏移量
         note_rtable_replacement: Dict[str, str]
@@ -1044,11 +1098,13 @@ class MidiConvert(MusicSequence):
             mismatch_error_ignorance=ignore_mismatch_error,
             speed_multiplier=playment_speed,
             default_midi_program=default_midi_program_value,
+            default_midi_volume=default_midi_volume_value,
             default_tempo=default_tempo_value,
             pitched_note_referance_table=pitched_note_rtable,
             percussion_note_referance_table=percussion_note_rtable,
             minimum_vol=minimum_volume,
             volume_processing_function=vol_processing_function,
+            panning_processing_function=pan_processing_function,
             deviation=pitch_deviation,
             note_referance_table_replacement=note_rtable_replacement,
         )
@@ -1060,12 +1116,14 @@ class MidiConvert(MusicSequence):
         mismatch_error_ignorance: bool = True,
         play_speed: float = 1,
         default_midi_program: int = MIDI_DEFAULT_PROGRAM_VALUE,
+        default_midi_volume: int = MIDI_DEFAULT_VOLUME_VALUE,
         default_tempo: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
         vol_processing_func: FittingFunctionType = natural_curve,
+        pan_processing_func: FittingFunctionType = panning_2_rotation_linear,
         music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},
     ):
@@ -1082,6 +1140,8 @@ class MidiConvert(MusicSequence):
             音乐播放速度倍数
         default_midi_program: int
             默认的 MIDI Program 值，当 Midi 文件没有指定 Program 值时，使用此值
+        default_midi_volume: int
+            默认每个通道的音量值，当 Midi 文件没有指定音量值时，使用此值
         default_tempo: int
             默认的MIDI TEMPO值
         pitched_note_table: Dict[int, Tuple[str, int]]
@@ -1093,7 +1153,9 @@ class MidiConvert(MusicSequence):
         min_volume: float
             最小播放音量
         vol_processing_func: Callable[[float], float]
-            声像偏移拟合函数
+            音量对播放距离的拟合函数
+        pan_processing_func: Callable[[float], float]
+            声像偏移对播放旋转角度的拟合函数
         music_pitch_deviation: float
             全曲音符的音调偏移量
         note_table_replacement: Dict[str, str]
@@ -1115,12 +1177,14 @@ class MidiConvert(MusicSequence):
                 ignore_mismatch_error=mismatch_error_ignorance,
                 playment_speed=play_speed,
                 default_midi_program_value=default_midi_program,
+                default_midi_volume_value=default_midi_volume,
                 default_tempo_value=default_tempo,
                 pitched_note_rtable=pitched_note_table,
                 percussion_note_rtable=percussion_note_table,
                 enable_old_exe_format=old_exe_format,
                 minimum_volume=min_volume,
                 vol_processing_function=vol_processing_func,
+                pan_processing_function=pan_processing_func,
                 pitch_deviation=music_pitch_deviation,
                 note_rtable_replacement=note_table_replacement,
             )

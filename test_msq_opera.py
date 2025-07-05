@@ -30,5 +30,5 @@ with open("test.msq", "rb") as f:
     pprint("流式 MSQ 元数据：")
     pprint(metas := load_decode_musicsequence_metainfo(f))
     pprint("流式 MSQ 音符序列：")
-    for i in load_decode_msq_flush_release(f, metas[-1], metas[-2]):
+    for i in load_decode_msq_flush_release(f, metas[-2], metas[-3], metas[-1]):
         pprint(i)

@@ -42,7 +42,7 @@ from .constants import (
 )
 from .exceptions import MusicSequenceDecodeError
 from .subclass import MineNote, mctick2timestr
-from .types import MidiInstrumentTableType, MineNoteChannelType
+from .types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
 
 
 def empty_midi_channels(
@@ -171,6 +171,47 @@ def straight_line(vol: float) -> float:
     return vol / -8 + 16
 
 
+def panning_2_rotation_linear(pan_: float) -> float:
+    """
+    Midi 左右平衡偏移值线性转为声源旋转角度
+
+    Parameters
+    ----------
+    pan_: int
+        Midi 左右平衡偏移值
+        注：此参数为int，范围从0到127，当为 64 时，声源居中
+
+    Returns
+    -------
+    float
+        声源旋转角度
+    """
+    return (pan_ - 64) * 90 / 63
+
+
+def panning_2_rotation_trigonometric(pan_: float) -> float:
+    """
+    Midi 左右平衡偏移值，依照圆的声场定位，转为声源旋转角度
+
+    Parameters
+    ----------
+    pan_: int
+        Midi 左右平衡偏移值
+        注：此参数为int，范围从0到127，当为 64 时，声源居中
+
+    Returns
+    -------
+    float
+        声源旋转角度
+    """
+    if pan_ <= 0:
+        return -90
+    elif pan_ >= 127:
+        return 90
+    else:
+        return math.degrees(math.acos((64 - pan_) / 63)) - 90
+
+
 def minenote_to_command_paramaters(
     note_: MineNote,
     pitch_deviation: float = 0,
@@ -252,12 +293,15 @@ def midi_msgs_to_minenote(
     inst_: int,  # 乐器编号
     note_: int,
     percussive_: bool,  # 是否作为打击乐器启用
+    volume_: int,
     velocity_: int,
+    panning_: int,
     start_time_: int,
     duration_: int,
     play_speed: float,
     midi_reference_table: MidiInstrumentTableType,
-    volume_processing_method_: Callable[[float], float],
+    volume_processing_method_: FittingFunctionType,
+    panning_processing_method_: FittingFunctionType,
     note_table_replacement: Dict[str, str] = {},
 ) -> MineNote:
     """
@@ -265,12 +309,15 @@ def midi_msgs_to_minenote(
     :param inst_: int 乐器编号
     :param note_: int 音高编号（音符编号）
     :param percussive_: bool 是否作为打击乐器启用
-    :param velocity_: int 力度(响度)
+    :param volume_: int 音量
+    :param velocity_: int 力度
+    :param panning_: int 声相偏移
     :param start_time_: int 音符起始时间（微秒）
     :param duration_: int 音符持续时间（微秒）
     :param play_speed: float 曲目播放速度
     :param midi_reference_table: Dict[int, str] 转换对照表
-    :param volume_proccessing_method_: Callable[[float], float] 音量处理函数
+    :param volume_processing_method_: Callable[[float], float] 音量处理函数
+    :param panning_processing_method_: Callable[[float], float] 立体声相偏移处理函数
     :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
 
     :return MineNote我的世界音符对象
@@ -281,8 +328,6 @@ def midi_msgs_to_minenote(
         "note.bd" if percussive_ else "note.flute",
     )
 
-    mc_distance_volume = volume_processing_method_(velocity_)
-
     return MineNote(
         mc_sound_name=note_table_replacement.get(mc_sound_ID, mc_sound_ID),
         midi_pitch=note_,
@@ -291,7 +336,8 @@ def midi_msgs_to_minenote(
         last_time=round(duration_ / float(play_speed) / 50000),
         mass_precision_time=round((start_time_ / float(play_speed) - tk * 50000) / 800),
         is_percussion=percussive_,
-        displacement=(0, mc_distance_volume, 0),
+        distance=volume_processing_method_(volume_),
+        azimuth=(panning_processing_method_(panning_), 0),
     )
 
 
@@ -299,12 +345,15 @@ def midi_msgs_to_minenote_using_kami_respack(
     inst_: int,  # 乐器编号
     note_: int,
     percussive_: bool,  # 是否作为打击乐器启用
+    volume_: int,
     velocity_: int,
+    panning_: int,
     start_time_: int,
     duration_: int,
     play_speed: float,
     midi_reference_table: MidiInstrumentTableType,
     volume_processing_method_: Callable[[float], float],
+    panning_processing_method_: FittingFunctionType,
     note_table_replacement: Dict[str, str] = {},
 ) -> MineNote:
     """
@@ -312,12 +361,15 @@ def midi_msgs_to_minenote_using_kami_respack(
     :param inst_: int 乐器编号
     :param note_: int 音高编号（音符编号）
     :param percussive_: bool 是否作为打击乐器启用
-    :param velocity_: int 力度(响度)
+    :param volume_: int 音量
+    :param velocity_: int 力度
+    :param panning_: int 声相偏移
     :param start_time_: int 音符起始时间（微秒）
     :param duration_: int 音符持续时间（微秒）
     :param play_speed: float 曲目播放速度
     :param midi_reference_table: Dict[int, str] 转换对照表
-    :param volume_proccessing_method_: Callable[[float], float] 音量处理函数
+    :param volume_processing_method_: Callable[[float], float] 音量处理函数
+    :param panning_processing_method_: Callable[[float], float] 立体声相偏移处理函数
     :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
 
     :return MineNote我的世界音符对象
@@ -327,7 +379,9 @@ def midi_msgs_to_minenote_using_kami_respack(
     if not percussive_ and (0 <= inst_ <= 119):
         mc_sound_ID = "{}{}.{}".format(
             # inst_, "d" if duration_ < 500_000 else "c", note_
-            inst_, "d", note_
+            inst_,
+            "d",
+            note_,
         )
     elif percussive_ and (27 <= inst_ <= 87):
         mc_sound_ID = "-1d.{}".format(inst_)
@@ -339,8 +393,6 @@ def midi_msgs_to_minenote_using_kami_respack(
             "note.bd" if percussive_ else "note.flute",
         )
 
-    mc_distance_volume = volume_processing_method_(velocity_)
-
     return MineNote(
         mc_sound_name=note_table_replacement.get(mc_sound_ID, mc_sound_ID),
         midi_pitch=note_ if using_original else 1,
@@ -349,11 +401,14 @@ def midi_msgs_to_minenote_using_kami_respack(
         last_time=round(duration_ / float(play_speed) / 50000),
         mass_precision_time=round((start_time_ / float(play_speed) - tk * 50000) / 800),
         is_percussion=percussive_,
-        displacement=(0, mc_distance_volume, 0),
+        distance=volume_processing_method_(volume_),
+        azimuth=(panning_processing_method_(panning_), 0),
         extra_information={
             "USING_ORIGINAL_SOUND": using_original,  # 判断 extra_information 中是否有 USING_ORIGINAL_SOUND 键是判断是否使用神羽资源包解析的一个显著方法
             "INST_VALUE": note_ if percussive_ else inst_,
             "NOTE_VALUE": inst_ if percussive_ else note_,
+            "VOLUME_VALUE": volume_,
+            "PIN_VALUE": panning_,
         },
     )
 
@@ -456,7 +511,7 @@ def soundID_to_blockID(
 
 def load_decode_musicsequence_metainfo(
     buffer_in: BinaryIO,
-) -> Tuple[str, float, float, bool, int]:
+) -> Tuple[str, float, float, bool, int, bool]:
     """
     以流的方式解码音乐序列元信息
 
@@ -468,10 +523,10 @@ def load_decode_musicsequence_metainfo(
     Returns
     -------
     Tuple[str, float, float, bool, int]
-        音乐名称，最小音量，音调偏移，是否启用高精度，最后的流指针位置
+        音乐名称，最小音量，音调偏移，是否启用高精度，最后的流指针位置，是否使用新的音符存储格式（MineNote第三版）
 
     """
-    buffer_in.seek(4, 0)
+    note_format_v3 = buffer_in.read(4) in (b"MSQ$", b"FSQ$")
     group_1 = int.from_bytes(buffer_in.read(2), "big")
     group_2 = int.from_bytes(buffer_in.read(2), "big", signed=False)
 
@@ -490,6 +545,7 @@ def load_decode_musicsequence_metainfo(
         ),
         bool(group_2 & 0b1000000000000000),
         stt_index + 8,
+        note_format_v3,
     )
 
 
@@ -497,6 +553,7 @@ def load_decode_fsq_flush_release(
     buffer_in: BinaryIO,
     starter_index: int,
     high_quantity_note: bool,
+    new_note_format: bool,
 ) -> Generator[MineNote, Any, None]:
     """
     以流的方式解码FSQ音乐序列的音符序列并流式返回
@@ -509,6 +566,8 @@ def load_decode_fsq_flush_release(
         字节流中，音符序列的起始索引
     high_quantity_note : bool
         是否启用高精度音符解析
+    new_note_format : bool
+        是否启用新音符格式解析（MineNote第三版）
 
     Returns
     -------
@@ -540,9 +599,16 @@ def load_decode_fsq_flush_release(
                 12 + high_quantity_note + ((_first_byte := (buffer_in.read(1)))[0] >> 2)
             )
 
-            yield MineNote.decode(
-                code_buffer=_first_byte + buffer_in.read(_note_bytes_length),
-                is_high_time_precision=high_quantity_note,
+            yield (
+                MineNote.decode(
+                    code_buffer=_first_byte + buffer_in.read(_note_bytes_length),
+                    is_high_time_precision=high_quantity_note,
+                )
+                if new_note_format
+                else decode_note_bytes_v2(
+                    code_buffer_bytes=_first_byte + buffer_in.read(_note_bytes_length),
+                    is_high_time_precision=high_quantity_note,
+                )
             )
         except Exception as _err:
             # print(bytes_buffer_in[stt_index:end_index])
@@ -557,6 +623,7 @@ def load_decode_msq_flush_release(
     buffer_in: BinaryIO,
     starter_index: int,
     high_quantity_note: bool,
+    new_note_format: bool,
 ) -> Generator[Tuple[int, MineNote], Any, None]:
     """以流的方式解码MSQ音乐序列的音符序列并流式返回
 
@@ -568,6 +635,8 @@ def load_decode_msq_flush_release(
         字节流中，音符序列的起始索引
     high_quantity_note : bool
         是否启用高精度音符解析
+    new_note_format : bool
+        是否启用新音符格式解析（MineNote第三版）
 
     Returns
     -------
@@ -703,9 +772,18 @@ def load_decode_msq_flush_release(
                     # print("读取音符字节串", _bytes_buffer_in[_stt_index:_end_index])
                     _read_in_note_list.append(
                         (
-                            MineNote.decode(
-                                code_buffer=_bytes_buffer_in[_stt_index:_end_index],
-                                is_high_time_precision=high_quantity_note,
+                            (
+                                MineNote.decode(
+                                    code_buffer=_bytes_buffer_in[_stt_index:_end_index],
+                                    is_high_time_precision=high_quantity_note,
+                                )
+                                if new_note_format
+                                else decode_note_bytes_v2(
+                                    code_buffer_bytes=_bytes_buffer_in[
+                                        _stt_index:_end_index
+                                    ],
+                                    is_high_time_precision=high_quantity_note,
+                                )
                             ),
                             __channel_index,
                         )
@@ -802,3 +880,128 @@ def guess_deviation(
         / total_instrument_count
         / total_note_count
     )
+
+
+# 延长支持用
+
+
+def decode_note_bytes_v1(
+    code_buffer_bytes: bytes,
+) -> MineNote:
+    """使用第一版的 MineNote 字节码标准析出MineNote类"""
+    group_1 = int.from_bytes(code_buffer_bytes[:6], "big")
+    percussive_ = bool(group_1 & 0b1)
+    duration_ = (group_1 := group_1 >> 1) & 0b11111111111111111
+    start_tick_ = (group_1 := group_1 >> 17) & 0b11111111111111111
+    note_pitch_ = (group_1 := group_1 >> 17) & 0b1111111
+    sound_name_length = group_1 >> 7
+
+    if code_buffer_bytes[6] & 0b1:
+        position_displacement_ = (
+            int.from_bytes(
+                code_buffer_bytes[8 + sound_name_length : 10 + sound_name_length],
+                "big",
+            )
+            / 1000,
+            int.from_bytes(
+                code_buffer_bytes[10 + sound_name_length : 12 + sound_name_length],
+                "big",
+            )
+            / 1000,
+            int.from_bytes(
+                code_buffer_bytes[12 + sound_name_length : 14 + sound_name_length],
+                "big",
+            )
+            / 1000,
+        )
+    else:
+        position_displacement_ = (0, 0, 0)
+
+    try:
+        return MineNote.from_traditional(
+            mc_sound_name=code_buffer_bytes[8 : 8 + sound_name_length].decode(
+                encoding="utf-8"
+            ),
+            midi_pitch=note_pitch_,
+            midi_velocity=code_buffer_bytes[6] >> 1,
+            start_time=start_tick_,
+            last_time=duration_,
+            is_percussion=percussive_,
+            displacement=position_displacement_,
+            extra_information={"track_number": code_buffer_bytes[7]},
+        )
+    except:
+        print(code_buffer_bytes, "\n", code_buffer_bytes[8 : 8 + sound_name_length])
+        raise
+
+
+def decode_note_bytes_v2(
+    code_buffer_bytes: bytes, is_high_time_precision: bool = True
+) -> MineNote:
+    """使用第二版的 MineNote 字节码标准析出MineNote类"""
+    group_1 = int.from_bytes(code_buffer_bytes[:6], "big")
+    percussive_ = bool(group_1 & 0b1)
+    duration_ = (group_1 := group_1 >> 1) & 0b11111111111111111
+    start_tick_ = (group_1 := group_1 >> 17) & 0b11111111111111111
+    note_pitch_ = (group_1 := group_1 >> 17) & 0b1111111
+    sound_name_length = group_1 >> 7
+
+    if code_buffer_bytes[6] & 0b1:
+        position_displacement_ = (
+            int.from_bytes(
+                (
+                    code_buffer_bytes[8 + sound_name_length : 10 + sound_name_length]
+                    if is_high_time_precision
+                    else code_buffer_bytes[
+                        7 + sound_name_length : 9 + sound_name_length
+                    ]
+                ),
+                "big",
+            )
+            / 1000,
+            int.from_bytes(
+                (
+                    code_buffer_bytes[10 + sound_name_length : 12 + sound_name_length]
+                    if is_high_time_precision
+                    else code_buffer_bytes[
+                        9 + sound_name_length : 11 + sound_name_length
+                    ]
+                ),
+                "big",
+            )
+            / 1000,
+            int.from_bytes(
+                (
+                    code_buffer_bytes[12 + sound_name_length : 14 + sound_name_length]
+                    if is_high_time_precision
+                    else code_buffer_bytes[
+                        11 + sound_name_length : 13 + sound_name_length
+                    ]
+                ),
+                "big",
+            )
+            / 1000,
+        )
+    else:
+        position_displacement_ = (0, 0, 0)
+
+    try:
+        return MineNote.from_traditional(
+            mc_sound_name=(
+                o := (
+                    code_buffer_bytes[8 : 8 + sound_name_length]
+                    if is_high_time_precision
+                    else code_buffer_bytes[7 : 7 + sound_name_length]
+                )
+            ).decode(encoding="GB18030"),
+            midi_pitch=note_pitch_,
+            midi_velocity=code_buffer_bytes[6] >> 1,
+            start_time=start_tick_,
+            last_time=duration_,
+            mass_precision_time=code_buffer_bytes[7] if is_high_time_precision else 0,
+            is_percussion=percussive_,
+            displacement=position_displacement_,
+        )
+    except:
+        print(code_buffer_bytes, "\n", o)
+        raise
