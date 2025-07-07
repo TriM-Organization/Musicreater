@@ -7,7 +7,7 @@
 Musicreater (音·创)
 A free open source library used for dealing with **Minecraft** digital musics.
 
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
@@ -169,7 +169,7 @@ class MusicSequence:
         pitched_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         minimum_vol: float = 0.1,
-        volume_processing_function: FittingFunctionType = natural_curve,
+        volume_processing_function: FittingFunctionType = velocity_2_distance_natural,
         panning_processing_function: FittingFunctionType = panning_2_rotation_linear,
         deviation: float = 0,
         note_referance_table_replacement: Dict[str, str] = {},
@@ -819,7 +819,7 @@ class MusicSequence:
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        vol_processing_function: FittingFunctionType = natural_curve,
+        vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
@@ -938,15 +938,15 @@ class MusicSequence:
                         that_note := midi_msgs_to_minenote(
                             inst_=(
                                 msg.note
-                                if msg.channel == 9
+                                if (_is_percussion := (msg.channel == 9))
                                 else channel_controler[msg.channel][MIDI_PROGRAM]
                             ),
                             note_=(
                                 channel_controler[msg.channel][MIDI_PROGRAM]
-                                if msg.channel == 9
+                                if _is_percussion
                                 else msg.note
                             ),
-                            percussive_=(msg.channel == 9),
+                            percussive_=_is_percussion,
                             volume_=channel_controler[msg.channel][MIDI_VOLUME],
                             velocity_=_velocity,
                             panning_=channel_controler[msg.channel][MIDI_PAN],
@@ -955,7 +955,7 @@ class MusicSequence:
                             play_speed=speed,
                             midi_reference_table=(
                                 percussion_note_rtable
-                                if msg.channel == 9
+                                if _is_percussion
                                 else pitched_note_rtable
                             ),
                             volume_processing_method_=vol_processing_function,
@@ -1039,7 +1039,7 @@ class MidiConvert(MusicSequence):
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         enable_old_exe_format: bool = False,
         minimum_volume: float = 0.1,
-        vol_processing_function: FittingFunctionType = natural_curve,
+        vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         pitch_deviation: float = 0,
         note_rtable_replacement: Dict[str, str] = {},
@@ -1122,7 +1122,7 @@ class MidiConvert(MusicSequence):
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
-        vol_processing_func: FittingFunctionType = natural_curve,
+        vol_processing_func: FittingFunctionType = velocity_2_distance_natural,
         pan_processing_func: FittingFunctionType = panning_2_rotation_linear,
         music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},

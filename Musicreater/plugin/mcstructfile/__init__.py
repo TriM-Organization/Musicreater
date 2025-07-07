@@ -2,7 +2,7 @@
 """
 用以生成单个mcstructure文件的附加功能
 
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md

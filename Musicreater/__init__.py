@@ -5,7 +5,7 @@
 Musicreater(音·创)
 A free open source library used for dealing with **Minecraft** digital musics.
 
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
@@ -22,7 +22,7 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.4.0"
+__version__ = "2.4.0.1"
 __vername__ = "全景声支持、音量调节修复"
 __author__ = (
     ("金羿", "Eilles"),
@@ -58,8 +58,8 @@ __all__ = [
     "MM_NBS_PITCHED_INSTRUMENT_TABLE",
     "MM_NBS_PERCUSSION_INSTRUMENT_TABLE",
     # 操作性函数
-    "natural_curve",
-    "straight_line",
+    "velocity_2_distance_natural",
+    "velocity_2_distance_straight",
     "panning_2_rotation_linear",
     "panning_2_rotation_trigonometric",
     "load_decode_musicsequence_metainfo",

@@ -4,7 +4,7 @@
 """
 
 """
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
@@ -41,7 +41,7 @@ from .constants import (
     MM_INSTRUMENT_RANGE_TABLE,
 )
 from .exceptions import MusicSequenceDecodeError
-from .subclass import MineNote, mctick2timestr
+from .subclass import MineNote, mctick2timestr, SingleNoteBox
 from .types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
 
 
@@ -127,7 +127,7 @@ def midi_inst_to_mc_sound(
     )
 
 
-def natural_curve(
+def velocity_2_distance_natural(
     vol: float,
 ) -> float:
     """
@@ -155,7 +155,7 @@ def natural_curve(
     )
 
 
-def straight_line(vol: float) -> float:
+def velocity_2_distance_straight(vol: float) -> float:
     """
     midi力度值拟合成的距离函数
 
@@ -251,42 +251,6 @@ def minenote_to_command_paramaters(
         ),
     )
 
-
-# def single_note_to_command_parameters(
-#     note_: SingleNote,
-#     reference_table: MidiInstrumentTableType,
-#     deviation: float = 0,
-#     volume_processing_method: Callable[[float], float] = natural_curve,
-# ) -> Tuple[
-#     str,
-#     Tuple[float, float, float],
-#     float,
-#     Union[float, Literal[None]],
-# ]:
-#     """
-#     将音符转为播放的指令之参数
-#     :param note_:int 音符对象
-#     :param reference_table:Dict[int, str] 转换对照表
-#     :param deviation:float 音调偏移量
-#     :param volume_proccessing_method:Callable[[float], float] 音量处理函数
-
-#     :return str[我的世界音符ID], Tuple[float,float,float]播放视角坐标, float[指令音量参数], float[指令音调参数]
-#     """
-
-#     mc_sound_ID, _X = inst_to_sould_with_deviation(
-#         note_.inst,
-#         reference_table,
-#         "note.bd" if note_.percussive else "note.flute",
-#     )
-
-#     mc_distance_volume = volume_processing_method(note_.velocity)
-
-#     return (
-#         mc_sound_ID,
-#         (0, mc_distance_volume, 0),
-#         note_.velocity / 127,
-#         None if note_.percussive else 2 ** ((note_.pitch - 60 - _X + deviation) / 12),
-#     )
 
 
 def midi_msgs_to_minenote(
@@ -449,6 +413,7 @@ def midi_msgs_to_minenote_using_kami_respack(
 
 
 def is_in_diapason(note_pitch: float, instrument: str) -> bool:
+    """音是否在乐器可演奏之范围之内"""
     note_range = MM_INSTRUMENT_RANGE_TABLE.get(instrument, ((-1, 128), 0))[0]
     return note_pitch >= note_range[0] and note_pitch <= note_range[1]
 
@@ -456,6 +421,7 @@ def is_in_diapason(note_pitch: float, instrument: str) -> bool:
 def is_note_in_diapason(
     note_: MineNote,
 ) -> bool:
+    """一个 MineNote 音符是否在其乐器可演奏之范围之内"""
     note_range = MM_INSTRUMENT_RANGE_TABLE.get(note_.sound_name, ((-1, 128), 0))[0]
     return note_.note_pitch >= note_range[0] and note_.note_pitch <= note_range[1]
 
@@ -483,7 +449,6 @@ def note_to_redstone_block(
     # return SingleNoteBox()  # TO-DO
 
 
-@staticmethod
 def soundID_to_blockID(
     sound_id: str, random_select: bool = False, default_block: str = "air"
 ) -> str:

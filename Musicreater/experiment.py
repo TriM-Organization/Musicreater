@@ -5,7 +5,7 @@
 
 
 """
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
@@ -49,7 +49,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        vol_processing_function: FittingFunctionType = natural_curve,
+        vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:

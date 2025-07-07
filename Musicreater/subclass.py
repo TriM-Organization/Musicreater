@@ -5,7 +5,7 @@
 """
 
 """
-版权所有 © 2024 金羿 & 诸葛亮与八卦阵
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
 Copyright © 2025 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
@@ -49,10 +49,10 @@ class MineNote:
     """是否作为打击乐器启用"""
 
     sound_distance: float
-    """声源距离"""
+    """声源距离 方块"""
 
     sound_azimuth: Tuple[float, float]
-    """声源方位"""
+    """声源方位 角度"""
 
     extra_info: Any
     """你觉得放什么好？"""
@@ -107,15 +107,16 @@ class MineNote:
         )
         """是否为打击乐器"""
 
-        self.sound_distance = (
-            (16 if distance > 16 else (distance if distance > 0 else 0))
-            if distance
-            else 0
-        )
-        """声源距离"""
-
         self.sound_azimuth = (azimuth[0] % 360, azimuth[1] % 360) if azimuth else (0, 0)
         """声源方位"""
+
+        # 如果指定为零，那么为零，但如果不指定或者指定为负数，则为 0.01 的距离
+        self.sound_distance = (
+            (16 if distance > 16 else (distance if distance >= 0 else 0.01))
+            if distance is not None
+            else 0.01
+        )
+        """声源距离"""
 
         self.extra_info = extra_information
 
