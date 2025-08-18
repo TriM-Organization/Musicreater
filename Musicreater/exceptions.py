@@ -113,13 +113,20 @@ class NoteOnOffMismatchError(MidiFormatException):
         """音符开音和停止不匹配的错误"""
         super().__init__("音符不匹配", *args)
 
+class LyricMismatchError(MSCTBaseException):
+    """歌词匹配解析错误"""
+
+    def __init__(self, *args):
+        """有可能产生了错误的歌词解析"""
+        super().__init__("歌词解析错误", *args)
+
 
 class ZeroSpeedError(MSCTBaseException, ZeroDivisionError):
     """以0作为播放速度的错误"""
 
     def __init__(self, *args):
         """以0作为播放速度的错误"""
-        super().__init__("播放速度为0", *args)
+        super().__init__("播放速度为零", *args)
 
 
 class IllegalMinimumVolumeError(MSCTBaseException, ValueError):

@@ -25,12 +25,28 @@ from typing import List, Literal, Union
 
 
 def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
-    """使用compression指定的算法打包目录为zip文件\n
-    默认算法为DEFLATED(8),可用算法如下：\n
-    STORED = 0\n
-    DEFLATED = 8\n
-    BZIP2 = 12\n
-    LZMA = 14\n
+    """
+    使用指定的压缩算法将目录打包为zip文件
+
+    Parameters
+    ------------
+    sourceDir: str
+        要压缩的源目录路径
+    outFilename: str
+        输出的zip文件路径
+    compression: int, 可选
+        压缩算法，默认为8 (DEFLATED)
+        可用算法：
+        STORED = 0
+        DEFLATED = 8 (默认)
+        BZIP2 = 12
+        LZMA = 14
+    exceptFile: list[str], 可选
+        需要排除在压缩包外的文件名称列表（可选）
+
+    Returns
+    ---------
+    None
     """
 
     zipf = zipfile.ZipFile(outFilename, "w", compression)

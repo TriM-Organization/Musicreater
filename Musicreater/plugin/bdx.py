@@ -60,50 +60,55 @@ def form_command_block_in_BDX_bytes(
     customName: str = "",
     executeOnFirstTick: bool = False,
     trackOutput: bool = True,
-):
+) -> bytes:
     """
-    使用指定项目返回指定的指令方块放置指令项
-    :param command: `str`
+    使用指定参数生成指定的指令方块放置指令项
+
+    Parameters
+    ------------
+    command: str
         指令
-    :param particularValue:
+    particularValue: int
         方块特殊值，即朝向
-            :0	下	无条件
-            :1	上	无条件
-            :2	z轴负方向	无条件
-            :3	z轴正方向	无条件
-            :4	x轴负方向	无条件
-            :5	x轴正方向	无条件
-            :6	下	无条件
-            :7	下	无条件
-
-            :8	下	有条件
-            :9	上	有条件
-            :10	z轴负方向	有条件
-            :11	z轴正方向	有条件
-            :12	x轴负方向	有条件
-            :13	x轴正方向	有条件
-            :14	下	有条件
-            :14	下	有条件
+        :0	下	无条件
+        :1	上	无条件
+        :2	z轴负方向	无条件
+        :3	z轴正方向	无条件
+        :4	x轴负方向	无条件
+        :5	x轴正方向	无条件
+        :6	下	无条件
+        :7	下	无条件
+        :8	下	有条件
+        :9	上	有条件
+        :10	z轴负方向	有条件
+        :11	z轴正方向	有条件
+        :12	x轴负方向	有条件
+        :13	x轴正方向	有条件
+        :14	下	有条件
+        :14	下	有条件
         注意！此处特殊值中的条件会被下面condition参数覆写
-    :param impluse: `int 0|1|2`
+    impluse: int (0|1|2)
         方块类型
-            0脉冲 1循环 2连锁
-    :param condition: `bool`
+        0脉冲 1循环 2连锁
+    condition: bool
         是否有条件
-    :param needRedstone: `bool`
+    needRedstone: bool
         是否需要红石
-    :param tickDelay: `int`
+    tickDelay: int
         执行延时
-    :param customName: `str`
+    customName: str
         悬浮字
-    lastOutput: `str`
-        上次输出字符串，注意此处需要留空
-    :param executeOnFirstTick: `bool`
-        首刻执行(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
-    :param trackOutput: `bool`
-        是否输出
+    lastOutput: str
+        命令方块的上次输出字符串，注意此处需要留空
+    executeOnFirstTick: bool
+        是否启用首刻执行（循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行）
+    trackOutput: bool
+        是否启用命令方块输出
 
-    :return:str
+    Returns
+    ---------
+    bytes
+        用以生成 bdx 结构的字节码
     """
     block = b"\x24" + particularValue.to_bytes(2, byteorder="big", signed=False)
 
@@ -127,9 +132,19 @@ def commands_to_BDX_bytes(
     max_height: int = 64,
 ):
     """
-    :param commands: 指令列表(指令, 延迟)
-    :param max_height: 生成结构最大高度
-    :return 成功与否，成功返回(True,未经过压缩的源,结构占用大小)，失败返回(False,str失败原因)
+    指令列表转换为用以生成 bdx 结构的字节码
+
+    Parameters
+    ------------
+    commands: list[tuple[str, int]]
+        指令列表，每个元素为 (指令, 延迟)
+    max_height: int
+        生成结构最大高度
+
+    Returns
+    ---------
+    tuple[bool, bytes, int] or tuple[bool, str]
+        成功与否，成功返回 (True, 未经过压缩的源, 结构占用大小)，失败返回 (False, str失败原因)
     """
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(

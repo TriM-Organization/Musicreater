@@ -34,6 +34,99 @@ from .types import ChannelType, FittingFunctionType
 from .utils import *
 
 
+class FutureMidiConvertLyricSupport(MidiConvert):
+    """
+    歌词测试支持
+    """
+
+    def to_command_list_in_delay(
+        self,
+        player_selector: str = "@a",
+        using_lyric: bool = True,
+    ) -> Tuple[List[MineCommand], int, int]:
+        """
+        将midi转换为我的世界命令列表，并输出每个音符之后的延迟
+
+        Parameters
+        ----------
+        player_selector: str
+            玩家选择器，默认为`@a`
+
+        Returns
+        -------
+        tuple( list[MineCommand指令,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
+        """
+
+        notes_list: List[MineNote] = sorted(
+            [i for j in self.channels.values() for i in j],
+            key=lambda note: note.start_tick,
+        )
+
+        # 此处 我们把通道视为音轨
+        self.music_command_list = []
+        multi = max_multi = 0
+        delaytime_previous = 0
+
+        for note in notes_list:
+            if (tickdelay := (note.start_tick - delaytime_previous)) == 0:
+                multi += 1
+            else:
+                max_multi = max(max_multi, multi)
+                multi = 0
+
+            (
+                mc_sound_ID,
+                relative_coordinates,
+                volume_percentage,
+                mc_pitch,
+            ) = minenote_to_command_paramaters(
+                note,
+                pitch_deviation=self.music_deviation,
+            )
+            self.music_command_list.append(
+                MineCommand(
+                    command=(
+                        self.execute_cmd_head.format(player_selector)
+                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            mc_sound_ID,
+                            *relative_coordinates,
+                            volume_percentage,
+                            1.0 if note.percussive else mc_pitch,
+                            self.minimum_volume,
+                        )
+                    ),
+                    annotation=(
+                        "在{}播放噪音{}".format(
+                            mctick2timestr(note.start_tick),
+                            mc_sound_ID,
+                        )
+                        if note.percussive
+                        else "在{}播放乐音{}".format(
+                            mctick2timestr(note.start_tick),
+                            "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
+                        )
+                    ),
+                    tick_delay=tickdelay,
+                ),
+            )
+            if using_lyric and note.extra_info["LYRIC_TEXT"]:
+                self.music_command_list.append(
+                    MineCommand(
+                        self.execute_cmd_head.format(player_selector)
+                        + 'title @s title " "'
+                    )
+                )
+                self.music_command_list.append(
+                    MineCommand(
+                        self.execute_cmd_head.format(player_selector)
+                        + "title @s subtitle {}".format(note.extra_info["LYRIC_TEXT"])
+                    )
+                )
+            delaytime_previous = note.start_tick
+
+        return self.music_command_list, notes_list[-1].start_tick, max_multi + 1
+
+
 class FutureMidiConvertKamiRES(MidiConvert):
     """
     神羽资源包之测试支持
@@ -758,10 +851,21 @@ class FutureMidiConvertM4(MidiConvert):
         _note: MineNote,
         _apply_time_division: float = 10,
     ) -> List[MineNote]:
-        """传入音符数据，返回分割后的插值列表
-        :param _note: MineNote 音符
-        :param _apply_time_division: int 间隔帧数
-        :return list[tuple(int开始时间（毫秒）, int乐器, int音符, int力度（内置）, float音量（播放）),]"""
+        """
+        传入音符数据，返回分割后的插值列表
+
+        Parameters
+        ------------
+        _note: MineNote
+            音符
+        _apply_time_division: int
+            间隔帧数
+
+        Returns
+        ---------
+        list[tuple[int, int, int, int, float]]
+            分割后的插值列表，每个元素为 (开始时间（毫秒）, 乐器, 音符, 力度（内置）, 音量（播放）)
+        """
 
         if _note.percussive:
             return [

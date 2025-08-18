@@ -136,7 +136,7 @@ def velocity_2_distance_natural(
     Parameters
     ----------
     vol: int
-        midi音符力度值
+        midi 音符力度值
 
     Returns
     -------
@@ -162,7 +162,7 @@ def velocity_2_distance_straight(vol: float) -> float:
     Parameters
     ----------
     vol: int
-        midi音符力度值
+        midi 音符力度值
 
     Returns
     -------
@@ -179,7 +179,7 @@ def panning_2_rotation_linear(pan_: float) -> float:
     ----------
     pan_: int
         Midi 左右平衡偏移值
-        注：此参数为int，范围从0到127，当为 64 时，声源居中
+        注：此参数为int，范围从 0 到 127，当为 64 时，声源居中
 
     Returns
     -------
@@ -197,7 +197,7 @@ def panning_2_rotation_trigonometric(pan_: float) -> float:
     ----------
     pan_: int
         Midi 左右平衡偏移值
-        注：此参数为int，范围从0到127，当为 64 时，声源居中
+        注：此参数为int，范围从 0 到 127，当为 64 时，声源居中
 
     Returns
     -------
@@ -222,11 +222,19 @@ def minenote_to_command_paramaters(
     Union[float, Literal[None]],
 ]:
     """
-    将MineNote对象转为《我的世界》音符播放所需之参数
-    :param note_:MineNote 音符对象
-    :param deviation:float 音调偏移量
+    将 MineNote 对象转为《我的世界》音符播放所需之参数
 
-    :return str[我的世界音符ID], Tuple[float,float,float]播放视角坐标, float[指令音量参数], float[指令音调参数]
+    Parameters
+    ------------
+    note_: MineNote
+        音符对象
+    deviation: float
+        音调偏移量
+
+    Returns
+    ---------
+    str, tuple[float, float, float], float, float
+        我的世界音符ID, 播放视角坐标, 指令音量参数, 指令音调参数
     """
 
     return (
@@ -252,7 +260,6 @@ def minenote_to_command_paramaters(
     )
 
 
-
 def midi_msgs_to_minenote(
     inst_: int,  # 乐器编号
     note_: int,
@@ -267,24 +274,46 @@ def midi_msgs_to_minenote(
     volume_processing_method_: FittingFunctionType,
     panning_processing_method_: FittingFunctionType,
     note_table_replacement: Dict[str, str] = {},
+    lyric_line: str = "",
 ) -> MineNote:
     """
     将Midi信息转为我的世界音符对象
-    :param inst_: int 乐器编号
-    :param note_: int 音高编号（音符编号）
-    :param percussive_: bool 是否作为打击乐器启用
-    :param volume_: int 音量
-    :param velocity_: int 力度
-    :param panning_: int 声相偏移
-    :param start_time_: int 音符起始时间（微秒）
-    :param duration_: int 音符持续时间（微秒）
-    :param play_speed: float 曲目播放速度
-    :param midi_reference_table: Dict[int, str] 转换对照表
-    :param volume_processing_method_: Callable[[float], float] 音量处理函数
-    :param panning_processing_method_: Callable[[float], float] 立体声相偏移处理函数
-    :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
 
-    :return MineNote我的世界音符对象
+    Parameters
+    ------------
+    inst_: int
+        乐器编号
+    note_: int
+        音高编号（音符编号）
+    percussive_: bool
+        是否作为打击乐器启用
+    volume_: int
+        音量
+    velocity_: int
+        力度
+    panning_: int
+        声相偏移
+    start_time_: int
+        音符起始时间（微秒）
+    duration_: int
+        音符持续时间（微秒）
+    play_speed: float
+        曲目播放速度
+    midi_reference_table: Dict[int, str]
+        转换对照表
+    volume_processing_method_: Callable[[float], float]
+        音量处理函数
+    panning_processing_method_: Callable[[float], float]
+        立体声相偏移处理函数
+    note_table_replacement: Dict[str, str]
+        音符替换表，定义 Minecraft 音符字串的替换
+    lyric_line: str
+        该音符的歌词
+
+    Returns
+    ---------
+    MineNote
+        我的世界音符对象
     """
     mc_sound_ID = midi_inst_to_mc_sound(
         inst_,
@@ -302,6 +331,11 @@ def midi_msgs_to_minenote(
         is_percussion=percussive_,
         distance=volume_processing_method_(volume_),
         azimuth=(panning_processing_method_(panning_), 0),
+        extra_information={
+            "LYRIC_TEXT": lyric_line,
+            "VOLUME_VALUE": volume_,
+            "PIN_VALUE": panning_,
+        },
     )
 
 
@@ -319,24 +353,46 @@ def midi_msgs_to_minenote_using_kami_respack(
     volume_processing_method_: Callable[[float], float],
     panning_processing_method_: FittingFunctionType,
     note_table_replacement: Dict[str, str] = {},
+    lyric_line: str = "",
 ) -> MineNote:
     """
-    将Midi信息转为我的世界音符对象
-    :param inst_: int 乐器编号
-    :param note_: int 音高编号（音符编号）
-    :param percussive_: bool 是否作为打击乐器启用
-    :param volume_: int 音量
-    :param velocity_: int 力度
-    :param panning_: int 声相偏移
-    :param start_time_: int 音符起始时间（微秒）
-    :param duration_: int 音符持续时间（微秒）
-    :param play_speed: float 曲目播放速度
-    :param midi_reference_table: Dict[int, str] 转换对照表
-    :param volume_processing_method_: Callable[[float], float] 音量处理函数
-    :param panning_processing_method_: Callable[[float], float] 立体声相偏移处理函数
-    :param note_table_replacement: Dict[str, str] 音符替换表，定义 Minecraft 音符字串的替换
+    将Midi信息转为我的世界音符对象，使用神羽资源包兼容格式
 
-    :return MineNote我的世界音符对象
+    Parameters
+    ------------
+    inst_: int
+        乐器编号
+    note_: int
+        音高编号（音符编号）
+    percussive_: bool
+        是否作为打击乐器启用
+    volume_: int
+        音量
+    velocity_: int
+        力度
+    panning_: int
+        声相偏移
+    start_time_: int
+        音符起始时间（微秒）
+    duration_: int
+        音符持续时间（微秒）
+    play_speed: float
+        曲目播放速度
+    midi_reference_table: Dict[int, str]
+        转换对照表
+    volume_processing_method_: Callable[[float], float]
+        音量处理函数
+    panning_processing_method_: Callable[[float], float]
+        立体声相偏移处理函数
+    note_table_replacement: Dict[str, str]
+        音符替换表，定义 Minecraft 音符字串的替换
+    lyric_line: str
+        该音符的歌词
+
+    Returns
+    ---------
+    MineNote
+        我的世界音符对象
     """
 
     using_original = False
@@ -371,6 +427,7 @@ def midi_msgs_to_minenote_using_kami_respack(
             "USING_ORIGINAL_SOUND": using_original,  # 判断 extra_information 中是否有 USING_ORIGINAL_SOUND 键是判断是否使用神羽资源包解析的一个显著方法
             "INST_VALUE": note_ if percussive_ else inst_,
             "NOTE_VALUE": inst_ if percussive_ else note_,
+            "LYRIC_TEXT": lyric_line,
             "VOLUME_VALUE": volume_,
             "PIN_VALUE": panning_,
         },

@@ -22,8 +22,8 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.4.0.1"
-__vername__ = "全景声支持、音量调节修复"
+__version__ = "2.4.1"
+__vername__ = "Midi 歌词支持，文档格式更新"
 __author__ = (
     ("金羿", "Eilles"),
     ("诸葛亮与八卦阵", "bgArray"),
@@ -41,13 +41,26 @@ __all__ = [
     "SingleNoteBox",
     "ProgressBarStyle",
     # "TimeStamp", 未来功能
-    # 默认值
+    # 字典键
     "MIDI_PROGRAM",
     "MIDI_VOLUME",
     "MIDI_PAN",
+    # 默认值
     "MIDI_DEFAULT_PROGRAM_VALUE",
     "MIDI_DEFAULT_VOLUME_VALUE",
     "DEFAULT_PROGRESSBAR_STYLE",
+    # Midi 自己的对照表
+    "MIDI_PITCH_NAME_TABLE",
+    "MIDI_PITCHED_NOTE_NAME_GROUP",
+    "MIDI_PITCHED_NOTE_NAME_TABLE",
+    "MIDI_PERCUSSION_NOTE_NAME_TABLE",
+    # Minecraft 自己的对照表
+    "MC_PERCUSSION_INSTRUMENT_LIST",
+    "MC_PITCHED_INSTRUMENT_LIST",
+    "MC_INSTRUMENT_BLOCKS_TABLE",
+    "MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE",
+    "MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE",
+    # Midi 与 游戏 的对照表
     "MM_INSTRUMENT_RANGE_TABLE",
     "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
     "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
@@ -62,10 +75,68 @@ __all__ = [
     "velocity_2_distance_straight",
     "panning_2_rotation_linear",
     "panning_2_rotation_trigonometric",
+    # 工具函数
     "load_decode_musicsequence_metainfo",
     "load_decode_msq_flush_release",
     "load_decode_fsq_flush_release",
     "guess_deviation",
+    "mctick2timestr",
+    "midi_inst_to_mc_sound",
 ]
 
-from .main import *
+from .main import MusicSequence, MidiConvert
+
+from .subclass import (
+    MineNote,
+    MineCommand,
+    SingleNoteBox,
+    ProgressBarStyle,
+    mctick2timestr,
+    DEFAULT_PROGRESSBAR_STYLE,
+)
+
+from .utils import (
+    # 兼容性函数
+    load_decode_musicsequence_metainfo,
+    load_decode_msq_flush_release,
+    load_decode_fsq_flush_release,
+    # 工具函数
+    guess_deviation,
+    midi_inst_to_mc_sound,
+    # 处理用函数
+    velocity_2_distance_natural,
+    velocity_2_distance_straight,
+    panning_2_rotation_linear,
+    panning_2_rotation_trigonometric,
+)
+
+from .constants import (
+    # 字典键
+    MIDI_PROGRAM,
+    MIDI_PAN,
+    MIDI_VOLUME,
+    # 默认值
+    MIDI_DEFAULT_PROGRAM_VALUE,
+    MIDI_DEFAULT_VOLUME_VALUE,
+    # MIDI 表
+    MIDI_PITCH_NAME_TABLE,
+    MIDI_PITCHED_NOTE_NAME_GROUP,
+    MIDI_PITCHED_NOTE_NAME_TABLE,
+    MIDI_PERCUSSION_NOTE_NAME_TABLE,
+    # 我的世界 表
+    MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE,
+    MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE,
+    MC_INSTRUMENT_BLOCKS_TABLE,
+    MC_PERCUSSION_INSTRUMENT_LIST,
+    MC_PITCHED_INSTRUMENT_LIST,
+    # MIDI 到 我的世界 表
+    MM_INSTRUMENT_RANGE_TABLE,
+    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DISLINK_PITCHED_INSTRUMENT_TABLE,
+    MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE,
+    MM_NBS_PITCHED_INSTRUMENT_TABLE,
+    MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
+)

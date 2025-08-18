@@ -130,9 +130,7 @@ class MusicSequence:
 
         if minimum_volume_of_music > 1 or minimum_volume_of_music <= 0:
             raise IllegalMinimumVolumeError(
-                "自订的最小音量参数错误：{}，应在 (0,1] 范围内。".format(
-                    minimum_volume_of_music
-                )
+                "最小音量不得为 {}，应在 (0,1] 范围内。".format(minimum_volume_of_music)
             )
         # max_volume = 1 if max_volume > 1 else (0.001 if max_volume <= 0 else max_volume)
 
@@ -594,7 +592,7 @@ class MusicSequence:
 
         else:
             raise MusicSequenceTypeError(
-                "输入的二进制字节码不是合法的音符序列格式，无法解码，码头前 10 字节为：",
+                "输入的二进制字节码不是正确的音符序列格式，无法解码，码前十字节为：",
                 bytes_buffer_in[:10],
             )
 
@@ -851,12 +849,12 @@ class MusicSequence:
 
         Returns
         -------
-        以频道作为分割的Midi音符列表字典, 音符总数, 乐器使用统计:
         Tuple[MineNoteChannelType, int, Dict[str, int]]
+            以通道作为分割的Midi音符列表字典, 音符总数, 乐器使用统计
         """
 
         if speed == 0:
-            raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
+            raise ZeroSpeedError("播放速度不得为零，应为 (0,1] 范围内的实数。")
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
         midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
@@ -893,8 +891,15 @@ class MusicSequence:
             ],
         ] = empty_midi_channels(default_staff=[])
 
+        lyric_cache: List[Tuple[int, str]] = []
+
         # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
-        # 采用的时遍历信息思路
+        # 采用的是遍历信息思路
+
+        # 来自 202508 的留言
+        # 该处代码有点问题
+        # merged track 丢失了 track 信息，会导致音符不匹配的问题出现
+        # 应该用遍历 Track 的方式来处理
         for msg in midi.merged_track:
             if msg.time != 0:
                 # 微秒
@@ -904,36 +909,66 @@ class MusicSequence:
             if msg.type == "set_tempo":
                 tempo = msg.tempo
             elif msg.type == "program_change":
+                # 检测 乐器变化 之 midi 事件
                 channel_controler[msg.channel][MIDI_PROGRAM] = msg.program
 
             elif msg.is_cc(7):
+                # Control Change 更改当前通道的 音量 的事件（大幅度）
                 channel_controler[msg.channel][MIDI_VOLUME] = msg.value
             elif msg.is_cc(10):
+                # Control Change 更改当前通道的 音调偏移 的事件（大幅度）
                 channel_controler[msg.channel][MIDI_PAN] = msg.value
 
+            elif msg.type == "lyrics":
+                # 歌词事件
+                lyric_cache.append((microseconds, msg.text))
+                # print(lyric_cache, flush=True)
+
             elif msg.type == "note_on" and msg.velocity != 0:
+                # 一个音符开始弹奏
+
+                # 加入音符队列甲（按通道分隔）
+                # (音高,乐器)
                 note_queue_A[msg.channel].append(
                     (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
                 )
+                # 音符队列乙（按通道分隔）
+                # (力度,微秒)
                 note_queue_B[msg.channel].append((msg.velocity, microseconds))
 
             elif (msg.type == "note_off") or (
                 msg.type == "note_on" and msg.velocity == 0
             ):
+                # 一个音符结束弹奏
+
                 if (
                     msg.note,
                     channel_controler[msg.channel][MIDI_PROGRAM],
                 ) in note_queue_A[msg.channel]:
+                    # 在甲队列中发现了同一个 音高和乐器 的音符
+
+                    # 获取其音符力度和微秒数
                     _velocity, _ms = note_queue_B[msg.channel][
                         note_queue_A[msg.channel].index(
                             (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
                         )
                     ]
+
+                    # 在队列中删除此音符
                     note_queue_A[msg.channel].remove(
                         (msg.note, channel_controler[msg.channel][MIDI_PROGRAM])
                     )
                     note_queue_B[msg.channel].remove((_velocity, _ms))
 
+                    _lyric = ""
+                    # 找一找歌词吧
+                    if lyric_cache:
+                        for i in range(len(lyric_cache)):
+                            if lyric_cache[i][0] >= _ms:
+                                _lyric = lyric_cache.pop(i)[1]
+                                break
+
+                    # 更新结果信息
                     midi_channels[msg.channel].append(
                         that_note := midi_msgs_to_minenote(
                             inst_=(
@@ -961,14 +996,19 @@ class MusicSequence:
                             volume_processing_method_=vol_processing_function,
                             panning_processing_method_=pan_processing_function,
                             note_table_replacement=note_rtable_replacement,
+                            lyric_line=_lyric,
                         )
                     )
+
+                    # 更新统计信息
                     note_count += 1
                     if that_note.sound_name in note_count_per_instrument.keys():
                         note_count_per_instrument[that_note.sound_name] += 1
                     else:
                         note_count_per_instrument[that_note.sound_name] = 1
+
                 else:
+                    # 什么？找不到 note on 消息？？
                     if ignore_mismatch_error:
                         print(
                             "[WARRING] MIDI格式错误 音符不匹配 {} 无法在上文中找到与之匹配的音符开音消息".format(
@@ -993,7 +1033,24 @@ class MusicSequence:
 
         3 音符结束消息
         ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
+
         del tempo
+
+        if lyric_cache:
+            # 怎么有歌词多啊
+            if ignore_mismatch_error:
+                print(
+                    "[WARRING] MIDI 解析错误 歌词对应错误，以下歌词未能填入音符之中，已经填入的仍可能有误 {}".format(
+                        lyric_cache
+                    )
+                )
+            else:
+                raise LyricMismatchError(
+                    "MIDI 解析产生错误",
+                    "歌词解析过程中无法对应音符，已填入的音符仍可能有误",
+                    lyric_cache,
+                )
+
         channels = dict(
             [
                 (channel_no, sorted(channel_notes, key=lambda note: note.start_tick))
@@ -1126,6 +1183,7 @@ class MidiConvert(MusicSequence):
         pan_processing_func: FittingFunctionType = panning_2_rotation_linear,
         music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},
+        midi_charset: str = "utf-8",
     ):
         """
         直接输入文件地址，将 midi 文件读入
@@ -1171,6 +1229,7 @@ class MidiConvert(MusicSequence):
             return cls.from_mido_obj(
                 midi_obj=mido.MidiFile(
                     midi_file_path,
+                    charset=midi_charset,
                     clip=True,
                 ),
                 midi_name=midi_music_name,

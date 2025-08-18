@@ -70,17 +70,25 @@ def form_note_block_in_NBT_struct(
     instrument: str = "note.harp",
     powered: bool = False,
     compability_version_number: int = COMPABILITY_VERSION_119,
-):
-    """生成音符盒方块
-    :param note: `int`(0~24)
+) -> Block:
+    """
+    生成音符盒方块
+
+    Parameters
+    ------------
+    note: int (0~24)
         音符的音高
-    :param coordinate: `tuple[int,int,int]`
+    coordinate: tuple[int, int, int]
         此方块所在之相对坐标
-    :param instrument: `str`
+    instrument: str
         音符盒的乐器
-    :param powered: `bool`
+    powered: bool
         是否已被激活
-    :return Block
+
+    Returns
+    -------
+    Block
+        生成的方块对象
     """
 
     return Block(
@@ -108,15 +116,26 @@ def form_repeater_in_NBT_struct(
     delay: int,
     facing: int,
     compability_version_number: int = COMPABILITY_VERSION_119,
-):
-    """生成中继器方块
-    :param facing: 朝向：
+) -> Block:
+    """
+    生成中继器方块
+
+    Parameters
+    ----------
+    facing: int (0~3)
+        朝向：
         Z- 北 0
         X- 东 1
         Z+ 南 2
         X+ 西 3
-    :param delay: 0~3
-    :return Block()"""
+    delay: int (0~3)
+        信号延迟
+
+    Returns
+    -------
+    Block
+        生成的方块对象
+    """
 
     return Block(
         "minecraft",
@@ -141,50 +160,58 @@ def form_command_block_in_NBT_struct(
     executeOnFirstTick: bool = False,
     trackOutput: bool = True,
     compability_version_number: int = COMPABILITY_VERSION_119,
-):
+) -> Block:
     """
-    使用指定项目返回指定的指令方块结构
-    :param command: `str`
+    使用指定参数生成指令方块
+
+
+    Parameters
+    ----------
+    command: str
         指令
-    :param coordinate: `tuple[int,int,int]`
+    coordinate: tuple[int,int,int]
         此方块所在之相对坐标
-    :param particularValue:
+    particularValue: int
         方块特殊值，即朝向
-            :0	下	无条件
-            :1	上	无条件
-            :2	z轴负方向	无条件
-            :3	z轴正方向	无条件
-            :4	x轴负方向	无条件
-            :5	x轴正方向	无条件
-            :6	下	无条件
-            :7	下	无条件
-
-            :8	下	有条件
-            :9	上	有条件
-            :10	z轴负方向	有条件
-            :11	z轴正方向	有条件
-            :12	x轴负方向	有条件
-            :13	x轴正方向	有条件
-            :14	下	有条件
-            :14	下	有条件
+        :0	下	无条件
+        :1	上	无条件
+        :2	z轴负方向	无条件
+        :3	z轴正方向	无条件
+        :4	x轴负方向	无条件
+        :5	x轴正方向	无条件
+        :6	下	无条件
+        :7	下	无条件
+        :8	下	有条件
+        :9	上	有条件
+        :10	z轴负方向	有条件
+        :11	z轴正方向	有条件
+        :12	x轴负方向	有条件
+        :13	x轴正方向	有条件
+        :14	下	有条件
+        :14	下	有条件
         注意！此处特殊值中的条件会被下面condition参数覆写
-    :param impluse: `int 0|1|2`
+    impluse: int (0|1|2)
         方块类型
-            0脉冲 1循环 2连锁
-    :param condition: `bool`
+        0脉冲 1循环 2连锁
+    condition: bool
         是否有条件
-    :param alwaysRun: `bool`
+    alwaysRun: bool
         是否始终执行
-    :param tickDelay: `int`
+    tickDelay: int
         执行延时
-    :param customName: `str`
+    customName: str
         悬浮字
-    :param executeOnFirstTick: `bool`
-        首刻执行(循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行)
-    :param trackOutput: `bool`
-        是否输出
+    executeOnFirstTick: bool
+        是否启用首刻执行（循环指令方块是否激活后立即执行，若为False，则从激活时起延迟后第一次执行）
+    trackOutput: bool
+        是否启用命令方块输出
+    compability_version_number: int
+        版本兼容代号
 
-    :return:str
+    Returns
+    -------
+    Block
+        生成的方块对象
     """
 
     return Block(
@@ -231,9 +258,19 @@ def commands_to_structure(
     compability_version_: int = COMPABILITY_VERSION_119,
 ):
     """
-    :param commands: 指令列表
-    :param max_height: 生成结构最大高度
-    :return 结构类,结构占用大小,终点坐标
+    由指令列表生成(纯指令方块)结构
+
+    Parameters
+    ------------
+    commands: list
+        指令列表
+    max_height: int
+        生成结构最大高度
+
+    Returns
+    ---------
+    Structure, tuple[int, int, int], tuple[int, int, int]
+        结构类, 结构占用大小, 终点坐标
     """
 
     _sideLength = bottem_side_length_of_smallest_square_bottom_box(
@@ -321,12 +358,25 @@ def commands_to_redstone_delay_structure(
     compability_version_: int = COMPABILITY_VERSION_119,
 ) -> Tuple[Structure, Tuple[int, int, int], Tuple[int, int, int]]:
     """
-    :param commands: 指令列表
-    :param delay_length: 延时总长
-    :param max_multicmd_length: 最大同时播放的音符数量
-    :param base_block: 生成结构的基底方块
-    :param axis_: 生成结构的延展方向
-    :return 结构类,结构占用大小,终点坐标
+    由指令列表生成由红石中继器延迟的结构
+
+    Parameters
+    ------------
+    commands: list
+        指令列表
+    delay_length: int
+        延时总长
+    max_multicmd_length: int
+        最大同时播放的音符数量
+    base_block: Block
+        生成结构的基底方块
+    axis_: str
+        生成结构的延展方向
+
+    Returns
+    ---------
+    Structure, tuple[int, int, int], tuple[int, int, int]
+        结构类, 结构占用大小, 终点坐标
     """
     if axis_ in ["z+", "Z+"]:
         extensioon_direction = z

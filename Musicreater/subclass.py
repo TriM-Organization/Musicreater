@@ -70,23 +70,41 @@ class MineNote:
         azimuth: Optional[Tuple[float, float]] = None,
         extra_information: Optional[Dict[str, Any]] = None,
     ):
-        """用于存储单个音符的类
+        """
+        用于存储单个音符的类
 
-        :param mc_sound_name:`str` 《我的世界》声音ID
-        :param midi_pitch:`int` midi音高
-        :param midi_velocity:`int` midi响度(力度)
-        :param start_time:`int` 开始之时(命令刻)
+        Parameters
+        ------------
+        mc_sound_name: str
+            《我的世界》声音ID
+        midi_pitch: int
+            midi音高
+        midi_velocity: int
+            midi响度(力度)
+        start_time: int
+            开始之时(命令刻)
             注：此处的时间是用从乐曲开始到当前的刻数
-        :param last_time:`int` 音符延续时间(命令刻)
-        :param mass_precision_time:`int` 高精度的开始时间偏移量(1/1250秒)
-        :param is_percussion:`bool` 是否作为打击乐器
-        :param distance: `float` 发声源距离玩家的距离（半径 `r`）
+        last_time: int
+            音符延续时间(命令刻)
+        mass_precision_time: int
+            高精度的开始时间偏移量(1/1250秒)
+        is_percussion: bool
+            是否作为打击乐器
+        distance: float
+            发声源距离玩家的距离（半径 `r`）
             注：距离越近，音量越高，默认为 0。此参数可以与音量成某种函数关系。
-        :param azimuth:`tuple[float, float]` 声源方位
+        azimuth: tuple[float, float]
+            声源方位
             注：此参数为tuple，包含两个元素，分别表示：
             `rV`  发声源在竖直（上下）轴上，从玩家视角正前方开始，向顺时针旋转的角度
             `rH`  发声源在水平（左右）轴上，从玩家视角正前方开始，向上（到达玩家正上方顶点后变为向下，以此类推的旋转）旋转的角度
-        :param extra_information:`Any` 附加信息"""
+        extra_information: Any
+            附加信息，尽量存储为字典
+
+        Returns
+        ---------
+        MineNote 类
+        """
         self.sound_name: str = mc_sound_name
         """乐器ID"""
         self.note_pitch: int = 66 if midi_pitch is None else midi_pitch
@@ -94,9 +112,9 @@ class MineNote:
         self.velocity: int = midi_velocity
         """响度(力度)"""
         self.start_tick: int = start_time
-        """开始之时 tick"""
+        """开始之时 命令刻"""
         self.duration: int = last_time
-        """音符持续时间 tick"""
+        """音符持续时间 命令刻"""
         self.high_precision_time: int = mass_precision_time
         """高精度开始时间偏量 0.4 毫秒"""
 
@@ -133,17 +151,35 @@ class MineNote:
         displacement: Optional[Tuple[float, float, float]] = None,
         extra_information: Optional[Any] = None,
     ):
-        """用于存储单个音符的类
-        :param mc_sound_name:`str` 《我的世界》声音ID
-        :param midi_pitch:`int` midi音高
-        :param midi_velocity:`int` midi响度(力度)
-        :param start_time:`int` 开始之时(命令刻)
+        """
+        从传统音像位移格式传参，写入用于存储单个音符的类
+
+        Parameters
+        ------------
+        mc_sound_name: str
+            《我的世界》声音ID
+        midi_pitch: int
+            midi音高
+        midi_velocity: int
+            midi响度(力度)
+        start_time: int
+            开始之时(命令刻)
             注：此处的时间是用从乐曲开始到当前的刻数
-        :param last_time:`int` 音符延续时间(命令刻)
-        :param mass_precision_time:`int` 高精度的开始时间偏移量(1/1250秒)
-        :param is_percussion:`bool` 是否作为打击乐器
-        :param displacement:`tuple[float,float,float]` 声像位移
-        :param extra_information:`Any` 附加信息"""
+        last_time: int
+            音符延续时间(命令刻)
+        mass_precision_time: int
+            高精度的开始时间偏移量(1/1250秒)
+        is_percussion: bool
+            是否作为打击乐器
+        displacement: tuple[float, float, float]
+            声像位移
+        extra_information: Any
+            附加信息，尽量为字典。
+
+        Returns
+        ---------
+        MineNote 类
+        """
 
         if displacement is None:
             displacement = (0, 0, 0)
@@ -246,10 +282,17 @@ class MineNote:
         """
         将数据打包为字节码
 
-        :param is_displacement_included:`bool` 是否包含声像偏移数据，默认为**是**
-        :param is_high_time_precision:`bool` 是否启用高精度，默认为**是**
+        Parameters
+        ------------
+        is_displacement_included: bool
+            是否包含声像偏移数据，默认为**是**
+        is_high_time_precision: bool
+            是否启用高精度，默认为**是**
 
-        :return bytes 打包好的字节码
+        Returns
+        ---------
+        bytes
+            打包好的字节码
         """
 
         # MineNote 的字节码共有三个顺次版本分别如下
@@ -545,12 +588,26 @@ class SingleNoteBox:
         percussion: Optional[bool] = None,
         annotation: str = "",
     ):
-        """用于存储单个音符盒的类
-        :param instrument_block_ 音符盒演奏所使用的乐器方块
-        :param note_value_ 音符盒的演奏音高
-        :param percussion 此音符盒乐器是否作为打击乐处理
+        """
+        用于存储单个音符盒的类
+
+        Parameters
+        ------------
+        instrument_block_: str
+            音符盒演奏所使用的乐器方块
+        note_value_: int
+            音符盒的演奏音高
+        percussion: bool
+            此音符盒乐器是否作为打击乐处理
             注：若为空，则自动识别是否为打击乐器
-        :param annotation 音符注释"""
+        annotation: Any
+            音符注释
+
+        Returns
+        ---------
+        SingleNoteBox 类
+        """
+
         self.instrument_block = instrument_block_
         """乐器方块"""
         self.note_value = note_value_
@@ -634,7 +691,8 @@ class ProgressBarStyle:
         to_play_s: Optional[str] = None,
         played_s: Optional[str] = None,
     ):
-        """用于存储进度条样式的类
+        """
+        用于存储进度条样式的类
 
         | 标识符   | 指定的可变量     |
         |---------|----------------|
@@ -646,9 +704,18 @@ class ProgressBarStyle:
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
 
-        :param base_s 基础样式，用以定义进度条整体
-        :param to_play_s 进度条样式：尚未播放的样子
-        :param played_s 已经播放的样子
+        Parameters
+        ------------
+        base_s: str
+            基础样式，用以定义进度条整体
+        to_play_s: str
+            进度条样式：尚未播放的样子
+        played_s: str
+            已经播放的样子
+
+        Returns
+        ---------
+        ProgressBarStyle 类
         """
 
         self.base_style = (
@@ -709,9 +776,19 @@ class ProgressBarStyle:
         """
         直接依照此格式输出一个进度条
 
-        :param played_delays: int 当前播放进度积分值
-        :param total_delays: int  乐器总延迟数（积分数）
-        :param music_name: str    曲名
+        Parameters
+        ------------
+        played_delays: int
+            当前播放进度积分值
+        total_delays: int
+            乐器总延迟数（计分板值）
+        music_name: str
+            曲名
+
+        Returns
+        ---------
+        str
+            进度条字符串
         """
 
         return (

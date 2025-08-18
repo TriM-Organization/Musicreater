@@ -26,6 +26,7 @@ RES.txt
 /Packer/checksum.txt
 /bgArrayLib
 /fcwslib
+test_lyric-mido.py
 
 # Byte-compiled / optimized
 __pycache__/

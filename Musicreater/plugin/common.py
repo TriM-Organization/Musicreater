@@ -19,9 +19,22 @@ Terms & Conditions: License.md in the root directory
 import math
 
 
-def bottem_side_length_of_smallest_square_bottom_box(total: int, maxHeight: int):
-    """给定总方块数量和最大高度，返回所构成的图形外切正方形的边长
-    :param total: 总方块数量
-    :param maxHeight: 最大高度
-    :return: 外切正方形的边长 int"""
-    return math.ceil(math.sqrt(math.ceil(total / maxHeight)))
+def bottem_side_length_of_smallest_square_bottom_box(
+    _total_block_count: int, _max_height: int
+):
+    """
+    给定结构的总方块数量和规定的最大高度，返回该结构应当构成的图形，在底面的外切正方形之边长
+
+    Parameters
+    ------------
+    _total_block_count: int
+        总方块数量
+    _max_height: int
+        规定的结构最大高度
+
+    Returns
+    ---------
+    int
+        外切正方形的边长
+    """
+    return math.ceil(math.sqrt(math.ceil(_total_block_count / _max_height)))
