@@ -112,7 +112,7 @@ class MusicSequence:
         """
         音符序列类
 
-        Paramaters
+        Parameters
         ==========
         name_of_music: str
             乐曲名称
@@ -175,7 +175,7 @@ class MusicSequence:
         """
         自mido对象导入一个音符序列类
 
-        Paramaters
+        Parameters
         ==========
         mido_file: mido.MidiFile
             需要处理的midi对象
@@ -247,7 +247,7 @@ class MusicSequence:
         """
         从字节码导入音乐序列，目前支持 MSQ 第二、三、四版和 FSQ 第一、二版。
 
-        Paramaters
+        Parameters
         ==========
         bytes_buffer_in: bytes
             字节码
@@ -1588,7 +1588,7 @@ class MidiConvert(MusicSequence):
                     relative_coordinates,
                     volume_percentage,
                     mc_pitch,
-                ) = minenote_to_command_paramaters(
+                ) = minenote_to_command_parameters(
                     note,
                     pitch_deviation=self.music_deviation,
                 )
@@ -1672,7 +1672,7 @@ class MidiConvert(MusicSequence):
                 relative_coordinates,
                 volume_percentage,
                 mc_pitch,
-            ) = minenote_to_command_paramaters(
+            ) = minenote_to_command_parameters(
                 note,
                 pitch_deviation=self.music_deviation,
             )
@@ -1758,7 +1758,7 @@ class MidiConvert(MusicSequence):
                 relative_coordinates,
                 volume_percentage,
                 mc_pitch,
-            ) = minenote_to_command_paramaters(
+            ) = minenote_to_command_parameters(
                 note,
                 pitch_deviation=self.music_deviation,
             )

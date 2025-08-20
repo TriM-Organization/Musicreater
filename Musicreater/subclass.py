@@ -18,7 +18,7 @@ Terms & Conditions: License.md in the root directory
 
 from math import sin, cos, asin, radians, degrees, sqrt, atan
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple, Union, Dict
+from typing import Optional, Any, List, Tuple, Union, Dict, Sequence
 
 from .constants import MC_PITCHED_INSTRUMENT_LIST
 
@@ -54,7 +54,7 @@ class MineNote:
     sound_azimuth: Tuple[float, float]
     """声源方位 角度"""
 
-    extra_info: Any
+    extra_info: Dict[str, Any]
     """你觉得放什么好？"""
 
     def __init__(
@@ -68,7 +68,7 @@ class MineNote:
         is_percussion: Optional[bool] = None,
         distance: Optional[float] = None,
         azimuth: Optional[Tuple[float, float]] = None,
-        extra_information: Optional[Dict[str, Any]] = None,
+        extra_information: Dict[str, Any] = {},
     ):
         """
         用于存储单个音符的类
@@ -98,7 +98,7 @@ class MineNote:
             注：此参数为tuple，包含两个元素，分别表示：
             `rV`  发声源在竖直（上下）轴上，从玩家视角正前方开始，向顺时针旋转的角度
             `rH`  发声源在水平（左右）轴上，从玩家视角正前方开始，向上（到达玩家正上方顶点后变为向下，以此类推的旋转）旋转的角度
-        extra_information: Any
+        extra_information: Dict[str, Any]
             附加信息，尽量存储为字典
 
         Returns
@@ -136,7 +136,7 @@ class MineNote:
         )
         """声源距离"""
 
-        self.extra_info = extra_information
+        self.extra_info = extra_information if extra_information else {}
 
     @classmethod
     def from_traditional(
@@ -210,7 +210,15 @@ class MineNote:
             is_percussion=is_percussion,
             distance=r,
             azimuth=(alpha_v, beta_h),
-            extra_information=extra_information,
+            extra_information=(
+                (
+                    extra_information
+                    if isinstance(extra_information, dict)
+                    else {"EXTRA_INFO": extra_information}
+                )
+                if extra_information
+                else {}
+            ),
         )
 
     @property
@@ -225,7 +233,7 @@ class MineNote:
 
     @classmethod
     def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
-        """自字节码析出MineNote类"""
+        """自字节码析出 MineNote 类"""
         group_1 = int.from_bytes(code_buffer[:6], "big")
         percussive_ = bool(group_1 & 0b1)
         duration_ = (group_1 := group_1 >> 1) & 0b11111111111111111
@@ -375,9 +383,34 @@ class MineNote:
             )
         )
 
-    def set_info(self, sth: Any):
+    def set_info(self, key: Union[str, Sequence[str]], value: Any):
         """设置附加信息"""
-        self.extra_info = sth
+        if isinstance(key, str):
+            self.extra_info[key] = value
+        elif (
+            isinstance(key, Sequence)
+            and isinstance(value, Sequence)
+            and (k := len(key)) == len(value)
+        ):
+            for i in range(k):
+                self.extra_info[key[i]] = value[i]
+        else:
+            raise TypeError("参数类型错误")
+
+    def get_info(self, key: str) -> Any:
+        """获取附加信息"""
+        if key in self.extra_info:
+            return self.extra_info[key]
+        elif "EXTRA_INFO" in self.extra_info:
+            if (
+                isinstance(self.extra_info["EXTRA_INFO"], dict)
+                and key in self.extra_info["EXTRA_INFO"]
+            ):
+                return self.extra_info["EXTRA_INFO"].get(key)
+            else:
+                return self.extra_info["EXTRA_INFO"]
+        else:
+            return None
 
     def stringize(
         self, include_displacement: bool = False, include_extra_data: bool = False

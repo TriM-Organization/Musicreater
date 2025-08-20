@@ -49,7 +49,7 @@ ChannelType = Dict[
     ],
 ]
 """
-以字典所标记的频道信息类型（已弃用）
+以字典所标记的通道信息类型（已弃用）
 
 Dict[int,Dict[int,List[Union[Tuple[Literal["PgmC"], int, int],Tuple[Literal["NoteS"], int, int, int],Tuple[Literal["NoteE"], int, int],]],],]
 """
@@ -60,7 +60,14 @@ MineNoteChannelType = Mapping[
     List[MineNote,],
 ]
 """
-我的世界频道信息类型
+我的世界通道信息类型
 
 Dict[int,Dict[int,List[MineNote,],],]
 """
+
+MineNoteTrackType = Mapping[
+    int,
+    List[MineNote,],
+]
+
+

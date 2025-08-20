@@ -79,7 +79,7 @@ class FutureMidiConvertLyricSupport(MidiConvert):
                 relative_coordinates,
                 volume_percentage,
                 mc_pitch,
-            ) = minenote_to_command_paramaters(
+            ) = minenote_to_command_parameters(
                 note,
                 pitch_deviation=self.music_deviation,
             )
@@ -367,7 +367,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
                     relative_coordinates,
                     volume_percentage,
                     mc_pitch,
-                ) = minenote_to_command_paramaters(
+                ) = minenote_to_command_parameters(
                     note,
                     pitch_deviation=self.music_deviation,
                 )
@@ -446,7 +446,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
                 relative_coordinates,
                 volume_percentage,
                 mc_pitch,
-            ) = minenote_to_command_paramaters(
+            ) = minenote_to_command_parameters(
                 note,
                 pitch_deviation=self.music_deviation,
             )
@@ -783,7 +783,7 @@ class FutureMidiConvertJavaE(MidiConvert):
                     relative_coordinates,
                     volume_percentage,
                     mc_pitch,
-                ) = minenote_to_command_paramaters(
+                ) = minenote_to_command_parameters(
                     note,
                     pitch_deviation=self.music_deviation,
                 )
@@ -874,8 +874,14 @@ class FutureMidiConvertM4(MidiConvert):
 
         totalCount = int(_note.duration / _apply_time_division)
 
-        if totalCount == 0:
-            print(_note.extra_info)
+        if (
+            totalCount == 0
+            or (_note.get_info("PITCH") > 2 and _note.sound_name != "note.bass")
+        ):
+            from rich import print as prt
+
+            prt("[INFO] 音符太短或音调太高，无法生成插值")
+            prt(_note)
             return [
                 _note,
             ]
@@ -883,18 +889,24 @@ class FutureMidiConvertM4(MidiConvert):
 
         result: List[MineNote] = []
 
+        _slide = _note.duration / totalCount
+        _distance_slide = 20 / totalCount
+
         for _i in range(totalCount):
             result.append(
                 MineNote(
                     mc_sound_name=_note.sound_name,
                     midi_pitch=_note.note_pitch,
                     midi_velocity=_note.velocity,
-                    start_time=int(
-                        _note.start_tick + _i * (_note.duration / totalCount)
-                    ),
-                    last_time=int(_note.duration / totalCount),
+                    start_time=int(_note.start_tick + _i * _slide),
+                    last_time=int(_slide),
                     # track_number=_note.track_no,
                     is_percussion=_note.percussive,
+                    distance=_note.sound_distance + _i * _distance_slide,
+                    azimuth=(
+                        _note.sound_azimuth[0],
+                        _note.sound_azimuth[1] + 5 * random.random(),
+                    ),
                     extra_information=_note.extra_info,
                 )
                 # (
@@ -931,14 +943,17 @@ class FutureMidiConvertM4(MidiConvert):
         for channel in self.channels.values():
             for note in channel:
                 note.set_info(
-                    minenote_to_command_paramaters(
+                    ["NOTE_ID", "COODINATES", "VOLUME", "PITCH"],
+                    minenote_to_command_parameters(
                         note,
                         pitch_deviation=self.music_deviation,
-                    )
+                    ),
                 )
 
                 if not note.percussive:
-                    notes_list.extend(self._linear_note(note, 1 * note.extra_info[3]))
+                    notes_list.extend(
+                        self._linear_note(note, 2 * note.get_info("PITCH"))
+                    )
                 else:
                     notes_list.append(note)
 
@@ -954,12 +969,17 @@ class FutureMidiConvertM4(MidiConvert):
             else:
                 max_multi = max(max_multi, multi)
                 multi = 0
+
             (
                 mc_sound_ID,
                 relative_coordinates,
                 volume_percentage,
                 mc_pitch,
-            ) = note.extra_info
+            ) = minenote_to_command_parameters(
+                note,
+                pitch_deviation=self.music_deviation,
+            )
+
             self.music_command_list.append(
                 MineCommand(
                     command=(

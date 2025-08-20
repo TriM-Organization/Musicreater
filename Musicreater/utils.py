@@ -212,8 +212,8 @@ def panning_2_rotation_trigonometric(pan_: float) -> float:
         return math.degrees(math.acos((64 - pan_) / 63)) - 90
 
 
-def minenote_to_command_paramaters(
-    note_: MineNote,
+def minenote_to_command_parameters(
+    mine_note: MineNote,
     pitch_deviation: float = 0,
 ) -> Tuple[
     str,
@@ -226,7 +226,7 @@ def minenote_to_command_paramaters(
 
     Parameters
     ------------
-    note_: MineNote
+    mine_note: MineNote
         音符对象
     deviation: float
         音调偏移量
@@ -238,19 +238,19 @@ def minenote_to_command_paramaters(
     """
 
     return (
-        note_.sound_name,
-        note_.position_displacement,
-        note_.velocity / 127,
+        mine_note.sound_name,
+        mine_note.position_displacement,
+        mine_note.velocity / 127,
         (
             None
-            if note_.percussive
+            if mine_note.percussive
             else (
                 2
                 ** (
                     (
-                        note_.note_pitch
+                        mine_note.note_pitch
                         - 60
-                        - MM_INSTRUMENT_DEVIATION_TABLE.get(note_.sound_name, 6)
+                        - MM_INSTRUMENT_DEVIATION_TABLE.get(mine_note.sound_name, 6)
                         + pitch_deviation
                     )
                     / 12
