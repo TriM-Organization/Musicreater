@@ -34,7 +34,7 @@
 [![GitHub Repo stars](https://img.shields.io/github/stars/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/stargazers)
 [![GitHub Repo Forks](https://img.shields.io/github/forks/TriM-Organization/Musicreater?color=white&logo=GitHub&style=plastic)](https://github.com/TriM-Organization/Musicreater/forks)
 
-简体中文 🇨🇳 | [English🇬🇧](README_EN.md)
+简体中文🇨🇳 | [English🇬🇧](README_EN.md)
 
 ## 介绍 🚀
 
@@ -74,7 +74,7 @@
 
 ## 作者 ✒
 
-**金羿 Eilles**：我的世界基岩版指令作者，个人开发者，B 站不知名 UP 主，江西老表。
+**金羿 Eilles**：我的世界基岩版指令作者，个人开发者，B 站不知名 UP 主。
 
 **诸葛亮与八卦阵 bgArray**：我的世界基岩版玩家，喜欢编程和音乐，深圳学生。
 

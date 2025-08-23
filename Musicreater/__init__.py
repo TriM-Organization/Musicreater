@@ -22,7 +22,7 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.4.2"
+__version__ = "2.4.2.1"
 __vername__ = "音符附加信息升级"
 __author__ = (
     ("金羿", "Eilles"),
@@ -62,6 +62,7 @@ __all__ = [
     "MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE",
     # Midi 与 游戏 的对照表
     "MM_INSTRUMENT_RANGE_TABLE",
+    "MM_INSTRUMENT_DEVIATION_TABLE",
     "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
     "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
     "MM_TOUCH_PITCHED_INSTRUMENT_TABLE",
@@ -131,6 +132,7 @@ from .constants import (
     MC_PITCHED_INSTRUMENT_LIST,
     # MIDI 到 我的世界 表
     MM_INSTRUMENT_RANGE_TABLE,
+    MM_INSTRUMENT_DEVIATION_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_TOUCH_PITCHED_INSTRUMENT_TABLE,

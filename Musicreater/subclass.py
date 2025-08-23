@@ -395,7 +395,8 @@ class MineNote:
             for i in range(k):
                 self.extra_info[key[i]] = value[i]
         else:
-            raise TypeError("参数类型错误")
+            # 提供简单报错就行了，如果放一堆 if 语句，降低处理速度
+            raise TypeError("参数类型错误；键：`{}` 值：`{}`".format(key, value))
 
     def get_info(self, key: str) -> Any:
         """获取附加信息"""

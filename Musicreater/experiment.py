@@ -874,14 +874,17 @@ class FutureMidiConvertM4(MidiConvert):
 
         totalCount = int(_note.duration / _apply_time_division)
 
-        if (
-            totalCount == 0
-            or (_note.get_info("PITCH") > 2 and _note.sound_name != "note.bass")
+        if totalCount == 0 or (
+            _note.get_info("PITCH") > 1.89 and _note.sound_name != "note.bass"
         ):
-            from rich import print as prt
 
-            prt("[INFO] 音符太短或音调太高，无法生成插值")
-            prt(_note)
+            # 喂喂，这是测试用的，别发版啊！！！
+
+            # from rich import print as prt
+
+            # prt("[INFO] 音符太短或音调太高，无法生成插值")
+            # prt(_note)
+
             return [
                 _note,
             ]
@@ -905,7 +908,7 @@ class FutureMidiConvertM4(MidiConvert):
                     distance=_note.sound_distance + _i * _distance_slide,
                     azimuth=(
                         _note.sound_azimuth[0],
-                        _note.sound_azimuth[1] + 5 * random.random(),
+                        _note.sound_azimuth[1] + 10 * (random.random() - 0.5),
                     ),
                     extra_information=_note.extra_info,
                 )
@@ -952,7 +955,7 @@ class FutureMidiConvertM4(MidiConvert):
 
                 if not note.percussive:
                     notes_list.extend(
-                        self._linear_note(note, 2 * note.get_info("PITCH"))
+                        self._linear_note(note, 2.75 / note.get_info("PITCH"))
                     )
                 else:
                     notes_list.append(note)
