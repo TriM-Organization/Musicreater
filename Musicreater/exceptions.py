@@ -39,7 +39,7 @@ class MidiFormatException(MSCTBaseException):
 
     def __init__(self, *args):
         """音·创库版本的所有MIDI格式错误均继承于此"""
-        super().__init__("MIDI格式错误", *args)
+        super().__init__("MIDI 格式错误", *args)
 
 
 class MidiDestroyedError(MSCTBaseException):
@@ -47,7 +47,7 @@ class MidiDestroyedError(MSCTBaseException):
 
     def __init__(self, *args):
         """Midi文件损坏"""
-        super().__init__("MIDI文件损坏：无法读取MIDI文件", *args)
+        super().__init__("MIDI文件损坏：无法读取 MIDI 文件", *args)
 
 
 # class MidiUnboundError(MSCTBaseException):
@@ -87,7 +87,7 @@ class NotDefineTempoError(MidiFormatException):
 
     def __init__(self, *args):
         """没有Tempo设定导致时间无法计算的错误"""
-        super().__init__("在曲目开始时没有声明Tempo（未指定拍长）", *args)
+        super().__init__("在曲目开始时没有声明 Tempo（未指定拍长）", *args)
 
 
 class ChannelOverFlowError(MidiFormatException):

@@ -34,6 +34,7 @@ __all__ = [
     "AXIS_PARTICULAR_VALUE",
     "COMPABILITY_VERSION_117",
     "COMPABILITY_VERSION_119",
+    "COMPABILITY_VERSION_121",
     # BDX 函数
     "bdx_move",
     "form_command_block_in_BDX_bytes",
@@ -62,6 +63,7 @@ from .mcstructure import (
     AXIS_PARTICULAR_VALUE,
     COMPABILITY_VERSION_119,
     COMPABILITY_VERSION_117,
+    COMPABILITY_VERSION_121,
     command_statevalue,
     form_note_block_in_NBT_struct,
     form_repeater_in_NBT_struct,

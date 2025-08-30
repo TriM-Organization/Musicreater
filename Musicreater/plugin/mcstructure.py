@@ -58,6 +58,10 @@ COMPABILITY_VERSION_117: int = 17879555
 """
 Minecraft 1.17 兼容版本号
 """
+COMPABILITY_VERSION_121: int = 18168865
+"""
+Minecraft 1.21 兼容版本号
+"""
 
 
 def command_statevalue(axis_: Literal["x", "y", "z", "X", "Y", "Z"], forward_: bool):
@@ -236,7 +240,9 @@ def form_command_block_in_NBT_struct(
                 "SuccessCount": 0,
                 "TickDelay": tickDelay,
                 "TrackOutput": trackOutput,
-                "Version": 25,
+                "Version": (
+                    25 if compability_version_number <= COMPABILITY_VERSION_119 else 43
+                ),
                 "auto": alwaysRun,
                 "conditionMet": False,  # 是否已经满足条件
                 "conditionalMode": condition,

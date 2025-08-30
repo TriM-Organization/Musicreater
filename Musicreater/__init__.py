@@ -22,7 +22,7 @@ The Licensor of Musicreater("this project") is Eilles, bgArray.
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "2.4.2.1"
+__version__ = "2.4.2.2"
 __vername__ = "音符附加信息升级"
 __author__ = (
     ("金羿", "Eilles"),
