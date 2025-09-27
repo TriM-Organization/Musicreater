@@ -398,7 +398,7 @@ def midi_msgs_to_minenote_using_kami_respack(
     using_original = False
     if not percussive_ and (0 <= inst_ <= 119):
         mc_sound_ID = "{}{}.{}".format(
-            # inst_, "d" if duration_ < 500_000 else "c", note_
+            # inst_, "c" if (duration_ > 1000_000) and (inst_ in (0, 1, 2, 3, 4, 5, 6, 7, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53)) else "d", note_
             inst_,
             "d",
             note_,
