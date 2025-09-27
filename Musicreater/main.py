@@ -671,7 +671,7 @@ class MusicSequence:
         # 音乐名称 music_name 长度最多 63 支持到 31 个中文字符 或 63 个西文字符
 
         bytes_buffer = (
-            (b"FSQ!" if flowing_codec_support else b"MSQ!")
+            (b"FSQ$" if flowing_codec_support else b"MSQ$")
             + (
                 (len(r := self.music_name.encode("GB18030")) << 10)  # 音乐名称长度
                 + round(self.minimum_volume * 1000)  # 最小音量
