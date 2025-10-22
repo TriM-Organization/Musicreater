@@ -955,7 +955,7 @@ class FutureMidiConvertM4(MidiConvert):
 
                 if not note.percussive:
                     notes_list.extend(
-                        self._linear_note(note, 2.75 / note.get_info("PITCH"))
+                        self._linear_note(note, 2.55 / note.get_info("PITCH"))
                     )
                 else:
                     notes_list.append(note)
