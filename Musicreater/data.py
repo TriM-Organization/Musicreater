@@ -19,11 +19,38 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-from math import sin, cos, asin, radians, degrees, sqrt, atan
+from math import sin, cos, asin, radians, degrees, sqrt, atan, inf
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple, Union, Dict, Sequence
+from typing import Optional, Any, List, Tuple, Union, Dict, Sequence, Callable
+import bisect
 
+from .types import FittingFunctionType
 from .constants import MC_PITCHED_INSTRUMENT_LIST
+
+
+class ArgumentCurve:
+
+    base_line: float = 0
+    """基线/默认值"""
+
+    default_curve: Callable[[float], float]
+    """默认曲线"""
+
+    defined_curves: Dict[float, "ArgumentCurve"] = {}
+    """调整后的曲线集合"""
+
+    left_border: float = 0
+    """定义域左边界"""
+
+    right_border: float = inf
+    """定义域右边界"""
+
+    def __init__(self, baseline: float = 0, default_function: Callable[[float], float] = lambda x: 0, function_set: Dict = {}) -> None:
+        pass
+
+    def __call__(self, *args: Any, **kwds: Any) -> Any:
+        pass
+
 
 
 class SoundAtmos:
@@ -325,6 +352,9 @@ class SingleTrack(list):
 
     sound_position: SoundAtmos
     """声像方位"""
+
+    argument_curves: Dict[str, FittingFunctionType]
+    """参数曲线"""
 
     extra_info: Dict[str, Any]
     """你觉得放什么好？"""
