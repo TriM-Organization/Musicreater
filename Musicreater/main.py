@@ -1183,7 +1183,7 @@ class MidiConvert(MusicSequence):
         pan_processing_func: FittingFunctionType = panning_2_rotation_linear,
         music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},
-        midi_charset: str = "utf-8",
+        midi_charset: str = "latin1",
     ):
         """
         直接输入文件地址，将 midi 文件读入
