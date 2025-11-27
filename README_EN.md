@@ -43,6 +43,13 @@ Musicreater is a free open-source library used for digital music that being play
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
+> **NOTICE** The project inside this repository is only the support library, which is mainly for the developers of music related software for _Minecraft: Bedrock Edition_.
+>
+> The _Bedrock Edition music convertor_ which is for common users is in [Linglun Converter](../../../Linglun-Converter).
+> 
+> We are also developing a _BE music editor_ (digital audio workstation): [Linglun](../../../LinglunStudio)
+
+
 ## Installation 🔳
 
 -   Via pypi
@@ -106,7 +113,7 @@ This list is not in any order.
 
 ## Contact Us 📞
 
-Meet problems? Welcome to give out your issue [here](https://github.com/EillesWan/Musicreater/issues/new)!
+Meet problems? Welcome to give out your issue [here](../../issues/new)!
 
 Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
 
