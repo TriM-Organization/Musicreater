@@ -18,11 +18,11 @@ Terms & Conditions: License.md in the root directory
 
 
 class MSCTBaseException(Exception):
-    """音·创库版本的所有错误均继承于此"""
+    """音·创 的所有错误均继承于此"""
 
     def __init__(self, *args):
-        """音·创库版本的所有错误均继承于此"""
-        super().__init__(*args)
+        """音·创 的所有错误均继承于此"""
+        super().__init__("音·创", *args)
 
     def meow(
         self,
@@ -35,10 +35,10 @@ class MSCTBaseException(Exception):
 
 
 class MidiFormatException(MSCTBaseException):
-    """音·创库版本的所有MIDI格式错误均继承于此"""
+    """音·创 的所有MIDI格式错误均继承于此"""
 
     def __init__(self, *args):
-        """音·创库版本的所有MIDI格式错误均继承于此"""
+        """音·创 的所有MIDI格式错误均继承于此"""
         super().__init__("MIDI 格式错误", *args)
 
 
@@ -59,7 +59,7 @@ class MidiDestroyedError(MSCTBaseException):
 # 此错误在本版本内已经不再使用
 
 
-class CommandFormatError(RuntimeError):
+class CommandFormatError(MSCTBaseException, RuntimeError):
     """指令格式与目标格式不匹配而引起的错误"""
 
     def __init__(self, *args):
@@ -112,6 +112,7 @@ class NoteOnOffMismatchError(MidiFormatException):
     def __init__(self, *args):
         """音符开音和停止不匹配的错误"""
         super().__init__("音符不匹配", *args)
+
 
 class LyricMismatchError(MSCTBaseException):
     """歌词匹配解析错误"""
