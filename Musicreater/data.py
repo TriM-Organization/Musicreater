@@ -415,3 +415,7 @@ class SingleTrack(list):
     def get_info(self, key: str, default: Any = None) -> Any:
         """获取附加信息"""
         return self.extra_info.get(key, default)
+
+class SingleMusic(object):
+    """存储单个曲子的类"""
+
