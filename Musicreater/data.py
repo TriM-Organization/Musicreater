@@ -4,8 +4,6 @@
 存储音·创新数据存储类
 """
 
-# WARNING 本文件中使用之功能尚未启用
-
 """
 版权所有 © 2025 金羿
 Copyright © 2025 Eilles
@@ -18,42 +16,21 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+# WARNING 本文件中使用之功能尚未启用
 
-from math import sin, cos, asin, radians, degrees, sqrt, atan, inf
+from math import sin, cos, asin, radians, degrees, sqrt, atan, inf, ceil
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple, Union, Dict, Sequence, Callable
-import bisect
+from typing import Optional, Any, List, Tuple, Union, Dict, Sequence, Callable, Generator
+from enum import Enum
 
 from .types import FittingFunctionType
 from .constants import MC_PITCHED_INSTRUMENT_LIST
 
-
-class ArgumentCurve:
-
-    base_line: float = 0
-    """基线/默认值"""
-
-    default_curve: Callable[[float], float]
-    """默认曲线"""
-
-    defined_curves: Dict[float, "ArgumentCurve"] = {}
-    """调整后的曲线集合"""
-
-    left_border: float = 0
-    """定义域左边界"""
-
-    right_border: float = inf
-    """定义域右边界"""
-
-    def __init__(self, baseline: float = 0, default_function: Callable[[float], float] = lambda x: 0, function_set: Dict = {}) -> None:
-        pass
-
-    def __call__(self, *args: Any, **kwds: Any) -> Any:
-        pass
-
+from .paramcurve import ParamCurve
 
 
 class SoundAtmos:
+    """声源方位类"""
 
     sound_distance: float
     """声源距离 方块"""
@@ -66,6 +43,20 @@ class SoundAtmos:
         distance: Optional[float] = None,
         azimuth: Optional[Tuple[float, float]] = None,
     ) -> None:
+        """
+        定义一个发声方位
+        
+        Parameters
+        ------------
+        distance: float
+            发声源距离玩家的距离（半径 `r`）
+            注：距离越近，音量越高，默认为 0。此参数可以与音量成某种函数关系。
+        azimuth: tuple[float, float]
+            声源方位
+            注：此参数为tuple，包含两个元素，分别表示：
+            `rV`  发声源在竖直（上下）轴上，从玩家视角正前方开始，向顺时针旋转的角度
+            `rH`  发声源在水平（左右）轴上，从玩家视角正前方开始，向上（到达玩家正上方顶点后变为向下，以此类推的旋转）旋转的角度
+        """
 
         self.sound_azimuth = (azimuth[0] % 360, azimuth[1] % 360) if azimuth else (0, 0)
         """声源方位"""
@@ -103,7 +94,7 @@ class SoundAtmos:
 
     @property
     def position_displacement(self) -> Tuple[float, float, float]:
-        """声像位移"""
+        """声像位移，直接可应用于我的世界的相对视角的坐标参考系中（^x ^y ^z）"""
         dk1 = self.sound_distance * round(cos(radians(self.sound_azimuth[1])), 8)
         return (
             -dk1 * round(sin(radians(self.sound_azimuth[0])), 8),
@@ -161,14 +152,6 @@ class SingleNote:
             高精度的开始时间偏移量(1/1250秒)
         is_percussion: bool
             是否作为打击乐器
-        distance: float
-            发声源距离玩家的距离（半径 `r`）
-            注：距离越近，音量越高，默认为 0。此参数可以与音量成某种函数关系。
-        azimuth: tuple[float, float]
-            声源方位
-            注：此参数为tuple，包含两个元素，分别表示：
-            `rV`  发声源在竖直（上下）轴上，从玩家视角正前方开始，向顺时针旋转的角度
-            `rH`  发声源在水平（左右）轴上，从玩家视角正前方开始，向上（到达玩家正上方顶点后变为向下，以此类推的旋转）旋转的角度
         extra_information: Dict[str, Any]
             附加信息，尽量存储为字典
 
@@ -332,6 +315,17 @@ class SingleNote:
             return self.start_tick > other.start_tick
 
 
+class CurvableParam(str, Enum):
+    """可曲线化的参数枚举类"""
+    PITCH = "note-pitch"
+    VELOCITY = "note-velocity"
+    VOLUME = "note-volume"
+    DISTANCE = "note-sound-distance"
+    HORIZONTAL_PANNING = "note-H-panning-degree"
+    VERTICAL_PANNING = "note-V-panning-degree"
+
+
+
 class SingleTrack(list):
     """存储单个轨道的类"""
 
@@ -353,7 +347,7 @@ class SingleTrack(list):
     sound_position: SoundAtmos
     """声像方位"""
 
-    argument_curves: Dict[str, FittingFunctionType]
+    argument_curves: Dict[CurvableParam, ParamCurve]
     """参数曲线"""
 
     extra_info: Dict[str, Any]
@@ -397,6 +391,11 @@ class SingleTrack(list):
         """音符数"""
         return len(self)
 
+    @property
+    def track_notes(self) -> List[SingleNote]:
+        """音符列表"""
+        return self
+
     def set_info(self, key: Union[str, Sequence[str]], value: Any):
         """设置附加信息"""
         if isinstance(key, str):
@@ -416,6 +415,90 @@ class SingleTrack(list):
         """获取附加信息"""
         return self.extra_info.get(key, default)
 
-class SingleMusic(object):
+
+    def get_notes(self) -> Generator[SingleNote, Any, None]:
+
+        # TODO : 添加其他参数以及参数曲线到这里来
+        for note in self:
+            yield note
+
+
+class SingleMusic(list):
     """存储单个曲子的类"""
 
+    music_name: str
+    """乐曲名称"""
+
+    music_creator: str
+    """本我的世界曲目的制作者"""
+
+    music_original_author: str
+    """曲目的原作者"""
+
+    music_description: str
+    """当前曲目的简介"""
+
+    music_credits: str
+    """曲目的版权信息"""
+
+    # 感叹一下什么交冗余设计啊！（叉腰）
+    extra_info: Dict[str, Any]
+    """这还得放东西？"""
+
+    def __init__(
+        self,
+        name: str = "未命名乐曲",
+        creator: str = "未命名制作者",
+        original_author: str = "未命名原作者",
+        description: str = "未命名简介",
+        credits: str = "未命名版权信息",
+        *args: SingleTrack,
+        extra_information: Dict[str, Any] = {},
+    ):
+        self.music_name = name
+        """乐曲名称"""
+
+        self.music_creator = creator
+        """曲目制作者"""
+
+        self.music_original_author = original_author
+        """乐曲原作者"""
+
+        self.music_description = description
+        """简介"""
+
+        self.music_credits = credits
+        """版权信息"""
+
+        self.extra_info = extra_information if extra_information else {}
+
+        super().__init__(*args)
+
+    @property
+    def track_amount(self) -> int:
+        """音轨数"""
+        return len(self)
+
+    @property
+    def music_tracks(self) -> List[SingleTrack]:
+        """音轨列表"""
+        return self
+
+    def set_info(self, key: Union[str, Sequence[str]], value: Any):
+        """设置附加信息"""
+        if isinstance(key, str):
+            self.extra_info[key] = value
+        elif (
+            isinstance(key, Sequence)
+            and isinstance(value, Sequence)
+            and (k := len(key)) == len(value)
+        ):
+            for i in range(k):
+                self.extra_info[key[i]] = value[i]
+        else:
+            # 提供简单报错就行了，如果放一堆 if 语句，降低处理速度
+            raise TypeError("参数类型错误；键：`{}` 值：`{}`".format(key, value))
+
+    def get_info(self, key: str, default: Any = None) -> Any:
+        """获取附加信息"""
+        return self.extra_info.get(key, default)

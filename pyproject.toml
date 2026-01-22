@@ -47,6 +47,7 @@
     full = [
         "TrimMCStruct <= 0.0.5.9",
         "brotli >= 1.0.0",
+        "numpy"
     ]
     dev = [
         "TrimMCStruct <= 0.0.5.9",
