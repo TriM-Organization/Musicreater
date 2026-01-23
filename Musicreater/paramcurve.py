@@ -237,7 +237,7 @@ class ParamCurve:
         ----------
         base_value : float
             边界外默认值（当 boundary_mode 为 BoundaryBehaviour.CONSTANT 时使用）。
-        default_interp : FittingFunctionType
+        default_interpolation_function : FittingFunctionType
             新关键帧的默认 out_interp。
         boundary_mode : BoundaryBehaviour
             范围外行为：
@@ -249,6 +249,9 @@ class ParamCurve:
         self.boundary_behaviour = boundary_mode
 
         self._keys: List[Keyframe] = []
+
+    def __bool__(self) -> bool:
+        return bool(self._keys) or (self.base_line != 0)
 
     def add_key(
         self,

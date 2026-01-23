@@ -20,7 +20,21 @@ Terms & Conditions: License.md in the root directory
 
 from math import sin, cos, asin, radians, degrees, sqrt, atan, inf, ceil
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple, Union, Dict, Sequence, Callable, Generator
+from typing import (
+    Optional,
+    Any,
+    List,
+    Tuple,
+    Union,
+    Dict,
+    Set,
+    Sequence,
+    Callable,
+    Generator,
+    Iterable,
+    Iterator,
+    Literal,
+)
 from enum import Enum
 
 from .types import FittingFunctionType
@@ -36,7 +50,7 @@ class SoundAtmos:
     """声源距离 方块"""
 
     sound_azimuth: Tuple[float, float]
-    """声源方位 角度"""
+    """声源方位 角度(rV左右 rH上下)"""
 
     def __init__(
         self,
@@ -45,7 +59,7 @@ class SoundAtmos:
     ) -> None:
         """
         定义一个发声方位
-        
+
         Parameters
         ------------
         distance: float
@@ -113,13 +127,13 @@ class SingleNote:
     velocity: int
     """力度"""
 
-    start_tick: int
+    start_time: int
     """开始之时 命令刻"""
 
     duration: int
     """音符持续时间 命令刻"""
 
-    high_precision_time: int
+    high_precision_start_time: int
     """高精度开始时间偏量 1/1250 秒"""
 
     extra_info: Dict[str, Any]
@@ -164,11 +178,11 @@ class SingleNote:
         """midi音高"""
         self.velocity: int = midi_velocity
         """响度(力度)"""
-        self.start_tick: int = start_time
+        self.start_time: int = start_time
         """开始之时 命令刻"""
         self.duration: int = last_time
         """音符持续时间 命令刻"""
-        self.high_precision_time: int = mass_precision_time
+        self.high_precision_start_time: int = mass_precision_time
         """高精度开始时间偏量 0.4 毫秒"""
 
         self.extra_info = extra_information if extra_information else {}
@@ -227,14 +241,14 @@ class SingleNote:
         return (
             (
                 (
-                    ((((self.note_pitch << 7) + self.velocity) << 17) + self.start_tick)
+                    ((((self.note_pitch << 7) + self.velocity) << 17) + self.start_time)
                     << 17
                 )
                 + self.duration
             ).to_bytes(6, "big")
             # + self.track_no.to_bytes(1, "big")
             + (
-                self.high_precision_time.to_bytes(1, "big")
+                self.high_precision_start_time.to_bytes(1, "big")
                 if is_high_time_precision
                 else b""
             )
@@ -263,9 +277,9 @@ class SingleNote:
         return "TrackedNote(Pitch = {}, Velocity = {}, StartTick = {}, Duration = {}, TimeOffset = {}".format(
             self.note_pitch,
             self.velocity,
-            self.start_tick,
+            self.start_time,
             self.duration,
-            self.high_precision_time,
+            self.high_precision_start_time,
         ) + (
             ", ExtraData = {})".format(self.extra_info) if include_extra_data else ")"
         )
@@ -279,18 +293,18 @@ class SingleNote:
         return (
             self.note_pitch,
             self.velocity,
-            self.start_tick,
+            self.start_time,
             self.duration,
-            self.high_precision_time,
+            self.high_precision_start_time,
         )
 
     def __dict__(self):
         return {
             "Pitch": self.note_pitch,
             "Velocity": self.velocity,
-            "StartTick": self.start_tick,
+            "StartTick": self.start_time,
             "Duration": self.duration,
-            "TimeOffset": self.high_precision_time,
+            "TimeOffset": self.high_precision_start_time,
             "ExtraData": self.extra_info,
         }
 
@@ -302,31 +316,88 @@ class SingleNote:
 
     def __lt__(self, other) -> bool:
         """比较自己是否在开始时间上早于另一个音符"""
-        if self.start_tick == other.start_tick:
-            return self.high_precision_time < other.high_precision_time
+        if self.start_time == other.start_tick:
+            return self.high_precision_start_time < other.high_precision_time
         else:
-            return self.start_tick < other.start_tick
+            return self.start_time < other.start_tick
 
     def __gt__(self, other) -> bool:
         """比较自己是否在开始时间上晚于另一个音符"""
-        if self.start_tick == other.start_tick:
-            return self.high_precision_time > other.high_precision_time
+        if self.start_time == other.start_tick:
+            return self.high_precision_start_time > other.high_precision_time
         else:
-            return self.start_tick > other.start_tick
+            return self.start_time > other.start_tick
 
 
 class CurvableParam(str, Enum):
     """可曲线化的参数枚举类"""
-    PITCH = "note-pitch"
-    VELOCITY = "note-velocity"
-    VOLUME = "note-volume"
-    DISTANCE = "note-sound-distance"
-    HORIZONTAL_PANNING = "note-H-panning-degree"
-    VERTICAL_PANNING = "note-V-panning-degree"
+
+    PITCH = "adjust_note_pitch"
+    VELOCITY = "adjust_note_velocity"
+    VOLUME = "adjust_note_volume"
+    DISTANCE = "adjust_note_sound_distance"
+    LR_PANNING = "adjust_note_leftright_panning_degree"
+    UD_PANNING = "adjust_note_updown_panning_degree"
 
 
+@dataclass
+class MineNote:
+    """我的世界音符对象（仅提供我的世界相关接口）"""
 
-class SingleTrack(list):
+    pitch: float
+    """midi音高"""
+    instrument: str
+    """乐器ID"""
+    velocity: float
+    """力度"""
+    volume: float
+    """音量"""
+    start_tick: int
+    """开始之时 命令刻"""
+    duration_tick: int
+    """音符持续时间 命令刻"""
+    persiced_time: int
+    """高精度开始时间偏量 1/1250 秒"""
+    percussive: bool
+    """是否作为打击乐器启用"""
+    position: SoundAtmos
+    """声像方位"""
+
+    @classmethod
+    def from_single_note(
+        cls,
+        note: SingleNote,
+        note_instrument: str,
+        sound_volume: float,
+        is_percussive_note: bool,
+        sound_position: SoundAtmos,
+        adjust_note_pitch: float = 0.0,
+        adjust_note_velocity: float = 0.0,
+        adjust_note_volume: float = 0.0,
+        adjust_note_sound_distance: float = 0.0,
+        adjust_note_leftright_panning_degree: float = 0.0,
+        adjust_note_updown_panning_degree: float = 0.0,
+    ) -> "MineNote":
+        """从SingleNote对象创建MineNote对象"""
+        sound_position.sound_distance += adjust_note_sound_distance
+        sound_position.sound_azimuth = (
+            sound_position.sound_azimuth[0] + adjust_note_leftright_panning_degree,
+            sound_position.sound_azimuth[1] + adjust_note_updown_panning_degree,
+        )
+        return cls(
+            pitch=note.note_pitch + adjust_note_pitch,
+            instrument=note_instrument,
+            velocity=note.velocity + adjust_note_velocity,
+            volume=sound_volume + adjust_note_volume,
+            start_tick=note.start_time,
+            duration_tick=note.duration,
+            persiced_time=note.high_precision_start_time,
+            percussive=is_percussive_note,
+            position=sound_position,
+        )
+
+
+class SingleTrack(List[SingleNote]):
     """存储单个轨道的类"""
 
     track_name: str
@@ -347,7 +418,7 @@ class SingleTrack(list):
     sound_position: SoundAtmos
     """声像方位"""
 
-    argument_curves: Dict[CurvableParam, ParamCurve]
+    argument_curves: Dict[CurvableParam, Union[ParamCurve, Literal[None]]]
     """参数曲线"""
 
     extra_info: Dict[str, Any]
@@ -384,7 +455,77 @@ class SingleTrack(list):
 
         self.extra_info = extra_information if extra_information else {}
 
+        self.argument_curves = {
+            CurvableParam.PITCH: None,
+            CurvableParam.VELOCITY: None,
+            CurvableParam.VOLUME: None,
+            CurvableParam.DISTANCE: None,
+            CurvableParam.LR_PANNING: None,
+            CurvableParam.UD_PANNING: None,
+        }
+
         super().__init__(*args)
+        super().sort()
+
+    def append(self, object: SingleNote) -> None:
+        """
+        添加一个音符，推荐使用 add 方法
+        """
+
+        return self.add(object)
+
+    def add(self, item: SingleNote) -> None:
+        """
+        在音轨里添加一个音符
+        """
+
+        if not isinstance(item, SingleNote):
+            raise TypeError(
+                "单音轨类的元素类型须为单音符（SingleNote），不可为：{}".format(
+                    type(item).__name__
+                )
+            )
+        super().append(item)
+        super().sort()
+
+    def update(self, items: Iterable[SingleNote]):
+        """
+        拼接两个音轨
+        """
+        super().extend(items)
+        super().sort()
+
+    def get(self, time: int) -> Iterator[SingleNote]:
+        """通过开始时间来获取音符"""
+
+        return filter(lambda x: x.start_time == time, self)
+
+    def get_range(
+        self, start_time: float, end_time: float = inf
+    ) -> Iterator[SingleNote]:
+        """通过开始时间和结束时间来获取音符"""
+
+        return filter(
+            lambda x: (x.start_time >= start_time) and (x.start_time <= end_time), self
+        )
+
+    def get_minenotes(
+        self, range_start_time: float = 0, range_end_time: float = inf
+    ) -> Generator[MineNote, Any, None]:
+
+        for note in self.get_range(range_start_time, range_end_time):
+            yield MineNote.from_single_note(
+                note,
+                self.track_instrument,
+                self.track_volume,
+                self.is_percussive,
+                self.sound_position,
+                **{
+                    item.value: self.argument_curves[item].value_at(note.start_time)  # type: ignore
+                    for item in CurvableParam
+                    if self.argument_curves[item]
+                },
+            )
 
     @property
     def note_amount(self) -> int:
@@ -416,14 +557,7 @@ class SingleTrack(list):
         return self.extra_info.get(key, default)
 
 
-    def get_notes(self) -> Generator[SingleNote, Any, None]:
-
-        # TODO : 添加其他参数以及参数曲线到这里来
-        for note in self:
-            yield note
-
-
-class SingleMusic(list):
+class SingleMusic(List[SingleTrack]):
     """存储单个曲子的类"""
 
     music_name: str
