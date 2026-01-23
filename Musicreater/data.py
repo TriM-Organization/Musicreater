@@ -512,6 +512,7 @@ class SingleTrack(List[SingleNote]):
     def get_minenotes(
         self, range_start_time: float = 0, range_end_time: float = inf
     ) -> Generator[MineNote, Any, None]:
+        """获取能够用以在我的世界播放的音符数据类"""
 
         for note in self.get_range(range_start_time, range_end_time):
             yield MineNote.from_single_note(
