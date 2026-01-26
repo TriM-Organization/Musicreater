@@ -85,7 +85,7 @@ __all__ = [
     "midi_inst_to_mc_sound",
 ]
 
-from .main import MusicSequence, MidiConvert
+from .old_main import MusicSequence, MidiConvert
 
 from .subclass import (
     MineNote,

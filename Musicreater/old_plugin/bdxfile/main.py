@@ -17,7 +17,7 @@ from typing import Optional
 
 import brotli
 
-from ...main import MidiConvert
+from ...old_main import MidiConvert
 from ...subclass import MineCommand, ProgressBarStyle
 from ..bdx import (
     bdx_move,

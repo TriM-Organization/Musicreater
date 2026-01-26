@@ -1,9 +1,9 @@
 import Musicreater.experiment
-import Musicreater.plugin
-import Musicreater.plugin.mcstructfile
+import Musicreater.old_plugin
+import Musicreater.old_plugin.mcstructfile
 
 print(
-    Musicreater.plugin.mcstructfile.to_mcstructure_file_in_delay(
+    Musicreater.old_plugin.mcstructfile.to_mcstructure_file_in_delay(
         Musicreater.experiment.FutureMidiConvertM4.from_midi_file(
             input("midi路径:"), old_exe_format=False
         ),

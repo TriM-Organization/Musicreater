@@ -40,9 +40,9 @@ from .constants import (
     MM_INSTRUMENT_DEVIATION_TABLE,
     MM_INSTRUMENT_RANGE_TABLE,
 )
-from .exceptions import MusicSequenceDecodeError
+from .old_exceptions import MusicSequenceDecodeError
 from .subclass import MineNote, mctick2timestr, SingleNoteBox
-from .types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
+from .old_types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
 
 
 def empty_midi_channels(

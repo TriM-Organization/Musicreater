@@ -1,15 +1,15 @@
 import Musicreater
 import Musicreater.experiment
-import Musicreater.plugin
+import Musicreater.old_plugin
 
 # import Musicreater.previous
-from Musicreater.plugin.addonpack import (
+from Musicreater.old_plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
     to_addon_pack_in_score,
 )
-from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
-from Musicreater.plugin.mcstructfile import (
+from Musicreater.old_plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
+from Musicreater.old_plugin.mcstructfile import (
     to_mcstructure_file_in_delay,
     to_mcstructure_file_in_repeater,
     to_mcstructure_file_in_score,
@@ -21,7 +21,7 @@ MSCT_MAIN = (
     # Musicreater.previous,
 )
 
-MSCT_PLUGIN = (Musicreater.plugin,)
+MSCT_PLUGIN = (Musicreater.old_plugin,)
 
 MSCT_PLUGIN_FUNCTION = (
     to_addon_pack_in_delay,

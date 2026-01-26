@@ -16,7 +16,7 @@ import os
 import shutil
 from typing import Literal, Optional, Tuple
 
-from ...main import MidiConvert
+from ...old_main import MidiConvert
 from ...subclass import ProgressBarStyle
 from ..archive import behavior_mcpack_manifest, compress_zipfile
 from ..mcstructure import (

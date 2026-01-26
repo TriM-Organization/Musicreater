@@ -16,8 +16,8 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-from ..exceptions import NotDefineProgramError, ZeroSpeedError
-from ..main import MidiConvert
+from ..old_exceptions import NotDefineProgramError, ZeroSpeedError
+from ..old_main import MidiConvert
 from ..subclass import MineCommand
 from ..utils import inst_to_sould_with_deviation, perc_inst_to_soundID_withX
 

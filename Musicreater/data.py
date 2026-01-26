@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
-存储音·创新数据存储类
+存储 音·创 v3 的内部数据类
 """
 
 """
-版权所有 © 2025 金羿
-Copyright © 2025 Eilles
+版权所有 © 2026 金羿
+Copyright © 2026 Eilles
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -16,7 +16,6 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-# WARNING 本文件中使用之功能尚未启用
 
 from math import sin, cos, asin, radians, degrees, sqrt, atan, inf, ceil
 from dataclasses import dataclass
@@ -37,9 +36,7 @@ from typing import (
 )
 from enum import Enum
 
-from .types import FittingFunctionType
-from .constants import MC_PITCHED_INSTRUMENT_LIST
-
+from .exceptions import SingleNoteDecodeError, ParameterTypeError
 from .paramcurve import ParamCurve
 
 
@@ -205,13 +202,21 @@ class SingleNote:
                 last_time=duration_,
                 mass_precision_time=code_buffer[6] if is_high_time_precision else 0,
             )
-        except:
+        except Exception as e:
+            # 我也不知道为什么这里要放一个异常处理
+            # 之前用到过吗？
+            # —— 2026.01.25 金羿
             print(
-                "[Error] 单音符解析错误，字节码`{}`，{}启用高精度时间偏移\n".format(
+                "[Exception] 单音符解析错误，字节码`{}`，{}启用高精度时间偏移\n".format(
                     code_buffer, "已" if is_high_time_precision else "未"
                 )
             )
-            raise
+            raise SingleNoteDecodeError(
+                e,
+                "技术信息：\nGROUP1\t`{}`\nCODE_BUFFER\t`{}`".format(
+                    group_1, code_buffer
+                ),
+            )
 
     def encode(self, is_high_time_precision: bool = True) -> bytes:
         """
@@ -267,7 +272,9 @@ class SingleNote:
                 self.extra_info[key[i]] = value[i]
         else:
             # 提供简单报错就行了，如果放一堆 if 语句，降低处理速度
-            raise TypeError("参数类型错误；键：`{}` 值：`{}`".format(key, value))
+            raise ParameterTypeError(
+                "参数类型错误；键：`{}` 值：`{}`".format(key, value)
+            )
 
     def get_info(self, key: str, default: Any = None) -> Any:
         """获取附加信息"""
@@ -369,6 +376,7 @@ class MineNote:
         note: SingleNote,
         note_instrument: str,
         sound_volume: float,
+        is_persiced_time: bool,
         is_percussive_note: bool,
         sound_position: SoundAtmos,
         adjust_note_pitch: float = 0.0,
@@ -391,7 +399,7 @@ class MineNote:
             volume=sound_volume + adjust_note_volume,
             start_tick=note.start_time,
             duration_tick=note.duration,
-            persiced_time=note.high_precision_start_time,
+            persiced_time=note.high_precision_start_time if is_persiced_time else 0,
             percussive=is_percussive_note,
             position=sound_position,
         )
@@ -480,8 +488,8 @@ class SingleTrack(List[SingleNote]):
         """
 
         if not isinstance(item, SingleNote):
-            raise TypeError(
-                "单音轨类的元素类型须为单音符（SingleNote），不可为：{}".format(
+            raise ParameterTypeError(
+                "单音轨类的元素类型须为单音符（`SingleNote`），不可为：`{}`".format(
                     type(item).__name__
                 )
             )
@@ -514,15 +522,16 @@ class SingleTrack(List[SingleNote]):
     ) -> Generator[MineNote, Any, None]:
         """获取能够用以在我的世界播放的音符数据类"""
 
-        for note in self.get_range(range_start_time, range_end_time):
+        for _note in self.get_range(range_start_time, range_end_time):
             yield MineNote.from_single_note(
-                note,
-                self.track_instrument,
-                self.track_volume,
-                self.is_percussive,
-                self.sound_position,
+                note=_note,
+                note_instrument=self.track_instrument,
+                sound_volume=self.track_volume,
+                is_persiced_time=self.is_high_time_precision,
+                is_percussive_note=self.is_percussive,
+                sound_position=self.sound_position,
                 **{
-                    item.value: self.argument_curves[item].value_at(note.start_time)  # type: ignore
+                    item.value: self.argument_curves[item].value_at(_note.start_time)  # type: ignore
                     for item in CurvableParam
                     if self.argument_curves[item]
                 },
@@ -551,7 +560,9 @@ class SingleTrack(List[SingleNote]):
                 self.extra_info[key[i]] = value[i]
         else:
             # 提供简单报错就行了，如果放一堆 if 语句，降低处理速度
-            raise TypeError("参数类型错误；键：`{}` 值：`{}`".format(key, value))
+            raise ParameterTypeError(
+                "参数类型错误；键：`{}` 值：`{}`".format(key, value)
+            )
 
     def get_info(self, key: str, default: Any = None) -> Any:
         """获取附加信息"""
@@ -632,7 +643,9 @@ class SingleMusic(List[SingleTrack]):
                 self.extra_info[key[i]] = value[i]
         else:
             # 提供简单报错就行了，如果放一堆 if 语句，降低处理速度
-            raise TypeError("参数类型错误；键：`{}` 值：`{}`".format(key, value))
+            raise ParameterTypeError(
+                "参数类型错误；键：`{}` 值：`{}`".format(key, value)
+            )
 
     def get_info(self, key: str, default: Any = None) -> Any:
         """获取附加信息"""

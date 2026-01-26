@@ -11,7 +11,7 @@ import shutil
 from typing import Optional, Tuple
 
 import Musicreater.experiment
-from Musicreater.plugin.archive import compress_zipfile
+from Musicreater.old_plugin.archive import compress_zipfile
 from Musicreater.utils import guess_deviation, is_in_diapason
 
 

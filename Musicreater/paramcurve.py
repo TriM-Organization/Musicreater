@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
 """
-存储音·创音轨所需的参数曲线
+存储 音·创 v3 内部数据使用的参数曲线
 """
 
 """
-版权所有 © 2025 金羿
-Copyright © 2025 Eilles
+版权所有 © 2026 金羿
+Copyright © 2026 Eilles
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -17,7 +17,7 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-# WARNING 本文件中使用之功能尚未启用
+# WARNING 本文件所含之功能未经完整测试
 # 鉴于白谭若佬给出的建议：本功能应是处于低优先级开发的
 # 因此暂时用处不大，可以稍微放一会再进行开发
 # 目前用人工智能生成了部分代码，只经过简单的测试

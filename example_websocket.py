@@ -1,13 +1,13 @@
 import Musicreater
-import Musicreater.plugin
-import Musicreater.plugin.websocket
+import Musicreater.old_plugin
+import Musicreater.old_plugin.websocket
 
 import os
 
 dire = input("midi目录：")
 
 print(
-    Musicreater.plugin.websocket.to_websocket_server(
+    Musicreater.old_plugin.websocket.to_websocket_server(
         [
             Musicreater.MidiConvert.from_midi_file(
                 os.path.join(dire, names), old_exe_format=False

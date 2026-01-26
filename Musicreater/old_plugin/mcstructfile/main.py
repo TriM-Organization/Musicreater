@@ -14,7 +14,7 @@ Terms & Conditions: License.md in the root directory
 import os
 from typing import Literal
 
-from ...main import MidiConvert
+from ...old_main import MidiConvert
 from ...subclass import MineCommand
 from ..mcstructure import (
     COMPABILITY_VERSION_117,

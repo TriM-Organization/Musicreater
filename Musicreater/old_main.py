@@ -37,9 +37,9 @@ from itertools import chain
 import mido
 
 from .constants import *
-from .exceptions import *
+from .old_exceptions import *
 from .subclass import *
-from .types import *
+from .old_types import *
 from .utils import *
 
 """

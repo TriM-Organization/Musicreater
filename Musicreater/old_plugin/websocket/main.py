@@ -19,7 +19,7 @@ from typing import List, Literal, Optional, Tuple
 
 import fcwslib
 
-from ...main import MidiConvert
+from ...old_main import MidiConvert
 from ...subclass import MineCommand, ProgressBarStyle
 
 

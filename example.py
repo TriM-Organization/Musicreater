@@ -19,18 +19,18 @@ Terms & Conditions: ./License.md
 import os
 
 import Musicreater
-from Musicreater.plugin.addonpack import (
+from Musicreater.old_plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
     to_addon_pack_in_score,
 )
-from Musicreater.plugin.mcstructfile import (
+from Musicreater.old_plugin.mcstructfile import (
     to_mcstructure_file_in_delay,
     to_mcstructure_file_in_repeater,
     to_mcstructure_file_in_score,
 )
 
-from Musicreater.plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
+from Musicreater.old_plugin.bdxfile import to_BDX_file_in_delay, to_BDX_file_in_score
 
 # 获取midi列表
 midi_path = input(f"请输入MIDI路径：")

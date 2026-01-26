@@ -18,8 +18,8 @@ Terms & Conditions: License.md in the root directory
 
 from typing import Dict, List, Tuple
 
-from .exceptions import *
-from .main import (
+from .old_exceptions import *
+from .old_main import (
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
     MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
@@ -30,7 +30,7 @@ from .main import (
 
 from .constants import MIDI_PAN, MIDI_PROGRAM, MIDI_VOLUME
 from .subclass import *
-from .types import ChannelType, FittingFunctionType
+from .old_types import ChannelType, FittingFunctionType
 from .utils import *
 
 
