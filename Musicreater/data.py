@@ -16,7 +16,13 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+# “
+# 把代码 洒落在这里
+# 和音符 留下的沙砾
+# 一点一点爬进你类定义的缝隙
+# ”     —— 乐曲访问 by resnah
 
+import heapq
 from math import sin, cos, asin, radians, degrees, sqrt, atan, inf, ceil
 from dataclasses import dataclass
 from typing import (
@@ -33,11 +39,15 @@ from typing import (
     Iterable,
     Iterator,
     Literal,
+    Hashable,
+    TypeVar,
 )
 from enum import Enum
 
-from .exceptions import SingleNoteDecodeError, ParameterTypeError
+from .exceptions import SingleNoteDecodeError, ParameterTypeError, ParameterValueError
 from .paramcurve import ParamCurve
+
+T = TypeVar("T")
 
 
 class SoundAtmos:
@@ -411,6 +421,9 @@ class SingleTrack(List[SingleNote]):
     track_name: str
     """轨道之名称"""
 
+    is_enabled: bool
+    """该音轨是否启用"""
+
     track_instrument: str
     """乐器ID"""
 
@@ -440,11 +453,15 @@ class SingleTrack(List[SingleNote]):
         precise_time: bool = True,
         percussion: bool = False,
         sound_direction: SoundAtmos = SoundAtmos(),
+        enabled: bool = True,
         extra_information: Dict[str, Any] = {},
         *args: SingleNote,
     ):
         self.track_name = name
         """音轨名称"""
+
+        self.is_enabled = enabled
+        """音轨启用情况"""
 
         self.track_instrument = instrument
         """乐器ID"""
@@ -494,27 +511,40 @@ class SingleTrack(List[SingleNote]):
                 )
             )
         super().append(item)
-        super().sort()
+        super().sort()  # =========================== TODO 需要优化
 
     def update(self, items: Iterable[SingleNote]):
         """
         拼接两个音轨
         """
         super().extend(items)
-        super().sort()
+        super().sort()  # =========================== TODO 需要优化
 
-    def get(self, time: int) -> Iterator[SingleNote]:
+    def get(self, time: int) -> Generator[SingleNote, None, None]:
         """通过开始时间来获取音符"""
 
-        return filter(lambda x: x.start_time == time, self)
+        return (x for x in self if x.start_time == time)
 
-    def get_range(
+    def get_notes(
         self, start_time: float, end_time: float = inf
-    ) -> Iterator[SingleNote]:
+    ) -> Generator[SingleNote, None, None]:
         """通过开始时间和结束时间来获取音符"""
-
-        return filter(
-            lambda x: (x.start_time >= start_time) and (x.start_time <= end_time), self
+        if end_time < start_time:
+            raise ParameterValueError(
+                "获取音符的时间范围有误，终止时间`{}`早于起始时间`{}`".format(
+                    end_time, start_time
+                )
+            )
+        elif start_time < 0 or end_time < 0:
+            raise ParameterValueError(
+                "获取音符的时间范围有误，终止时间`{}`和起始时间`{}`皆不可为负数".format(
+                    end_time, start_time
+                )
+            )
+        return (
+            x
+            for x in self
+            if (x.start_time >= start_time) and (x.start_time <= end_time)
         )
 
     def get_minenotes(
@@ -522,7 +552,7 @@ class SingleTrack(List[SingleNote]):
     ) -> Generator[MineNote, Any, None]:
         """获取能够用以在我的世界播放的音符数据类"""
 
-        for _note in self.get_range(range_start_time, range_end_time):
+        for _note in self.get_notes(range_start_time, range_end_time):
             yield MineNote.from_single_note(
                 note=_note,
                 note_instrument=self.track_instrument,
@@ -626,9 +656,107 @@ class SingleMusic(List[SingleTrack]):
         return len(self)
 
     @property
-    def music_tracks(self) -> List[SingleTrack]:
-        """音轨列表"""
-        return self
+    def music_tracks(self) -> Iterator[SingleTrack]:
+        """音轨列表，不包含被禁用的音轨"""
+        return (track for track in self if track.is_enabled)
+
+    @staticmethod
+    def yield_from_tracks(
+        tracks: Sequence[Iterator[T]],
+        sort_key: Callable[[T], Any],
+        is_subseq_sorted: bool = True,
+    ) -> Iterator[T]:
+        """从任意迭代器列表迭代符合顺序的元素
+        （惰性多路归并多个迭代器，按 sort_key 排序）
+
+        参数
+        ----
+        tracks: Sequence[Iterator[T]]
+            迭代器列表
+        sort_key: Callable[[T], Any]
+            接受 T 元素，返回可比较的键
+        is_subseq_sorted: bool = True
+            子序列是否已排序
+
+        迭代
+        ----
+            归并后的每个元素，按 sort_key 升序
+        """
+        if is_subseq_sorted:
+            return heapq.merge(*tracks, key=sort_key)
+        else:
+            # 初始化堆
+            heap_pool: List[Tuple[Any, int, T]] = []
+            for _index, _track in enumerate(tracks):
+                try:
+                    item = next(_track)
+                    heapq.heappush(heap_pool, (sort_key(item), _index, item))
+                except StopIteration:
+                    continue
+
+            # 归并主循环
+            while heap_pool:
+                _key, _index, item = heapq.heappop(heap_pool)
+                yield item
+                try:
+                    next_item = next(tracks[_index])
+                    heapq.heappush(heap_pool, (sort_key(next_item), _index, next_item))
+                except StopIteration:
+                    pass
+        # NEVER REACH:
+        # pool: List[Tuple[str, T]] = []
+        # remove_track: List[str] = []
+        # for _name, _track in tracks.items():
+        #     try:
+        #         pool.append((_name, next(_track)))
+        #     except StopIteration:
+        #         remove_track.append(_name)
+        # for _x in remove_track:
+        #     tracks.pop(_x)
+        # del remove_track
+        # while tracks and pool:
+        #     yield (_x := min(pool, key=sort_key))[1]
+        #     try:
+        #         pool.append((_x[0], next(tracks[_x[0]])))
+        #     except StopIteration:
+        #         tracks.pop(_x[0])
+        # pool.sort(key=sort_key)
+        # for _remain in pool:
+        #     yield _remain[1]
+
+    def get_tracked_notes(
+        self, start_time: float, end_time: float = inf
+    ) -> Generator[Iterator[SingleNote], Any, None]:
+        """获取指定时间段的各个音轨的音符数据"""
+        return (track.get_notes(start_time, end_time) for track in self)
+
+    def get_tracked_minenotes(
+        self, start_time: float, end_time: float = inf
+    ) -> Generator[Iterator[MineNote], Any, None]:
+        """获取指定时间段的各个音轨的，供我的世界播放的音符数据类"""
+        return (track.get_minenotes(start_time, end_time) for track in self)
+
+    def get_notes(
+        self, start_time: float, end_time: float = inf
+    ) -> Iterator[SingleNote]:
+        """获取指定时间段的所有音符数据，按照时间顺序"""
+        if self.track_amount == 0:
+            return iter(())
+        return self.yield_from_tracks(
+            [track.get_notes(start_time, end_time) for track in self],
+            sort_key=lambda x: x.start_time,
+        )
+
+    def get_minenotes(
+        self, start_time: float, end_time: float = inf
+    ) -> Generator[MineNote, Any, None]:
+        """获取指定时间段所有的，供我的世界播放的音符数据类，按照时间顺序"""
+        if self.track_amount == 0:
+            return
+        yield from self.yield_from_tracks(
+            [track.get_minenotes(start_time, end_time) for track in self],
+            sort_key=lambda x: x.start_tick,
+        )
 
     def set_info(self, key: Union[str, Sequence[str]], value: Any):
         """设置附加信息"""

@@ -1,13 +1,13 @@
 from rich.pretty import pprint
 
-import Musicreater
+import Musicreater.old_init as old_init
 from Musicreater.utils import (
     load_decode_msq_flush_release,
     load_decode_musicsequence_metainfo,
 )
 
-msc_seq = Musicreater.MusicSequence.from_mido(
-    Musicreater.mido.MidiFile(
+msc_seq = old_init.MusicSequence.from_mido(
+    old_init.mido.MidiFile(
         "./resources/测试片段.mid",
     ),
     "TEST-测试片段",
@@ -20,7 +20,7 @@ with open("test.msq", "wb") as f:
     f.write(msq_bytes := msc_seq.encode_dump())
 
 with open("test.msq", "rb") as f:
-    msc_seq_r = Musicreater.MusicSequence.load_decode(f.read())
+    msc_seq_r = old_init.MusicSequence.load_decode(f.read())
 
 pprint("常规 MSQ 读取成功：")
 pprint(msc_seq_r)

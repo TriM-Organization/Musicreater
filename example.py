@@ -18,7 +18,7 @@ Terms & Conditions: ./License.md
 
 import os
 
-import Musicreater
+import Musicreater.old_init as old_init
 from Musicreater.old_plugin.addonpack import (
     to_addon_pack_in_delay,
     to_addon_pack_in_repeater,
@@ -156,7 +156,7 @@ else:
 
 
 print(f"正在处理 {midi_path} ：")
-cvt_mid = Musicreater.MidiConvert.from_midi_file(
+cvt_mid = old_init.MidiConvert.from_midi_file(
     midi_path, old_exe_format=False, min_volume=prompts[0], play_speed=prompts[1]
 )
 
@@ -187,7 +187,7 @@ print(
             cvt_method(
                 cvt_mid,
                 out_path,
-                Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,  # type: ignore
+                old_init.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,  # type: ignore
                 *prompts[3:],
             )
         )
@@ -199,14 +199,14 @@ print(
                 to_BDX_file_in_score(
                     cvt_mid,
                     out_path,
-                    Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
+                    old_init.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
                     *prompts[3:],
                 )
                 if playerFormat == 1
                 else to_BDX_file_in_delay(
                     cvt_mid,
                     out_path,
-                    Musicreater.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
+                    old_init.DEFAULT_PROGRESSBAR_STYLE if prompts[2] else None,
                     *prompts[3:],
                 )
             )

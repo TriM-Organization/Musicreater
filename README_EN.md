@@ -1,5 +1,5 @@
-[Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
-[Bilibili: bgArray]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[Bilibili: Eilles]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFEilles-00A1E7?style=for-the-badge
+[Bilibili: Alioth]: https://img.shields.io/badge/Bilibili-%E7%8E%89%E8%A1%A1Alioth-00A1E7?style=for-the-badge
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
@@ -14,7 +14,7 @@
     </img>
 </p>
 
-<h3 align="center">A free open-source library of <i>Minecraft</i> digital music.</h3>
+<h3 align="center">A free and open-source library for handling with <i>Minecraft</i> digital music.</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
@@ -22,7 +22,7 @@
 <p>
 
 [![][Bilibili: Eilles]](https://space.bilibili.com/397369002/)
-[![][Bilibili: bgArray]](https://space.bilibili.com/604072474)
+[![][Bilibili: Alioth]](https://space.bilibili.com/604072474)
 [![CodeStyle: black]](https://github.com/psf/black)
 [![][python]](https://www.python.org/)
 [![][license]](LICENSE)
@@ -39,7 +39,7 @@
 
 ## Introduction🚀
 
-Musicreater is a free open-source library used for digital music that being played in _Minecraft_.
+Musicreater is a free open-source library used for handling with digital musics that being able to be played in _Minecraft_.
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
@@ -85,7 +85,7 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 **Eilles (金羿)**：A student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
 
-**bgArray (诸葛亮与八卦阵)**: A student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
+**Alioth (玉衡Alioth)**: A student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
 
 **Touch (偷吃不是 Touch)**: A man who is good at using command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
 

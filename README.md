@@ -1,5 +1,5 @@
 [Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
-[Bilibili: 诸葛亮与八卦阵]: https://img.shields.io/badge/Bilibili-%E8%AF%B8%E8%91%9B%E4%BA%AE%E4%B8%8E%E5%85%AB%E5%8D%A6%E9%98%B5-00A1E7?style=for-the-badge
+[Bilibili: 玉衡Alioth]: https://img.shields.io/badge/Bilibili-%E7%8E%89%E8%A1%A1Alioth-00A1E7?style=for-the-badge
 [CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
 [python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
 [release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
@@ -23,7 +23,7 @@
 <p>
 
 [![][Bilibili: 金羿ELS]](https://space.bilibili.com/397369002/)
-[![][Bilibili: 诸葛亮与八卦阵]](https://space.bilibili.com/604072474)
+[![][Bilibili: 玉衡Alioth]](https://space.bilibili.com/604072474)
 [![CodeStyle: black]](https://github.com/psf/black)
 [![][python]](https://www.python.org/)
 [![][license]](LICENSE)
@@ -83,7 +83,7 @@
 
 **金羿 Eilles**：我的世界基岩版指令作者，个人开发者，B 站不知名 UP 主。
 
-**诸葛亮与八卦阵 bgArray**：我的世界基岩版玩家，喜欢编程和音乐，深圳学生。
+**玉衡Alioth Alioth**：我的世界基岩版玩家，喜欢编程和音乐，学生。
 
 **偷吃不是Touch Touch**：我的世界基岩版指令制作者，提供测试支持
 
@@ -97,7 +97,7 @@
 -   感谢由 **[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”**\<QQ1600515314\> 带来的 midi 音色解析以及转换指令的算法，我们将其改编并应用；同时，感谢他的[网页版转换器](https://dislink.github.io/midi2bdx/)给我们的开发与更新带来巨大的压力和动力，让我们在原本一骑绝尘的摸鱼道路上转向开发。
 -   感谢 **Mono**\<QQ738893087\> 反馈安装时的问题，辅助我们找到了视窗操作系统下的兼容性问题；感谢其反馈延迟播放器出现的重大问题，让我们得以修改全部延迟播放错误；尤其感谢他对于我们的软件的大力宣传
 -   感谢 **Ammelia “艾米利亚”**\<QQ2838334637\> 敦促我们进行新的功能开发，并为新功能提出了非常优秀的大量建议，以及提供的 BDX 导入测试支持，为我们的新结构生成算法提供了大量的实际理论支持
--   感谢 **[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
+-   感谢 **[神羽 “SnowyKami”](https://www.sfkm.me/)** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
 -   感谢 **指令师\_苦力怕 playjuice123**\<QQ240667197\> 为我们的程序找出错误，并提醒我们修复一个一直存在的大 bug。
 -   感谢 **雷霆**\<QQ3555268519\> 用他那令所有开发者都大为光火的操作方法为我们的程序找出错误，并提醒修复 bug。
 -   感谢 **小埋**\<QQ2039310975\> 反馈附加包生成时缺少描述和标题的问题。

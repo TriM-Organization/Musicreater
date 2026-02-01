@@ -44,6 +44,9 @@ MIDI_PAN = "pan"
 """Midi通道立体声场偏移"""
 
 
+
+
+
 # Midi用对照表
 
 MIDI_DEFAULT_VOLUME_VALUE: int = (

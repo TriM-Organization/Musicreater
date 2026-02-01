@@ -1,13 +1,13 @@
 from rich.pretty import pprint
 
-import Musicreater
+import Musicreater.old_init as old_init
 from Musicreater.utils import (
     load_decode_fsq_flush_release,
     load_decode_musicsequence_metainfo,
 )
 
-msc_seq = Musicreater.MusicSequence.from_mido(
-    Musicreater.mido.MidiFile(
+msc_seq = old_init.MusicSequence.from_mido(
+    old_init.mido.MidiFile(
         "./resources/测试片段.mid",
     ),
     "TEST-测试片段",
@@ -20,7 +20,7 @@ with open("test.fsq", "wb") as f:
     f.write(fsq_bytes := msc_seq.encode_dump(flowing_codec_support=True))
 
 with open("test.fsq", "rb") as f:
-    msc_seq_r = Musicreater.MusicSequence.load_decode(f.read(), verify=True)
+    msc_seq_r = old_init.MusicSequence.load_decode(f.read(), verify=True)
 
 pprint("FSQ 传入类成功：")
 pprint(msc_seq_r)

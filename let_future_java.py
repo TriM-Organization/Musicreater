@@ -123,7 +123,7 @@ msc_cvt = Musicreater.experiment.FutureMidiConvertJavaE.from_midi_file(
     input("midi路径："),
     play_speed=float(input("播放速度：")),
     old_exe_format=True,
-    note_table_replacement=Musicreater.MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE,
+    note_table_replacement=Musicreater.old_init.MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE,
     # pitched_note_table=Musicreater.MM_NBS_PITCHED_INSTRUMENT_TABLE,
 )
 

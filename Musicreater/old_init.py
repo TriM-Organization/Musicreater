@@ -1,0 +1,144 @@
+# -*- coding: utf-8 -*-
+"""一个简单的我的世界音频转换库
+音·创 (Musicreater)
+是一款免费开源的《我的世界》数字音频支持库。
+Musicreater(音·创)
+A free open source library used for dealing with **Minecraft** digital musics.
+
+版权所有 © 2025 金羿 & 诸葛亮与八卦阵
+Copyright © 2025 Eilles & bgArray
+
+音·创（“本项目”）的协议颁发者为 金羿、诸葛亮与八卦阵
+The Licensor of Musicreater("this project") is Eilles, bgArray.
+
+本项目根据 第一版 汉钰律许可协议（“本协议”）授权。
+任何人皆可从以下地址获得本协议副本：https://gitee.com/EillesWan/YulvLicenses。
+若非因法律要求或经过了特殊准许，此作品在根据本协议“原样”提供的基础上，不予提供任何形式的担保、任何明示、任何暗示或类似承诺。也就是说，用户将自行承担因此作品的质量或性能问题而产生的全部风险。
+详细的准许和限制条款请见原协议文本。
+"""
+
+# 睿乐组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
+
+
+__version__ = "2.4.2.3"
+__vername__ = "音符附加信息升级"
+__author__ = (
+    ("金羿", "Eilles"),
+    ("诸葛亮与八卦阵", "bgArray"),
+    ("鱼旧梦", "ElapsingDreams"),
+    ("偷吃不是Touch", "Touch"),
+)
+__all__ = [
+    # 主要类
+    "MusicSequence",
+    "MidiConvert",
+    # 附加类
+    # "SingleNote",
+    "MineNote",
+    "MineCommand",
+    "SingleNoteBox",
+    "ProgressBarStyle",
+    # "TimeStamp", 未来功能
+    # 字典键
+    "MIDI_PROGRAM",
+    "MIDI_VOLUME",
+    "MIDI_PAN",
+    # 默认值
+    "MIDI_DEFAULT_PROGRAM_VALUE",
+    "MIDI_DEFAULT_VOLUME_VALUE",
+    "DEFAULT_PROGRESSBAR_STYLE",
+    # Midi 自己的对照表
+    "MIDI_PITCH_NAME_TABLE",
+    "MIDI_PITCHED_NOTE_NAME_GROUP",
+    "MIDI_PITCHED_NOTE_NAME_TABLE",
+    "MIDI_PERCUSSION_NOTE_NAME_TABLE",
+    # Minecraft 自己的对照表
+    "MC_PERCUSSION_INSTRUMENT_LIST",
+    "MC_PITCHED_INSTRUMENT_LIST",
+    "MC_INSTRUMENT_BLOCKS_TABLE",
+    "MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE",
+    "MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE",
+    # Midi 与 游戏 的对照表
+    "MM_INSTRUMENT_RANGE_TABLE",
+    "MM_INSTRUMENT_DEVIATION_TABLE",
+    "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
+    "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_TOUCH_PITCHED_INSTRUMENT_TABLE",
+    "MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_DISLINK_PITCHED_INSTRUMENT_TABLE",
+    "MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_NBS_PITCHED_INSTRUMENT_TABLE",
+    "MM_NBS_PERCUSSION_INSTRUMENT_TABLE",
+    # 操作性函数
+    "velocity_2_distance_natural",
+    "velocity_2_distance_straight",
+    "panning_2_rotation_linear",
+    "panning_2_rotation_trigonometric",
+    # 工具函数
+    "load_decode_musicsequence_metainfo",
+    "load_decode_msq_flush_release",
+    "load_decode_fsq_flush_release",
+    "guess_deviation",
+    "mctick2timestr",
+    "midi_inst_to_mc_sound",
+]
+
+from .old_main import MusicSequence, MidiConvert
+
+from .subclass import (
+    MineNote,
+    MineCommand,
+    SingleNoteBox,
+    ProgressBarStyle,
+    mctick2timestr,
+    DEFAULT_PROGRESSBAR_STYLE,
+)
+
+from .utils import (
+    # 兼容性函数
+    load_decode_musicsequence_metainfo,
+    load_decode_msq_flush_release,
+    load_decode_fsq_flush_release,
+    # 工具函数
+    guess_deviation,
+    midi_inst_to_mc_sound,
+    # 处理用函数
+    velocity_2_distance_natural,
+    velocity_2_distance_straight,
+    panning_2_rotation_linear,
+    panning_2_rotation_trigonometric,
+)
+
+from .constants import (
+    # 字典键
+    MIDI_PROGRAM,
+    MIDI_PAN,
+    MIDI_VOLUME,
+    # 默认值
+    MIDI_DEFAULT_PROGRAM_VALUE,
+    MIDI_DEFAULT_VOLUME_VALUE,
+    # MIDI 表
+    MIDI_PITCH_NAME_TABLE,
+    MIDI_PITCHED_NOTE_NAME_GROUP,
+    MIDI_PITCHED_NOTE_NAME_TABLE,
+    MIDI_PERCUSSION_NOTE_NAME_TABLE,
+    # 我的世界 表
+    MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE,
+    MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE,
+    MC_INSTRUMENT_BLOCKS_TABLE,
+    MC_PERCUSSION_INSTRUMENT_LIST,
+    MC_PITCHED_INSTRUMENT_LIST,
+    # MIDI 到 我的世界 表
+    MM_INSTRUMENT_RANGE_TABLE,
+    MM_INSTRUMENT_DEVIATION_TABLE,
+    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DISLINK_PITCHED_INSTRUMENT_TABLE,
+    MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE,
+    MM_NBS_PITCHED_INSTRUMENT_TABLE,
+    MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
+)

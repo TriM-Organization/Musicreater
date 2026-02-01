@@ -1,4 +1,4 @@
-import Musicreater
+import Musicreater.old_init as old_init
 import Musicreater.experiment
 import Musicreater.old_plugin
 
@@ -16,12 +16,12 @@ from Musicreater.old_plugin.mcstructfile import (
 )
 
 MSCT_MAIN = (
-    Musicreater,
-    Musicreater.experiment,
+    old_init,
+    old_init.experiment,
     # Musicreater.previous,
 )
 
-MSCT_PLUGIN = (Musicreater.old_plugin,)
+MSCT_PLUGIN = (old_init.old_plugin,)
 
 MSCT_PLUGIN_FUNCTION = (
     to_addon_pack_in_delay,
