@@ -5,8 +5,8 @@
 """
 
 """
-版权所有 © 2025 金羿
-Copyright © 2025 Eilles
+版权所有 © 2026 金羿
+Copyright © 2026 Eilles
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -26,7 +26,7 @@ Terms & Conditions: License.md in the root directory
 import sys
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import (
@@ -137,9 +137,12 @@ class PluginConfig(ABC):
 class PluginType(str, Enum):
     """插件类型枚举"""
 
-    FUNCTION_IMPORT = "import_data"
-    FUNCTION_EXPORT = "export_data"
-    FUNCTION_OPERATE = "data_operate"
+    FUNCTION_MUSIC_IMPORT = "import_music_data"
+    FUNCTION_TRACK_IMPORT = "import_track_data"
+    FUNCTION_MUSIC_OPERATE = "music_data_operating"
+    FUNCTION_TRACK_OPERATE = "track_data_operating"
+    FUNCTION_MUSIC_EXPORT = "export_music_data"
+    FUNCTION_TRACK_EXPORT = "export_track_data"
     SERVICE = "service"
     LIBRARY = "library"
 
@@ -160,11 +163,11 @@ class PluginMetaInformation(ABC):
     """插件类型"""
     license: str = "MIT License"
     """插件发布时采用的许可协议"""
-    dependencies: Sequence[str] = []
+    dependencies: Sequence[str] = tuple()
     """插件是否对其他插件存在依赖"""
 
 
-class TopBasePlugin(ABC):
+class TopPluginBase(ABC):
     """所有插件的抽象基类"""
 
     metainfo: PluginMetaInformation
@@ -180,14 +183,15 @@ class TopBasePlugin(ABC):
                     )
                 )
         else:
-            raise PluginMetainfoNotFoundError(
-                "类`{cls_name}`必须定义一个`metainfo`属性。".format(
-                    cls_name=cls.__name__
+            if not cls.__name__.endswith("PluginBase"):
+                raise PluginMetainfoNotFoundError(
+                    "类`{cls_name}`必须定义一个`metainfo`属性。".format(
+                        cls_name=cls.__name__
+                    )
                 )
-            )
 
 
-class TopInOutBasePlugin(TopBasePlugin, ABC):
+class TopInOutPluginBase(TopPluginBase, ABC):
     """导入导出用抽象基类"""
 
     supported_formats: Tuple[str, ...] = tuple()
@@ -218,15 +222,15 @@ class TopInOutBasePlugin(TopBasePlugin, ABC):
         return format_name.upper().endswith(self.supported_formats)
 
 
-class MusicInputPlugin(TopInOutBasePlugin, ABC):
+class MusicInputPluginBase(TopInOutPluginBase, ABC):
     """导入用插件抽象基类-完整曲目"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_IMPORT:
+        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_IMPORT:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`MusicInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`MusicInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -245,15 +249,15 @@ class MusicInputPlugin(TopInOutBasePlugin, ABC):
             return self.loadbytes(f, config)
 
 
-class TrackInputPlugin(TopInOutBasePlugin, ABC):
+class TrackInputPluginBase(TopInOutPluginBase, ABC):
     """导入用插件抽象基类-单个音轨"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_IMPORT:
+        if cls.metainfo.type != PluginType.FUNCTION_TRACK_IMPORT:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`TrackInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`TrackInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -272,15 +276,15 @@ class TrackInputPlugin(TopInOutBasePlugin, ABC):
             return self.loadbytes(f, config)
 
 
-class MusicOperatePlugin(TopBasePlugin, ABC):
+class MusicOperatePluginBase(TopPluginBase, ABC):
     """音乐处理用插件抽象基类-完整曲目"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_OPERATE:
+        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_OPERATE:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`MusicOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`MusicOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -294,15 +298,15 @@ class MusicOperatePlugin(TopBasePlugin, ABC):
         pass
 
 
-class TrackOperatePlugin(TopBasePlugin, ABC):
+class TrackOperatePluginBase(TopPluginBase, ABC):
     """音乐处理用插件抽象基类-单个音轨"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_OPERATE:
+        if cls.metainfo.type != PluginType.FUNCTION_TRACK_OPERATE:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`TrackOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`TrackOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -316,15 +320,15 @@ class TrackOperatePlugin(TopBasePlugin, ABC):
         pass
 
 
-class MusicOutputPlugin(TopInOutBasePlugin, ABC):
+class MusicOutputPluginBase(TopInOutPluginBase, ABC):
     """导出用插件的抽象基类-完整曲目"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_EXPORT:
+        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_EXPORT:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`MusicOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`MusicOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -345,15 +349,15 @@ class MusicOutputPlugin(TopInOutBasePlugin, ABC):
         pass
 
 
-class TrackOutputPlugin(TopInOutBasePlugin, ABC):
+class TrackOutputPluginBase(TopInOutPluginBase, ABC):
     """导出用插件的抽象基类-单个音轨"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_EXPORT:
+        if cls.metainfo.type != PluginType.FUNCTION_TRACK_EXPORT:
             raise PluginMetainfoValueError(
-                "插件类`{cls_name}`是从`TrackOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
+                "插件类`{cls_name}`是从`TrackOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
                     cls_type=cls.metainfo.type.name,
                 )
@@ -374,7 +378,7 @@ class TrackOutputPlugin(TopInOutBasePlugin, ABC):
         pass
 
 
-class ServicePlugin(TopBasePlugin, ABC):
+class ServicePluginBase(TopPluginBase, ABC):
     """服务插件抽象基类"""
 
     def __init_subclass__(cls) -> None:
@@ -394,7 +398,7 @@ class ServicePlugin(TopBasePlugin, ABC):
         pass
 
 
-class LibraryPlugin(TopBasePlugin, ABC):
+class LibraryPluginBase(TopPluginBase, ABC):
     """插件依赖库的抽象基类"""
 
     def __init_subclass__(cls) -> None:

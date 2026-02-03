@@ -5,8 +5,8 @@
 """
 
 """
-版权所有 © 2025 金羿 & 玉衡Alioth
-Copyright © 2025 Eilles & YuhengAlioth
+版权所有 © 2026 金羿 & 玉衡Alioth
+Copyright © 2026 Eilles & YuhengAlioth
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -56,14 +56,13 @@ class MusicreaterInnerlyError(MusicreaterBaseException):
         """内部错误（面向开发者的报错信息）"""
         super().__init__("内部错误 - ", *args)
 
+
 class MusicreaterOuterlyError(MusicreaterBaseException):
     """外部错误"""
 
     def __init__(self, *args):
         """外部错误（面向用户的报错信息）"""
         super().__init__("外部错误 - ", *args)
-
-
 
 
 class InnerlyParameterError(MusicreaterInnerlyError):
@@ -90,6 +89,13 @@ class ParameterValueError(InnerlyParameterError, ValueError):
         super().__init__("参数数值错误：", *args)
 
 
+class PluginNotSpecifiedError(InnerlyParameterError, LookupError):
+    """未指定插件"""
+
+    def __init__(self, *args):
+        """未指定插件"""
+        super().__init__("未指定插件：", *args)
+
 
 class OuterlyParameterError(MusicreaterOuterlyError):
     """外部参数错误"""
@@ -115,6 +121,12 @@ class IllegalMinimumVolumeError(OuterlyParameterError, ValueError):
         super().__init__("最小播放音量超出范围：", *args)
 
 
+class FileFormatNotSupportedError(MusicreaterOuterlyError):
+    """不支持的文件格式"""
+
+    def __init__(self, *args):
+        """文件格式不受支持"""
+        super().__init__("不支持的文件格式：", *args)
 
 
 class NoteBinaryDecodeError(MusicreaterOuterlyError):
@@ -148,6 +160,7 @@ class NoteBinaryFileVerificationFailed(NoteBinaryDecodeError):
         """音乐存储文件与其校验值不一致"""
         super().__init__("音乐存储文件校验失败：", *args)
 
+
 class PluginDefineError(MusicreaterInnerlyError):
     """插件定义错误（内部相关）"""
 
@@ -155,12 +168,14 @@ class PluginDefineError(MusicreaterInnerlyError):
         """插件本身存在错误"""
         super().__init__("插件内部错误 - ", *args)
 
+
 class PluginInstanceNotFoundError(PluginDefineError, LookupError):
     """插件实例未找到"""
 
     def __init__(self, *args):
         """插件实例未找到"""
         super().__init__("插件实例未找到：", *args)
+
 
 class PluginAttributeNotFoundError(PluginDefineError, AttributeError):
     """插件属性定义错误"""
@@ -177,6 +192,7 @@ class PluginMetainfoError(PluginDefineError):
         """插件元信息定义错误"""
         super().__init__("插件元信息定义错误 - ", *args)
 
+
 class PluginMetainfoTypeError(PluginMetainfoError, TypeError):
     """插件元信息定义类型错误"""
 
@@ -184,12 +200,14 @@ class PluginMetainfoTypeError(PluginMetainfoError, TypeError):
         """插件元信息定义类型错误"""
         super().__init__("插件元信息类型错误：", *args)
 
+
 class PluginMetainfoValueError(PluginMetainfoError, ValueError):
     """插件元信息定义值错误"""
 
     def __init__(self, *args):
         """插件元信息定义值错误"""
         super().__init__("插件元信息数值错误：", *args)
+
 
 class PluginMetainfoNotFoundError(PluginMetainfoError, PluginAttributeNotFoundError):
     """插件元信息定义缺少错误"""

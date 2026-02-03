@@ -5,8 +5,8 @@
 """
 
 """
-版权所有 © 2025 金羿 & 诸葛亮与八卦阵
-Copyright © 2025 Eilles & bgArray
+版权所有 © 2026 金羿 & 诸葛亮与八卦阵
+Copyright © 2026 Eilles & bgArray
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -42,9 +42,6 @@ MIDI_VOLUME = "volume"
 
 MIDI_PAN = "pan"
 """Midi通道立体声场偏移"""
-
-
-
 
 
 # Midi用对照表

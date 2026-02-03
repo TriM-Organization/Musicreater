@@ -421,7 +421,7 @@ class SingleTrack(List[SingleNote]):
     track_name: str
     """轨道之名称"""
 
-    is_enabled: bool
+    is_enabled: bool = True
     """该音轨是否启用"""
 
     track_instrument: str
@@ -453,15 +453,11 @@ class SingleTrack(List[SingleNote]):
         precise_time: bool = True,
         percussion: bool = False,
         sound_direction: SoundAtmos = SoundAtmos(),
-        enabled: bool = True,
         extra_information: Dict[str, Any] = {},
         *args: SingleNote,
     ):
         self.track_name = name
         """音轨名称"""
-
-        self.is_enabled = enabled
-        """音轨启用情况"""
 
         self.track_instrument = instrument
         """乐器ID"""
@@ -491,6 +487,21 @@ class SingleTrack(List[SingleNote]):
 
         super().__init__(*args)
         super().sort()
+
+    def disable(self) -> None:
+        """禁用音轨"""
+
+        self.is_enabled = False
+
+    def enable(self) -> None:
+        """启用音轨"""
+
+        self.is_enabled = True
+
+    def toggle_able(self) -> None:
+        """切换音轨的启用状态"""
+
+        self.is_enabled = not self.is_enabled
 
     def append(self, object: SingleNote) -> None:
         """
@@ -728,13 +739,15 @@ class SingleMusic(List[SingleTrack]):
         self, start_time: float, end_time: float = inf
     ) -> Generator[Iterator[SingleNote], Any, None]:
         """获取指定时间段的各个音轨的音符数据"""
-        return (track.get_notes(start_time, end_time) for track in self)
+        return (track.get_notes(start_time, end_time) for track in self.music_tracks)
 
     def get_tracked_minenotes(
         self, start_time: float, end_time: float = inf
     ) -> Generator[Iterator[MineNote], Any, None]:
         """获取指定时间段的各个音轨的，供我的世界播放的音符数据类"""
-        return (track.get_minenotes(start_time, end_time) for track in self)
+        return (
+            track.get_minenotes(start_time, end_time) for track in self.music_tracks
+        )
 
     def get_notes(
         self, start_time: float, end_time: float = inf
@@ -743,7 +756,7 @@ class SingleMusic(List[SingleTrack]):
         if self.track_amount == 0:
             return iter(())
         return self.yield_from_tracks(
-            [track.get_notes(start_time, end_time) for track in self],
+            [track.get_notes(start_time, end_time) for track in self.music_tracks],
             sort_key=lambda x: x.start_time,
         )
 
@@ -754,7 +767,7 @@ class SingleMusic(List[SingleTrack]):
         if self.track_amount == 0:
             return
         yield from self.yield_from_tracks(
-            [track.get_minenotes(start_time, end_time) for track in self],
+            [track.get_minenotes(start_time, end_time) for track in self.music_tracks],
             sort_key=lambda x: x.start_tick,
         )
 

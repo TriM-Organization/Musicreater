@@ -27,7 +27,6 @@ https://gitee.com/TriM-Organization/Musicreater/blob/master/LICENSE.md。
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-
 __version__ = "3.0.0-alpha"
 
 __author__ = (
@@ -36,3 +35,37 @@ __author__ = (
     ("鱼旧梦", "ElapsingDreams"),
     ("偷吃不是Touch", "Touch"),
 )
+
+from .paramcurve import ParamCurve, InterpolationMethod, BoundaryBehaviour
+
+from .data import (
+    SingleMusic,
+    SingleTrack,
+    SingleNote,
+    SoundAtmos,
+    MineNote,
+    CurvableParam,
+)
+
+from .plugins import load_plugin_module
+
+from .main import MusiCreater
+
+__all__ = [
+    "__version__",
+    "__author__",
+    # 参数曲线相关
+    "ParamCurve",
+    "InterpolationMethod",
+    "BoundaryBehaviour",
+    # 音乐数据结构
+    "SingleMusic",
+    "SingleTrack",
+    "SingleNote",
+    "SoundAtmos",
+    "MineNote",
+    "CurvableParam",
+    # 工程项目相关
+    "load_plugin_module",
+    "MusiCreater",
+]

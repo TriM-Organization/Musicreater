@@ -35,7 +35,7 @@
 
 [简体中文 🇨🇳](README.md) | English🇬🇧
 
-**Notice that the localizations of documents may NOT be up-to-date.**
+**Notice that the localizations of documents may probably NOT be up-to-date. The original document is in Chinese.**
 
 ## Introduction🚀
 
