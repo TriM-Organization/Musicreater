@@ -93,24 +93,76 @@ from .data import SingleMusic, SingleTrack
 # ]
 
 
+# ========================
+# 枚举类
+# ========================
+
+class PluginTypes(str, Enum):
+    """插件类型枚举"""
+
+    FUNCTION_MUSIC_IMPORT = "import_music_data"
+    FUNCTION_TRACK_IMPORT = "import_track_data"
+    FUNCTION_MUSIC_OPERATE = "music_data_operating"
+    FUNCTION_TRACK_OPERATE = "track_data_operating"
+    FUNCTION_MUSIC_EXPORT = "export_music_data"
+    FUNCTION_TRACK_EXPORT = "export_track_data"
+    SERVICE = "service"
+    LIBRARY = "library"
+
+
+
+# ========================
+# 数据类
+# ========================
+
+
 @dataclass
 class PluginConfig(ABC):
     """插件配置基类"""
 
     def to_dict(self) -> Dict[str, Any]:
-        """字典化配置文件"""
+        """将配置内容转换为字典
+
+        返回
+        ====
+        Dict[str, Any]
+            配置项的字典表示，不包含以下划线开头的私有属性
+        """
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "PluginConfig":
-        """从字典创建配置实例"""
+        """从字典创建配置实例
+
+        参数
+        ====
+        data: Dict[str, Any]
+            包含配置字段的字典
+
+        返回
+        ====
+        PluginConfig
+            配置类的实例
+        """
+
         # 只保留类中定义的字段
         field_names = {f.name for f in cls.__dataclass_fields__.values()}
         filtered_data = {k: v for k, v in data.items() if k in field_names}
         return cls(**filtered_data)
 
     def save_to_file(self, file_path: Path) -> None:
-        """保存配置到文件"""
+        """保存配置到 TOML 文件
+
+        参数
+        ====
+        file_path: Path
+            目标文件路径；必须以 .toml 为后缀
+
+        异常
+        ====
+        PluginConfigDumpError
+            当文件后缀不是 .toml 或写入失败时抛出
+        """
         if file_path.suffix.upper() == ".TOML":
             file_path.parent.mkdir(parents=True, exist_ok=True)
         else:
@@ -126,25 +178,28 @@ class PluginConfig(ABC):
 
     @classmethod
     def load_from_file(cls, file_path: Path) -> "PluginConfig":
-        """从文件加载配置"""
+        """从 TOML 文件加载配置
+
+        参数
+        ====
+        file_path: Path
+            源文件路径
+
+        返回
+        ====
+        PluginConfig
+            加载后的配置实例
+
+        异常
+        ====
+        PluginConfigLoadError
+            当读取或解析失败时抛出
+        """
         try:
             with file_path.open("rb") as f:
                 return cls.from_dict(tomllib.load(f))
         except Exception as e:
             raise PluginConfigLoadError(e)
-
-
-class PluginType(str, Enum):
-    """插件类型枚举"""
-
-    FUNCTION_MUSIC_IMPORT = "import_music_data"
-    FUNCTION_TRACK_IMPORT = "import_track_data"
-    FUNCTION_MUSIC_OPERATE = "music_data_operating"
-    FUNCTION_TRACK_OPERATE = "track_data_operating"
-    FUNCTION_MUSIC_EXPORT = "export_music_data"
-    FUNCTION_TRACK_EXPORT = "export_track_data"
-    SERVICE = "service"
-    LIBRARY = "library"
 
 
 @dataclass
@@ -159,12 +214,17 @@ class PluginMetaInformation(ABC):
     """插件简介"""
     version: Tuple[int, ...]
     """插件版本号"""
-    type: PluginType
+    type: PluginTypes
     """插件类型"""
     license: str = "MIT License"
     """插件发布时采用的许可协议"""
     dependencies: Sequence[str] = tuple()
     """插件是否对其他插件存在依赖"""
+
+
+# ========================
+# 抽象基类
+# ========================
 
 
 class TopPluginBase(ABC):
@@ -195,7 +255,7 @@ class TopInOutPluginBase(TopPluginBase, ABC):
     """导入导出用抽象基类"""
 
     supported_formats: Tuple[str, ...] = tuple()
-    """支持的格式"""
+    """支持的格式（定义后会自动转大写）"""
 
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
@@ -214,11 +274,33 @@ class TopInOutPluginBase(TopPluginBase, ABC):
             )
 
     def can_handle_file(self, file_path: Path) -> bool:
-        """判断是否可处理某个文件"""
+        """判断是否可处理某个文件
+
+        参数
+        ====
+        file_path: Path
+            待检测的文件路径
+
+        返回
+        ====
+        bool
+            若文件后缀已在本类中定义，则返回 True
+        """
         return file_path.suffix.upper().endswith(self.supported_formats)
 
     def can_handle_format(self, format_name: str) -> bool:
-        """判断是否可处理某个格式"""
+        """判断是否可处理某个格式
+
+        参数
+        ====
+        format_name: str
+            格式名称（如 'MIDI', 'WAV'）
+
+        返回
+        ====
+        bool
+            若格式名本类中已经定义，则返回 True
+        """
         return format_name.upper().endswith(self.supported_formats)
 
 
@@ -228,7 +310,7 @@ class MusicInputPluginBase(TopInOutPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_IMPORT:
+        if cls.metainfo.type != PluginTypes.FUNCTION_MUSIC_IMPORT:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`MusicInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -240,11 +322,38 @@ class MusicInputPluginBase(TopInOutPluginBase, ABC):
     def loadbytes(
         self, bytes_buffer_in: BinaryIO, config: Optional[PluginConfig]
     ) -> "SingleMusic":
-        """从字节流加载数据到完整曲目"""
+        """从字节流加载数据到完整曲目
+
+        参数
+        ====
+        bytes_buffer_in: BinaryIO
+            输入的二进制字节流
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleMusic
+            解析得到的完整曲目对象
+        """
+
         pass
 
     def load(self, file_path: Path, config: Optional[PluginConfig]) -> "SingleMusic":
-        """从文件加载数据到完整曲目"""
+        """从文件加载数据到完整曲目
+
+        参数
+        ====
+        file_path: Path
+            输入文件路径
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleMusic
+            解析得到的完整曲目对象
+        """
         with file_path.open("rb") as f:
             return self.loadbytes(f, config)
 
@@ -255,7 +364,7 @@ class TrackInputPluginBase(TopInOutPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_TRACK_IMPORT:
+        if cls.metainfo.type != PluginTypes.FUNCTION_TRACK_IMPORT:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`TrackInputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_IMPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -267,11 +376,37 @@ class TrackInputPluginBase(TopInOutPluginBase, ABC):
     def loadbytes(
         self, bytes_buffer_in: BinaryIO, config: Optional[PluginConfig]
     ) -> "SingleTrack":
-        """从字节流加载音符数据到单个音轨"""
+        """从字节流加载音符数据到单个音轨
+
+        参数
+        ====
+        bytes_buffer_in: BinaryIO
+            输入的二进制字节流
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleTrack
+            解析得到的单个音轨对象
+        """
         pass
 
     def load(self, file_path: Path, config: Optional[PluginConfig]) -> "SingleTrack":
-        """从文件加载音符数据到单个音轨"""
+        """从文件加载音符数据到单个音轨
+
+        参数
+        ====
+        file_path: Path
+            输入文件路径
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleTrack
+            解析得到的单个音轨对象
+        """
         with file_path.open("rb") as f:
             return self.loadbytes(f, config)
 
@@ -282,7 +417,7 @@ class MusicOperatePluginBase(TopPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_OPERATE:
+        if cls.metainfo.type != PluginTypes.FUNCTION_MUSIC_OPERATE:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`MusicOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -294,7 +429,20 @@ class MusicOperatePluginBase(TopPluginBase, ABC):
     def process(
         self, data: "SingleMusic", config: Optional[PluginConfig]
     ) -> "SingleMusic":
-        """处理完整曲目的数据"""
+        """处理完整曲目的数据
+
+        参数
+        ====
+        data: SingleMusic
+            待处理的完整曲目
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleMusic
+            处理后的完整曲目
+        """
         pass
 
 
@@ -304,7 +452,7 @@ class TrackOperatePluginBase(TopPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_TRACK_OPERATE:
+        if cls.metainfo.type != PluginTypes.FUNCTION_TRACK_OPERATE:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`TrackOperatePlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_OPERATE`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -316,7 +464,20 @@ class TrackOperatePluginBase(TopPluginBase, ABC):
     def process(
         self, data: "SingleTrack", config: Optional[PluginConfig]
     ) -> "SingleTrack":
-        """处理单个音轨的音符数据"""
+        """处理单个音轨的音符数据
+
+        参数
+        ====
+        data: SingleTrack
+            待处理的单个音轨
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        SingleTrack
+            处理后的单个音轨
+        """
         pass
 
 
@@ -326,7 +487,7 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_MUSIC_EXPORT:
+        if cls.metainfo.type != PluginTypes.FUNCTION_MUSIC_EXPORT:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`MusicOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_MUSIC_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -338,14 +499,38 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
     def dumpbytes(
         self, data: "SingleMusic", config: Optional[PluginConfig]
     ) -> BinaryIO:
-        """将完整曲目导出为对应格式的字节流"""
+        """将完整曲目导出为对应格式的字节流
+
+        参数
+        ====
+        data: SingleMusic
+            待导出的完整曲目
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        BinaryIO
+            导出后的二进制字节流
+        """
         pass
 
     @abstractmethod
     def dump(
         self, data: "SingleMusic", file_path: Path, config: Optional[PluginConfig]
     ):
-        """将完整曲目导出为对应格式的文件"""
+        """将完整曲目导出为对应格式的文件
+
+        参数
+        ====
+        data: SingleMusic
+            待导出的完整曲目
+        file_path: Path
+            输出文件路径
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+        """
+
         pass
 
 
@@ -355,7 +540,7 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.FUNCTION_TRACK_EXPORT:
+        if cls.metainfo.type != PluginTypes.FUNCTION_TRACK_EXPORT:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`TrackOutputPlugin`继承的，该类的子类应当为一个`PluginType.FUNCTION_TRACK_EXPORT`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -367,14 +552,37 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
     def dumpbytes(
         self, data: "SingleTrack", config: Optional[PluginConfig]
     ) -> BinaryIO:
-        """将单个音轨导出为对应格式的字节流"""
+        """将单个音轨导出为对应格式的字节流
+
+        参数
+        ====
+        data: SingleTrack
+            待导出的单个音轨
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+
+        返回
+        ====
+        BinaryIO
+            导出后的二进制字节流
+        """
         pass
 
     @abstractmethod
     def dump(
         self, data: "SingleTrack", file_path: Path, config: Optional[PluginConfig]
     ):
-        """将单个音轨导出为对应格式的文件"""
+        """将单个音轨导出为对应格式的文件
+
+        参数
+        ====
+        data: SingleTrack
+            待导出的单个音轨
+        file_path: Path
+            输出文件路径
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+        """
         pass
 
 
@@ -384,7 +592,7 @@ class ServicePluginBase(TopPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.SERVICE:
+        if cls.metainfo.type != PluginTypes.SERVICE:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`ServicePlugin`继承的，该类的子类应当为一个`PluginType.SERVICE`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,
@@ -394,7 +602,15 @@ class ServicePluginBase(TopPluginBase, ABC):
 
     @abstractmethod
     def serve(self, config: Optional[PluginConfig], *args) -> None:
-        """服务插件的运行逻辑"""
+        """服务插件的运行逻辑
+
+        参数
+        ====
+        config: Optional[PluginConfig]
+            插件配置；**可选**
+        *args: Any
+            其他运行时参数
+        """
         pass
 
 
@@ -404,7 +620,7 @@ class LibraryPluginBase(TopPluginBase, ABC):
     def __init_subclass__(cls) -> None:
         super().__init_subclass__()
 
-        if cls.metainfo.type != PluginType.LIBRARY:
+        if cls.metainfo.type != PluginTypes.LIBRARY:
             raise PluginMetainfoValueError(
                 "插件类`{cls_name}`是从`LibraryPlugin`继承的，该类的子类应当为一个`PluginType.LIBRARY`类型的插件，而不是`PluginType.{cls_type}`".format(
                     cls_name=cls.__name__,

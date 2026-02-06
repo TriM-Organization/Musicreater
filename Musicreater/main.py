@@ -47,19 +47,25 @@ import re
 
 
 from difflib import get_close_matches
-from typing import Dict, Generator, List, Optional, Tuple, Union
+from typing import Dict, Generator, List, Optional, Tuple, Union, Mapping, Callable
 from pathlib import Path
 
 
 from .data import SingleMusic, SingleTrack
-from .exceptions import FileFormatNotSupportedError, PluginNotSpecifiedError
+from .exceptions import (
+    FileFormatNotSupportedError,
+    PluginNotSpecifiedError,
+    PluginNotFoundError,
+)
 from ._plugin_abc import TopPluginBase
 from .plugins import (
     _global_plugin_registry,
     PluginRegistry,
     PluginConfig,
-    PluginType,
+    PluginTypes,
     load_plugin_module,
+    T_IOPlugin,
+    T_Plugin,
 )
 
 
@@ -72,7 +78,7 @@ class MusiCreater:
     __plugin_registry: PluginRegistry
     """插件注册表实例"""
     _plugin_cache: Dict[str, TopPluginBase]
-    """插件缓存字典，插件名为键、插件实例为值"""
+    """插件缓存字典，插件id为键、插件实例为值"""
     music: SingleMusic
     """当前曲目实例"""
 
@@ -86,149 +92,119 @@ class MusiCreater:
 
         self.music = whole_music
 
+    @staticmethod
+    def _get_plugin_within_iousage(
+        get_func: Callable[[Union[Path, str]], Generator[T_IOPlugin, None, None]],
+        fpath: Path,
+        plg_regdict: Dict[str, T_IOPlugin],
+        plg_id: Optional[str],
+    ) -> T_IOPlugin:
+
+        __plugin: Optional[T_IOPlugin] = None
+        if plg_id:
+            __plugin = plg_regdict.get(plg_id)
+
+        else:
+            for __plg in get_func(fpath):
+                if __plugin:
+                    raise PluginNotSpecifiedError(
+                        "文件类型`{}`可被多个插件处理，请在调用函数的参数中指定插件名称".format(
+                            fpath.suffix.upper()
+                        )
+                    )
+                __plugin = __plg
+        if __plugin:
+            return __plugin
+        else:
+            raise FileFormatNotSupportedError(
+                "无法找到处理`{}`类型文件的插件".format(fpath.suffix.upper())
+            )
+
     @classmethod
     def import_music(
         cls,
         file_path: Path,
-        plugin_name: Optional[str] = None,
+        plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
-    ):
-        __music = None
-        if plugin_name:
-            __music = _global_plugin_registry.get_music_input_plugin(plugin_name).load(
-                file_path, plugin_config
-            )
-        else:
-            for plugin in _global_plugin_registry.get_music_input_plugin_by_format(
-                file_path
-            ):
-                if __music is not None:
-                    raise PluginNotSpecifiedError(
-                        "文件类型`{}`可被多个插件处理，请在导入函数的参数中指定插件名称".format(
-                            file_path.suffix.upper()
-                        )
-                    )
-                __music = plugin.load(file_path, plugin_config)
-        if __music is None:
-            raise FileFormatNotSupportedError(
-                "无法找到处理`{}`类型文件的插件".format(file_path.suffix.upper())
-            )
-        return cls(whole_music=__music)
+    ) -> "MusiCreater":
+        return cls(
+            whole_music=cls._get_plugin_within_iousage(
+                _global_plugin_registry.get_music_input_plugin_by_format,
+                file_path,
+                _global_plugin_registry._music_input_plugins,
+                plugin_id,
+            ).load(file_path, plugin_config)
+        )
 
     def import_track(
         self,
         file_path: Path,
-        plugin_name: Optional[str] = None,
+        plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
     ) -> SingleTrack:
-        __track = None
-        if plugin_name:
-            __track = self.get_plugin_by_name(
-                plugin_name
-            ).load(  # pyright: ignore[reportAttributeAccessIssue]
-                file_path, plugin_config
-            )
-        else:
-            for plugin in self.__plugin_registry.get_track_input_plugin_by_format(
-                file_path
-            ):
-                if __track:
-                    raise PluginNotSpecifiedError(
-                        "文件类型`{}`可被多个插件处理，请在导入函数的参数中指定插件名称".format(
-                            file_path.suffix.upper()
-                        )
-                    )
-                __track = plugin.load(file_path, plugin_config)
-        if __track:
-            self.music.append(__track)
-            return __track
-        raise FileFormatNotSupportedError(
-            "无法找到处理`{}`类型文件的插件".format(file_path.suffix.upper())
+        self.music.append(
+            self._get_plugin_within_iousage(
+                self.__plugin_registry.get_track_input_plugin_by_format,
+                file_path,
+                self.__plugin_registry._track_input_plugins,
+                plugin_id,
+            ).load(file_path, plugin_config)
         )
+        return self.music[-1]
 
     def export_music(
         self,
         file_path: Path,
-        plugin_name: Optional[str] = None,
+        plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
     ) -> None:
-        __plugin = None
-        if plugin_name:
-            __plugin = self.get_plugin_by_name(plugin_name)
-        else:
-            for plugin in self.__plugin_registry.get_music_output_plugin_by_format(
-                file_path
-            ):
-                if __plugin:
-                    raise PluginNotSpecifiedError(
-                        "文件类型`{}`可被多个插件处理，请在导出函数的参数中指定插件名称".format(
-                            file_path.suffix.upper()
-                        )
-                    )
-                __plugin = plugin
-
-        if __plugin:
-            __plugin.dump(  # pyright: ignore[reportAttributeAccessIssue]
-                self.music, file_path, plugin_config
-            )
-        else:
-            raise FileFormatNotSupportedError(
-                "无法找到处理`{}`类型文件的插件".format(file_path.suffix.upper())
-            )
+        self._get_plugin_within_iousage(
+            self.__plugin_registry.get_music_output_plugin_by_format,
+            file_path,
+            self.__plugin_registry._music_output_plugins,
+            plugin_id,
+        ).dump(self.music, file_path, plugin_config)
 
     def export_track(
         self,
         track_index: int,
         file_path: Path,
-        plugin_name: Optional[str] = None,
+        plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
     ) -> None:
-        __plugin = None
-        if plugin_name:
-            __plugin = self.get_plugin_by_name(plugin_name)
-        else:
-            for plugin in self.__plugin_registry.get_track_output_plugin_by_format(
-                file_path
-            ):
-                if __plugin:
-                    raise PluginNotSpecifiedError(
-                        "文件类型`{}`可被多个插件处理，请在导出函数的参数中指定插件名称".format(
-                            file_path.suffix.upper()
-                        )
-                    )
-                __plugin = plugin
-
-        if __plugin:
-            __plugin.dump(  # pyright: ignore[reportAttributeAccessIssue]
-                self.music[track_index], file_path, plugin_config
-            )
-        else:
-            raise FileFormatNotSupportedError(
-                "无法找到处理`{}`类型文件的插件".format(file_path.suffix.upper())
-            )
+        self._get_plugin_within_iousage(
+            self.__plugin_registry.get_track_output_plugin_by_format,
+            file_path,
+            self.__plugin_registry._track_output_plugins,
+            plugin_id,
+        ).dump(self.music[track_index], file_path, plugin_config)
 
     def perform_operation_on_music(
-        self, plugin_name: str, plugin_config: Optional[PluginConfig] = None
+        self, plugin_id: str, plugin_config: Optional[PluginConfig] = None
     ):
-        # 这样做是为了兼容以后的*撤回/重做*功能
-        self.music = self.get_plugin_by_name(
-            plugin_name
-        ).process(  # pyright: ignore[reportAttributeAccessIssue]
-            self.music, plugin_config
-        )
+        if __plugin := self.__plugin_registry._music_operate_plugins.get(plugin_id):
+            # 这样做是为了兼容以后的*撤回/重做*功能
+            self.music = __plugin.process(self.music, plugin_config)
+        else:
+            raise PluginNotFoundError(
+                "无法找到惟一识别码为`{}`的插件".format(plugin_id)
+            )
 
     def perform_operation_on_track(
         self,
         track_index: int,
-        plugin_name: str,
+        plugin_id: str,
         plugin_config: Optional[PluginConfig] = None,
     ):
-        # 这样做是为了兼容以后的*撤回/重做*功能
-        self.music[track_index] = self.get_plugin_by_name(
-            plugin_name
-        ).process(  # pyright: ignore[reportAttributeAccessIssue]
-            self.music[track_index], plugin_config
-        )
+        if __plugin := self.__plugin_registry._track_operate_plugins.get(plugin_id):
+            # 这样做是为了兼容以后的*撤回/重做*功能
+            self.music[track_index] = __plugin.process(
+                self.music[track_index], plugin_config
+            )
+        else:
+            raise PluginNotFoundError(
+                "无法找到惟一识别码为`{}`的插件".format(plugin_id)
+            )
 
     @staticmethod
     def _camel_to_snake(name: str) -> str:
@@ -240,8 +216,8 @@ class MusiCreater:
             "([a-z0-9])([A-Z])", r"\1_\2", re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
         ).lower()
 
-    def _parse_plugin_name(self, attr_name: str) -> Optional[str]:
-        """解析属性名称为插件名称"""
+    def _parse_plugin_id(self, attr_name: str) -> Optional[str]:
+        """解析属性名称为插件惟一识别码"""
 
         # 尝试去除 _plugin 后缀
         if attr_name.endswith("_plugin"):
@@ -256,35 +232,35 @@ class MusiCreater:
             if snake_case_name in self._plugin_cache:  # 尝试转换后的插件名
                 return snake_case_name
             else:
-                return self._parse_plugin_name(snake_case_name)
+                return self._parse_plugin_id(snake_case_name)
 
         return None
 
-    def _get_closest_plugin_name(self, requested_name: str) -> Optional[str]:
-        """找到最接近的插件名称（用于更好的错误提示）"""
+    def _get_closest_plugin_id(self, requested_id: str) -> Optional[str]:
+        """找到最接近的插件识别码（用于更好的错误提示）"""
 
         matches = get_close_matches(
-            requested_name, self._plugin_cache.keys(), n=1, cutoff=0.6
+            requested_id, self._plugin_cache.keys(), n=1, cutoff=0.6
         )
         return matches[0] if matches else None
 
-    def get_plugin_by_name(self, name: str) -> TopPluginBase:
+    def get_plugin_by_id(self, plg_id: str):
         """获取插件实例，并缓存起来，提高性能"""
-        if name.startswith("_"):
-            raise AttributeError("属性`{}`不存在，不应访问类的私有属性".format(name))
+        if plg_id.startswith("_"):
+            raise AttributeError("属性`{}`不存在，不应访问类的私有属性".format(plg_id))
 
-        if name in self._plugin_cache:
-            return self._plugin_cache[name]
+        if plg_id in self._plugin_cache:
+            return self._plugin_cache[plg_id]
         else:
-            plugin_name = self._parse_plugin_name(name)
+            plugin_name = self._parse_plugin_id(plg_id)
             if plugin_name:
-                self._plugin_cache[name] = self._plugin_cache[plugin_name]
-                return self._plugin_cache[name]
+                self._plugin_cache[plg_id] = self._plugin_cache[plugin_name]
+                return self._plugin_cache[plg_id]
 
-        closest = self._get_closest_plugin_name(name)
+        closest = self._get_closest_plugin_id(plg_id)
 
         raise AttributeError(
-            "插件`{}`不存在，请检查插件名称是否正确".format(name)
+            "插件`{}`不存在，请检查插件的惟一识别码是否正确".format(plg_id)
             + (
                 "；或者阁下可能想要使用的是`{}`插件？".format(closest)
                 if closest
@@ -292,18 +268,18 @@ class MusiCreater:
             )
         )
 
-    def __getattr__(self, name: str):
+    def __getattr__(self, plugin_id: str):
         """动态属性访问，允许直接 实例.插件名 来访问插件"""
-        return self.get_plugin_by_name(name)
+        return self.get_plugin_by_id(plugin_id)
 
     def _cache_all_plugins(self):
         """获取所有已注册插件的名称"""
-        for __plugin_type, __plugins_set in self.__plugin_registry:
-            for __plugin in __plugins_set:
-                if __plugin.metainfo.name in self._plugin_cache:  # 避免重复缓存
+        for __plugin_type, __plugins_map in self.__plugin_registry:
+            for __plugin_id, __plugin in __plugins_map.items():
+                if __plugin_id in self._plugin_cache:  # 避免重复缓存
                     if (
                         __plugin.metainfo.version
-                        <= self._plugin_cache[__plugin.metainfo.name].metainfo.version
+                        <= self._plugin_cache[__plugin_id].metainfo.version
                     ):  # 优先使用版本号最大的插件
                         continue
-                self._plugin_cache[__plugin.metainfo.name] = __plugin
+                self._plugin_cache[__plugin_id] = __plugin

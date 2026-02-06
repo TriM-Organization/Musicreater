@@ -27,7 +27,7 @@ from Musicreater.plugins import (
     music_input_plugin,
     PluginConfig,
     PluginMetaInformation,
-    PluginType,
+    PluginTypes,
     MusicInputPluginBase,
 )
 
@@ -37,11 +37,11 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
     """Midi 音乐数据导入插件"""
 
     metainfo = PluginMetaInformation(
-        name="midi_2_music_plugin",
+        name="Midi 导入插件",
         author="金羿、玉衡Alioth",
         description="从 Midi 文件导入音乐数据",
         version=(0, 0, 1),
-        type=PluginType.FUNCTION_MUSIC_IMPORT,
+        type=PluginTypes.FUNCTION_MUSIC_IMPORT,
         license="Same as Musicreater",
     )
 

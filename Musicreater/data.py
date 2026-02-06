@@ -476,14 +476,7 @@ class SingleTrack(List[SingleNote]):
 
         self.extra_info = extra_information if extra_information else {}
 
-        self.argument_curves = {
-            CurvableParam.PITCH: None,
-            CurvableParam.VELOCITY: None,
-            CurvableParam.VOLUME: None,
-            CurvableParam.DISTANCE: None,
-            CurvableParam.LR_PANNING: None,
-            CurvableParam.UD_PANNING: None,
-        }
+        self.argument_curves = {item: None for item in CurvableParam}
 
         super().__init__(*args)
         super().sort()
@@ -572,9 +565,9 @@ class SingleTrack(List[SingleNote]):
                 is_percussive_note=self.is_percussive,
                 sound_position=self.sound_position,
                 **{
-                    item.value: self.argument_curves[item].value_at(_note.start_time)  # type: ignore
+                    item.value: argcrv.value_at(_note.start_time)
                     for item in CurvableParam
-                    if self.argument_curves[item]
+                    if (argcrv := self.argument_curves[item])
                 },
             )
 

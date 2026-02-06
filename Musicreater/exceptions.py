@@ -225,6 +225,23 @@ class PluginLoadError(MusicreaterOuterlyError):
         super().__init__("插件加载错误 - ", *args)
 
 
+class PluginNotFoundError(PluginLoadError):
+    """插件未找到"""
+
+    def __init__(self, *args):
+        """插件未找到"""
+        super().__init__("插件未找到：", *args)
+
+
+class PluginRegisteredError(PluginLoadError):
+    """插件重复注册"""
+
+    def __init__(self, *args):
+        """插件已被注册注册"""
+        super().__init__("插件重复注册：", *args)
+
+
+
 class PluginConfigRelatedError(MusicreaterOuterlyError):
     """插件配置相关错误"""
 

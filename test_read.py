@@ -14,5 +14,11 @@ print(msct:=MusiCreater.import_music(Path("./resources/测试片段.mid")))
 print(msct.music)
 
 
+# 为了让类型检查器满意，以下方法不建议使用，因为这本质上是越过了 MusiCreater 类而直接执行插件的函数
+print(t := msct.midi_2_music_plugin.load(Path("./resources/测试片段.mid"), None))
+# 我们建议用这种方式来代替
+t = _global_plugin_registry._music_input_plugins["midi_2_music_plugin"].load(Path("./resources/测试片段.mid"), None)
 
-print(msct.midi_2_music_plugin.load(Path("./resources/测试片段.mid"), None))
+print(_global_plugin_registry)
+print(msct._plugin_cache)
+
