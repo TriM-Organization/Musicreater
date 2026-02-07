@@ -3,10 +3,9 @@
     dynamic = ["version"]
     requires-python = ">= 3.8, < 4.0"
     dependencies = [
-        "mido >= 1.3",
-        "tomli >= 2.4.0; python_version < '3.11'",
-        "tomli-w >= 1.0.0",
-        "xxhash >= 3",
+        "tomli >= 2.4.0, < 3.0 ; python_version < '3.11'",
+        "tomli-w >= 1.0.0, < 2.0",
+        "xxhash >= 3, < 4.0",
     ]
 
     authors = [
@@ -46,14 +45,23 @@
 
 
 [project.optional-dependencies]
-    full = [
-        "TrimMCStruct <= 0.0.5.9",
-        "brotli >= 1.0.0",
+    midi = [
+        "mido >= 1.3, < 2.0",
+    ]
+    structure = [
         "numpy",
+        "TrimMCStruct <= 0.0.5.9",
+        "brotli >= 1.0.0, < 2.0",
+    ]
+    full = [
+        "mido >= 1.3",
+        "numpy",
+        "TrimMCStruct <= 0.0.5.9",
+        "brotli >= 1.0.0, < 2.0",
     ]
     dev = [
         "TrimMCStruct <= 0.0.5.9",
-        "brotli >= 1.0.0",
+        "brotli >= 1.0.0, < 2.0",
         "dill",
         "rich",
         "pyinstaller",

@@ -60,6 +60,7 @@ from .exceptions import (
     ParameterTypeError,
     PluginInstanceNotFoundError,
     PluginRegisteredError,
+    PluginNotFoundError,
 )
 
 
@@ -119,16 +120,19 @@ def load_plugin_module(package: Union[Path, str]):
         插件包路径或名称，当为 Path 类时为路径，为 str 时为包名，切勿混淆。
     """
 
-    if isinstance(package, Path):
-        relative_path = package.resolve().relative_to(Path.cwd().resolve())
-        if relative_path.stem == "__init__":
-            return importlib.import_module(".".join(relative_path.parts[:-1]))
+    try:
+        if isinstance(package, Path):
+            relative_path = package.resolve().relative_to(Path.cwd().resolve())
+            if relative_path.stem == "__init__":
+                return importlib.import_module(".".join(relative_path.parts[:-1]))
+            else:
+                return importlib.import_module(
+                    ".".join(relative_path.parts[:-1] + (relative_path.stem,))
+                )
         else:
-            return importlib.import_module(
-                ".".join(relative_path.parts[:-1] + (relative_path.stem,))
-            )
-    else:
-        return importlib.import_module(package)
+            return importlib.import_module(package)
+    except ModuleNotFoundError as e:
+        raise PluginNotFoundError("无法找到名为`{}`的插件包".format(package))
 
 
 class PluginRegistry:
@@ -278,10 +282,10 @@ class PluginRegistry:
                 ],
                 key=lambda plugin: plugin.metainfo.version,
             )
-        except ValueError:
+        except ValueError as e:
             raise PluginInstanceNotFoundError(
                 "未找到“用于{}、名为`{}`”的插件".format(plugin_usage, plugin_name)
-            )
+            ) from e
 
     def get_music_input_plugin(self, plugin_name: str) -> MusicInputPluginBase:
         """获取指定名称的全曲导入用插件，当名称重叠时，取版本号最大的"""
@@ -389,6 +393,7 @@ def music_operate_plugin(plugin_id: str):
         plugin_id, _global_plugin_registry.register_music_operate_plugin
     )
 
+
 def track_operate_plugin(plugin_id: str):
     """音轨处理插件装饰器"""
     return __plugin_regist_decorator(
@@ -415,6 +420,7 @@ def service_plugin(plugin_id: str):
     return __plugin_regist_decorator(
         plugin_id, _global_plugin_registry.register_service_plugin
     )
+
 
 def library_plugin(plugin_id: str):
     """支持库插件装饰器"""

@@ -36,11 +36,14 @@ from itertools import chain
 
 import mido
 
-from .constants import *
+from Musicreater.constants import *
 from .old_exceptions import *
 from .subclass import *
 from .old_types import *
 from .utils import *
+
+from Musicreater.builtin_plugins.midi_read.constants import *
+from Musicreater.builtin_plugins.midi_read.utils import *
 
 """
 学习笔记：
@@ -796,7 +799,7 @@ class MusicSequence:
     def add_note(self, channel_no: int, note: MineNote, is_sort: bool = True):
         """
         在指定通道添加一个音符
-        值得注意：在版本 2.2.3 及之前 is_sort 参数默认为 False ；在此之后为 True
+        值得注意：在版本 2.2.3 及之前 is_sort 参数默认为 False；在此之后为 True
         """
         self.channels[channel_no].append(note)
         self.total_note_count += 1

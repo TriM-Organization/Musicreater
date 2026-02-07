@@ -241,7 +241,6 @@ class PluginRegisteredError(PluginLoadError):
         super().__init__("插件重复注册：", *args)
 
 
-
 class PluginConfigRelatedError(MusicreaterOuterlyError):
     """插件配置相关错误"""
 

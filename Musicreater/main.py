@@ -257,13 +257,11 @@ class MusiCreater:
                 self._plugin_cache[plg_id] = self._plugin_cache[plugin_name]
                 return self._plugin_cache[plg_id]
 
-        closest = self._get_closest_plugin_id(plg_id)
-
         raise AttributeError(
             "插件`{}`不存在，请检查插件的惟一识别码是否正确".format(plg_id)
             + (
                 "；或者阁下可能想要使用的是`{}`插件？".format(closest)
-                if closest
+                if (closest := self._get_closest_plugin_id(plg_id))
                 else ""
             )
         )

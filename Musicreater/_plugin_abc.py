@@ -41,6 +41,7 @@ from typing import (
     Generator,
     Iterator,
     Set,
+    Type,
 )
 
 if sys.version_info >= (3, 11):
@@ -97,6 +98,7 @@ from .data import SingleMusic, SingleTrack
 # 枚举类
 # ========================
 
+
 class PluginTypes(str, Enum):
     """插件类型枚举"""
 
@@ -108,7 +110,6 @@ class PluginTypes(str, Enum):
     FUNCTION_TRACK_EXPORT = "export_track_data"
     SERVICE = "service"
     LIBRARY = "library"
-
 
 
 # ========================
@@ -174,7 +175,7 @@ class PluginConfig(ABC):
             with file_path.open("wb") as f:
                 tomli_w.dump(self.to_dict(), f, multiline_strings=False, indent=4)
         except Exception as e:
-            raise PluginConfigDumpError(e)
+            raise PluginConfigDumpError("插件配置文件无法保存。") from e
 
     @classmethod
     def load_from_file(cls, file_path: Path) -> "PluginConfig":
@@ -199,7 +200,7 @@ class PluginConfig(ABC):
             with file_path.open("rb") as f:
                 return cls.from_dict(tomllib.load(f))
         except Exception as e:
-            raise PluginConfigLoadError(e)
+            raise PluginConfigLoadError("插件配置文件无法加载。") from e
 
 
 @dataclass

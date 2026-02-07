@@ -33,7 +33,6 @@ __author__ = (
     ("金羿", "Eilles"),
     ("玉衡Alioth", "YuhengAlioth"),
     ("鱼旧梦", "ElapsingDreams"),
-    ("偷吃不是Touch", "Touch"),
 )
 
 from .paramcurve import ParamCurve, InterpolationMethod, BoundaryBehaviour

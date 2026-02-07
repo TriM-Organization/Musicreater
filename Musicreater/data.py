@@ -222,11 +222,10 @@ class SingleNote:
                 )
             )
             raise SingleNoteDecodeError(
-                e,
                 "技术信息：\nGROUP1\t`{}`\nCODE_BUFFER\t`{}`".format(
                     group_1, code_buffer
                 ),
-            )
+            ) from e
 
     def encode(self, is_high_time_precision: bool = True) -> bytes:
         """
@@ -621,7 +620,7 @@ class SingleMusic(List[SingleTrack]):
     music_credits: str
     """曲目的版权信息"""
 
-    # 感叹一下什么交冗余设计啊！（叉腰）
+    # 感叹一下什么叫冗余设计啊！（叉腰）
     extra_info: Dict[str, Any]
     """这还得放东西？"""
 

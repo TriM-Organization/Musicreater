@@ -577,8 +577,7 @@ wheels = [
 name = "musicreater"
 source = { editable = "." }
 dependencies = [
-    { name = "mido" },
-    { name = "tomli" },
+    { name = "tomli", marker = "python_full_version < '3.11'" },
     { name = "tomli-w", version = "1.0.0", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version < '3.9'" },
     { name = "tomli-w", version = "1.2.0", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version >= '3.9'" },
     { name = "xxhash" },
@@ -595,6 +594,17 @@ dev = [
 ]
 full = [
     { name = "brotli" },
+    { name = "mido" },
+    { name = "numpy", version = "1.24.4", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "numpy", version = "2.0.2", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version >= '3.10'" },
+    { name = "trimmcstruct" },
+]
+midi = [
+    { name = "mido" },
+]
+structure = [
+    { name = "brotli" },
     { name = "numpy", version = "1.24.4", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version < '3.9'" },
     { name = "numpy", version = "2.0.2", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version == '3.9.*'" },
     { name = "numpy", version = "2.2.6", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version >= '3.10'" },
@@ -605,19 +615,23 @@ full = [
 requires-dist = [
     { name = "brotli", marker = "extra == 'dev'", specifier = ">=1.0.0" },
     { name = "brotli", marker = "extra == 'full'", specifier = ">=1.0.0" },
+    { name = "brotli", marker = "extra == 'structure'", specifier = ">=1.0.0" },
     { name = "dill", marker = "extra == 'dev'" },
-    { name = "mido", specifier = ">=1.3" },
+    { name = "mido", marker = "extra == 'full'", specifier = ">=1.3" },
+    { name = "mido", marker = "extra == 'midi'", specifier = ">=1.3" },
     { name = "numpy", marker = "extra == 'full'" },
+    { name = "numpy", marker = "extra == 'structure'" },
     { name = "pyinstaller", marker = "extra == 'dev'" },
     { name = "rich", marker = "extra == 'dev'" },
-    { name = "tomli" },
-    { name = "tomli-w" },
+    { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.4.0,<3.0" },
+    { name = "tomli-w", specifier = ">=1.0.0,<2.0" },
     { name = "trimmcstruct", marker = "extra == 'dev'", specifier = "<=0.0.5.9" },
     { name = "trimmcstruct", marker = "extra == 'full'", specifier = "<=0.0.5.9" },
+    { name = "trimmcstruct", marker = "extra == 'structure'", specifier = "<=0.0.5.9" },
     { name = "twine", marker = "extra == 'dev'" },
     { name = "xxhash", specifier = ">=3" },
 ]
-provides-extras = ["full", "dev"]
+provides-extras = ["midi", "structure", "full", "dev"]
 
 [[package]]
 name = "mutf8"
