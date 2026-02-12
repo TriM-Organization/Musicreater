@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存储 音·创 v3 的插件接口与管理相关内容
+音·创 v3 的插件接口与管理相关内容
 """
 
 """
@@ -213,7 +213,7 @@ class PluginRegistry:
 
     @staticmethod
     def _get_io_plugin_by_format(
-        plugin_regdict: Dict[str, T_IOPlugin], fpath_or_format: Union[Path, str]
+        plugin_regdict: Mapping[str, T_IOPlugin], fpath_or_format: Union[Path, str]
     ) -> Generator[T_IOPlugin, None, None]:
         if isinstance(fpath_or_format, str):
             return (

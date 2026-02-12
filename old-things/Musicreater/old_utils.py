@@ -39,29 +39,13 @@ from Musicreater.constants import (
     MM_INSTRUMENT_DEVIATION_TABLE,
     MM_INSTRUMENT_RANGE_TABLE,
 )
-from .old_exceptions import MusicSequenceDecodeError
+from Musicreater.exceptions import SingleNoteDecodeError
+from Musicreater._utils import enumerated_stuffcopy_dictionary
+
+from Musicreater.builtin_plugins.midi_read.utils import midi_inst_to_mc_sound
+
 from .subclass import MineNote, mctick2timestr, SingleNoteBox
 from .old_types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
-
-
-def empty_midi_channels(
-    channel_count: int = 17, default_staff: Any = {}
-) -> Dict[int, Any]:
-    """
-    空MIDI通道字典
-    """
-
-    return dict(
-        (
-            i,
-            (
-                default_staff.copy()
-                if isinstance(default_staff, (dict, list))
-                else default_staff
-            ),
-        )  # 这告诉我们，你不能忽略任何一个复制的序列，因为它真的，我哭死，折磨我一整天，全在这个bug上了
-        for i in range(channel_count)
-    )
 
 
 def inst_to_sould_with_deviation(
@@ -97,34 +81,6 @@ def inst_to_sould_with_deviation(
             default_instrument, 6 if sound_id in MC_PITCHED_INSTRUMENT_LIST else -1
         ),
     )
-
-
-def midi_inst_to_mc_sound(
-    instrumentID: int,
-    reference_table: MidiInstrumentTableType,
-    default_instrument: str = "note.flute",
-) -> str:
-    """
-    返回midi的乐器ID对应的我的世界乐器名
-
-    Parameters
-    ----------
-    instrumentID: int
-        midi的乐器ID
-    reference_table: Dict[int, Tuple[str, int]]
-        转换乐器参照表
-    default_instrument: str
-        查无此乐器时的替换乐器
-
-    Returns
-    -------
-    str我的世界乐器名
-    """
-    return reference_table.get(
-        instrumentID,
-        default_instrument,
-    )
-
 
 
 def minenote_to_command_parameters(
@@ -172,85 +128,6 @@ def minenote_to_command_parameters(
                 )
             )
         ),
-    )
-
-
-def midi_msgs_to_minenote(
-    inst_: int,  # 乐器编号
-    note_: int,
-    percussive_: bool,  # 是否作为打击乐器启用
-    volume_: int,
-    velocity_: int,
-    panning_: int,
-    start_time_: int,
-    duration_: int,
-    play_speed: float,
-    midi_reference_table: MidiInstrumentTableType,
-    volume_processing_method_: FittingFunctionType,
-    panning_processing_method_: FittingFunctionType,
-    note_table_replacement: Dict[str, str] = {},
-    lyric_line: str = "",
-) -> MineNote:
-    """
-    将Midi信息转为我的世界音符对象
-
-    Parameters
-    ------------
-    inst_: int
-        乐器编号
-    note_: int
-        音高编号（音符编号）
-    percussive_: bool
-        是否作为打击乐器启用
-    volume_: int
-        音量
-    velocity_: int
-        力度
-    panning_: int
-        声相偏移
-    start_time_: int
-        音符起始时间（微秒）
-    duration_: int
-        音符持续时间（微秒）
-    play_speed: float
-        曲目播放速度
-    midi_reference_table: Dict[int, str]
-        转换对照表
-    volume_processing_method_: Callable[[float], float]
-        音量处理函数
-    panning_processing_method_: Callable[[float], float]
-        立体声相偏移处理函数
-    note_table_replacement: Dict[str, str]
-        音符替换表，定义 Minecraft 音符字串的替换
-    lyric_line: str
-        该音符的歌词
-
-    Returns
-    ---------
-    MineNote
-        我的世界音符对象
-    """
-    mc_sound_ID = midi_inst_to_mc_sound(
-        inst_,
-        midi_reference_table,
-        "note.bd" if percussive_ else "note.flute",
-    )
-
-    return MineNote(
-        mc_sound_name=note_table_replacement.get(mc_sound_ID, mc_sound_ID),
-        midi_pitch=note_,
-        midi_velocity=velocity_,
-        start_time=(tk := int(start_time_ / float(play_speed) / 50000)),
-        last_time=round(duration_ / float(play_speed) / 50000),
-        mass_precision_time=round((start_time_ / float(play_speed) - tk * 50000) / 800),
-        is_percussion=percussive_,
-        distance=volume_processing_method_(volume_),
-        azimuth=(panning_processing_method_(panning_), 0),
-        extra_information={
-            "LYRIC_TEXT": lyric_line,
-            "VOLUME_VALUE": volume_,
-            "PIN_VALUE": panning_,
-        },
     )
 
 
@@ -549,11 +426,10 @@ def load_decode_fsq_flush_release(
             )
         except Exception as _err:
             # print(bytes_buffer_in[stt_index:end_index])
-            raise MusicSequenceDecodeError(
-                _err,
+            raise SingleNoteDecodeError(
                 "所截取的音符码之首个字节：",
                 _first_byte,
-            )
+            ) from _err
 
 
 def load_decode_msq_flush_release(
@@ -600,8 +476,8 @@ def load_decode_msq_flush_release(
 
     _total_note_count = 1
 
-    _channel_infos = empty_midi_channels(
-        default_staff={"NOW_INDEX": 0, "NOTE_COUNT": 0, "HAVE_READ": 0, "END_INDEX": -1}
+    _channel_infos = enumerated_stuffcopy_dictionary(
+        staff={"NOW_INDEX": 0, "NOTE_COUNT": 0, "HAVE_READ": 0, "END_INDEX": -1}
     )
 
     for __channel_index in _channel_infos.keys():
@@ -730,7 +606,7 @@ def load_decode_msq_flush_release(
                     _total_note_count -= 1
                 except Exception as _err:
                     # print(channels_)
-                    raise MusicSequenceDecodeError("难以定位的解码错误", _err)
+                    raise SingleNoteDecodeError("难以定位的解码错误") from _err
         if not _read_in_note_list:
             break
             # _note_list.append

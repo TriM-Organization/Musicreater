@@ -41,7 +41,7 @@ https://gitee.com/TriM-Organization/Musicreater/blob/master/LICENSE.md。
 # Bug retreat! Bug retreat!
 # Exceptions and errors are causing chaos
 # Words combine! Codes unite!
-# Hurry to call the programmer! Let's Go!
+# Hurry to call the Programmer! Let's Go!
 
 import re
 
@@ -96,9 +96,10 @@ class MusiCreater:
     def _get_plugin_within_iousage(
         get_func: Callable[[Union[Path, str]], Generator[T_IOPlugin, None, None]],
         fpath: Path,
-        plg_regdict: Dict[str, T_IOPlugin],
+        plg_regdict: Mapping[str, T_IOPlugin],
         plg_id: Optional[str],
     ) -> T_IOPlugin:
+        """这个函数是用于从指定的注册表项里面调取实例的，仅供下面这几个函数使用"""
 
         __plugin: Optional[T_IOPlugin] = None
         if plg_id:

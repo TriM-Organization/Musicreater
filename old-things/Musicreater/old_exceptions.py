@@ -34,14 +34,6 @@ class MSCTBaseException(Exception):
         raise self
 
 
-class MidiFormatException(MSCTBaseException):
-    """音·创 的所有MIDI格式错误均继承于此"""
-
-    def __init__(self, *args):
-        """音·创 的所有MIDI格式错误均继承于此"""
-        super().__init__("MIDI 格式错误", *args)
-
-
 class MidiDestroyedError(MSCTBaseException):
     """Midi文件损坏"""
 
@@ -82,84 +74,3 @@ class CommandFormatError(MSCTBaseException, RuntimeError):
 # 那么这两个音符的音长无法判断。这是个好问题，但是不是我现在能解决的，也不是我们现在想解决的问题
 
 
-class NotDefineTempoError(MidiFormatException):
-    """没有Tempo设定导致时间无法计算的错误"""
-
-    def __init__(self, *args):
-        """没有Tempo设定导致时间无法计算的错误"""
-        super().__init__("在曲目开始时没有声明 Tempo（未指定拍长）", *args)
-
-
-class ChannelOverFlowError(MidiFormatException):
-    """一个midi中含有过多的通道"""
-
-    def __init__(self, max_channel=16, *args):
-        """一个midi中含有过多的通道"""
-        super().__init__("含有过多的通道（数量应≤{}）".format(max_channel), *args)
-
-
-class NotDefineProgramError(MidiFormatException):
-    """没有Program设定导致没有乐器可以选择的错误"""
-
-    def __init__(self, *args):
-        """没有Program设定导致没有乐器可以选择的错误"""
-        super().__init__("未指定演奏乐器", *args)
-
-
-class NoteOnOffMismatchError(MidiFormatException):
-    """音符开音和停止不匹配的错误"""
-
-    def __init__(self, *args):
-        """音符开音和停止不匹配的错误"""
-        super().__init__("音符不匹配", *args)
-
-
-class LyricMismatchError(MSCTBaseException):
-    """歌词匹配解析错误"""
-
-    def __init__(self, *args):
-        """有可能产生了错误的歌词解析"""
-        super().__init__("歌词解析错误", *args)
-
-# 已重构
-class ZeroSpeedError(MSCTBaseException, ZeroDivisionError):
-    """以0作为播放速度的错误"""
-
-    def __init__(self, *args):
-        """以0作为播放速度的错误"""
-        super().__init__("播放速度为零", *args)
-
-# 已重构
-class IllegalMinimumVolumeError(MSCTBaseException, ValueError):
-    """最小播放音量有误的错误"""
-
-    def __init__(self, *args):
-        """最小播放音量错误"""
-        super().__init__("最小播放音量超出范围", *args)
-
-
-# 已重构
-class MusicSequenceDecodeError(MSCTBaseException):
-    """音乐序列解码错误"""
-
-    def __init__(self, *args):
-        """音乐序列无法正确解码的错误"""
-        super().__init__("解码音符序列文件时出现问题", *args)
-
-
-# 已重构
-class MusicSequenceTypeError(MSCTBaseException):
-    """音乐序列类型错误"""
-
-    def __init__(self, *args):
-        """无法识别音符序列字节码的类型"""
-        super().__init__("错误的音符序列字节类型", *args)
-
-
-# 已重构
-class MusicSequenceVerificationFailed(MusicSequenceDecodeError):
-    """音乐序列校验失败"""
-
-    def __init__(self, *args):
-        """音符序列文件与其校验值不一致"""
-        super().__init__("音符序列文件校验失败", *args)

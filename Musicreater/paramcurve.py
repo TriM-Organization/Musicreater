@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存储 音·创 v3 内部数据使用的参数曲线
+音·创 v3 内部数据使用的参数曲线
 """
 
 """
@@ -26,11 +26,9 @@ Terms & Conditions: License.md in the root directory
 
 from math import ceil
 from dataclasses import dataclass
-from typing import Optional, Any, List, Tuple
+from typing import Optional, Any, List, Tuple, Callable
 from enum import Enum
 import bisect
-
-from .types import FittingFunctionType
 
 
 def _evaluate_bezier_segment(
@@ -178,7 +176,7 @@ class Keyframe:
     value: float
 
     # 函数插值模式
-    out_interp: Optional[FittingFunctionType] = None
+    out_interp: Optional[Callable[[float], float]] = None
 
     # 贝塞尔模式
     in_tangent: Optional[Tuple[float, float]] = (
@@ -215,7 +213,7 @@ class ParamCurve:
     base_line: float = 0.0
     """基线/默认值"""
 
-    base_interpolation_function: FittingFunctionType
+    base_interpolation_function: Callable[[float], float]
     """默认（未指定区间时的）关键帧插值模式"""
 
     boundary_behaviour: BoundaryBehaviour
@@ -227,7 +225,7 @@ class ParamCurve:
     def __init__(
         self,
         base_value: float = 0.0,
-        default_interpolation_function: FittingFunctionType = InterpolationMethod.linear,
+        default_interpolation_function: Callable[[float], float] = InterpolationMethod.linear,
         boundary_mode: BoundaryBehaviour = BoundaryBehaviour.CONSTANT,
     ):
         """
@@ -257,7 +255,7 @@ class ParamCurve:
         self,
         time: float,
         value: float,
-        out_interp: Optional[FittingFunctionType] = None,
+        out_interp: Optional[Callable[[float], float]] = None,
         in_tangent: Optional[Tuple[float, float]] = None,
         out_tangent: Optional[Tuple[float, float]] = None,
         use_bezier: bool = False,
@@ -328,7 +326,7 @@ class ParamCurve:
     def update_key_interp(
         self,
         time: float,
-        out_interp: Optional[FittingFunctionType] = None,
+        out_interp: Optional[Callable[[float], float]] = None,
         in_tangent: Optional[Tuple[float, float]] = None,
         out_tangent: Optional[Tuple[float, float]] = None,
         use_bezier: bool = False,
@@ -486,7 +484,7 @@ class ParamCurve:
         """返回 (time, value) 列表。"""
         return [(k.time, k.value) for k in self._keys]
 
-    def set_default_interpolation_function(self, interp_func: FittingFunctionType):
+    def set_default_interpolation_function(self, interp_func: Callable[[float], float]):
         """设置默认插值函数。"""
         self.base_interpolation_function = interp_func
 

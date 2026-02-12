@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存储 音·创 v3 用到的一些报错类型
+音·创 v3 用到的一些报错类型
 """
 
 """
@@ -106,10 +106,10 @@ class OuterlyParameterError(MusicreaterOuterlyError):
 
 
 class ZeroSpeedError(OuterlyParameterError, ZeroDivisionError):
-    """以0作为播放速度的错误"""
+    """以 0 作为播放速度的错误"""
 
     def __init__(self, *args):
-        """以0作为播放速度的错误"""
+        """以 0 作为播放速度的错误"""
         super().__init__("播放速度为零：", *args)
 
 

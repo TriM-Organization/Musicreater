@@ -34,15 +34,6 @@ z = "z"
 z
 """
 
-MIDI_PROGRAM = "program"
-"""Midi乐器编号"""
-
-MIDI_VOLUME = "volume"
-"""Midi通道音量"""
-
-MIDI_PAN = "pan"
-"""Midi通道立体声场偏移"""
-
 
 # Midi用对照表
 

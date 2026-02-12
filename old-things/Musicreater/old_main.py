@@ -170,7 +170,7 @@ class MusicSequence:
         pitched_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_referance_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         minimum_vol: float = 0.1,
-        volume_processing_function: FittingFunctionType = velocity_2_distance_natural,
+        volume_processing_function: FittingFunctionType = volume_2_distance_natural,
         panning_processing_function: FittingFunctionType = panning_2_rotation_linear,
         deviation: float = 0,
         note_referance_table_replacement: Dict[str, str] = {},
@@ -273,7 +273,7 @@ class MusicSequence:
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("GB18030")
 
-            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
             total_note_count = 0
             if verify:
                 _header_index = stt_index
@@ -415,7 +415,7 @@ class MusicSequence:
                 _t6_buffer = _t2_buffer = 0
 
             _channel_inst_chart: Dict[str, Dict[str, int]] = {}
-            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
 
             for i in range(total_note_count):
                 if verify:
@@ -525,7 +525,7 @@ class MusicSequence:
             music_name_ = bytes_buffer_in[
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("GB18030")
-            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
             for channel_index in channels_.keys():
                 for i in range(
                     int.from_bytes(
@@ -568,7 +568,7 @@ class MusicSequence:
             music_name_ = bytes_buffer_in[
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("utf-8")
-            channels_: MineNoteChannelType = empty_midi_channels(default_staff=[])
+            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
             for channel_index in channels_.keys():
                 for i in range(
                     int.from_bytes(
@@ -820,7 +820,7 @@ class MusicSequence:
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
         pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-        vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
+        vol_processing_function: FittingFunctionType = volume_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},
     ) -> Tuple[MineNoteChannelType, int, Dict[str, int]]:
@@ -860,10 +860,10 @@ class MusicSequence:
             raise ZeroSpeedError("播放速度不得为零，应为 (0,1] 范围内的实数。")
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        midi_channels: MineNoteChannelType = enumerated_stuff_copy(staff=[])
 
-        channel_controler: Dict[int, Dict[str, int]] = empty_midi_channels(
-            default_staff={
+        channel_controler: Dict[int, Dict[str, int]] = enumerated_stuff_copy(
+            staff={
                 MIDI_PROGRAM: default_program_value,
                 MIDI_VOLUME: default_volume_value,
                 MIDI_PAN: 64,
@@ -883,7 +883,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = empty_midi_channels(default_staff=[])
+        ] = enumerated_stuff_copy(staff=[])
         note_queue_B: Dict[
             int,
             List[
@@ -892,7 +892,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = empty_midi_channels(default_staff=[])
+        ] = enumerated_stuff_copy(staff=[])
 
         lyric_cache: List[Tuple[int, str]] = []
 
@@ -1099,7 +1099,7 @@ class MidiConvert(MusicSequence):
         percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         enable_old_exe_format: bool = False,
         minimum_volume: float = 0.1,
-        vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
+        vol_processing_function: FittingFunctionType = volume_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         pitch_deviation: float = 0,
         note_rtable_replacement: Dict[str, str] = {},
@@ -1182,7 +1182,7 @@ class MidiConvert(MusicSequence):
         percussion_note_table: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
         old_exe_format: bool = False,
         min_volume: float = 0.1,
-        vol_processing_func: FittingFunctionType = velocity_2_distance_natural,
+        vol_processing_func: FittingFunctionType = volume_2_distance_natural,
         pan_processing_func: FittingFunctionType = panning_2_rotation_linear,
         music_pitch_deviation: float = 0,
         note_table_replacement: Dict[str, str] = {},

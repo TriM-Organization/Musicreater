@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存储 音·创 v3 的插件基类，提供抽象接口以供实际插件使用
+音·创 v3 的插件基类，提供抽象接口以供实际插件使用
 """
 
 """
@@ -42,6 +42,7 @@ from typing import (
     Iterator,
     Set,
     Type,
+    Mapping,
 )
 
 if sys.version_info >= (3, 11):
@@ -132,7 +133,7 @@ class PluginConfig(ABC):
         return {k: v for k, v in self.__dict__.items() if not k.startswith("_")}
 
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "PluginConfig":
+    def from_dict(cls, data: Mapping[str, Any]) -> "PluginConfig":
         """从字典创建配置实例
 
         参数

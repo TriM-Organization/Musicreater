@@ -592,6 +592,8 @@ MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
 
 # NoteBlockStudio “NBS”音色对照表
 # https://github.com/OpenNBS/NoteBlockStudio/blob/main/scripts/midi_instruments/midi_instruments.gml
+# 此表来自于 Commit 1ab5357c197872495197f27ad8374d711b2a5195
+# 需要更新：https://github.com/OpenNBS/NoteBlockStudio/compare/main...development?diff=unified&w
 
 MM_NBS_PITCHED_INSTRUMENT_TABLE: Dict[int, str] = {
     0: "note.harp",

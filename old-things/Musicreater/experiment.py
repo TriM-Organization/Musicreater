@@ -182,10 +182,10 @@ class FutureMidiConvertKamiRES(MidiConvert):
             raise ZeroSpeedError("播放速度为 0 ，其需要(0,1]范围内的实数。")
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: MineNoteChannelType = empty_midi_channels(default_staff=[])
+        midi_channels: MineNoteChannelType = enumerated_stuff_copy(staff=[])
 
-        channel_controler: Dict[int, Dict[str, int]] = empty_midi_channels(
-            default_staff={
+        channel_controler: Dict[int, Dict[str, int]] = enumerated_stuff_copy(
+            staff={
                 MIDI_PROGRAM: default_program_value,
                 MIDI_VOLUME: default_volume_value,
                 MIDI_PAN: 64,
@@ -205,7 +205,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
                     int,
                 ]
             ],
-        ] = empty_midi_channels(default_staff=[])
+        ] = enumerated_stuff_copy(staff=[])
         note_queue_B: Dict[
             int,
             List[
@@ -214,7 +214,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
                     int,
                 ]
             ],
-        ] = empty_midi_channels(default_staff=[])
+        ] = enumerated_stuff_copy(staff=[])
 
         # 直接使用mido.midifiles.tracks.merge_tracks转为单轨
         # 采用的时遍历信息思路
@@ -1042,7 +1042,7 @@ class FutureMidiConvertM5(MidiConvert):
         #     )
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: ChannelType = empty_midi_channels()
+        midi_channels: ChannelType = enumerated_stuff_copy()
         tempo = 500000
 
         # 我们来用通道统计音乐信息
@@ -1052,7 +1052,7 @@ class FutureMidiConvertM5(MidiConvert):
             if not track:
                 continue
 
-            note_queue = empty_midi_channels(default_staff=[])
+            note_queue = enumerated_stuff_copy(staff=[])
 
             for msg in track:
                 if msg.time != 0:

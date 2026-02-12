@@ -1,0 +1,237 @@
+
+classDiagram
+
+    direction LR
+
+    class Exception{
+        Python 内置基类
+    }
+
+    class MusicreaterBaseException {
+        "[音·创] - ..."
+        所有音·创 v3 错误的基类
+    }
+
+    class MusicreaterInnerlyError {
+        "内部错误 - ..."
+        面向开发者的内部错误
+    }
+
+    class MusicreaterOuterlyError {
+        "外部错误 - ..."
+        面向用户的外部错误
+    }
+
+    class InnerlyParameterError {
+        "内部传参错误 - ..."
+        内部参数相关错误
+    }
+
+    class OuterlyParameterError {
+        "参数错误 - ..."
+        外部参数相关错误
+    }
+
+    class ParameterTypeError {
+        "参数类型错误：..."
+        继承自 InnerlyParameterError 和 TypeError
+    }
+
+    class ParameterValueError {
+        "参数数值错误：..."
+        继承自 InnerlyParameterError 和 ValueError
+    }
+
+    class PluginNotSpecifiedError {
+        "未指定插件：..."
+        继承自 InnerlyParameterError 和 LookupError
+    }
+
+    class ZeroSpeedError {
+        "播放速度为零：..."
+        继承自 OuterlyParameterError 和 ZeroDivisionError
+    }
+
+    class IllegalMinimumVolumeError {
+        "最小播放音量超出范围：..."
+        继承自 OuterlyParameterError 和 ValueError
+    }
+
+    class FileFormatNotSupportedError {
+        "不支持的文件格式：..."
+        继承自 MusicreaterOuterlyError
+    }
+
+    class NoteBinaryDecodeError {
+        "解码音乐存储二进制数据时出现问题 - ..."
+        继承自 MusicreaterOuterlyError
+    }
+
+    class SingleNoteDecodeError {
+        "音符解码出错：..."
+        继承自 NoteBinaryDecodeError
+    }
+
+    class NoteBinaryFileTypeError {
+        "无法识别音乐存储文件对应的类型：..."
+        继承自 NoteBinaryDecodeError
+    }
+
+    class NoteBinaryFileVerificationFailed {
+        "音乐存储文件校验失败：..."
+        继承自 NoteBinaryDecodeError
+    }
+
+    class PluginDefineError {
+        "插件内部错误 - ..."
+        插件定义相关的内部错误
+    }
+
+    class PluginInstanceNotFoundError {
+        "插件实例未找到：..."
+        继承自 PluginDefineError 和 LookupError
+    }
+
+    class PluginAttributeNotFoundError {
+        "插件类的必要属性不存在：..."
+        继承自 PluginDefineError 和 AttributeError
+    }
+
+    class PluginMetainfoError {
+        "插件元信息定义错误 - ..."
+        插件元信息相关错误
+    }
+
+    class PluginMetainfoTypeError {
+        "插件元信息类型错误：..."
+        继承自 PluginMetainfoError 和 TypeError
+    }
+
+    class PluginMetainfoValueError {
+        "插件元信息数值错误：..."
+        继承自 PluginMetainfoError 和 ValueError
+    }
+
+    class PluginMetainfoNotFoundError {
+        "插件元信息未定义：..."
+        继承自 PluginMetainfoError 和 PluginAttributeNotFoundError
+    }
+
+    class PluginLoadError {
+        "插件加载错误 - ..."
+        插件加载相关的外部错误
+    }
+
+    class PluginNotFoundError {
+        "插件未找到：..."
+        继承自 PluginLoadError
+    }
+
+    class PluginRegisteredError {
+        "插件重复注册：..."
+        继承自 PluginLoadError
+    }
+
+    class PluginConfigRelatedError {
+        "插件配置相关错误 - ..."
+        插件配置相关错误基类
+    }
+
+    class PluginConfigLoadError {
+        "插件配置文件加载错误：..."
+        继承自 PluginLoadError、PluginConfigRelatedError
+    }
+
+    class PluginConfigDumpError {
+        "插件配置文件保存错误：..."
+        继承自 PluginConfigRelatedError
+    }
+    %% 高亮定义
+
+    class ParameterTypeError ::: highlight
+    class ParameterValueError ::: highlight
+    class PluginNotSpecifiedError ::: highlight
+    class ZeroSpeedError ::: highlight
+    class IllegalMinimumVolumeError ::: highlight
+    class FileFormatNotSupportedError ::: highlight
+    class SingleNoteDecodeError ::: highlight
+    class NoteBinaryFileTypeError ::: highlight
+    class NoteBinaryFileVerificationFailed ::: highlight
+    class PluginInstanceNotFoundError ::: highlight
+    class PluginAttributeNotFoundError ::: highlight
+    class PluginMetainfoTypeError ::: highlight
+    class PluginMetainfoValueError ::: highlight
+    class PluginMetainfoNotFoundError ::: highlight
+    class PluginNotFoundError ::: highlight
+    class PluginRegisteredError ::: highlight
+    class PluginConfigLoadError ::: highlight
+    class PluginConfigDumpError ::: highlight
+
+    %% 定义高亮样式
+    classDef highlight fill:,stroke-width:5px
+
+    %% 继承关系（箭头从子类指向父类）
+    Exception <|-- MusicreaterBaseException
+    Exception <|-- TypeError
+    Exception <|-- ValueError
+    Exception <|-- LookupError
+    Exception <|-- AttributeError
+    Exception <|-- ZeroDivisionError
+    MusicreaterBaseException <|-- MusicreaterInnerlyError
+    MusicreaterBaseException <|-- MusicreaterOuterlyError
+
+    MusicreaterInnerlyError <|-- InnerlyParameterError
+    MusicreaterOuterlyError <|-- OuterlyParameterError
+
+    InnerlyParameterError <|-- ParameterTypeError
+    TypeError <|-- ParameterTypeError
+
+    InnerlyParameterError <|-- ParameterValueError
+    ValueError <|-- ParameterValueError
+
+    InnerlyParameterError <|-- PluginNotSpecifiedError
+    LookupError <|-- PluginNotSpecifiedError
+
+    OuterlyParameterError <|-- ZeroSpeedError
+    ZeroDivisionError <|-- ZeroSpeedError
+
+    OuterlyParameterError <|-- IllegalMinimumVolumeError
+    ValueError <|-- IllegalMinimumVolumeError
+
+    MusicreaterOuterlyError <|-- FileFormatNotSupportedError
+    MusicreaterOuterlyError <|-- NoteBinaryDecodeError
+
+    NoteBinaryDecodeError <|-- SingleNoteDecodeError
+    NoteBinaryDecodeError <|-- NoteBinaryFileTypeError
+    NoteBinaryDecodeError <|-- NoteBinaryFileVerificationFailed
+
+    MusicreaterInnerlyError <|-- PluginDefineError
+
+    PluginDefineError <|-- PluginInstanceNotFoundError
+    LookupError <|-- PluginInstanceNotFoundError
+
+    PluginDefineError <|-- PluginAttributeNotFoundError
+    AttributeError <|-- PluginAttributeNotFoundError
+
+    PluginDefineError <|-- PluginMetainfoError
+
+    PluginMetainfoError <|-- PluginMetainfoTypeError
+    TypeError <|-- PluginMetainfoTypeError
+
+    PluginMetainfoError <|-- PluginMetainfoValueError
+    ValueError <|-- PluginMetainfoValueError
+
+    PluginMetainfoError <|-- PluginMetainfoNotFoundError
+    PluginAttributeNotFoundError <|-- PluginMetainfoNotFoundError
+
+    MusicreaterOuterlyError <|-- PluginLoadError
+
+    PluginLoadError <|-- PluginNotFoundError
+    PluginLoadError <|-- PluginRegisteredError
+
+    MusicreaterOuterlyError <|-- PluginConfigRelatedError
+
+    PluginLoadError <|-- PluginConfigLoadError
+    PluginConfigRelatedError <|-- PluginConfigLoadError
+
+    PluginConfigRelatedError <|-- PluginConfigDumpError

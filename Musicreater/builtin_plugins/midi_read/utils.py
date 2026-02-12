@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 """
@@ -20,18 +19,21 @@ Terms & Conditions: License.md in the root directory
 
 import math
 
+from typing import Callable, Dict, List, Optional, Sequence, Tuple, Mapping
+
+from Musicreater import SingleNote, SoundAtmos
 
 
-def velocity_2_distance_natural(
+def volume_2_distance_natural(
     vol: float,
 ) -> float:
     """
-    midi力度值拟合成的距离函数
+    Midi 力度值/音量值拟合成的距离函数，一种更加自然的听感？
 
     Parameters
     ----------
     vol: int
-        midi 音符力度值
+        Midi 音符力度值（0~127）
 
     Returns
     -------
@@ -50,20 +52,20 @@ def velocity_2_distance_natural(
     )
 
 
-def velocity_2_distance_straight(vol: float) -> float:
+def volume_2_distance_straight(vol: float) -> float:
     """
-    midi力度值拟合成的距离函数
+    Midi 力度值/音量值拟合成的距离函数，线性转换
 
     Parameters
     ----------
     vol: int
-        midi 音符力度值
+        Midi 音符力度值（0~127）
 
     Returns
     -------
     float播放中心到玩家的距离
     """
-    return vol / -8 + 16
+    return (vol + 1) / -8 + 16
 
 
 def panning_2_rotation_linear(pan_: float) -> float:
@@ -106,3 +108,115 @@ def panning_2_rotation_trigonometric(pan_: float) -> float:
     else:
         return math.degrees(math.acos((64 - pan_) / 63)) - 90
 
+
+def midi_inst_to_mc_sound(
+    instrumentID: int,
+    reference_table: Mapping[int, str],
+    default_instrument: str = "note.flute",
+) -> str:
+    """
+    返回midi的乐器ID对应的我的世界乐器名
+
+    Parameters
+    ----------
+    instrumentID: int
+        midi的乐器ID
+    reference_table: Dict[int, Tuple[str, int]]
+        转换乐器参照表
+    default_instrument: str
+        查无此乐器时的替换乐器
+
+    Returns
+    -------
+    str我的世界乐器名
+    """
+    return reference_table.get(
+        instrumentID,
+        default_instrument,
+    )
+
+
+def midi_msgs_to_noteinfo(
+    inst: int,  # 乐器编号
+    note: int,
+    percussive: bool,  # 是否作为打击乐器启用
+    volume: int,
+    velocity: int,
+    panning: int,
+    start_time: int,
+    duration: int,
+    play_speed: float,
+    midi_reference_table: Mapping[int, str],
+    volume_processing_method: Callable[[float], float],
+    panning_processing_method: Callable[[float], float],
+    note_table_replacement: Mapping[str, str] = {},
+    lyric_line: str = "",
+) -> Tuple[SingleNote, str, float, Tuple[float, float]]:
+    """
+    将 Midi信息转为音符对象
+
+    Parameters
+    ------------
+    inst: int
+        乐器编号
+    note: int
+        音高编号（音符编号）
+    percussive: bool
+        是否作为打击乐器启用
+    volume: int
+        音量
+    velocity: int
+        力度
+    panning: int
+        声相偏移
+    start_time: int
+        音符起始时间（微秒）
+    duration: int
+        音符持续时间（微秒）
+    play_speed: float
+        曲目播放速度
+    midi_reference_table: Dict[int, str]
+        转换对照表
+    volume_processing_method: Callable[[float], float]
+        音量处理函数
+    panning_processing_method: Callable[[float], float]
+        立体声相偏移处理函数
+    note_table_replacement: Dict[str, str]
+        音符替换表，定义 Minecraft 音符字串的替换
+    lyric_line: str
+        该音符的歌词
+
+    Returns
+    ---------
+    Tuple[
+        MineNote我的世界音符对象,
+        str我的世界声音名,
+        float播放中心到玩家的距离,
+        Tuple[float, float]声源旋转角度
+    ]
+    """
+    mc_sound_ID = midi_inst_to_mc_sound(
+        inst,
+        midi_reference_table,
+        "note.bd" if percussive else "note.flute",
+    )
+
+    return (
+        SingleNote(
+            midi_pitch=note,
+            note_volume=int((velocity / 127) + 0.5),
+            start_tick=(tk := int(start_time / float(play_speed) / 50000)),
+            keep_tick=round(duration / float(play_speed) / 50000),
+            mass_precision_time=round(
+                (start_time / float(play_speed) - tk * 50000) / 800
+            ),
+            extra_information={
+                "LYRIC_TEXT": lyric_line,
+                "VOLUME_VALUE": volume,
+                "PIN_VALUE": panning,
+            },
+        ),
+        note_table_replacement.get(mc_sound_ID, mc_sound_ID),
+        volume_processing_method(volume),
+        (panning_processing_method(panning), 0),
+    )

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-存储 音·创 v3 定义的一些数据类型，可以用于类型检查器
+音·创 v3 定义的一些数据类型，可以用于类型检查器
 """
 
 """
@@ -19,7 +19,3 @@ Terms & Conditions: License.md in the root directory
 
 from typing import Callable, Dict, List, Literal, Mapping, Tuple, Union
 
-FittingFunctionType = Callable[[float], float]
-"""
-拟合函数类型
-"""

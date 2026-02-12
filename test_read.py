@@ -21,7 +21,7 @@ print(t := msct.midi_2_music_plugin.load(Path("./resources/测试片段.mid"), N
 t = _global_plugin_registry._music_input_plugins["midi_2_music_plugin"].load(
     Path("./resources/测试片段.mid"),
     MidiImportConfig(
-        speed=1.0,
+        speed_multiplier=1.0,
     ),
 )
 # 或者
