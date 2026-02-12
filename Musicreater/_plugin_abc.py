@@ -498,9 +498,9 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def dumpbytes(
+    def stream_dump(
         self, data: "SingleMusic", config: Optional[PluginConfig]
-    ) -> BinaryIO:
+    ) -> Iterator[bytes]:
         """将完整曲目导出为对应格式的字节流
 
         参数
@@ -512,12 +512,11 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
 
         返回
         ====
-        BinaryIO
-            导出后的二进制字节流
+        Iterator[bytes]
+            分块导出的二进制字节串
         """
         pass
 
-    @abstractmethod
     def dump(
         self, data: "SingleMusic", file_path: Path, config: Optional[PluginConfig]
     ):
@@ -533,7 +532,9 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
             插件配置；**可选**
         """
 
-        pass
+        with file_path.open("wb") as f:
+            for _bytes in self.stream_dump(data, config):
+                f.write(_bytes)
 
 
 class TrackOutputPluginBase(TopInOutPluginBase, ABC):
@@ -551,9 +552,9 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def dumpbytes(
+    def stream_dump(
         self, data: "SingleTrack", config: Optional[PluginConfig]
-    ) -> BinaryIO:
+    ) -> Iterator[bytes]:
         """将单个音轨导出为对应格式的字节流
 
         参数
@@ -565,12 +566,11 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
 
         返回
         ====
-        BinaryIO
-            导出后的二进制字节流
+        Iterator[bytes]
+            分块导出的二进制字节串
         """
         pass
 
-    @abstractmethod
     def dump(
         self, data: "SingleTrack", file_path: Path, config: Optional[PluginConfig]
     ):
@@ -585,7 +585,9 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
         config: Optional[PluginConfig]
             插件配置；**可选**
         """
-        pass
+        with file_path.open("wb") as f:
+            for _bytes in self.stream_dump(data, config):
+                f.write(_bytes)
 
 
 class ServicePluginBase(TopPluginBase, ABC):
@@ -603,15 +605,13 @@ class ServicePluginBase(TopPluginBase, ABC):
             )
 
     @abstractmethod
-    def serve(self, config: Optional[PluginConfig], *args) -> None:
+    def serve(self, config: Optional[PluginConfig]) -> None:
         """服务插件的运行逻辑
 
         参数
         ====
         config: Optional[PluginConfig]
             插件配置；**可选**
-        *args: Any
-            其他运行时参数
         """
         pass
 

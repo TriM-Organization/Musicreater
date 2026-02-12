@@ -28,13 +28,15 @@ from typing import BinaryIO, Optional
 from pathlib import Path
 from dataclasses import dataclass
 
-from Musicreater import SingleMusic
+from Musicreater import SingleMusic, SingleTrack
 from Musicreater.plugins import (
-    music_input_plugin,
     PluginConfig,
     PluginMetaInformation,
     PluginTypes,
+    music_input_plugin,
     MusicInputPluginBase,
+    track_input_plugin,
+    TrackInputPluginBase,
 )
 
 
@@ -46,18 +48,18 @@ class ExampleImportConfig(PluginConfig):
 
 
 @music_input_plugin("something_convert_to_music")
-class ExampleImportPlugin(MusicInputPluginBase):
+class ExampleImportMusicPlugin(MusicInputPluginBase):
     metainfo = PluginMetaInformation(
-        name="示例导入插件",
+        name="示例导入插件·甲",
         author="金羿",
-        description="这是一个示例导入插件",
+        description="这是一个示例导入插件，演示导入到全曲的插件编写过程",
         version=(0, 0, 1),
         type=PluginTypes.FUNCTION_MUSIC_IMPORT,
         license="The Unlicense",
         dependencies=("something_convertion_library"),
     )
 
-    supported_formats = ("EXP", "example_format")
+    supported_formats = ("EXP", "EXAMPLE_FORMAT")
 
     def loadbytes(
         self, bytes_buffer_in: BinaryIO, config: Optional[ExampleImportConfig]
@@ -70,3 +72,25 @@ class ExampleImportPlugin(MusicInputPluginBase):
     ) -> "SingleMusic":
         with file_path.open("rb") as f:
             return self.loadbytes(f, config)
+
+
+@track_input_plugin("something_convert_to_track")
+class ExampleImportTrackPlugin(TrackInputPluginBase):
+    metainfo = PluginMetaInformation(
+        name="示例导入插件·乙",
+        author="金羿",
+        description="这是一个示例导入插件，演示导入到音轨的插件编写过程",
+        version=(0, 0, 1),
+        type=PluginTypes.FUNCTION_TRACK_IMPORT,
+        license="The Unlicense",
+        # 可以缺省依赖，如果不需要的话
+    )
+
+    supported_formats = ("EXP", "example_format")
+
+    def loadbytes(
+        self, bytes_buffer_in: BinaryIO, config: Optional[ExampleImportConfig]
+    ) -> "SingleTrack":
+        return SingleTrack()
+    
+    # 可以缺省 load 方法，会直接用上面展示过的方法读取数据
