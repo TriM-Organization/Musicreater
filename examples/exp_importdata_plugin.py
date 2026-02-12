@@ -24,7 +24,7 @@ Copyright © 2026 Eilles
 本声明仅限于包含此声明的本文件，本声明与项目内其他文件无关。
 """
 
-from typing import BinaryIO
+from typing import BinaryIO, Optional
 from pathlib import Path
 from dataclasses import dataclass
 
@@ -54,17 +54,19 @@ class ExampleImportPlugin(MusicInputPluginBase):
         version=(0, 0, 1),
         type=PluginTypes.FUNCTION_MUSIC_IMPORT,
         license="The Unlicense",
-        dependencies=("something_convertion_library")
+        dependencies=("something_convertion_library"),
     )
 
     supported_formats = ("EXP", "example_format")
 
     def loadbytes(
-        self, bytes_buffer_in: BinaryIO, config: ExampleImportConfig
+        self, bytes_buffer_in: BinaryIO, config: Optional[ExampleImportConfig]
     ) -> "SingleMusic":
         return SingleMusic()
 
+    # 插件可选地定义 load 方法，从文件导入数据。下面展示的是不定义 load 方法时候的实现方式
     def load(
-        self, file_path: Path, config: ExampleImportConfig
+        self, file_path: Path, config: Optional[ExampleImportConfig]
     ) -> "SingleMusic":
-        return SingleMusic()
+        with file_path.open("rb") as f:
+            return self.loadbytes(f, config)

@@ -20,6 +20,8 @@ Email [TriM-Organization@hotmail.com](mailto:TriM-Organization@hotmail.com)
 本声明仅限于包含此声明的本文件，本声明与项目内其他文件无关。
 ```
 
+本教程文档的关联文件是[exp_importdata_plugin.py](./exp_importdata_plugin.py)
+
 ## 新建文件夹 · 基础模块知识
 
 
@@ -28,7 +30,7 @@ Email [TriM-Organization@hotmail.com](mailto:TriM-Organization@hotmail.com)
 这就意味着，承载插件的模块本质上可以是多个 Python 的 `.py` 文件组成的，带有 `__init__.py` 的一个文件夹；
 或者是一个简单的 `.py` 文件。
 
-我们有这种共识：你已经知道了模块的相关知识，我后面无需赘述插件和模块的区别。
+我们有这种共识：大家已经知道了模块的相关知识，后面的教程中你已经理解 **音·创 v3** 插件和 Python 模块的区别。
 
 ## 开始编写插件 · 插件基础
 
@@ -103,23 +105,26 @@ class ExampleImportPlugin(MusicInputPluginBase):
         version=(0, 0, 1),               # 插件版本
         type=PluginTypes.FUNCTION_MUSIC_IMPORT, # 插件类型
         license="The Unlicense",         # 插件许可证
-        dependencies=("something_convertion_library") # 插件对于其他插件的依赖项
+        dependencies=("something_convertion_library") # 插件对于其他插件的依赖项（此功能尚未实现）
     )
 
-    # 导入导出插件支持的数据格式，大小写皆可
+    # 导入导出插件支持的数据格式，大小写皆可，无需加后缀名前的那个点
     supported_formats = ("EXP", "example_format")
 
     # 定义 loadbytes 方法，从字节流中导入数据
     def loadbytes(
-        self, bytes_buffer_in: BinaryIO, config: ExampleImportConfig
+        self, bytes_buffer_in: BinaryIO, config: Optional[ExampleImportConfig]
     ) -> "SingleMusic":
         ...
 
-    # 插件可选地定义 load 方法，从文件导入数据
+    # 插件可选地定义 load 方法，从文件导入数据。下面展示的是不定义 load 方法时候的实现方式
     def load(
-        self, file_path: Path, config: ExampleImportConfig
+        self, file_path: Path, config: Optional[ExampleImportConfig]
     ) -> "SingleMusic":
-        ...
+        with file_path.open("rb") as f:
+            return self.loadbytes(f, config)
 ```
 
 至此，一个插件的编写已经完成。
+
+同时，如果有不清楚的地方，可以查看我们的[内置插件](../Musicreater/builtin_plugins/)，说不定会给你一些启发。
