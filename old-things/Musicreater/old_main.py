@@ -37,14 +37,17 @@ from itertools import chain
 import mido
 
 from Musicreater.constants import *
+from Musicreater.exceptions import IllegalMinimumVolumeError, NoteBinaryFileVerificationFailed as MusicSequenceVerificationFailed, SingleNoteDecodeError, NoteBinaryFileTypeError as MusicSequenceTypeError, ZeroSpeedError
+
+from Musicreater.builtin_plugins.midi_read.constants import MIDI_DEFAULT_PROGRAM_VALUE, MIDI_DEFAULT_VOLUME_VALUE, MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE, MM_TOUCH_PITCHED_INSTRUMENT_TABLE
+from Musicreater.builtin_plugins.midi_read.exceptions import NoteOnOffMismatchError, LyricMismatchError
+from Musicreater.builtin_plugins.midi_read.utils import volume_2_distance_natural, panning_2_rotation_trigonometric, panning_2_rotation_linear
+
+
 from .old_exceptions import *
 from .subclass import *
 from .old_types import *
-from .utils import *
-
-from Musicreater.builtin_plugins.midi_read.constants import *
-from Musicreater.builtin_plugins.midi_read.utils import *
-
+from .old_utils import *
 """
 学习笔记：
 tempo:  microseconds per quarter note 毫秒每四分音符，换句话说就是一拍占多少微秒
@@ -77,6 +80,10 @@ tick * tempo / 1000000.0 / ticks_per_beat * 一秒多少游戏刻
 
 
 """
+
+MIDI_PAN = "midi-pan"
+MIDI_PROGRAM = "midi-program"
+MIDI_VOLUME = "midi-volume"
 
 
 @dataclass(init=False)
@@ -273,7 +280,7 @@ class MusicSequence:
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("GB18030")
 
-            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
+            channels_: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
             total_note_count = 0
             if verify:
                 _header_index = stt_index
@@ -310,9 +317,9 @@ class MusicSequence:
                         stt_index = end_index
                     except Exception as _err:
                         # print(channels_)
-                        raise MusicSequenceDecodeError(
-                            _err, "当前全部通道数据：", channels_
-                        )
+                        raise SingleNoteDecodeError(
+                            "当前全部通道数据：", channels_
+                        ) from _err
                 if verify:
                     if (
                         _count_verify := xxh3_64(
@@ -415,7 +422,7 @@ class MusicSequence:
                 _t6_buffer = _t2_buffer = 0
 
             _channel_inst_chart: Dict[str, Dict[str, int]] = {}
-            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
+            channels_: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
 
             for i in range(total_note_count):
                 if verify:
@@ -468,9 +475,9 @@ class MusicSequence:
                     stt_index = end_index
                 except Exception as _err:
                     # print(bytes_buffer_in[stt_index:end_index])
-                    raise MusicSequenceDecodeError(
-                        _err, "所截取的音符码：", bytes_buffer_in[stt_index:end_index]
-                    )
+                    raise SingleNoteDecodeError(
+                        "所截取的音符码：", bytes_buffer_in[stt_index:end_index]
+                    ) from _err
 
                 if _read_note.sound_name in _channel_inst_chart:
                     _channel_inst_chart[_read_note.sound_name]["CNT"] += 1
@@ -525,7 +532,7 @@ class MusicSequence:
             music_name_ = bytes_buffer_in[
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("GB18030")
-            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
+            channels_: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
             for channel_index in channels_.keys():
                 for i in range(
                     int.from_bytes(
@@ -568,7 +575,7 @@ class MusicSequence:
             music_name_ = bytes_buffer_in[
                 8 : (stt_index := 8 + (group_1 >> 10))
             ].decode("utf-8")
-            channels_: MineNoteChannelType = enumerated_stuff_copy(staff=[])
+            channels_: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
             for channel_index in channels_.keys():
                 for i in range(
                     int.from_bytes(
@@ -860,9 +867,9 @@ class MusicSequence:
             raise ZeroSpeedError("播放速度不得为零，应为 (0,1] 范围内的实数。")
 
         # 一个midi中仅有16个通道 我们通过通道来识别而不是音轨
-        midi_channels: MineNoteChannelType = enumerated_stuff_copy(staff=[])
+        midi_channels: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
 
-        channel_controler: Dict[int, Dict[str, int]] = enumerated_stuff_copy(
+        channel_controler: Dict[int, Dict[str, int]] = enumerated_stuffcopy_dictionary(
             staff={
                 MIDI_PROGRAM: default_program_value,
                 MIDI_VOLUME: default_volume_value,
@@ -883,7 +890,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = enumerated_stuff_copy(staff=[])
+        ] = enumerated_stuffcopy_dictionary(staff=[])
         note_queue_B: Dict[
             int,
             List[
@@ -892,7 +899,7 @@ class MusicSequence:
                     int,
                 ]
             ],
-        ] = enumerated_stuff_copy(staff=[])
+        ] = enumerated_stuffcopy_dictionary(staff=[])
 
         lyric_cache: List[Tuple[int, str]] = []
 
@@ -973,7 +980,7 @@ class MusicSequence:
 
                     # 更新结果信息
                     midi_channels[msg.channel].append(
-                        that_note := midi_msgs_to_minenote(
+                        that_note := midi_msgs_to_minenote( # 无法强行兼容了，pass
                             inst_=(
                                 msg.note
                                 if (_is_percussion := (msg.channel == 9))

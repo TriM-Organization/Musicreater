@@ -41,7 +41,6 @@ from .constants import (
     MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
 )
 from .exceptions import (
-    MidiFormatError,
     NoteOnOffMismatchError,
     ChannelOverFlowError,
     LyricMismatchError,

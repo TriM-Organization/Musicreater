@@ -225,12 +225,19 @@ class PluginLoadError(MusicreaterOuterlyError):
         super().__init__("插件加载错误 - ", *args)
 
 
+class PluginDependencyNotFound(PluginLoadError):
+    """插件依赖未找到"""
+
+    def __init__(self, *args):
+        super().__init__("未找到所需的插件依赖：", *args)
+
+
 class PluginNotFoundError(PluginLoadError):
     """插件未找到"""
 
     def __init__(self, *args):
         """插件未找到"""
-        super().__init__("插件未找到：", *args)
+        super().__init__("无法找到插件：", *args)
 
 
 class PluginRegisteredError(PluginLoadError):

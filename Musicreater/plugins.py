@@ -33,6 +33,7 @@ from typing import (
     TypeVar,
     Mapping,
     Callable,
+    Type,
 )
 from itertools import chain
 
@@ -61,6 +62,7 @@ from .exceptions import (
     PluginInstanceNotFoundError,
     PluginRegisteredError,
     PluginNotFoundError,
+    PluginDependencyNotFound,
 )
 
 
@@ -147,6 +149,7 @@ class PluginRegistry:
         self._track_output_plugins: Dict[str, TrackOutputPluginBase] = {}
         self._service_plugins: Dict[str, ServicePluginBase] = {}
         self._library_plugins: Dict[str, LibraryPluginBase] = {}
+        self._all_plugin_id: List = []
 
     def __iter__(self) -> Iterator[Tuple[PluginTypes, Mapping[str, TopPluginBase]]]:
         """迭代器，返回所有插件"""
@@ -163,23 +166,25 @@ class PluginRegistry:
             )
         )
 
-    @staticmethod
-    def _register_plugin(cls_dict: dict, plg_class: type, plg_id: str) -> None:
+    def _register_plugin(
+        self, cls_dict: dict, plg_class: Type[TopPluginBase], plg_id: str
+    ) -> None:
         """注册插件"""
         if plg_id in cls_dict:
             if cls_dict[plg_id].metainfo.version >= plg_class.metainfo.version:
                 raise PluginRegisteredError(
-                    "插件惟一识别码`{}`所对应的插件已存在更高版本`{}`，请勿重复注册同一插件！".format(
+                    "插件惟一识别码`{}`所对应的插件已存在更高版本`{}`，请勿重复注册同一插件。".format(
                         plg_id, plg_class.metainfo
                     )
                 )
+        if (i for i in plg_class.metainfo.dependencies if i not in self._all_plugin_id):
+            raise PluginDependencyNotFound(
+                "插件 `{}` 依赖于这些插件：`{}`。载入此插件时，请务必将后者提前载入。"
+            )
         cls_dict[plg_id] = plg_class()
+        self._all_plugin_id.append(plg_id)
 
-    def register_music_input_plugin(
-        self,
-        plugin_class: type,
-        plugin_id: str,
-    ) -> None:
+    def register_music_input_plugin(self, plugin_class: type, plugin_id: str) -> None:
         """注册输入插件-整首曲目"""
         self._register_plugin(self._music_input_plugins, plugin_class, plugin_id)
 
