@@ -131,7 +131,7 @@ class SoundAtmos:
 class SingleNote:
     """存储单个音符的类"""
 
-    note_pitch: int
+    midi_pitch: int
     """midi音高"""
 
     volume: int
@@ -151,7 +151,7 @@ class SingleNote:
 
     def __init__(
         self,
-        midi_pitch: Optional[int],
+        note_pitch: Optional[int],
         note_volume: int,
         start_tick: int,
         keep_tick: int,
@@ -184,7 +184,7 @@ class SingleNote:
         MineNote 类
         """
 
-        self.note_pitch: int = 66 if midi_pitch is None else midi_pitch
+        self.midi_pitch: int = 66 if note_pitch is None else note_pitch
         """midi音高"""
         self.volume: int = note_volume
         """响度(力度)"""
@@ -209,7 +209,7 @@ class SingleNote:
 
         try:
             return cls(
-                midi_pitch=note_pitch_,
+                note_pitch=note_pitch_,
                 note_volume=note_volume_,
                 start_tick=start_tick_,
                 keep_tick=duration_,
@@ -258,7 +258,7 @@ class SingleNote:
         return (
             (
                 (
-                    ((((self.note_pitch << 7) + self.volume) << 17) + self.start_time)
+                    ((((self.midi_pitch << 7) + self.volume) << 17) + self.start_time)
                     << 17
                 )
                 + self.duration
@@ -294,7 +294,7 @@ class SingleNote:
 
     def stringize(self, include_extra_data: bool = False) -> str:
         return "TrackedNote(Pitch = {}, Volume = {}, StartTick = {}, Duration = {}, TimeOffset = {}".format(
-            self.note_pitch,
+            self.midi_pitch,
             self.volume,
             self.start_time,
             self.duration,
@@ -310,7 +310,7 @@ class SingleNote:
         self,
     ) -> Tuple[int, int, int, int, int]:
         return (
-            self.note_pitch,
+            self.midi_pitch,
             self.volume,
             self.start_time,
             self.duration,
@@ -319,7 +319,7 @@ class SingleNote:
 
     def __dict__(self):
         return {
-            "Pitch": self.note_pitch,
+            "Pitch": self.midi_pitch,
             "Volume": self.volume,
             "StartTick": self.start_time,
             "Duration": self.duration,
@@ -400,7 +400,7 @@ class MineNote:
             sound_position.sound_azimuth[1] + adjust_note_updown_panning_degree,
         )
         return cls(
-            pitch=note.note_pitch + adjust_note_pitch,
+            pitch=note.midi_pitch + adjust_note_pitch,
             instrument=note_instrument,
             volume=note.volume + adjust_note_volume,
             start_tick=note.start_time,
@@ -414,13 +414,13 @@ class MineNote:
 class SingleTrack(List[SingleNote]):
     """存储单个轨道的类"""
 
-    track_name: str
+    name: str
     """轨道之名称"""
 
     is_enabled: bool = True
     """该音轨是否启用"""
 
-    track_instrument: str
+    instrument: str
     """乐器ID"""
 
     is_high_time_precision: bool
@@ -441,17 +441,17 @@ class SingleTrack(List[SingleNote]):
     def __init__(
         self,
         *args: SingleNote,
-        name: str = "未命名音轨",
-        instrument: str = "",
+        track_name: str = "未命名音轨",
+        track_instrument: str = "",
         precise_time: bool = True,
         percussion: bool = False,
         sound_direction: SoundAtmos = SoundAtmos(),
         extra_information: Dict[str, Any] = {},
     ):
-        self.track_name = name
+        self.name = track_name
         """音轨名称"""
 
-        self.track_instrument = instrument
+        self.instrument = track_instrument
         """乐器ID"""
 
         self.is_high_time_precision = precise_time
@@ -520,7 +520,7 @@ class SingleTrack(List[SingleNote]):
 
     def get_notes(
         self, start_time: float, end_time: float = inf
-    ) -> Generator[SingleNote, None, None]:
+    ) -> Iterator[SingleNote]:
         """通过开始时间和结束时间来获取音符"""
         if end_time < start_time:
             raise ParameterValueError(
@@ -528,12 +528,13 @@ class SingleTrack(List[SingleNote]):
                     end_time, start_time
                 )
             )
-        elif start_time < 0 or end_time < 0:
+        elif end_time < 0:
             raise ParameterValueError(
-                "获取音符的时间范围有误，终止时间`{}`和起始时间`{}`皆不可为负数".format(
-                    end_time, start_time
-                )
+                "获取音符的时间范围有误，终止时间`{}`不可为负数".format(end_time)
             )
+        elif start_time <= 0 and end_time >= self[-1].start_time:
+            return iter(self)
+
         return (
             x
             for x in self
@@ -548,7 +549,7 @@ class SingleTrack(List[SingleNote]):
         for _note in self.get_notes(range_start_time, range_end_time):
             yield MineNote.from_single_note(
                 note=_note,
-                note_instrument=self.track_instrument,
+                note_instrument=self.instrument,
                 is_persiced_time=self.is_high_time_precision,
                 is_percussive_note=self.is_percussive,
                 sound_position=self.sound_position,
@@ -565,9 +566,30 @@ class SingleTrack(List[SingleNote]):
         return len(self)
 
     @property
-    def track_notes(self) -> List[SingleNote]:
+    def notes(self) -> List[SingleNote]:
         """音符列表"""
         return self
+
+    @property
+    def minenotes(self) -> Iterator[MineNote]:
+        """
+        直接返回当前音轨所有音符的我的世界数据形式
+        """
+        return (
+            MineNote.from_single_note(
+                note=_note,
+                note_instrument=self.instrument,
+                is_persiced_time=self.is_high_time_precision,
+                is_percussive_note=self.is_percussive,
+                sound_position=self.sound_position,
+                **{
+                    item.value: argcrv.value_at(_note.start_time)
+                    for item in CurvableParam
+                    if (argcrv := self.argument_curves[item])
+                },
+            )
+            for _note in self
+        )
 
     def set_info(self, key: Union[str, Sequence[str]], value: Any):
         """设置附加信息"""

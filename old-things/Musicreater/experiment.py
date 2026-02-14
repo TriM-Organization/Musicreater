@@ -28,10 +28,10 @@ from .old_main import (
     mido,
 )
 
-from .constants import MIDI_PAN, MIDI_PROGRAM, MIDI_VOLUME
+from .old_main import MIDI_PAN, MIDI_PROGRAM, MIDI_VOLUME
 from .subclass import *
 from .old_types import ChannelType, FittingFunctionType
-from .utils import *
+from .old_utils import *
 
 
 class FutureMidiConvertLyricSupport(MidiConvert):
@@ -106,7 +106,7 @@ class FutureMidiConvertLyricSupport(MidiConvert):
                             "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                         )
                     ),
-                    tick_delay=tickdelay,
+                    delay=tickdelay,
                 ),
             )
             if using_lyric and note.extra_info["LYRIC_TEXT"]:
@@ -469,7 +469,7 @@ class FutureMidiConvertKamiRES(MidiConvert):
                             mc_sound_ID,
                         )
                     ),
-                    tick_delay=tickdelay,
+                    delay=tickdelay,
                 ),
             )
             delaytime_previous = note.start_tick
@@ -1006,7 +1006,7 @@ class FutureMidiConvertM4(MidiConvert):
                             "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                         )
                     ),
-                    tick_delay=tickdelay,
+                    delay=tickdelay,
                 ),
             )
             delaytime_previous = note.start_tick
@@ -1197,7 +1197,7 @@ class FutureMidiConvertM5(MidiConvert):
                 results.append(
                     MineCommand(
                         tracks[all_ticks[i]][j],
-                        tick_delay=(
+                        delay=(
                             (
                                 0
                                 if (

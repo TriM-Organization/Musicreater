@@ -20,9 +20,8 @@ from typing import List, Literal, Tuple
 
 from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
 
-from ..constants import x, y, z
 from ..subclass import MineCommand
-from .common import bottem_side_length_of_smallest_square_bottom_box
+from .common import bottem_side_length_of_smallest_square_bottom_box, x, y, z
 
 
 def antiaxis(axis: Literal["x", "z", "X", "Z"]):
@@ -300,7 +299,7 @@ def commands_to_structure(
         struct.set_block(
             coordinate,
             form_command_block_in_NBT_struct(
-                command=command.command_text,
+                command=command.command,
                 coordinate=coordinate,
                 particularValue=(
                     (1 if y_forward else 0)
@@ -321,7 +320,7 @@ def commands_to_structure(
                 condition=False,
                 alwaysRun=True,
                 tickDelay=command.delay,
-                customName=command.annotation_text,
+                customName=command.annotation,
                 executeOnFirstTick=False,
                 trackOutput=True,
                 compability_version_number=compability_version_,
@@ -486,7 +485,7 @@ def commands_to_redstone_delay_structure(
             struct.set_block(
                 (pos_now[x], 1, pos_now[z]),
                 form_command_block_in_NBT_struct(
-                    command=cmd.command_text,
+                    command=cmd.command,
                     coordinate=(pos_now[x], 1, pos_now[z]),
                     particularValue=command_statevalue(extensioon_direction, forward),
                     # impluse= (0 if first_impluse else 2),
@@ -494,7 +493,7 @@ def commands_to_redstone_delay_structure(
                     condition=False,
                     alwaysRun=False,
                     tickDelay=cmd.delay % 2,
-                    customName=cmd.annotation_text,
+                    customName=cmd.annotation,
                     compability_version_number=compability_version_,
                 ),
             )
@@ -518,7 +517,7 @@ def commands_to_redstone_delay_structure(
             struct.set_block(
                 (now_pos_copy[x], 1, now_pos_copy[z]),
                 form_command_block_in_NBT_struct(
-                    command=cmd.command_text,
+                    command=cmd.command,
                     coordinate=(now_pos_copy[x], 1, now_pos_copy[z]),
                     particularValue=command_statevalue(extensioon_direction, forward),
                     # impluse= (0 if first_impluse else 2),
@@ -526,7 +525,7 @@ def commands_to_redstone_delay_structure(
                     condition=False,
                     alwaysRun=False,
                     tickDelay=cmd.delay % 2,
-                    customName=cmd.annotation_text,
+                    customName=cmd.annotation,
                     compability_version_number=compability_version_,
                 ),
             )

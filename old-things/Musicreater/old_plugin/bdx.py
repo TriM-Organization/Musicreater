@@ -17,9 +17,8 @@ Terms & Conditions: License.md in the root directory
 
 from typing import List
 
-from ..constants import x, y, z
 from ..subclass import MineCommand
-from .common import bottem_side_length_of_smallest_square_bottom_box
+from .common import bottem_side_length_of_smallest_square_bottom_box, x, y, z
 
 BDX_MOVE_KEY = {
     "x": [b"\x0f", b"\x0e", b"\x1c", b"\x14", b"\x15"],
@@ -161,7 +160,7 @@ def commands_to_BDX_bytes(
 
     for command in commands_list:
         _bytes += form_command_block_in_BDX_bytes(
-            command.command_text,
+            command.command,
             (
                 (1 if y_forward else 0)
                 if (
@@ -181,7 +180,7 @@ def commands_to_BDX_bytes(
             condition=command.conditional,
             needRedstone=False,
             tickDelay=command.delay,
-            customName=command.annotation_text,
+            customName=command.annotation,
             executeOnFirstTick=False,
             trackOutput=True,
         )

@@ -37,17 +37,41 @@ from itertools import chain
 import mido
 
 from Musicreater.constants import *
-from Musicreater.exceptions import IllegalMinimumVolumeError, NoteBinaryFileVerificationFailed as MusicSequenceVerificationFailed, SingleNoteDecodeError, NoteBinaryFileTypeError as MusicSequenceTypeError, ZeroSpeedError
+from Musicreater.exceptions import (
+    IllegalMinimumVolumeError,
+    NoteBinaryFileVerificationFailed as MusicSequenceVerificationFailed,
+    SingleNoteDecodeError,
+    NoteBinaryFileTypeError as MusicSequenceTypeError,
+    ZeroSpeedError,
+)
 
-from Musicreater.builtin_plugins.midi_read.constants import MIDI_DEFAULT_PROGRAM_VALUE, MIDI_DEFAULT_VOLUME_VALUE, MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE, MM_TOUCH_PITCHED_INSTRUMENT_TABLE
-from Musicreater.builtin_plugins.midi_read.exceptions import NoteOnOffMismatchError, LyricMismatchError
-from Musicreater.builtin_plugins.midi_read.utils import volume_2_distance_natural, panning_2_rotation_trigonometric, panning_2_rotation_linear
+from Musicreater.builtin_plugins.midi_read.constants import (
+    MIDI_DEFAULT_PROGRAM_VALUE,
+    MIDI_DEFAULT_VOLUME_VALUE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+)
+from Musicreater.builtin_plugins.midi_read.exceptions import (
+    NoteOnOffMismatchError,
+    LyricMismatchError,
+)
+from Musicreater.builtin_plugins.midi_read.utils import (
+    volume_2_distance_natural,
+    panning_2_rotation_trigonometric,
+    panning_2_rotation_linear,
+)
+
+from Musicreater.builtin_plugins.to_commands.progressbar import (
+    DEFAULT_PROGRESSBAR_STYLE,
+    ProgressBarStyle,
+)
 
 
 from .old_exceptions import *
 from .subclass import *
 from .old_types import *
 from .old_utils import *
+
 """
 学习笔记：
 tempo:  microseconds per quarter note 毫秒每四分音符，换句话说就是一拍占多少微秒
@@ -980,7 +1004,7 @@ class MusicSequence:
 
                     # 更新结果信息
                     midi_channels[msg.channel].append(
-                        that_note := midi_msgs_to_minenote( # 无法强行兼容了，pass
+                        that_note := midi_msgs_to_minenote(  # 无法强行兼容了，pass
                             inst_=(
                                 msg.note
                                 if (_is_percussion := (msg.channel == 9))
@@ -1710,7 +1734,7 @@ class MidiConvert(MusicSequence):
                             "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                         )
                     ),
-                    tick_delay=tickdelay,
+                    delay=tickdelay,
                 ),
             )
             delaytime_previous = note.start_tick
@@ -1796,7 +1820,7 @@ class MidiConvert(MusicSequence):
                             "{}:{:.2f}".format(mc_sound_ID, mc_pitch),
                         )
                     ),
-                    tick_delay=tickdelay,
+                    delay=tickdelay,
                 ),
             )
             delaytime_previous[note.sound_name] = note.start_tick

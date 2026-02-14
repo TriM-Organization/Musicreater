@@ -71,7 +71,7 @@ def to_zip_pack_in_score(
             "w",
             encoding="utf-8",
         ) as f:
-            f.write("\n".join([single_cmd.cmd for single_cmd in cmdlist[i]]))
+            f.write("\n".join([single_cmd.mcfunction_command_string for single_cmd in cmdlist[i]]))
     index_file.writelines(
         (
             "scoreboard players add @a[score_{0}_min=1] {0} 1\n".format(
@@ -97,7 +97,7 @@ def to_zip_pack_in_score(
             f.writelines(
                 "\n".join(
                     [
-                        single_cmd.cmd
+                        single_cmd.mcfunction_command_string
                         for single_cmd in midi_cvt.form_java_progress_bar(
                             maxscore, scoreboard_name, progressbar_style
                         )

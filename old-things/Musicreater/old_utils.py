@@ -83,52 +83,7 @@ def inst_to_sould_with_deviation(
     )
 
 
-def minenote_to_command_parameters(
-    mine_note: MineNote,
-    pitch_deviation: float = 0,
-) -> Tuple[
-    str,
-    Tuple[float, float, float],
-    float,
-    Union[float, Literal[None]],
-]:
-    """
-    将 MineNote 对象转为《我的世界》音符播放所需之参数
 
-    Parameters
-    ------------
-    mine_note: MineNote
-        音符对象
-    deviation: float
-        音调偏移量
-
-    Returns
-    ---------
-    str, tuple[float, float, float], float, float
-        我的世界音符ID, 播放视角坐标, 指令音量参数, 指令音调参数
-    """
-
-    return (
-        mine_note.sound_name,
-        mine_note.position_displacement,
-        mine_note.velocity / 127,
-        (
-            None
-            if mine_note.percussive
-            else (
-                2
-                ** (
-                    (
-                        mine_note.note_pitch
-                        - 60
-                        - MM_INSTRUMENT_DEVIATION_TABLE.get(mine_note.sound_name, 6)
-                        + pitch_deviation
-                    )
-                    / 12
-                )
-            )
-        ),
-    )
 
 
 def midi_msgs_to_minenote_using_kami_respack(

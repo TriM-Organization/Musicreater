@@ -19,6 +19,9 @@ Terms & Conditions: License.md in the root directory
 
 from .main import MidiImportConfig, MidiImport2MusicPlugin
 
+# constants 里面那些对照表也要导进来写 __all__ 里
+# utils 里面那些拟合曲线也要
+
 __all__ = [
     "MidiImportConfig",
     "MidiImport2MusicPlugin",

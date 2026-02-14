@@ -203,7 +203,7 @@ def midi_msgs_to_noteinfo(
 
     return (
         SingleNote(
-            midi_pitch=note,
+            note_pitch=note,
             note_volume=int((velocity / 127) + 0.5),
             start_tick=(tk := int(start_time / float(play_speed) / 50000)),
             keep_tick=round(duration / float(play_speed) / 50000),

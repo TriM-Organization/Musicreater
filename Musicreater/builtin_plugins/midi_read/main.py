@@ -474,9 +474,9 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
             if track_properties[0] and (
                 track_name := midi_track_name_dict.get(track_properties[0])
             ):
-                every_single_track.track_name = track_name
+                every_single_track.name = track_name
             if track_properties[2]:
-                every_single_track.track_instrument = track_properties[2]
+                every_single_track.instrument = track_properties[2]
             if track_properties[3]:
                 every_single_track.sound_position.sound_distance = track_properties[3]
             if track_properties[4]:

@@ -18,6 +18,10 @@ Terms & Conditions: License.md in the root directory
 
 import math
 
+x = "x"
+y = "y"
+z = "z"
+
 
 def bottem_side_length_of_smallest_square_bottom_box(
     _total_block_count: int, _max_height: int

@@ -98,8 +98,8 @@ def to_websocket_server(
                                 "title {} actionbar {}".format(
                                     whom_to_play,
                                     progressbar_style.play_output(
-                                        played_delays=i,
-                                        total_delays=musics[music_to_play][1],
+                                        played_ticks=i,
+                                        total_ticks=musics[music_to_play][1],
                                         music_name=music_to_play,
                                     ),
                                 ),
@@ -111,7 +111,7 @@ def to_websocket_server(
                             >= (cmd := musics[music_to_play][0][now_played_cmd]).delay
                         ):
                             await self.send_command(
-                                cmd.command_text.replace(replacement, whom_to_play),
+                                cmd.command.replace(replacement, whom_to_play),
                                 callback=self.cmd_feedback,
                             )
                             now_played_cmd += 1
