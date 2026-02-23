@@ -501,7 +501,7 @@ class FutureMidiConvertJavaE(MidiConvert):
         -------
         list[MineCommand,]
         """
-        pgs_style = progressbar_style.base_style
+        pgs_style = progressbar_style.style_base_string
         """用于被替换的进度条原始样式"""
 
         """
@@ -686,8 +686,8 @@ class FutureMidiConvertJavaE(MidiConvert):
 
         for i in range(pgs_style.count("_")):
             npg_stl = (
-                pgs_style.replace("_", progressbar_style.played_style, i + 1)
-                .replace("_", progressbar_style.to_play_style)
+                pgs_style.replace("_", progressbar_style.progress_played, i + 1)
+                .replace("_", progressbar_style.progress_toplay)
                 .replace(r"%%N", self.music_name)
                 .replace(
                     r"%%s",

@@ -105,6 +105,10 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         license="Same as Musicreater",
     )
 
+
+    # 暂时没有适配动画内容和替换顺序
+    # 金羿正在处理这个，不需要改
+    # 但是返回值和接口内容不会变，直接用即可
     @staticmethod
     def generate_progressbar(
         max_score: int,
@@ -129,7 +133,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         -------
         list[MineCommand,]
         """
-        pgs_style = progressbar_style.base_style
+        orignal_style_string = progressbar_style.style_base_string
         """用于被替换的进度条原始样式"""
 
         """
@@ -143,19 +147,21 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
         """
-        per_value_in_each = max_score / pgs_style.count("_")
+        per_value_in_each = max_score / orignal_style_string.count("_")
         """每个进度条代表的分值"""
 
         result: List[MineCommand] = []
 
-        if r"%^s" in pgs_style:
-            pgs_style = pgs_style.replace(r"%^s", str(max_score))
+        if "%^s" in orignal_style_string:
+            orignal_style_string = orignal_style_string.replace("%^s", str(max_score))
 
-        if r"%^t" in pgs_style:
-            pgs_style = pgs_style.replace(r"%^t", mctick2timestr(max_score))
+        if "%^t" in orignal_style_string:
+            orignal_style_string = orignal_style_string.replace(
+                "%^t", mctick2timestr(max_score)
+            )
 
         sbn_pc = scoreboard_name[:2]
-        if r"%%%" in pgs_style:
+        if "%%%" in orignal_style_string:
             result.append(
                 MineCommand(
                     'scoreboard objectives add {}PercT dummy "百分比计算"'.format(
@@ -192,7 +198,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} = @s {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="赋值临时百分比",
+                    annotation="赋值当前进度",
                 )
             )
             result.append(
@@ -203,7 +209,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} *= n100 {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="转换临时百分比之单位至%（扩大精度）",
+                    annotation="转换当前进度之单位至百分比（扩大精度）",
                 )
             )
             result.append(
@@ -214,11 +220,11 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} /= MaxScore {}".format(
                         sbn_pc + "PercT", scoreboard_name
                     ),
-                    annotation="计算百分比",
+                    annotation="计算进度百分比",
                 )
             )
 
-        if r"%%t" in pgs_style:
+        if "%%t" in orignal_style_string:
             result.append(
                 MineCommand(
                     'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(
@@ -241,7 +247,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players set n20 {} 20".format(scoreboard_name),
-                    annotation="设置常量20",
+                    annotation="设置常量 20",
                 )
             )
             result.append(
@@ -250,7 +256,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players set n60 {} 60".format(scoreboard_name),
-                    annotation="设置常量60",
+                    annotation="设置常量 60",
                 )
             )
 
@@ -262,7 +268,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} = @s {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="赋值临时分",
+                    annotation="赋值临时分变量",
                 )
             )
             result.append(
@@ -273,7 +279,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} /= n20 {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="转换临时分之单位为秒（缩减精度）",
+                    annotation="转换临时分变量之单位为秒（缩减精度）",
                 )
             )
             result.append(
@@ -296,7 +302,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     + "scoreboard players operation @s {} /= n60 {}".format(
                         sbn_pc + "TMinT", scoreboard_name
                     ),
-                    annotation="转换临时分之单位为分（缩减精度）",
+                    annotation="转换临时分变量之单位为分（缩减精度）",
                 )
             )
 
@@ -312,54 +318,54 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                 )
             )
 
-        for i in range(pgs_style.count("_")):
+        for i in range(orignal_style_string.count("_")):
             npg_stl = (
-                pgs_style.replace("_", progressbar_style.played_style, i + 1)
-                .replace("_", progressbar_style.to_play_style)
-                .replace(r"%%N", music_name)
+                orignal_style_string.replace("_", progressbar_style.progress_played, i + 1)
+                .replace("_", progressbar_style.progress_toplay)
+                .replace("%%N", music_name)
                 .replace(
-                    r"%%s",
+                    "%%s",
                     '"},{"score":{"name":"*","objective":"'
                     + scoreboard_name
                     + '"}},{"text":"',
                 )
                 .replace(
-                    r"%%%",
-                    r'"},{"score":{"name":"*","objective":"'
+                    "%%%",
+                    '"},{"score":{"name":"*","objective":"'
                     + sbn_pc
-                    + r'PercT"}},{"text":"%',
+                    + 'PercT"}},{"text":"%',
                 )
                 .replace(
-                    r"%%t",
-                    r'"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
-                    r'{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
-                        r"{-}", sbn_pc
+                    "%%t",
+                    '"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
+                    '{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
+                        "{-}", sbn_pc
                     ),
                 )
             )
             result.append(
                 MineCommand(
                     execute_command_head.format(
-                        r"@a[scores={"
+                        "@a[scores={"
                         + scoreboard_name
                         + f"={int(i * per_value_in_each)}..{ceil((i + 1) * per_value_in_each)}"
-                        + r"}]"
+                        + "}]"
                     )
-                    + r'titleraw @s actionbar {"rawtext":[{"text":"'
+                    + 'titleraw @s actionbar {"rawtext":[{"text":"'
                     + npg_stl
-                    + r'"}]}',
+                    + '"}]}',
                     annotation="进度条显示",
                 )
             )
 
-        if r"%%%" in pgs_style:
+        if "%%%" in orignal_style_string:
             result.append(
                 MineCommand(
                     "scoreboard objectives remove {}PercT".format(sbn_pc),
                     annotation="移除临时百分比变量",
                 )
             )
-        if r"%%t" in pgs_style:
+        if "%%t" in orignal_style_string:
             result.append(
                 MineCommand(
                     "scoreboard objectives remove {}TMinT".format(sbn_pc),
