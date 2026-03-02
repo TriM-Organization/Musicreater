@@ -292,7 +292,7 @@ class MusicSequence:
 
         if bytes_buffer_in[:4] in (b"MSQ!", b"MSQ$"):
 
-            note_format_v3 = bytes_buffer_in[0] == b"MSQ$"
+            note_format_v3 = bytes_buffer_in[:4] == b"MSQ$"
 
             group_1 = int.from_bytes(bytes_buffer_in[4:6], "big", signed=False)
             group_2 = int.from_bytes(bytes_buffer_in[6:8], "big", signed=False)
@@ -446,6 +446,16 @@ class MusicSequence:
                 _t6_buffer = _t2_buffer = 0
 
             _channel_inst_chart: Dict[str, Dict[str, int]] = {}
+            """
+            乐器对应通道的表
+            {
+                乐器名: {
+                    "CNT": 当前通道的音符数量,
+                    "INDEX": 当前乐器在通道中的索引
+                }
+            }
+            也就是说，一个通道可以对应多个乐器（多个乐器可能分配到同一个通道）
+            """
             channels_: MineNoteChannelType = enumerated_stuffcopy_dictionary(staff=[])
 
             for i in range(total_note_count):
@@ -503,17 +513,27 @@ class MusicSequence:
                         "所截取的音符码：", bytes_buffer_in[stt_index:end_index]
                     ) from _err
 
+                # 按照乐器分配通道
                 if _read_note.sound_name in _channel_inst_chart:
+                    # 如果本身已经有这个乐器了，那就直接加一个计数就可以了
                     _channel_inst_chart[_read_note.sound_name]["CNT"] += 1
                 else:
+                    # 如果没有这个乐器
                     if len(_channel_inst_chart) >= 16:
+                        # 已经超过了 16 个乐器，当前通道数量是装不下的
+                        # 那就找一个音符数量最少的通道，把这个通道引用为
+                        # 当前这个乐器的通道
                         _channel_inst_chart[_read_note.sound_name] = min(
                             _channel_inst_chart.values(), key=lambda x: x["CNT"]
                         )  # 此处是指针式内存引用
-                    _channel_inst_chart[_read_note.sound_name] = {
-                        "CNT": 1,
-                        "INDEX": len(_channel_inst_chart),
-                    }
+                        _channel_inst_chart[_read_note.sound_name]["CNT"] += 1
+                    else:
+                        # 没有超过 16 个乐器，那就加！
+                        _channel_inst_chart[_read_note.sound_name] = {
+                            "CNT": 1,
+                            "INDEX": len(_channel_inst_chart),
+                        }
+                # 把音符添加到对应的通道里边
                 channels_[_channel_inst_chart[_read_note.sound_name]["INDEX"]].append(
                     _read_note
                 )
