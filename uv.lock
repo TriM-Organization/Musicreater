@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 2
 requires-python = ">=3.8, <4.0"
 resolution-markers = [
     "python_full_version >= '3.10'",
@@ -587,6 +587,10 @@ dependencies = [
 dev = [
     { name = "brotli" },
     { name = "dill" },
+    { name = "mido" },
+    { name = "numpy", version = "1.24.4", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version < '3.9'" },
+    { name = "numpy", version = "2.0.2", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version == '3.9.*'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://mirror.nju.edu.cn/pypi/web/simple" }, marker = "python_full_version >= '3.10'" },
     { name = "pyinstaller" },
     { name = "rich" },
     { name = "trimmcstruct" },
@@ -613,12 +617,14 @@ structure = [
 
 [package.metadata]
 requires-dist = [
-    { name = "brotli", marker = "extra == 'dev'", specifier = ">=1.0.0" },
-    { name = "brotli", marker = "extra == 'full'", specifier = ">=1.0.0" },
-    { name = "brotli", marker = "extra == 'structure'", specifier = ">=1.0.0" },
+    { name = "brotli", marker = "extra == 'dev'", specifier = ">=1.0.0,<2.0" },
+    { name = "brotli", marker = "extra == 'full'", specifier = ">=1.0.0,<2.0" },
+    { name = "brotli", marker = "extra == 'structure'", specifier = ">=1.0.0,<2.0" },
     { name = "dill", marker = "extra == 'dev'" },
-    { name = "mido", marker = "extra == 'full'", specifier = ">=1.3" },
-    { name = "mido", marker = "extra == 'midi'", specifier = ">=1.3" },
+    { name = "mido", marker = "extra == 'dev'", specifier = ">=1.3,<2.0" },
+    { name = "mido", marker = "extra == 'full'", specifier = ">=1.3,<2.0" },
+    { name = "mido", marker = "extra == 'midi'", specifier = ">=1.3,<2.0" },
+    { name = "numpy", marker = "extra == 'dev'" },
     { name = "numpy", marker = "extra == 'full'" },
     { name = "numpy", marker = "extra == 'structure'" },
     { name = "pyinstaller", marker = "extra == 'dev'" },
@@ -629,7 +635,7 @@ requires-dist = [
     { name = "trimmcstruct", marker = "extra == 'full'", specifier = "<=0.0.5.9" },
     { name = "trimmcstruct", marker = "extra == 'structure'", specifier = "<=0.0.5.9" },
     { name = "twine", marker = "extra == 'dev'" },
-    { name = "xxhash", specifier = ">=3" },
+    { name = "xxhash", specifier = ">=3.0,<4.0" },
 ]
 provides-extras = ["midi", "structure", "full", "dev"]
 
