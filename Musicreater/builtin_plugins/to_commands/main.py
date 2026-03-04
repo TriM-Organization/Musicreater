@@ -109,6 +109,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
     # 暂时没有适配动画内容和替换顺序
     # 金羿正在处理这个，不需要改
     # 但是返回值和接口内容不会变，直接用即可
+    #
     @staticmethod
     def generate_progressbar(
         max_score: int,
@@ -320,20 +321,12 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
 
         for i in range(orignal_style_string.count("_")):
             npg_stl = (
-                orignal_style_string.replace("_", progressbar_style.progress_played, i + 1)
-                .replace("_", progressbar_style.progress_toplay)
-                .replace("%%N", music_name)
+                orignal_style_string
                 .replace(
                     "%%s",
                     '"},{"score":{"name":"*","objective":"'
                     + scoreboard_name
                     + '"}},{"text":"',
-                )
-                .replace(
-                    "%%%",
-                    '"},{"score":{"name":"*","objective":"'
-                    + sbn_pc
-                    + 'PercT"}},{"text":"%',
                 )
                 .replace(
                     "%%t",
@@ -342,6 +335,14 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "{-}", sbn_pc
                     ),
                 )
+                .replace("%%N", music_name)
+                .replace(
+                    "%%%",
+                    '"},{"score":{"name":"*","objective":"'
+                    + sbn_pc
+                    + 'PercT"}},{"text":"%',
+                ).replace("_", progressbar_style.progress_played, i + 1)
+                .replace("_", progressbar_style.progress_toplay)
             )
             result.append(
                 MineCommand(
