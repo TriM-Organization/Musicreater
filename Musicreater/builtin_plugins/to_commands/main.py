@@ -105,7 +105,6 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         license="Same as Musicreater",
     )
 
-
     # 暂时没有适配动画内容和替换顺序
     # 金羿正在处理这个，不需要改
     # 但是返回值和接口内容不会变，直接用即可
@@ -141,32 +140,31 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         | 标识符   | 指定的可变量     |
         |---------|----------------|
         | `%%N`   | 乐曲名          |
-        | `%%s`   | 当前计分板值     |
         | `%^s`   | 计分板最大值     |
-        | `%%t`   | 当前播放时间     |
         | `%^t`   | 曲目总时长       |
+        | `%%s`   | 当前计分板值     |
+        | `%%t`   | 当前播放时间     |
         | `%%%`   | 当前进度比率     |
         | `_`     | 用以表示进度条占位|
+        | `%*%`   | 指定*的动画内容   |
         """
         per_value_in_each = max_score / orignal_style_string.count("_")
         """每个进度条代表的分值"""
 
         result: List[MineCommand] = []
 
-        if "%^s" in orignal_style_string:
-            orignal_style_string = orignal_style_string.replace("%^s", str(max_score))
+        orignal_style_string = (
+            orignal_style_string.replace("%%N", music_name)
+            .replace("%^s", str(max_score))
+            .replace("%^t", mctick2timestr(max_score))
+        )
 
-        if "%^t" in orignal_style_string:
-            orignal_style_string = orignal_style_string.replace(
-                "%^t", mctick2timestr(max_score)
-            )
-
-        sbn_pc = scoreboard_name[:2]
+        scoreboard_name_part = scoreboard_name[:2]
         if "%%%" in orignal_style_string:
             result.append(
                 MineCommand(
                     'scoreboard objectives add {}PercT dummy "百分比计算"'.format(
-                        sbn_pc
+                        scoreboard_name_part
                     ),
                     annotation="新增临时百分比变量",
                 )
@@ -197,7 +195,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} = @s {}".format(
-                        sbn_pc + "PercT", scoreboard_name
+                        scoreboard_name_part + "PercT", scoreboard_name
                     ),
                     annotation="赋值当前进度",
                 )
@@ -208,7 +206,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} *= n100 {}".format(
-                        sbn_pc + "PercT", scoreboard_name
+                        scoreboard_name_part + "PercT", scoreboard_name
                     ),
                     annotation="转换当前进度之单位至百分比（扩大精度）",
                 )
@@ -219,7 +217,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} /= MaxScore {}".format(
-                        sbn_pc + "PercT", scoreboard_name
+                        scoreboard_name_part + "PercT", scoreboard_name
                     ),
                     annotation="计算进度百分比",
                 )
@@ -229,7 +227,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
             result.append(
                 MineCommand(
                     'scoreboard objectives add {}TMinT dummy "时间计算：分"'.format(
-                        sbn_pc
+                        scoreboard_name_part
                     ),
                     annotation="新增临时分变量",
                 )
@@ -237,7 +235,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
             result.append(
                 MineCommand(
                     'scoreboard objectives add {}TSecT dummy "时间计算：秒"'.format(
-                        sbn_pc
+                        scoreboard_name_part
                     ),
                     annotation="新增临时秒变量",
                 )
@@ -267,7 +265,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} = @s {}".format(
-                        sbn_pc + "TMinT", scoreboard_name
+                        scoreboard_name_part + "TMinT", scoreboard_name
                     ),
                     annotation="赋值临时分变量",
                 )
@@ -278,7 +276,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} /= n20 {}".format(
-                        sbn_pc + "TMinT", scoreboard_name
+                        scoreboard_name_part + "TMinT", scoreboard_name
                     ),
                     annotation="转换临时分变量之单位为秒（缩减精度）",
                 )
@@ -289,7 +287,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} = @s {}".format(
-                        sbn_pc + "TSecT", sbn_pc + "TMinT"
+                        scoreboard_name_part + "TSecT", scoreboard_name_part + "TMinT"
                     ),
                     annotation="赋值临时秒",
                 )
@@ -301,7 +299,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} /= n60 {}".format(
-                        sbn_pc + "TMinT", scoreboard_name
+                        scoreboard_name_part + "TMinT", scoreboard_name
                     ),
                     annotation="转换临时分变量之单位为分（缩减精度）",
                 )
@@ -313,16 +311,68 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         "@a[scores={" + scoreboard_name + "=1..}]"
                     )
                     + "scoreboard players operation @s {} %= n60 {}".format(
-                        sbn_pc + "TSecT", scoreboard_name
+                        scoreboard_name_part + "TSecT", scoreboard_name
                     ),
                     annotation="确定临时秒（框定精度区间）",
                 )
             )
 
+        if progressbar_style.is_animate_autoloop and progressbar_style.animate_circle:
+
+            result.append(
+                MineCommand(
+                    'scoreboard objectives add {}AniC dummy "动画循环控制"'.format(
+                        scoreboard_name_part
+                    ),
+                    annotation="新增动画循环控制变量",
+                )
+            )
+            for animate_placeholder in progressbar_style.animate_circle:
+                max_loop_score = max(
+                    progressbar_style.animate_circle[animate_placeholder].keys()
+                )
+                if ("%%%" not in orignal_style_string or max_loop_score != 100) and (
+                    "%%t" not in orignal_style_string or max_loop_score not in (60, 20)
+                ):
+                    result.append(
+                        MineCommand(
+                            execute_command_head.format(
+                                "@a[scores={" + scoreboard_name + "=1..}]"
+                            )
+                            + "scoreboard players set n{num} {sbn} {num}".format(
+                                sbn=scoreboard_name,
+                                num=max_loop_score,
+                            ),
+                            annotation="设置常量 {num}".format(num=max_loop_score),
+                        )
+                    )
+
+                result.append(
+                    MineCommand(
+                        execute_command_head.format(
+                            "@a[scores={" + scoreboard_name + "=1..}]"
+                        )
+                        + "scoreboard players operation @s {sbnp}AniC = @s {sbn}".format(
+                            sbnp=scoreboard_name_part, sbn=scoreboard_name
+                        ),
+                    )
+                )
+                result.append(
+                    MineCommand(
+                        execute_command_head.format(
+                            "@a[scores={" + scoreboard_name + "=1..}]"
+                        )
+                        + "scoreboard players operation @s {sbnp}AniC %= n{num} {sbn}".format(
+                            sbnp=scoreboard_name_part,
+                            num=max_loop_score,
+                            sbn=scoreboard_name,
+                        ),
+                    )
+                )
+
         for i in range(orignal_style_string.count("_")):
             npg_stl = (
-                orignal_style_string
-                .replace(
+                orignal_style_string.replace(
                     "%%s",
                     '"},{"score":{"name":"*","objective":"'
                     + scoreboard_name
@@ -332,18 +382,57 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                     "%%t",
                     '"},{"score":{"name":"*","objective":"{-}TMinT"}},{"text":":"},'
                     '{"score":{"name":"*","objective":"{-}TSecT"}},{"text":"'.replace(
-                        "{-}", sbn_pc
+                        "{-}", scoreboard_name_part
                     ),
                 )
-                .replace("%%N", music_name)
                 .replace(
                     "%%%",
                     '"},{"score":{"name":"*","objective":"'
-                    + sbn_pc
+                    + scoreboard_name_part
                     + 'PercT"}},{"text":"%',
-                ).replace("_", progressbar_style.progress_played, i + 1)
+                )
+                .replace("_", progressbar_style.progress_played, i + 1)
                 .replace("_", progressbar_style.progress_toplay)
             )
+            for animate_placeholder in progressbar_style.animate_circle:
+                animation_start_tick = 0
+                npg_stl = npg_stl.replace(
+                    animate_placeholder,
+                    '"},{"translate": "%%'
+                    + str(
+                        len(progressbar_style.animate_circle[animate_placeholder]) + 1
+                    )
+                    + '","with":{"rawtext":['
+                    + (
+                        ",".join(
+                            (
+                                '{"selector":"@s[scores={{-}={*}..{&}}]"}'.replace(
+                                    "{*}", str(animation_start_tick)
+                                ).replace("{&}", str(animation_start_tick := end_tick))
+                                for end_tick in progressbar_style.animate_circle[
+                                    animate_placeholder
+                                ].keys()
+                            )
+                        ).replace(
+                            "{-}",
+                            (
+                                (scoreboard_name_part + "AniC")
+                                if progressbar_style.is_animate_autoloop
+                                else scoreboard_name
+                            ),
+                        )
+                    )
+                    + ","
+                    + ",".join(
+                        (
+                            '{"text":"' + animation_text + '"}'
+                            for animation_text in progressbar_style.animate_circle[
+                                animate_placeholder
+                            ].values()
+                        )
+                    )
+                    + ',{"text":"NaN"}]}},{"text":"',
+                )
             result.append(
                 MineCommand(
                     execute_command_head.format(
@@ -362,21 +451,28 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         if "%%%" in orignal_style_string:
             result.append(
                 MineCommand(
-                    "scoreboard objectives remove {}PercT".format(sbn_pc),
+                    "scoreboard objectives remove {}PercT".format(scoreboard_name_part),
                     annotation="移除临时百分比变量",
                 )
             )
         if "%%t" in orignal_style_string:
             result.append(
                 MineCommand(
-                    "scoreboard objectives remove {}TMinT".format(sbn_pc),
+                    "scoreboard objectives remove {}TMinT".format(scoreboard_name_part),
                     annotation="移除临时分变量",
                 )
             )
             result.append(
                 MineCommand(
-                    "scoreboard objectives remove {}TSecT".format(sbn_pc),
+                    "scoreboard objectives remove {}TSecT".format(scoreboard_name_part),
                     annotation="移除临时秒变量",
+                )
+            )
+        if progressbar_style.is_animate_autoloop and progressbar_style.animate_circle:
+            result.append(
+                MineCommand(
+                    "scoreboard objectives remove {}AniC".format(scoreboard_name_part),
+                    annotation="移除临时动画循环控制变量",
                 )
             )
 

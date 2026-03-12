@@ -1,0 +1,32 @@
+{
+    "rawtext": [
+        {
+            "translate": "%%4",
+            "with": {
+                "rawtext": [
+                    {
+                        "selector": "@e[name=某实体,scores={计分板=0..93}]"
+                    },
+                    {
+                        "selector": "@e[name=某实体,scores={计分板=1..93}]"
+                    },
+                    {
+                        "selector": "@e[name=某实体,scores={计分板=92..93}]"
+                    },
+                    {
+                        "text": "显示第一段"
+                    },
+                    {
+                        "text": "显示第二段"
+                    },
+                    {
+                        "text": "显示第三段"
+                    },
+                    {
+                        "text": "NaN"
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,9 +1,12 @@
-[Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge
-[Bilibili: 玉衡Alioth]: https://img.shields.io/badge/Bilibili-%E7%8E%89%E8%A1%A1Alioth-00A1E7?style=for-the-badge
-[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge
+<!-- [Bilibili: 金羿ELS]: https://img.shields.io/badge/Bilibili-%E9%87%91%E7%BE%BFELS-00A1E7?style=for-the-badge&label=作者B站
+[Bilibili: 玉衡Alioth]: https://img.shields.io/badge/Bilibili-%E7%8E%89%E8%A1%A1Alioth-00A1E7?style=for-the-badge&label=作者B站 -->
+[CodeStyle: black]: https://img.shields.io/badge/code%20style-black-121110.svg?style=for-the-badge&label=代码风格
 [python]: https://img.shields.io/badge/python-3.8-AB70FF?style=for-the-badge
-[release]: https://img.shields.io/github/v/release/EillesWan/Musicreater?style=for-the-badge
-[license]: https://img.shields.io/badge/Licence-%E6%B1%89%E9%92%B0%E5%BE%8B%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE-228B22?style=for-the-badge
+[release]: https://img.shields.io/github/v/release/TriM-Organization/Musicreater?style=for-the-badge&label=发行版
+[license]: https://img.shields.io/badge/Licence-%E6%B1%89%E9%92%B0%E5%BE%8B%E8%AE%B8%E5%8F%AF%E5%8D%8F%E8%AE%AE-228B22?style=for-the-badge&label=协议
+[commit-activity]: https://img.shields.io/github/commit-activity/m/TriM-Organization/Musicreater%2Fmaster?style=for-the-badge&label=提交活动&color=AB70FF
+
+
 
 <h1 align="center">音·创 Musicreater </h1>
 
@@ -22,8 +25,8 @@
     </a>
 <p>
 
-[![][Bilibili: 金羿ELS]](https://space.bilibili.com/397369002/)
-[![][Bilibili: 玉衡Alioth]](https://space.bilibili.com/604072474)
+<!-- [![][Bilibili: 金羿ELS]](https://space.bilibili.com/397369002/)
+[![][Bilibili: 玉衡Alioth]](https://space.bilibili.com/604072474) -->
 [![CodeStyle: black]](https://github.com/psf/black)
 [![][python]](https://www.python.org/)
 [![][license]](LICENSE)
