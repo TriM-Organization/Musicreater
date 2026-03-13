@@ -67,7 +67,7 @@ class MidiImportConfig(PluginConfig):
     default_volume_value: int = MIDI_DEFAULT_VOLUME_VALUE
     default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO
 
-    # 对照表
+    # 对照表，此处 None 值在下边 post init 函数中有处理
     pitched_note_reference_table: Mapping[int, str] = None  # type: ignore
     percussion_note_reference_table: Mapping[int, str] = None  # type: ignore
     note_replacement_table: Mapping[str, str] = None  # type: ignore
@@ -102,6 +102,10 @@ class MidiImportConfig(PluginConfig):
 
 
 class ControlerKeys(Enum):
+    """
+    Midi 控制器键
+    """
+
     MIDI_PROGRAM = "midi_program"
     MIDI_VOLUME = "midi_volume"
     MIDI_PAN = "midi_pan"
@@ -121,6 +125,8 @@ class TrackDivisionDict(
 ):
     """
     音轨分轨字典
+    键为音轨信息元组[音轨编号, 通道编号, 音符名称, 音量, 声相]
+    值为音轨对象
     """
 
     division_by_miditrack: bool = True
@@ -432,18 +438,6 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 msg,
                                 "无法在上文中找到与之匹配的音符开音消息。",
                             )
-
-        """整合后的音乐通道格式
-        每个通道包括若干消息元素其中逃不过这三种：
-
-        1 切换乐器消息
-        ("PgmC", 切换后的乐器ID: int, 距离演奏开始的毫秒)
-
-        2 音符开始消息
-        ("NoteS", 开始的音符ID, 力度（响度）, 距离演奏开始的毫秒)
-
-        3 音符结束消息
-        ("NoteE", 结束的音符ID, 距离演奏开始的毫秒)"""
 
         del midi_tempo
 

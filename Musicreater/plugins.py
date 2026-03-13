@@ -134,7 +134,7 @@ def load_plugin_module(package: Union[Path, str]):
         else:
             return importlib.import_module(package)
     except ModuleNotFoundError as e:
-        raise PluginNotFoundError("无法找到名为`{}`的插件包".format(package))
+        raise PluginNotFoundError("无法找到名为`{}`的插件包".format(package)) from e
 
 
 class PluginRegistry:
@@ -177,9 +177,13 @@ class PluginRegistry:
                         plg_id, plg_class.metainfo
                     )
                 )
-        if (i for i in plg_class.metainfo.dependencies if i not in self._all_plugin_id):
+        if missing_requirements := [
+            i for i in plg_class.metainfo.dependencies if i not in self._all_plugin_id
+        ]:
             raise PluginDependencyNotFound(
-                "插件 `{}` 依赖于这些插件：`{}`。载入此插件时，请务必将后者提前载入。"
+                "插件 `{}` 依赖于这些插件：`{}`；当前环境中缺失：`{}`。加载此插件时，请务必将被依赖的插件提前载入。".format(
+                    plg_id, plg_class.metainfo.dependencies, missing_requirements
+                )
             )
         cls_dict[plg_id] = plg_class()
         self._all_plugin_id.append(plg_id)

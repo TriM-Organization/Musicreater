@@ -19,10 +19,46 @@ Terms & Conditions: License.md in the root directory
 
 from .main import MidiImportConfig, MidiImport2MusicPlugin
 
-# constants 里面那些对照表也要导进来写 __all__ 里
-# utils 里面那些拟合曲线也要
+
+from .constants import (
+    MIDI_DEFAULT_PROGRAM_VALUE,
+    MIDI_DEFAULT_VOLUME_VALUE,
+    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DISLINK_PITCHED_INSTRUMENT_TABLE,
+    MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE,
+    MM_NBS_PITCHED_INSTRUMENT_TABLE,
+    MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
+)
+
+from .utils import (
+    volume_2_distance_natural,
+    volume_2_distance_straight,
+    panning_2_rotation_linear,
+    panning_2_rotation_trigonometric,
+)
 
 __all__ = [
+    # 插件参数和插件本体类
     "MidiImportConfig",
     "MidiImport2MusicPlugin",
+    # 内置的拟合函数
+    "volume_2_distance_straight",
+    "volume_2_distance_natural",
+    "panning_2_rotation_linear",
+    "panning_2_rotation_trigonometric",
+    # Midi 相关默认值
+    "MIDI_DEFAULT_PROGRAM_VALUE",
+    "MIDI_DEFAULT_VOLUME_VALUE",
+    # Midi 与 游戏内容 的对照表
+    "MM_CLASSIC_PITCHED_INSTRUMENT_TABLE",
+    "MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_TOUCH_PITCHED_INSTRUMENT_TABLE",
+    "MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_DISLINK_PITCHED_INSTRUMENT_TABLE",
+    "MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE",
+    "MM_NBS_PITCHED_INSTRUMENT_TABLE",
+    "MM_NBS_PERCUSSION_INSTRUMENT_TABLE",
 ]

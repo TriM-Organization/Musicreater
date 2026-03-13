@@ -85,7 +85,14 @@ __all__ = [
     "midi_inst_to_mc_sound",
 ]
 
-from .old_main import MusicSequence, MidiConvert
+from .old_main import (
+    MusicSequence,
+    MidiConvert,
+    # 字典键
+    MIDI_PROGRAM,
+    MIDI_PAN,
+    MIDI_VOLUME,
+)
 
 from .subclass import (
     MineNote,
@@ -96,7 +103,7 @@ from .subclass import (
     DEFAULT_PROGRESSBAR_STYLE,
 )
 
-from .utils import (
+from .old_utils import (
     # 兼容性函数
     load_decode_musicsequence_metainfo,
     load_decode_msq_flush_release,
@@ -104,21 +111,26 @@ from .utils import (
     # 工具函数
     guess_deviation,
     midi_inst_to_mc_sound,
-    # 处理用函数
-    velocity_2_distance_natural,
-    velocity_2_distance_straight,
-    panning_2_rotation_linear,
-    panning_2_rotation_trigonometric,
 )
 
-from .constants import (
-    # 字典键
-    MIDI_PROGRAM,
-    MIDI_PAN,
-    MIDI_VOLUME,
-    # 默认值
-    MIDI_DEFAULT_PROGRAM_VALUE,
+from Musicreater.builtin_plugins.midi_read import (
     MIDI_DEFAULT_VOLUME_VALUE,
+    MIDI_DEFAULT_PROGRAM_VALUE,
+    volume_2_distance_straight as velocity_2_distance_straight,
+    volume_2_distance_natural as velocity_2_distance_natural,
+    panning_2_rotation_linear,
+    panning_2_rotation_trigonometric,
+    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
+    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DISLINK_PITCHED_INSTRUMENT_TABLE,
+    MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE,
+    MM_NBS_PITCHED_INSTRUMENT_TABLE,
+    MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
+)
+
+from Musicreater.constants import (
     # MIDI 表
     MIDI_PITCH_NAME_TABLE,
     MIDI_PITCHED_NOTE_NAME_GROUP,
@@ -133,12 +145,4 @@ from .constants import (
     # MIDI 到 我的世界 表
     MM_INSTRUMENT_RANGE_TABLE,
     MM_INSTRUMENT_DEVIATION_TABLE,
-    MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
-    MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
-    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
-    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-    MM_DISLINK_PITCHED_INSTRUMENT_TABLE,
-    MM_DISLINK_PERCUSSION_INSTRUMENT_TABLE,
-    MM_NBS_PITCHED_INSTRUMENT_TABLE,
-    MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
 )

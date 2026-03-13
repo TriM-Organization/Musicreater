@@ -16,9 +16,18 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
-from .main import CommandConvertionConfig, NoteDataConvert2CommandPlugin
+from .main import NoteDataConvert2CommandPlugin, MineCommand
+
+from .progressbar import ProgressBarStyle, DEFAULT_PROGRESSBAR_STYLE
 
 __all__ = [
-    "CommandConvertionConfig",
+    # "CommandConvertionConfig",
+    # 插件主类
     "NoteDataConvert2CommandPlugin",
+    # 进度条样式类
+    "ProgressBarStyle",
+    # Minecraft 指令类
+    "MineCommand",
+    # 默认进度条样式
+    "DEFAULT_PROGRESSBAR_STYLE",
 ]

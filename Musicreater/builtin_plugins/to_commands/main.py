@@ -38,9 +38,9 @@ from .progressbar import ProgressBarStyle, DEFAULT_PROGRESSBAR_STYLE, mctick2tim
 from .utils import minenote_to_command_parameters
 
 
-@dataclass
-class CommandConvertionConfig(PluginConfig):
-    execute_command_head: str = "execute as {} at @s positioned ~ ~ ~ run "
+# @dataclass
+# class CommandConvertionConfig(PluginConfig):
+#     execute_command_head: str = "execute as {} at @s positioned ~ ~ ~ run "
 
 
 @dataclass
@@ -541,14 +541,15 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                             )
                         ),
                         annotation=(
-                            "在{}播放噪音{}".format(
+                            "[{}] 打击乐音符{}".format(
                                 mctick2timestr(note.start_tick),
-                                track.instrument,
+                                note.instrument,
                             )
                             if note.percussive
-                            else "在{}播放乐音{}".format(
+                            else "[{}] 音符{}:{:.2f}".format(
                                 mctick2timestr(note.start_tick),
-                                "{}:{:.2f}".format(track.instrument, mc_pitch),
+                                note.instrument,
+                                mc_pitch,
                             )
                         ),
                     ),
@@ -619,14 +620,15 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                         )
                     ),
                     annotation=(
-                        "在{}播放噪音{}".format(
+                        "[{}] 打击乐音符{}".format(
                             mctick2timestr(note.start_tick),
                             note.instrument,
                         )
                         if note.percussive
-                        else "在{}播放乐音{}".format(
+                        else "[{}] 音符{}:{:.2f}".format(
                             mctick2timestr(note.start_tick),
-                            "{}:{:.2f}".format(note.instrument, mc_pitch),
+                            note.instrument,
+                            mc_pitch,
                         )
                     ),
                     delay=tickdelay,

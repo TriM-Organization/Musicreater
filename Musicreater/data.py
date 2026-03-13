@@ -132,7 +132,7 @@ class SingleNote:
     """存储单个音符的类"""
 
     midi_pitch: int
-    """midi音高"""
+    """Midi 音高"""
 
     volume: int
     """力度/播放响度 0~100 百分比"""
@@ -164,7 +164,7 @@ class SingleNote:
         Parameters
         ------------
         midi_pitch: int
-            midi音高
+            Midi 音高
         note_volume: int
             响度/力度(百分比, 0~100)
         start_time: int
@@ -185,7 +185,7 @@ class SingleNote:
         """
 
         self.midi_pitch: int = 66 if note_pitch is None else note_pitch
-        """midi音高"""
+        """Midi 音高"""
         self.volume: int = note_volume
         """响度(力度)"""
         self.start_time: int = start_tick
@@ -349,7 +349,7 @@ class SingleNote:
 
 
 class CurvableParam(str, Enum):
-    """可曲线化的参数枚举类"""
+    """可曲线化的参数 枚举类"""
 
     PITCH = "adjust_note_pitch"
     VOLUME = "adjust_note_volume"
@@ -640,9 +640,9 @@ class SingleMusic(List[SingleTrack]):
         *args: SingleTrack,
         name: str = "未命名乐曲",
         creator: str = "未命名制作者",
-        original_author: str = "未命名原作者",
-        description: str = "未命名简介",
-        credits: str = "未命名版权信息",
+        original_author: str = "未命名原曲作",
+        description: str = "无简介",
+        credits: str = "保留所有权利。All Rights Reserved.",
         extra_information: Dict[str, Any] = {},
     ):
         self.music_name = name
