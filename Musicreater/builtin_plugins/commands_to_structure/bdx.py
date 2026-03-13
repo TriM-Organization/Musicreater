@@ -17,7 +17,7 @@ Terms & Conditions: License.md in the root directory
 
 from typing import List
 
-from ..subclass import MineCommand
+from Musicreater.builtin_plugins.to_commands import MineCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box, x, y, z
 
 BDX_MOVE_KEY = {

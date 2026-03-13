@@ -20,7 +20,7 @@ from typing import List, Literal, Tuple
 
 from TrimMCStruct import Block, Structure, TAG_Byte, TAG_Long
 
-from ..subclass import MineCommand
+from Musicreater.builtin_plugins.to_commands import MineCommand
 from .common import bottem_side_length_of_smallest_square_bottom_box, x, y, z
 
 
