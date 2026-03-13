@@ -16,7 +16,7 @@ from typing import Literal
 
 from ...old_main import MidiConvert
 from ...subclass import MineCommand
-from ..mcstructure import (
+from Musicreater.builtin_plugins.commands_to_structure.mcstructure import (
     COMPABILITY_VERSION_117,
     COMPABILITY_VERSION_119,
     commands_to_redstone_delay_structure,

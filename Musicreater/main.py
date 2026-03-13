@@ -117,9 +117,16 @@ class MusiCreater:
         if __plugin:
             return __plugin
         else:
-            raise FileFormatNotSupportedError(
-                "无法找到处理`{}`类型文件的插件".format(fpath.suffix.upper())
-            )
+            if plg_id:
+                raise PluginNotFoundError(
+                    "无法找到惟一识别码为`{}`、处理`{}`格式的插件".format(
+                        plg_id, fpath.suffix.upper()
+                    )
+                )
+            else:
+                raise FileFormatNotSupportedError(
+                    "无法找到处理`{}`格式的插件".format(fpath.suffix.upper())
+                )
 
     @classmethod
     def import_music(
@@ -159,7 +166,7 @@ class MusiCreater:
         plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
     ) -> None:
-        self._get_plugin_within_iousage(
+        return self._get_plugin_within_iousage(
             self.__plugin_registry.get_music_output_plugin_by_format,
             file_path,
             self.__plugin_registry._music_output_plugins,
@@ -173,7 +180,7 @@ class MusiCreater:
         plugin_id: Optional[str] = None,
         plugin_config: Optional[PluginConfig] = None,
     ) -> None:
-        self._get_plugin_within_iousage(
+        return self._get_plugin_within_iousage(
             self.__plugin_registry.get_track_output_plugin_by_format,
             file_path,
             self.__plugin_registry._track_output_plugins,

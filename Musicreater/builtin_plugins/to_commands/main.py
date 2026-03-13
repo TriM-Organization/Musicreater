@@ -94,7 +94,7 @@ class MineCommand:
             return False
 
 
-@library_plugin("notedata_2_command_plugin")
+@library_plugin("notedata_to_command_plugin")
 class NoteDataConvert2CommandPlugin(LibraryPluginBase):
     metainfo = PluginMetaInformation(
         name="音符数据指令支持插件",
@@ -481,8 +481,8 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
     @staticmethod
     def to_command_list_in_score(
         music: SingleMusic,
-        music_deviation: int = 0,
-        minimum_volume: float = 0,
+        music_deviation: float = 0,
+        minimum_volume: float = 0.01,
         scoreboard_name: str = "mscplay",
         execute_command_head: str = "execute as {} at @s positioned ~ ~ ~ run ",
     ) -> Tuple[List[List[MineCommand]], int, int]:
@@ -565,8 +565,8 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
     @staticmethod
     def to_command_list_in_delay(
         music: SingleMusic,
-        music_deviation: int = 0,
-        minimum_volume: float = 0,
+        music_deviation: float = 0,
+        minimum_volume: float = 0.01,
         player_selector: str = "@a",
         execute_command_head: str = "execute as {} at @s positioned ~ ~ ~ run ",
     ) -> Tuple[List[MineCommand], int, int]:
@@ -583,7 +583,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         tuple( list[MineCommand指令,...], int音乐时长游戏刻, int最大同时播放的指令数量 )
         """
 
-        # 此处 我们把通道视为音轨
+        # 音轨判断
         music_command_list = []
         multi = max_multi = 0
         delaytime_previous = 0
@@ -611,7 +611,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                 MineCommand(
                     command=(
                         execute_command_head.format(player_selector)
-                        + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                        + "playsound {} @s ^{} ^{} ^{} {} {} {}".format(
                             note.instrument,
                             *relative_coordinates,
                             volume_percentage,

@@ -135,7 +135,7 @@ class SingleNote:
     """Midi 音高"""
 
     volume: int
-    """力度/播放响度 0~100 百分比"""
+    """力度/播放响度 0~127 百廿七分比"""
 
     start_time: int
     """开始之时 命令刻"""
@@ -166,7 +166,7 @@ class SingleNote:
         midi_pitch: int
             Midi 音高
         note_volume: int
-            响度/力度(百分比, 0~100)
+            响度/力度(百廿七分比, 0~127)
         start_time: int
             开始之时(命令刻)
             注：此处的时间是用从乐曲开始到当前的刻数
@@ -367,7 +367,7 @@ class MineNote:
     instrument: str
     """乐器 ID"""
     volume: float
-    """力度/播放音量 0~100 百分比"""
+    """力度/播放音量 0~127 百廿七分比"""
     start_tick: int
     """开始之时 命令刻"""
     duration_tick: int
@@ -697,7 +697,8 @@ class SingleMusic(List[SingleTrack]):
             归并后的每个元素，按 sort_key 升序
         """
         if is_subseq_sorted:
-            return heapq.merge(*tracks, key=sort_key)
+            # 必须这样处理，不能 return 这个 merge，测试过了
+            yield from heapq.merge(*tracks, key=sort_key)
         else:
             # 初始化堆
             heap_pool: List[Tuple[Any, int, T]] = []
@@ -765,11 +766,11 @@ class SingleMusic(List[SingleTrack]):
 
     def get_minenotes(
         self, start_time: float, end_time: float = inf
-    ) -> Generator[MineNote, Any, None]:
+    ) -> Iterator[MineNote]:
         """获取指定时间段所有的，供我的世界播放的音符数据类，按照时间顺序"""
         if self.track_amount == 0:
-            return
-        yield from self.yield_from_tracks(
+            return iter(())
+        return self.yield_from_tracks(
             [track.get_minenotes(start_time, end_time) for track in self.music_tracks],
             sort_key=lambda x: x.start_tick,
         )

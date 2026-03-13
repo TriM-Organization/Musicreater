@@ -125,7 +125,7 @@ class TrackDivisionDict(
 ):
     """
     音轨分轨字典
-    键为音轨信息元组[音轨编号, 通道编号, 音符名称, 音量, 声相]
+    键为音轨信息元组[音轨编号, 通道编号, 乐器名称, 音量, 声相]
     值为音轨对象
     """
 
@@ -172,7 +172,7 @@ class TrackDivisionDict(
             return self[key]
 
 
-@music_input_plugin("midi_2_music_plugin")
+@music_input_plugin("midi_to_music_plugin")
 class MidiImport2MusicPlugin(MusicInputPluginBase):
     """Midi 音乐数据导入插件"""
 
@@ -193,7 +193,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         config: Optional[MidiImportConfig] = MidiImportConfig(),
     ) -> SingleMusic:
         return self.midifile_2_singlemusic(
-            mido.MidiFile(file=bytes_buffer_in),
+            mido.MidiFile(file=bytes_buffer_in, clip=True),
             config if config else MidiImportConfig(),
         )
 
@@ -202,7 +202,8 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
     ) -> SingleMusic:
         """从 Midi 文件导入音乐数据"""
         return self.midifile_2_singlemusic(
-            mido.MidiFile(filename=file_path), config if config else MidiImportConfig()
+            mido.MidiFile(filename=file_path, clip=True),
+            config if config else MidiImportConfig(),
         )
 
     @staticmethod
@@ -264,17 +265,15 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         """音符计数"""
         note_count_per_instrument: Dict[str, int] = {}
         """乐器使用统计"""
-        microseconds = 0
-        """当前的微妙时间"""
 
         note_queue_A: Dict[int, List[Tuple[int, int]]] = (
             enumerated_stuffcopy_dictionary(staff=[])
         )
-        """音符队列甲 Dict[通道, List[Tuple[int音高, int乐器, int轨道]]]"""
-        note_queue_B: Dict[int, List[Tuple[int, int, int]]] = (
+        """音符队列甲 Dict[通道, List[Tuple[int音高, int轨道]]]"""
+        note_queue_B: Dict[int, List[Tuple[int, int, int, int, int]]] = (
             enumerated_stuffcopy_dictionary(staff=[])
         )
-        """音符队列乙 Dict[通道, List[Tuple[int音高, int微秒时间]]]"""
+        """音符队列乙 Dict[通道, List[Tuple[int力度, int乐器, int音量, int偏移, int微秒时间]]]"""
 
         midi_lyric_cache: List[Tuple[int, str]] = []
         """歌词缓存 List[Tuple[int微秒时间, str歌词内容]]"""
@@ -287,8 +286,14 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         """轨道名称字典 Dict[int轨道编号, str轨道名称]"""
 
         for track_no, message_track in enumerate(midi.tracks):
+            # 每个音轨单独重置
+
+            microseconds = 0
+            """当前的微妙时间"""
             for msg in message_track:
                 if msg.type == "set_tempo":
+                    # Tempo 改变是一个全局的控制
+                    # 而且应该是很早出现的一个 Midi 消息
                     midi_tempo = msg.tempo
 
                 if msg.time != 0:
@@ -304,6 +309,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
 
                 elif msg.is_cc(7):
                     # Control Change 更改当前通道的 音量 的事件（大幅度，最高有效位）
+                    # print("通道、轨道、音量修改：",msg.channel, track_no, msg.value)
                     value_controler_per_channel[msg.channel][
                         ControlerKeys.MIDI_VOLUME
                     ] = msg.value
@@ -333,13 +339,19 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                     # (音高, 轨道)
                     note_queue_A[msg.channel].append((msg.note, track_no))
                     # 音符队列乙（按通道分隔）
-                    # (乐器, 力度, 微秒)
+                    # (力度, 乐器, 音量, 偏移, 微秒)
                     note_queue_B[msg.channel].append(
                         (
+                            msg.velocity,
                             value_controler_per_channel[msg.channel][
                                 ControlerKeys.MIDI_PROGRAM
                             ],
-                            msg.velocity,
+                            value_controler_per_channel[msg.channel][
+                                ControlerKeys.MIDI_VOLUME
+                            ],
+                            value_controler_per_channel[msg.channel][
+                                ControlerKeys.MIDI_PAN
+                            ],
                             microseconds,
                         )
                     )
@@ -351,26 +363,28 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
 
                     if (
                         msg.note,
-                        value_controler_per_channel[msg.channel][
-                            ControlerKeys.MIDI_PROGRAM
-                        ],
+                        track_no,
                     ) in note_queue_A[msg.channel]:
                         # 在甲队列中发现了同一个 音高和乐器且在同轨道 的音符
 
                         # 获取其音符力度和微秒数
-                        _velocity, _program, _ms = note_queue_B[msg.channel][
-                            note_queue_A[msg.channel].index((msg.note, track_no))
-                        ]
+                        _velocity, _program, _volume, _panning, _start_ms = (
+                            note_queue_B[msg.channel][
+                                note_queue_A[msg.channel].index((msg.note, track_no))
+                            ]
+                        )
 
                         # 在队列中删除此音符
                         note_queue_A[msg.channel].remove((msg.note, track_no))
-                        note_queue_B[msg.channel].remove((_velocity, _program, _ms))
+                        note_queue_B[msg.channel].remove(
+                            (_velocity, _program, _volume, _panning, _start_ms)
+                        )
 
                         _lyric = ""
                         # 找一找歌词吧
                         if midi_lyric_cache:
                             for i in range(len(midi_lyric_cache)):
-                                if midi_lyric_cache[i][0] >= _ms:
+                                if midi_lyric_cache[i][0] >= _start_ms:
                                     _lyric = midi_lyric_cache.pop(i)[1]
                                     break
 
@@ -385,15 +399,11 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 ),
                                 note=(_program if _is_percussion else msg.note),
                                 percussive=_is_percussion,
-                                volume=value_controler_per_channel[msg.channel][
-                                    ControlerKeys.MIDI_VOLUME
-                                ],
+                                volume=_volume,
                                 velocity=_velocity,
-                                panning=value_controler_per_channel[msg.channel][
-                                    ControlerKeys.MIDI_PAN
-                                ],
-                                start_time=_ms,  # 微秒
-                                duration=microseconds - _ms,  # 微秒
+                                panning=_panning,
+                                start_time=_start_ms,  # 微秒
+                                duration=microseconds - _start_ms,  # 微秒
                                 play_speed=config.speed_multiplier,
                                 midi_reference_table=(
                                     config.percussion_note_reference_table
@@ -406,6 +416,8 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 lyric_line=_lyric,
                             )
                         )
+
+                        # print(that_note.start_time, end=", ")
 
                         divided_tracks[
                             (
@@ -465,15 +477,16 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
             },
         )
         for track_properties, every_single_track in divided_tracks.items():
+            # [音轨编号, 通道编号, 乐器名称, 音量, 声相]
             if track_properties[0] and (
                 track_name := midi_track_name_dict.get(track_properties[0])
-            ):
+            ):  # 音轨编号
                 every_single_track.name = track_name
-            if track_properties[2]:
+            if track_properties[2]:  # 乐器名称
                 every_single_track.instrument = track_properties[2]
-            if track_properties[3]:
+            if track_properties[3]:  # 音量
                 every_single_track.sound_position.sound_distance = track_properties[3]
-            if track_properties[4]:
+            if track_properties[4]:  # 声相
                 every_single_track.sound_position.sound_azimuth = track_properties[4]
             final_music.append(every_single_track)
 

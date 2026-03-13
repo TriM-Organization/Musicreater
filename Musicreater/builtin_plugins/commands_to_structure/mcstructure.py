@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 """
-存放有关MCSTRUCTURE结构操作的内容
+音·创 v3 内置的 Minecraft 结构生成插件中有关 MCSTRUCTURE 结构操作的内容
 """
 
 """
-版权所有 © 2025 金羿 & 诸葛亮与八卦阵
-Copyright © 2025 Eilles & bgArray
+版权所有 © 2026 金羿、玉衡Alioth
+Copyright © 2026 Eilles, YuhengAlioth
 
 开源相关声明请见 仓库根目录下的 License.md
 Terms & Conditions: License.md in the root directory
@@ -25,10 +25,17 @@ from .common import bottem_side_length_of_smallest_square_bottom_box, x, y, z
 
 
 def antiaxis(axis: Literal["x", "z", "X", "Z"]):
+    """
+    在 x-z 平面上，返回指定轴的另一个轴
+    """
+
     return z if axis == x else x
 
 
 def forward_IER(forward: bool):
+    """
+    把用逻辑值标记的方向值缓存正负数，用以乘上增量
+    """
     return 1 if forward else -1
 
 
@@ -46,6 +53,9 @@ AXIS_PARTICULAR_VALUE = {
         False: 2,
     },
 }
+"""
+指令方块朝向对应特殊值
+"""
 
 # 1.19的结构兼容版本号
 COMPABILITY_VERSION_119: int = 17959425
@@ -278,12 +288,12 @@ def commands_to_structure(
         结构类, 结构占用大小, 终点坐标
     """
 
-    _sideLength = bottem_side_length_of_smallest_square_bottom_box(
+    _side_length = bottem_side_length_of_smallest_square_bottom_box(
         len(commands), max_height
     )
 
     struct = Structure(
-        size=(_sideLength, max_height, _sideLength),  # 声明结构大小
+        size=(_side_length, max_height, _side_length),  # 声明结构大小
         compability_version=compability_version_,
     )
 
@@ -311,7 +321,7 @@ def commands_to_structure(
                         (3 if z_forward else 2)
                         if (
                             ((now_z != 0) and (not z_forward))
-                            or (z_forward and (now_z != _sideLength - 1))
+                            or (z_forward and (now_z != _side_length - 1))
                         )
                         else 5
                     )
@@ -336,7 +346,7 @@ def commands_to_structure(
 
             now_z += 1 if z_forward else -1
 
-            if ((now_z >= _sideLength) and z_forward) or (
+            if ((now_z >= _side_length) and z_forward) or (
                 (now_z < 0) and (not z_forward)
             ):
                 now_z -= 1 if z_forward else -1
@@ -348,7 +358,7 @@ def commands_to_structure(
         (
             now_x + 1,
             max_height if now_x or now_z else now_y,
-            _sideLength if now_x else now_z,
+            _side_length if now_x else now_z,
         ),
         (now_x, now_y, now_z),
     )

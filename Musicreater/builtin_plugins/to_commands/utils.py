@@ -48,7 +48,7 @@ def minenote_to_command_parameters(
     ----
     mine_note: MineNote
         我的世界音符对象
-    deviation: float
+    pitch_deviation: float
         音调偏移量
 
     返回
@@ -59,7 +59,7 @@ def minenote_to_command_parameters(
 
     return (
         mine_note.position.position_displacement,
-        mine_note.volume / 100,
+        mine_note.volume / 127,
         (
             None
             if mine_note.percussive

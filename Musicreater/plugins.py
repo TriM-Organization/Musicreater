@@ -231,6 +231,7 @@ class PluginRegistry:
                 if plugin.can_handle_format(fpath_or_format)
             )
         elif isinstance(fpath_or_format, Path):
+            # print("在",plugin_regdict,"中，查找可用于处理",fpath_or_format,"的插件")
             return (
                 plugin
                 for plugin in plugin_regdict.values()

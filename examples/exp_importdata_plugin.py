@@ -22,6 +22,7 @@ Copyright © 2026 Eilles
 则无需标注原作者，允许该使用者自行署名
 
 本声明仅限于包含此声明的本文件，本声明与项目内其他文件无关。
+本声明同样适用于所有直接转载的内容。
 """
 
 from typing import BinaryIO, Optional
