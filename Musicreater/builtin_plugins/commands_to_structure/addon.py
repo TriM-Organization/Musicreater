@@ -1,0 +1,103 @@
+# -*- coding: utf-8 -*-
+"""
+音·创 v3 内置的 Minecraft 结构生成插件中有关附加包操作的内容
+"""
+
+"""
+版权所有 © 2026 金羿、玉衡Alioth
+Copyright © 2026 Eilles, YuhengAlioth
+
+开源相关声明请见 仓库根目录下的 License.md
+Terms & Conditions: License.md in the root directory
+"""
+
+# 睿乐组织 开发交流群 861684859
+# Email TriM-Organization@hotmail.com
+# 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
+
+
+import datetime
+import os
+import uuid
+import zipfile
+from typing import List, Literal, Union
+
+
+def compress_zipfile(sourceDir, outFilename, compression=8, exceptFile=None):
+    """
+    使用指定的压缩算法将目录打包为zip文件
+
+    Parameters
+    ------------
+    sourceDir: str
+        要压缩的源目录路径
+    outFilename: str
+        输出的zip文件路径
+    compression: int, 可选
+        压缩算法，默认为8 (DEFLATED)
+        可用算法：
+        STORED = 0
+        DEFLATED = 8 (默认)
+        BZIP2 = 12
+        LZMA = 14
+    exceptFile: list[str], 可选
+        需要排除在压缩包外的文件名称列表（可选）
+
+    Returns
+    ---------
+    None
+    """
+
+    zipf = zipfile.ZipFile(outFilename, "w", compression)
+    pre_len = len(os.path.dirname(sourceDir))
+    for parent, dirnames, filenames in os.walk(sourceDir):
+        for filename in filenames:
+            if filename == exceptFile:
+                continue
+            pathfile = os.path.join(parent, filename)
+            arc_name = pathfile[pre_len:].strip(os.path.sep)  # 相对路径
+            zipf.write(pathfile, arc_name)
+    zipf.close()
+
+
+def behavior_mcpack_manifest(
+    format_version: Union[Literal[1], Literal[2]] = 1,
+    pack_description: str = "",
+    pack_version: Union[List[int], Literal[None]] = None,
+    pack_name: str = "",
+    pack_uuid: Union[str, Literal[None]] = None,
+    pack_engine_version: Union[List[int], None] = None,
+    modules_description: str = "",
+    modules_version: List[int] = [0, 0, 1],
+    modules_uuid: Union[str, Literal[None]] = None,
+):
+    """
+    生成一个我的世界行为包组件的定义清单文件
+    """
+    if not pack_version:
+        now_date = datetime.datetime.now()
+        pack_version = [
+            now_date.year,
+            now_date.month * 100 + now_date.day,
+            now_date.hour * 100 + now_date.minute,
+        ]
+    result = {
+        "format_version": format_version,
+        "header": {
+            "description": pack_description,
+            "version": pack_version,
+            "name": pack_name,
+            "uuid": str(uuid.uuid4()) if not pack_uuid else pack_uuid,
+        },
+        "modules": [
+            {
+                "description": modules_description,
+                "type": "data",
+                "version": modules_version,
+                "uuid": str(uuid.uuid4()) if not modules_uuid else modules_uuid,
+            }
+        ],
+    }
+    if pack_engine_version:
+        result["header"]["min_engine_version"] = pack_engine_version
+    return result
