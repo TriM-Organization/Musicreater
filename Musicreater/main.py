@@ -6,7 +6,7 @@
 是一款免费开源的《我的世界》数字音频支持库。
 
 Musicreater (音·创)
-A free and open-source library for handling with **Minecraft** digital music.
+A cost free and open-source library for handling with **Minecraft** digital music.
 
 版权所有 © 2026 睿乐组织
 Copyright © 2026 TriM-Organization

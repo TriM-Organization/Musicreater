@@ -14,7 +14,7 @@
     </img>
 </p>
 
-<h3 align="center">A free and open-source library for handling with <i>Minecraft</i> digital music.</h3>
+<h3 align="center">A cost free and open-source library for handling with <i>Minecraft</i> digital music.</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
