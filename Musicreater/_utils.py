@@ -25,7 +25,7 @@ def enumerated_stuffcopy_dictionary(
     enumeration_times: int = 17, staff: T = {}
 ) -> Dict[int, T]:
     """
-    生成一个字典，其中键从0到enumeration_times-1，值是staff的拷贝
+    生成一个字典，其中键从 `0` 到 `enumeration_times-1`，值是 `staff` 的拷贝
     """
     # 这告诉我们，你不能忽略任何一个复制的序列，因为它真的，我哭死，折磨我一整天，全在这个bug上了
     # 上面的这指的是 copy.deepcopy  —— 金羿 来自 20260210

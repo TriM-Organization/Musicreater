@@ -631,4 +631,4 @@ class LibraryPluginBase(TopPluginBase, ABC):
             )
 
     # 怎么？
-    # 插件的彼此依赖就不需要什么调用了吧
+    # 插件的依赖项就不需要什么调用了吧

@@ -126,6 +126,11 @@ class SoundAtmos:
             dk1 * round(cos(radians(self.sound_azimuth[0])), 8),
         )
 
+    def __repr__(self) -> str:
+        return "SoundAtmos(d={}, rV={}, rH={})".format(
+            self.sound_distance, *self.sound_azimuth
+        )
+
 
 @dataclass(init=False)
 class SingleNote:
@@ -445,7 +450,7 @@ class SingleTrack(List[SingleNote]):
         track_instrument: str = "",
         precise_time: bool = True,
         percussion: bool = False,
-        sound_direction: SoundAtmos = SoundAtmos(),
+        sound_direction: Optional[SoundAtmos] = None,
         extra_information: Dict[str, Any] = {},
     ):
         self.name = track_name
@@ -460,7 +465,8 @@ class SingleTrack(List[SingleNote]):
         self.is_percussive = percussion
         """是否为打击乐器"""
 
-        self.sound_position = sound_direction
+        # 如果不这样的话，所有的新的 SingleTrack 类都会有一个共同的声像方位
+        self.sound_position = sound_direction if sound_direction else SoundAtmos()
         """声像方位"""
 
         self.extra_info = extra_information if extra_information else {}
