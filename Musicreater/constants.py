@@ -36,10 +36,8 @@ z
 
 
 # Midi用对照表
-
-
 MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
-    0: "C",
+    0: "C",  # Midi 最低，C-1
     1: "C#",
     2: "D",
     3: "D#",
@@ -51,7 +49,7 @@ MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     9: "A",
     10: "A#",
     11: "B",
-    12: "C",
+    12: "C",  # C0
     13: "C#",
     14: "D",
     15: "D#",
@@ -60,10 +58,10 @@ MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     18: "F#",
     19: "G",
     20: "G#",
-    21: "A",
+    21: "A",  # 钢琴最低，A0
     22: "A#",
     23: "B",
-    24: "C",
+    24: "C",  # C1
     25: "C#",
     26: "D",
     27: "D#",
@@ -99,7 +97,7 @@ MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     57: "A",
     58: "A#",
     59: "B",
-    60: "C",
+    60: "C",  # 钢琴中央 C，C4
     61: "C#",
     62: "D",
     63: "D#",
@@ -147,7 +145,7 @@ MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     105: "A",
     106: "A#",
     107: "B",
-    108: "C",
+    108: "C",  # 钢琴最高，C8
     109: "C#",
     110: "D",
     111: "D#",
@@ -166,9 +164,10 @@ MIDI_PITCH_NAME_TABLE: Dict[int, str] = {
     124: "E",
     125: "F",
     126: "F#",
-    127: "G",
+    127: "G",  # G9
 }
 """Midi音高名称对照表"""
+
 
 MIDI_PITCHED_NOTE_NAME_GROUP: Dict[int, Tuple[str, str]] = {
     1: ("钢琴", "Piano"),
@@ -514,7 +513,6 @@ MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
 默认的偏移量为 6 ，因为在计算音高时候少减去了 6 个 Pitch 单位
 （在表里的数据是用作被减数的，实际计算时默认有 +6，所以在表中默认的 6 最后就会被抵消）
 """
-
 
 
 # Midi音高对MC方块对照表
