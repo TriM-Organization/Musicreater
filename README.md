@@ -119,7 +119,11 @@
 
 如果需要与开发组进行交流，欢迎加入我们的[开发闲聊 Q 群](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)。
 
-亦可以联系我们[睿乐组织官方邮箱](mailto:TriM-Organization@hotmail.com)，取得进一步联系！
+亦可以联系我们组织的[邮箱](mailto:TriM-Organization@hotmail.com)！
+
+## 待办 ⏰
+
+当前未完成的任务和一些需要讨论的内容都收集在了[任务清单](./TO-DO.md)里，当然你也可以提[工单请求](https://gitee.com/TriM-Organization/Musicreater/issues/new)来进行讨论。
 
 ---
 

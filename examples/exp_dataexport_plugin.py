@@ -78,7 +78,7 @@ class ExampleExportMusicPlugin(MusicOutputPluginBase):
         for cfg in config:
             yield self.something_data_convert(cfg)
 
-    # 插件可选地定义 dump 方法，从文件导入数据。下面展示的是不定义 load 方法时候的实现方式
+    # 插件可选地定义 dump 方法，导出音乐数据到文件。下面展示的是，在不定义 dump 方法时候的，默认的实现方式
     def dump(
         self, data: SingleMusic, file_path: Path, config: ExampleExportConfig | None
     ):
