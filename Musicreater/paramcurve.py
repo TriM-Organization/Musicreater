@@ -24,7 +24,7 @@ Terms & Conditions: License.md in the root directory
 # 可以等伶伦工作站开发出来后再进行完整的测试
 
 
-from math import ceil
+from math import ceil, inf
 from dataclasses import dataclass
 from typing import Optional, Any, List, Tuple, Callable
 from enum import Enum
@@ -187,6 +187,16 @@ class Keyframe:
     )
     use_bezier: bool = False
 
+    def copy(self) -> "Keyframe":
+        return Keyframe(
+            time=self.time,
+            value=self.value,
+            out_interp=self.out_interp,
+            in_tangent=self.in_tangent,
+            out_tangent=self.out_tangent,
+            use_bezier=self.use_bezier,
+        )
+
 
 class BoundaryBehaviour(str, Enum):
     """
@@ -225,7 +235,9 @@ class ParamCurve:
     def __init__(
         self,
         base_value: float = 0.0,
-        default_interpolation_function: Callable[[float], float] = InterpolationMethod.linear,
+        default_interpolation_function: Callable[
+            [float], float
+        ] = InterpolationMethod.linear,
         boundary_mode: BoundaryBehaviour = BoundaryBehaviour.CONSTANT,
     ):
         """
@@ -250,6 +262,100 @@ class ParamCurve:
 
     def __bool__(self) -> bool:
         return bool(self._keys) or (self.base_line != 0)
+
+    def find_key(self, time: float) -> Tuple[int, Optional[Keyframe]]:
+        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
+        if idx < len(self._keys) and self._keys[idx].time == time:
+            return idx, self._keys[idx]
+        else:
+            print("[警告] ParamCurve.find_key: 找不到指定时间点所对应之关键帧")
+            return idx, None
+
+    def copy(
+        self,
+        start: float = 0,
+        end: float = inf,
+        keep_zone_boundary_value: bool = False,
+        global_boundary_safe: bool = True,
+    ) -> "ParamCurve":
+        """
+        返回参数曲线在某时间段内的副本
+
+        Parameters
+        ----------
+        start : float
+            起始时间。
+        end : float
+            结束时间。
+        keep_zone_boundary_value : bool
+            是否保留边界值（即在副本中的当前选区之边界创建以当前曲线值作为值的关键帧）。
+        global_boundary_safe : bool
+            当保留边界值启用时，是否忽略本身就处于参数曲线边界外的值，使其不创建关键帧。
+
+        Returns
+        -------
+        ParamCurve
+            参数曲线之副本
+        """
+        param_curve = ParamCurve(
+            self.base_line,
+            self.base_interpolation_function,
+            self.boundary_behaviour,
+        )
+        if start >= end:
+            return param_curve
+        start_index, starter_keyframe = self.find_key(start)
+        end_index, ender_keyframe = self.find_key(end)
+        if starter_keyframe and ender_keyframe:
+            param_curve._keys = [
+                key.copy() for key in self._keys[start_index : end_index + 1]
+            ]
+        elif starter_keyframe:
+            if end_index >= len(self._keys) and global_boundary_safe:
+                param_curve._keys = [key.copy() for key in self._keys[start_index:]]
+            else:
+                param_curve._keys = [
+                    key.copy() for key in self._keys[start_index:end_index]
+                ]
+                if keep_zone_boundary_value:
+                    param_curve.add_key(end, self.value_at(end))
+        elif ender_keyframe:
+            if start_index <= 0 and global_boundary_safe:
+                param_curve._keys = [key.copy() for key in self._keys[:end_index]]
+            else:
+                param_curve._keys = [
+                    key.copy() for key in self._keys[start_index : end_index + 1]
+                ]
+                if keep_zone_boundary_value:
+                    param_curve.add_key(start, self.value_at(start))
+        else:
+            if (
+                start_index <= 0
+                and end_index >= len(self._keys)
+                and global_boundary_safe
+            ):
+                param_curve._keys = [key.copy() for key in self._keys]
+            else:
+                param_curve._keys = [
+                    key.copy() for key in self._keys[start_index:end_index]
+                ]
+                if keep_zone_boundary_value:
+                    param_curve.add_key(start, self.value_at(start))
+                    param_curve.add_key(end, self.value_at(end))
+        return param_curve
+
+    def delete(self, start: float, end: float):
+        """
+        删除参数曲线在某时间段内的关键帧
+        """
+        if start > end:
+            return
+        start_index, starter_keyframe = self.find_key(start)
+        end_index, ender_keyframe = self.find_key(end)
+        if ender_keyframe:
+            del self._keys[start_index : end_index + 1]
+        else:
+            del self._keys[start_index:end_index]
 
     def add_key(
         self,
@@ -291,8 +397,8 @@ class ParamCurve:
         )
         new_key = Keyframe(time, value, interp, in_tangent, out_tangent, use_bezier)
 
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
+        idx, old_key = self.find_key(time)
+        if old_key:
             self._keys[idx] = new_key
         else:
             self._keys.insert(idx, new_key)
@@ -310,17 +416,21 @@ class ParamCurve:
         -------
         None
         """
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
+        idx, key = self.find_key(time)
+        if key:
             del self._keys[idx]
 
     def update_key_value(self, time: float, new_value: float):
         """更新关键帧值，保留其他属性。"""
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
-            k = self._keys[idx]
+        idx, key = self.find_key(time)
+        if key:
             self._keys[idx] = Keyframe(
-                time, new_value, k.out_interp, k.in_tangent, k.out_tangent, k.use_bezier
+                time,
+                new_value,
+                key.out_interp,
+                key.in_tangent,
+                key.out_tangent,
+                key.use_bezier,
             )
 
     def update_key_interp(
@@ -332,11 +442,10 @@ class ParamCurve:
         use_bezier: bool = False,
     ):
         """更新关键帧的插值属性。"""
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
-            k = self._keys[idx]
-            new_value = k.value
-            interp = out_interp if out_interp is not None else k.out_interp
+        idx, key = self.find_key(time)
+        if key:
+            new_value = key.value
+            interp = out_interp if out_interp is not None else key.out_interp
             self._keys[idx] = Keyframe(
                 time, new_value, interp, in_tangent, out_tangent, use_bezier
             )
@@ -349,13 +458,12 @@ class ParamCurve:
         use_bezier: bool = True,
     ):
         """单独设置关键帧的切线，不改变值。"""
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
-            k = self._keys[idx]
+        idx, key = self.find_key(time)
+        if key:
             self._keys[idx] = Keyframe(
                 time,
-                k.value,
-                out_interp=k.out_interp,
+                key.value,
+                out_interp=key.out_interp,
                 in_tangent=in_tangent,
                 out_tangent=out_tangent,
                 use_bezier=use_bezier,
@@ -366,9 +474,8 @@ class ParamCurve:
         将关键帧设为“平滑”模式（自动对称切线，并设为贝塞尔模式）。
         切线长度基于相邻关键帧的时间和值差。
         """
-        idx = bisect.bisect_left(self._keys, time, key=lambda k: k.time)
-        if idx < len(self._keys) and self._keys[idx].time == time:
-            k = self._keys[idx]
+        idx, key = self.find_key(time)
+        if key:
             prev_k = self._keys[idx - 1] if idx > 0 else None
             next_k = self._keys[idx + 1] if idx + 1 < len(self._keys) else None
 
@@ -382,13 +489,13 @@ class ParamCurve:
                 dt_in = dt_out = dt_total / 3.0
                 dv_in = dv_out = dv_total / 3.0
             elif prev_k:
-                dt_out = (k.time - prev_k.time) / 2.0
-                dv_out = (k.value - prev_k.value) / 2.0
+                dt_out = (key.time - prev_k.time) / 2.0
+                dv_out = (key.value - prev_k.value) / 2.0
                 dt_in = dt_out
                 dv_in = dv_out
             elif next_k:
-                dt_in = (next_k.time - k.time) / 2.0
-                dv_in = (next_k.value - k.value) / 2.0
+                dt_in = (next_k.time - key.time) / 2.0
+                dv_in = (next_k.value - key.value) / 2.0
                 dt_out = dt_in
                 dv_out = dv_in
 

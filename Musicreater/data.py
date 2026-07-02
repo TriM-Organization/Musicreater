@@ -131,6 +131,9 @@ class SoundAtmos:
             self.sound_distance, *self.sound_azimuth
         )
 
+    def copy(self) -> "SoundAtmos":
+        return SoundAtmos(self.sound_distance, self.sound_azimuth)
+
 
 @dataclass(init=False)
 class SingleNote:
@@ -182,7 +185,7 @@ class SingleNote:
         is_percussion: bool
             是否作为打击乐器
         extra_information: Dict[str, Any]
-            附加信息，尽量存储为字典
+            附加信息，尽量存储为字典，该内容不被任何“复制”方法保存
 
         Returns
         ---------
@@ -201,6 +204,8 @@ class SingleNote:
         """高精度开始时间偏量 0.4 毫秒"""
 
         self.extra_info = extra_information if extra_information else {}
+
+    
 
     @classmethod
     def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
@@ -306,6 +311,15 @@ class SingleNote:
             self.high_precision_start_time,
         ) + (
             ", ExtraData = {})".format(self.extra_info) if include_extra_data else ")"
+        )
+
+    def copy(self) -> "SingleNote":
+        return SingleNote(
+            note_pitch=self.midi_pitch,
+            note_volume=self.volume,
+            start_tick=self.start_time,
+            keep_tick=self.duration,
+            mass_precision_time=self.high_precision_start_time,
         )
 
     # def __list__(self) -> List[int]:
@@ -476,6 +490,30 @@ class SingleTrack(List[SingleNote]):
         super().__init__(*args)
         super().sort()
 
+    @classmethod
+    def from_note_list(
+        cls,
+        note_list: Iterable[SingleNote],
+        track_name: str = "未命名音轨",
+        track_instrument: str = "",
+        precise_time: bool = True,
+        percussion: bool = False,
+        sound_direction: Optional[SoundAtmos] = None,
+        extra_information: Dict[str, Any] = {},
+    ) -> "SingleTrack":
+        """从音符列表创建 SingleTrack 对象"""
+
+        single_track = cls(
+            track_name=track_name,
+            track_instrument=track_instrument,
+            precise_time=precise_time,
+            percussion=percussion,
+            sound_direction=sound_direction,
+            extra_information=extra_information,
+        )
+        single_track.update(note_list)
+        return single_track
+
     def disable(self) -> None:
         """禁用音轨"""
 
@@ -519,8 +557,56 @@ class SingleTrack(List[SingleNote]):
         super().extend(items)
         super().sort()  # =========================== TODO 需要优化
 
+    def copy(
+        self,
+        start_time: float = 0,
+        end_time: float = inf,
+        with_argument_curve: bool = False,
+        keep_zone_boundary_argument_value: bool = False,
+        global_boundary_argument_safe: bool = True,
+    ) -> "SingleTrack":
+        """
+        通过时间范围来复制音轨，返回一个音轨
+        """
+        single_track = SingleTrack.from_note_list(
+            [x for x in self if start_time <= x.start_time <= end_time],
+            track_instrument=self.instrument,
+            precise_time=self.is_high_time_precision,
+            percussion=self.is_percussive,
+            sound_direction=self.sound_position.copy(),
+        )
+        if with_argument_curve:
+            single_track.argument_curves = {
+                item: (
+                    None
+                    if curve is None
+                    else curve.copy(
+                        start=start_time,
+                        end=end_time,
+                        keep_zone_boundary_value=keep_zone_boundary_argument_value,
+                        global_boundary_safe=global_boundary_argument_safe,
+                    )
+                )
+                for item, curve in self.argument_curves.items()
+            }
+        return single_track
+
+    def delete(
+        self, start_time: float, end_time: float, with_argument_curve: bool = False
+    ):
+        """
+        删除时间范围内的音符
+        """
+        if with_argument_curve:
+            for curve in self.argument_curves.values():
+                if curve is not None:
+                    curve.delete(start_time, end_time)
+        for i, note in enumerate(self):
+            if start_time <= note.start_time <= end_time:
+                del self[i]
+
     def get(self, time: int) -> Generator[SingleNote, None, None]:
-        """通过开始时间来获取音符"""
+        """通过确切的开始时间来获取音符"""
 
         return (x for x in self if x.start_time == time)
 
