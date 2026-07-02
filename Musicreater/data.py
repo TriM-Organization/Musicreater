@@ -205,8 +205,6 @@ class SingleNote:
 
         self.extra_info = extra_information if extra_information else {}
 
-    
-
     @classmethod
     def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
         """自字节码析出 SingleNote 类"""
@@ -367,16 +365,6 @@ class SingleNote:
             return self.start_time > other.start_time
 
 
-class CurvableParam(str, Enum):
-    """可曲线化的参数 枚举类"""
-
-    PITCH = "adjust_note_pitch"
-    VOLUME = "adjust_note_volume"
-    DISTANCE = "adjust_note_sound_distance"
-    LR_PANNING = "adjust_note_leftright_panning_degree"
-    UD_PANNING = "adjust_note_updown_panning_degree"
-
-
 @dataclass
 class MineNote:
     """我的世界音符对象（仅提供我的世界相关接口）"""
@@ -428,6 +416,16 @@ class MineNote:
             percussive=is_percussive_note,
             position=sound_position,
         )
+
+
+class CurvableParam(str, Enum):
+    """可曲线化的参数 枚举类"""
+
+    PITCH = "adjust_note_pitch"
+    VOLUME = "adjust_note_volume"
+    DISTANCE = "adjust_note_sound_distance"
+    LR_PANNING = "adjust_note_leftright_panning_degree"
+    UD_PANNING = "adjust_note_updown_panning_degree"
 
 
 class SingleTrack(List[SingleNote]):
