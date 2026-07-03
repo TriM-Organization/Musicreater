@@ -208,7 +208,7 @@ def midi_msgs_to_noteinfo(
             start_tick=(tk := int(start_time / float(play_speed) / 50000)),
             keep_tick=round(duration / float(play_speed) / 50000),
             mass_precision_time=round(
-                (start_time / float(play_speed) - tk * 50000) / 800
+                (start_time / float(play_speed) - tk * 50000) / 200
             ),
             extra_information={
                 "LYRIC_TEXT": lyric_line,

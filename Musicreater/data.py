@@ -152,7 +152,7 @@ class SingleNote:
     """音符持续时间 命令刻"""
 
     high_precision_start_time: int
-    """高精度开始时间偏量 1/1250 秒"""
+    """高精度开始时间偏量 1/5000 秒"""
 
     extra_info: Dict[str, Any]
     """你觉得放什么好？"""
@@ -181,7 +181,7 @@ class SingleNote:
         last_time: int
             音符延续时间(命令刻)
         mass_precision_time: int
-            高精度的开始时间偏移量(1/1250秒)
+            高精度的开始时间偏移量(1/5000秒)
         is_percussion: bool
             是否作为打击乐器
         extra_information: Dict[str, Any]
@@ -204,6 +204,11 @@ class SingleNote:
         """高精度开始时间偏量 0.4 毫秒"""
 
         self.extra_info = extra_information if extra_information else {}
+
+    @property
+    def precise_start_time(self) -> float:
+        """高精度开始时间"""
+        return self.start_time + self.high_precision_start_time / 250
 
     @classmethod
     def decode(cls, code_buffer: bytes, is_high_time_precision: bool = True):
@@ -261,7 +266,7 @@ class SingleNote:
         # duration 17 位 支持到 131071 即 109.22583 分钟 合 1.8204305 小时
         # 共 48 位 合 6 字节
 
-        # high_time_precision（可选）长度 8 位 支持到 255 合 1 字节 支持 1/1250 秒]
+        # high_time_precision（可选）长度 8 位 支持到 255 合 1 字节 单位为 1/5000 秒]
 
         return (
             (
@@ -379,12 +384,17 @@ class MineNote:
     """开始之时 命令刻"""
     duration_tick: int
     """音符持续时间 命令刻"""
-    persiced_time: int
-    """高精度开始时间偏量 1/1250 秒"""
+    start_time_offset: int
+    """高精度开始时间偏量 1/5000 秒"""
     percussive: bool
     """是否作为打击乐器启用"""
     position: SoundAtmos
     """声像方位"""
+
+    @property
+    def precise_tick(self) -> float:
+        """高精度开始时间"""
+        return self.start_tick + self.start_time_offset / 250
 
     @classmethod
     def from_single_note(
@@ -412,7 +422,7 @@ class MineNote:
             volume=note.volume + adjust_note_volume,
             start_tick=note.start_time,
             duration_tick=note.duration,
-            persiced_time=note.high_precision_start_time if is_persiced_time else 0,
+            start_time_offset=note.high_precision_start_time if is_persiced_time else 0,
             percussive=is_percussive_note,
             position=sound_position,
         )
@@ -567,7 +577,7 @@ class SingleTrack(List[SingleNote]):
         通过时间范围来复制音轨，返回一个音轨
         """
         single_track = SingleTrack.from_note_list(
-            [x for x in self if start_time <= x.start_time <= end_time],
+            [x for x in self if start_time <= x.precise_start_time <= end_time],
             track_instrument=self.instrument,
             precise_time=self.is_high_time_precision,
             percussion=self.is_percussive,
@@ -600,13 +610,13 @@ class SingleTrack(List[SingleNote]):
                 if curve is not None:
                     curve.delete(start_time, end_time)
         for i, note in enumerate(self):
-            if start_time <= note.start_time <= end_time:
+            if start_time <= note.precise_start_time <= end_time:
                 del self[i]
 
     def get(self, time: int) -> Generator[SingleNote, None, None]:
         """通过确切的开始时间来获取音符"""
 
-        return (x for x in self if x.start_time == time)
+        return (x for x in self if x.precise_start_time == time)
 
     def get_notes(
         self, start_time: float, end_time: float = inf
@@ -622,13 +632,14 @@ class SingleTrack(List[SingleNote]):
             raise ParameterValueError(
                 "获取音符的时间范围有误，终止时间`{}`不可为负数".format(end_time)
             )
-        elif start_time <= 0 and end_time >= self[-1].start_time:
+        elif start_time <= 0 and end_time >= self[-1].precise_start_time:
             return iter(self)
 
         return (
             x
             for x in self
-            if (x.start_time >= start_time) and (x.start_time <= end_time)
+            if (x.precise_start_time >= start_time)
+            and (x.precise_start_time <= end_time)
         )
 
     def get_minenotes(
@@ -644,7 +655,7 @@ class SingleTrack(List[SingleNote]):
                 is_percussive_note=self.is_percussive,
                 sound_position=self.sound_position,
                 **{
-                    item.value: argcrv.value_at(_note.start_time)
+                    item.value: argcrv.value_at(_note.precise_start_time)
                     for item in CurvableParam
                     if (argcrv := self.argument_curves[item])
                 },
@@ -673,7 +684,7 @@ class SingleTrack(List[SingleNote]):
                 is_percussive_note=self.is_percussive,
                 sound_position=self.sound_position,
                 **{
-                    item.value: argcrv.value_at(_note.start_time)
+                    item.value: argcrv.value_at(_note.precise_start_time)
                     for item in CurvableParam
                     if (argcrv := self.argument_curves[item])
                 },
@@ -851,7 +862,7 @@ class SingleMusic(List[SingleTrack]):
             return iter(())
         return self.yield_from_tracks(
             [track.get_notes(start_time, end_time) for track in self.music_tracks],
-            sort_key=lambda x: x.start_time,
+            sort_key=lambda x: x.precise_start_time,
         )
 
     def get_minenotes(
