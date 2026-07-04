@@ -15,7 +15,7 @@
     </img>
 </p>
 
-<h3 align="center">一款免费开源的《我的世界》数字音频支持库。</h3>
+<h3 align="center">一款高性能、插件化的《我的世界》数字音频支持库。</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
@@ -41,13 +41,13 @@
 
 ## 介绍 🚀
 
-音·创 是一款免费开源的针对 **《我的世界》** 音乐的支持库
+音·创 是一款极致优化的针对 **《我的世界》** 音乐的支持库，通过插件化的设计，支持多种处理方式。
 
 欢迎加群：[861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
 > **注意** 本仓库内的项目仅仅是支持库，其用户为基岩版音乐相关软件的开发者
 >
-> 面向常规用户的 **基岩版音乐转换工具** 请参阅：[伶伦转换器](../../../Linglun-Converter)
+> 面向常规用户的 **基岩版音乐转换工具** 请参阅：[伶伦转换器](../../../Linglun-Converter)【已停止更新】
 >
 > 我们也正在开发面向高级用户的 **基岩版音乐编辑工具**（数字音频工作站）：[伶伦](../../../LinglunStudio)
 
@@ -60,21 +60,17 @@
     pip install --upgrade Musicreater
     ```
 
--   如果无法更新最新，可以尝试：
+-   如果无法更新至最新，可以尝试使用 pypi 的默认源：
 
     ```bash
     pip install --upgrade -i https://pypi.python.org/simple Musicreater
     ```
 
--   克隆仓库并安装（最新内容但**不推荐**）
+-   采用最新的开发分支下的滚动更新：
 
     ```bash
-    git clone https://gitee.com/TriM-Organization/Musicreater.git
-    cd Musicreater
-    python setup.py install
+    pip install "git+https://gitee.com/TriM-Organization/Musicreater.git@develop[dev]"
     ```
-
-以上命令中 `python`、`pip` 请依照各个环境不同灵活更换，可能为`python3`或`pip3`之类。
 
 ## 文档 📄
 

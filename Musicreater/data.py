@@ -765,6 +765,40 @@ class SingleMusic(List[SingleTrack]):
 
         super().__init__(*args)
 
+    @classmethod
+    def from_track_list(
+        cls,
+        track_list: Sequence[SingleTrack],
+        name: str = "未命名乐曲",
+        creator: str = "未命名制作者",
+        original_author: str = "未命名原曲作",
+        description: str = "无简介",
+        credits: str = "保留所有权利。All Rights Reserved.",
+        extra_information: Dict[str, Any] = {},
+    ) -> "SingleMusic":
+        single_music = cls(
+            name=name,
+            creator=creator,
+            original_author=original_author,
+            description=description,
+            credits=credits,
+            extra_information=extra_information,
+        )
+        single_music.extend(track_list)
+        return single_music
+
+    def copy(self) -> "SingleMusic":
+
+        # 没想到真的会用到全曲复制……
+        return self.from_track_list(
+            track_list=[tr.copy(with_argument_curve=True,) for tr in self],
+            name=self.music_name,
+            creator=self.music_creator,
+            original_author=self.music_original_author,
+            description=self.music_description,
+            credits=self.music_credits,
+        )
+
     @property
     def track_amount(self) -> int:
         """音轨数"""

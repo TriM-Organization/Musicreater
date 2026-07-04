@@ -14,7 +14,7 @@
     </img>
 </p>
 
-<h3 align="center">A cost free and open-source library for handling with <i>Minecraft</i> digital music.</h3>
+<h3 align="center">A blazing fast and plugin-supported library for editing <i>Minecraft</i> digital music.</h3>
 
 <p align="center">
     <img src="https://img.shields.io/badge/BUILD%20WITH%20LOVE-FF3432?style=for-the-badge">
@@ -39,15 +39,15 @@
 
 ## Introduction🚀
 
-Musicreater is a free open-source library used for handling with digital musics that being able to be played in _Minecraft_.
+Musicreater is a cost free, open-source, highly optimized library designed for editing digital musics that being able to be played in _Minecraft_. With the plugins, the library supports a lot of processing methods.
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
 > **NOTICE** The project inside this repository is only the support library, which is mainly for the developers of music related software for _Minecraft: Bedrock Edition_.
 >
-> The _Bedrock Edition music convertor_ which is for common users is in [Linglun Converter](../../../Linglun-Converter).
+> The _Bedrock Edition music convertor_ which is for common users is in [Linglun Converter](../../../Linglun-Converter). [Archived]
 > 
-> We are also developing a _BE music editor_ (digital audio workstation): [Linglun](../../../LinglunStudio)
+> We are also developing a _BE music editor_ (sth like a digital audio workstation): [Linglun](../../../LinglunStudio)
 
 
 ## Installation 🔳
@@ -58,17 +58,9 @@ Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr
     pip install Musicreater --upgrade
     ```
 
--   If above command cannot fetch latest version, try:
-
+-   Clone the letest version under development:
     ```bash
-    pip install -i https://pypi.python.org/simple Musicreater --upgrade
-    ```
-
--   Clone repo and Install (Latest but **NOT RECOMMANDED**):
-    ```bash
-    git clone https://github.com/TriM-Organization/Musicreater.git
-    cd Musicreater
-    python setup.py install
+    pip install "git+https://github.com/TriM-Organization/Musicreater.git@develop[dev]"
     ```
 
 Commands such as `python`、`pip` could be changed to some like `python3` or `pip3` according to the difference of platforms.
@@ -117,7 +109,7 @@ Meet problems? Welcome to give out your issue [here](../../issues/new)!
 
 Want to get in contact of developers? Welcome to join our [Chat QQ group](https://jq.qq.com/?_wv=1027&k=hpeRxrYr).
 
-Or contact us via [TriM-Org Official Email](mailto:TriM-Organization@hotmail.com)!
+Or contact us via [TriM-Org Email](mailto:TriM-Organization@hotmail.com)!
 
 ---
 
