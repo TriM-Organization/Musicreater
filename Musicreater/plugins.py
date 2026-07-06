@@ -65,7 +65,6 @@ from .exceptions import (
     PluginDependencyNotFound,
 )
 
-
 __all__ = [
     # 枚举类
     "PluginTypes",
@@ -113,7 +112,7 @@ T_Plugin = TypeVar(
 )
 
 
-def load_plugin_module(package: Union[Path, str]):
+def load_plugin_from_module(package: Union[Path, str]):
     """自动发现并加载插件包中的插件
 
     参数:
@@ -167,7 +166,10 @@ class PluginRegistry:
         )
 
     def _register_plugin(
-        self, cls_dict: dict, plg_class: Type[TopPluginBase], plg_id: str
+        self,
+        cls_dict: Dict,
+        plg_class: Type[TopPluginBase],
+        plg_id: str,
     ) -> None:
         """注册插件"""
         if plg_id in cls_dict:
@@ -175,6 +177,12 @@ class PluginRegistry:
                 raise PluginRegisteredError(
                     "插件惟一识别码`{}`所对应的插件已存在更高版本`{}`，请勿重复注册同一插件。".format(
                         plg_id, plg_class.metainfo
+                    )
+                )
+            if not cls_dict[plg_id].metainfo.similar_to(plg_class.metainfo):
+                raise PluginRegisteredError(
+                    "插件惟一识别码`{}`已经存在插件了，请勿使用相同识别码。".format(
+                        plg_id
                     )
                 )
         if missing_requirements := [

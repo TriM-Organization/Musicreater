@@ -1,11 +1,11 @@
 # 一个简单的项目实践测试
 from pathlib import Path
-from Musicreater import load_plugin_module, MusiCreater
+from Musicreater import load_plugin_from_module, MusiCreater
 from Musicreater.plugins import _global_plugin_registry
 
-load_plugin_module("Musicreater.builtin_plugins.midi_read")
-load_plugin_module("Musicreater.builtin_plugins.to_commands")
-load_plugin_module("Musicreater.builtin_plugins.commands_to_structure")
+load_plugin_from_module("Musicreater.builtin_plugins.midi_read")
+load_plugin_from_module("Musicreater.builtin_plugins.to_commands")
+load_plugin_from_module("Musicreater.builtin_plugins.commands_to_structure")
 
 from Musicreater.builtin_plugins.midi_read import MidiImportConfig
 from Musicreater.builtin_plugins.commands_to_structure import McstructureExportConfig

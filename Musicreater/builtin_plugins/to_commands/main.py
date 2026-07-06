@@ -37,7 +37,6 @@ from Musicreater._utils import enumerated_stuffcopy_dictionary
 from .progressbar import ProgressBarStyle, DEFAULT_PROGRESSBAR_STYLE, mctick2timestr
 from .utils import minenote_to_command_parameters
 
-
 # @dataclass
 # class CommandConvertionConfig(PluginConfig):
 #     execute_command_head: str = "execute as {} at @s positioned ~ ~ ~ run "
@@ -105,10 +104,6 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         license="Same as Musicreater",
     )
 
-    # 暂时没有适配动画内容和替换顺序
-    # 金羿正在处理这个，不需要改
-    # 但是返回值和接口内容不会变，直接用即可
-    #
     @staticmethod
     def generate_progressbar(
         max_score: int,

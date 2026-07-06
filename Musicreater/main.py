@@ -63,7 +63,7 @@ from .plugins import (
     PluginRegistry,
     PluginConfig,
     PluginTypes,
-    load_plugin_module,
+    load_plugin_from_module,
     T_IOPlugin,
     T_Plugin,
 )

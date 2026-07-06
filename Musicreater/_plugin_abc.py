@@ -209,7 +209,7 @@ class PluginMetaInformation(ABC):
     """插件元信息"""
 
     name: str
-    """插件名称，应为惟一之名"""
+    """插件名称"""
     author: str
     """插件作者"""
     description: str
@@ -222,6 +222,21 @@ class PluginMetaInformation(ABC):
     """插件发布时采用的许可协议"""
     dependencies: Sequence[str] = tuple()
     """插件是否对其他插件存在依赖"""
+
+    def similar_to(self, other: "PluginMetaInformation") -> bool:
+        """判断两个插件元信息是否相似
+
+        参数
+        ====
+        other: PluginMetaInformation
+            待比较的插件元信息
+
+        返回
+        ====
+        bool
+            两个插件元信息是否相似
+        """
+        return (self.name == other.name) and (self.type == other.type)
 
 
 # ========================

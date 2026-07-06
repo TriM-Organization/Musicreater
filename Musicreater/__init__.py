@@ -46,7 +46,7 @@ from .data import (
     CurvableParam,
 )
 
-from .plugins import load_plugin_module
+from .plugins import load_plugin_from_module
 
 from .main import MusiCreater
 
@@ -65,6 +65,6 @@ __all__ = [
     "MineNote",
     "CurvableParam",
     # 工程项目相关
-    "load_plugin_module",
+    "load_plugin_from_module",
     "MusiCreater",
 ]
