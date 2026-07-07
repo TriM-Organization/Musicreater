@@ -48,6 +48,12 @@ from Musicreater.constants import MM_INSTRUMENT_DEVIATION_TABLE
 
 
 class MusicPreview:
+    
+    # 当前的资源存储方法过于鸡肋
+    # 应当依托于 SingleMusic 和 SingleTrack 提供的 extra_info 参数，得到更优的解法
+    # 或者更理想的情况是把当前插件作为一个 Service 插件，然后通过 serve API 进行调用
+    # 但是还没设计好，等未来看看
+
     """
     原始资源存储规范：
     Dict[str"ID1": Dict[str"SoundID": ndarray[]]]
@@ -96,7 +102,11 @@ class MusicPreview:
         self.output_sample_rate = sample_rate
         self.get_value_method = value_get_method
         self.resources_path = resource_folder
-        self.pitch_precision_decimals = pitch_accuracy_decimals
+        
+        # 在当前算法下，小数点精度必须为 0
+        # 此处 TODO，需待旧梦来完善
+        self.pitch_precision_decimals = 0
+
 
         self.pitch_deviation = music_deviation
 
@@ -343,12 +353,21 @@ class MusicPreview:
             )
             if not note.percussive:
                 overlay(
-                    self.res_data[note.instrument][accurate_pitch] * note.volume / 127,
+                    self.res_data[note.instrument][accurate_pitch]
+                    * note.volume
+                    / (note.position.sound_distance + 0.5)
+                    / 127,
                     note.start_tick,
                 )
+                # 上述参数的原顺序应为
+                # x * (音量 / 127) * (1 / (距离 + 0.5))
+                # 乘法优先是为了提高计算精度，小的数的除法优先同理
             else:
                 overlay(
-                    self.res_data[note.instrument][accurate_pitch] * note.volume / 127,
+                    self.res_data[note.instrument][accurate_pitch]
+                    * note.volume
+                    / (note.position.sound_distance + 0.5)
+                    / 127,
                     note.start_tick,
                 )
 

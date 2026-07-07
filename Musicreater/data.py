@@ -93,6 +93,20 @@ class SoundAtmos:
         )
         """声源距离"""
 
+    def set_azimuth(self, azimuth: Tuple[float, float]) -> None:
+        """设置声源方位"""
+
+        self.sound_azimuth = (azimuth[0] % 360, azimuth[1] % 360)
+
+    def set_distance(self, distance: float) -> None:
+        """设置声源距离"""
+
+        self.sound_distance = (
+            (16 if distance > 16 else (distance if distance >= 0 else 0.01))
+            if distance is not None
+            else 0.01
+        )
+
     @classmethod
     def from_displacement(
         cls,
@@ -609,9 +623,15 @@ class SingleTrack(List[SingleNote]):
             for curve in self.argument_curves.values():
                 if curve is not None:
                     curve.delete(start_time, end_time)
-        for i, note in enumerate(self):
-            if start_time <= note.precise_start_time <= end_time:
-                del self[i]
+
+        for i, j in enumerate(
+            [
+                i
+                for i, x in enumerate(self)
+                if start_time <= x.precise_start_time <= end_time
+            ]
+        ):
+            del self[j - i]
 
     def get(self, time: int) -> Generator[SingleNote, None, None]:
         """通过确切的开始时间来获取音符"""

@@ -254,10 +254,10 @@ MIDI_PITCHED_NOTE_NAME_TABLE: Dict[int, Tuple[str, str]] = {
     62: ("铜管乐组", "Brass Section"),
     63: ("合成铜管 1", "Synth Brass 1"),
     64: ("合成铜管 2", "Synth Brass 2"),
-    65: ("高音萨克斯风", "Soprano Sax"),
-    66: ("中音萨克斯风", "Alto Sax"),
-    67: ("次中音萨克斯风", "Tenor Sax"),
-    68: ("上低音萨克斯风", "Baritone Sax"),
+    65: ("高音萨克斯", "Soprano Sax"),
+    66: ("中音萨克斯", "Alto Sax"),
+    67: ("次中音萨克斯", "Tenor Sax"),
+    68: ("上低音萨克斯", "Baritone Sax"),
     69: ("双簧管", "Oboe"),
     70: ("英国管", "English Horn"),
     71: ("大管（巴松管）", "Bassoon"),
@@ -400,6 +400,10 @@ MC_PITCHED_INSTRUMENT_LIST: List[str] = [
     "note.didgeridoo",
     "note.bit",
     "note.cow_bell",
+    "note.trumpet",
+    "note.trumpet_exposed",
+    "note.trumpet_weathered",
+    "note.trumpet_oxidized",
 ]
 """乐音乐器列表"""
 
@@ -422,6 +426,10 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "note.pling": ("glowstone",),
     "note.bassattack": ("stone",),  # 无法找到此音效
     "note.harp": ("dirt",),
+    "note.trumpet": ("waxed_copper",),
+    "note.trumpet_exposed": ("waxed_exposed_copper",),
+    "note.trumpet_weathered": ("waxed_weathered_copper",),
+    "note.trumpet_oxidized": ("waxed_oxidized_copper",),
     # 呃……
     "firework.blast": ("sandstone",),
     "firework.twinkle": ("red_sandstone",),
@@ -429,6 +437,14 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "mob.zombie.wood": ("sand",),
 }
 """MC乐器对音符盒下垫方块对照表"""
+
+MC_EILLES_RT261_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
+    "note.trumpet": "note.flute",
+    "note.trumpet_exposed": "note.flute",
+    "note.trumpet_weathered": "note.banjo",
+    "note.trumpet_oxidized": "note.banjo",
+}
+
 
 MC_EILLES_RTJE12_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
     "note.iron_xylophone": "note.xylophone",
@@ -457,6 +473,7 @@ MC_EILLES_RTBETA_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
 }
 """在 Minecraft JE Beta1.2 / BE 0.13.0 ~ JE 1.12 / BE 1.13.0 的版本中，部分乐器是没有的，这是金羿的乐器替换表"""
 
+
 # Midi对MC通用对照表
 
 MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[Tuple[int, int], int]] = {
@@ -481,8 +498,15 @@ MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[Tuple[int, int], int]] = {
     "firework.twinkle": ((-1, 128), 0),
     "fire.ignite": ((-1, 128), 0),
     "note.cow_bell": ((54, 78), 66),
+    "note.trumpet": ((42, 66), 54),
+    "note.trumpet_exposed": ((42, 66), 54),
+    "note.trumpet_weathered": ((30, 54), 42),
+    "note.trumpet_oxidized": ((30, 54), 42),
 }
-"""不同乐器的音域偏离对照表"""
+"""
+不同乐器的音域偏离对照表
+元组里的是范围，后面的整数是中央 C 所在
+"""
 
 MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
     "note.harp": 6,
@@ -505,6 +529,10 @@ MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
     "firework.twinkle": 0,
     "fire.ignite": 0,
     "note.cow_bell": 6,
+    "note.trumpet": 6,
+    "note.trumpet_exposed": 6,
+    "note.trumpet_weathered": -6,
+    "note.trumpet_oxidized": -6,
 }
 """
 不同乐器的音调偏离对照表  

@@ -22,8 +22,8 @@ from .old_exceptions import *
 from .old_main import (
     MM_CLASSIC_PERCUSSION_INSTRUMENT_TABLE,
     MM_CLASSIC_PITCHED_INSTRUMENT_TABLE,
-    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_DEFAULT_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DEFAULT_PITCHED_INSTRUMENT_TABLE,
     MidiConvert,
     mido,
 )
@@ -140,8 +140,8 @@ class FutureMidiConvertKamiRES(MidiConvert):
         default_program_value: int = -1,
         default_volume_value: int = 64,
         default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO,
-        pitched_note_rtable: MidiInstrumentTableType = MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
-        percussion_note_rtable: MidiInstrumentTableType = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
+        pitched_note_rtable: MidiInstrumentTableType = MM_DEFAULT_PITCHED_INSTRUMENT_TABLE,
+        percussion_note_rtable: MidiInstrumentTableType = MM_DEFAULT_PERCUSSION_INSTRUMENT_TABLE,
         vol_processing_function: FittingFunctionType = velocity_2_distance_natural,
         pan_processing_function: FittingFunctionType = panning_2_rotation_trigonometric,
         note_rtable_replacement: Dict[str, str] = {},

@@ -19,7 +19,6 @@ Terms & Conditions: License.md in the root directory
 
 from typing import Dict, List, Tuple
 
-
 # Midi用对照表
 
 MIDI_DEFAULT_VOLUME_VALUE: int = (
@@ -402,6 +401,34 @@ MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
     80: "note.bell",
 }
 """“偷吃”打击乐器对照表"""
+
+
+# 金羿音色对照表，在偷吃的表的基础上修改而来
+
+MM_EILLES_PITCHED_INSTRUMENT_TABLE: Dict[int, str] = (
+    MM_TOUCH_PITCHED_INSTRUMENT_TABLE
+    | {
+        57: "note.trumpet",
+        58: "note.trumpet_exposed",
+        59: "note.trumpet_weathered",
+        61: "note.trumpet",
+        62: "note.trumpet_oxidized",
+        63: "note.trumpet_weathered",
+        64: "note.trumpet_oxidized",
+        65: "note.trumpet",
+        66: "note.trumpet_exposed",
+        67: "note.trumpet_weathered",
+        68: "note.trumpet_oxidized",
+        69: "note.trumpet",
+        70: "note.trumpet",
+        71: "note.trumpet_exposed",
+        72: "note.banjo",
+    }
+)
+"""“金羿”乐音乐器对照表"""
+MM_EILLES_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {}
+"""“金羿”打击乐器对照表"""
+
 
 # Dislink “断联” 音色对照表
 # https://github.com/Dislink/midi2bdx/blob/main/index.html
@@ -795,3 +822,10 @@ MM_NBS_PERCUSSION_INSTRUMENT_TABLE: Dict[int, str] = {
     87: "note.basedrum",
 }
 """“NBS”打击乐器对照表"""
+
+
+# 默认音色对照表
+MM_DEFAULT_PITCHED_INSTRUMENT_TABLE = MM_EILLES_PITCHED_INSTRUMENT_TABLE
+"""默认的乐音乐器音色对照表"""
+MM_DEFAULT_PERCUSSION_INSTRUMENT_TABLE = MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE
+"""默认的打击乐器音色对照表"""

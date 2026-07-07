@@ -37,8 +37,8 @@ from Musicreater._utils import enumerated_stuffcopy_dictionary
 from .constants import (
     MIDI_DEFAULT_PROGRAM_VALUE,
     MIDI_DEFAULT_VOLUME_VALUE,
-    MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE,
-    MM_TOUCH_PITCHED_INSTRUMENT_TABLE,
+    MM_DEFAULT_PERCUSSION_INSTRUMENT_TABLE,
+    MM_DEFAULT_PITCHED_INSTRUMENT_TABLE,
 )
 from .exceptions import (
     NoteOnOffMismatchError,
@@ -89,12 +89,12 @@ class MidiImportConfig(PluginConfig):
         self.pitched_note_reference_table = (
             self.pitched_note_reference_table
             if self.pitched_note_reference_table
-            else MM_TOUCH_PITCHED_INSTRUMENT_TABLE
+            else MM_DEFAULT_PITCHED_INSTRUMENT_TABLE
         )
         self.percussion_note_reference_table = (
             self.percussion_note_reference_table
             if self.percussion_note_reference_table
-            else MM_TOUCH_PERCUSSION_INSTRUMENT_TABLE
+            else MM_DEFAULT_PERCUSSION_INSTRUMENT_TABLE
         )
         self.note_replacement_table = (
             self.note_replacement_table if self.note_replacement_table else {}

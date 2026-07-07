@@ -68,7 +68,7 @@ class PcmConversionConfig(PluginConfig):
     - 1 拉伸至 mc 播放器定义（我的世界效果）
     - 2 根据 midi 音符长度裁剪
     - 3 混音预留
-    - 4 匹配 midi 音符长度（最佳效果）
+    - 4 匹配 midi 音符长度
     """
     overlay_mode: Literal[1, 2] = 1
     """
