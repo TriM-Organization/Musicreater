@@ -96,7 +96,7 @@ class MineCommand:
 @library_plugin("notedata_to_command_plugin")
 class NoteDataConvert2CommandPlugin(LibraryPluginBase):
     metainfo = PluginMetaInformation(
-        name="音符数据指令支持插件",
+        name="音符数据的基岩版指令支持",
         author="金羿、玉衡Alioth",
         description="从音符数据转换为我的世界指令相关格式",
         version=(0, 0, 1),

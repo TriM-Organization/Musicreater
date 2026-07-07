@@ -174,7 +174,7 @@ class SingleNote:
         midi_pitch: int
             Midi 音高
         note_volume: int
-            响度/力度(百廿七分比, 0~127)
+            响度或曰力度(百廿七分比, 0~127)
         start_time: int
             开始之时(命令刻)
             注：此处的时间是用从乐曲开始到当前的刻数
@@ -377,9 +377,9 @@ class MineNote:
     pitch: float
     """Midi 音高"""
     instrument: str
-    """乐器 ID"""
+    """乐器标识"""
     volume: float
-    """力度/播放音量 0~127 百廿七分比"""
+    """力度或曰播放音量、响度 0~127 百廿七分比"""
     start_tick: int
     """开始之时 命令刻"""
     duration_tick: int
@@ -387,7 +387,7 @@ class MineNote:
     start_time_offset: int
     """高精度开始时间偏量 1/5000 秒"""
     percussive: bool
-    """是否作为打击乐器启用"""
+    """是否作为打击乐器使用"""
     position: SoundAtmos
     """声像方位"""
 
@@ -619,7 +619,7 @@ class SingleTrack(List[SingleNote]):
         return (x for x in self if x.precise_start_time == time)
 
     def get_notes(
-        self, start_time: float, end_time: float = inf
+        self, start_time: float = 0, end_time: float = inf
     ) -> Iterator[SingleNote]:
         """通过开始时间和结束时间来获取音符"""
         if end_time < start_time:
@@ -791,7 +791,12 @@ class SingleMusic(List[SingleTrack]):
 
         # 没想到真的会用到全曲复制……
         return self.from_track_list(
-            track_list=[tr.copy(with_argument_curve=True,) for tr in self],
+            track_list=[
+                tr.copy(
+                    with_argument_curve=True,
+                )
+                for tr in self
+            ],
             name=self.music_name,
             creator=self.music_creator,
             original_author=self.music_original_author,
@@ -875,13 +880,13 @@ class SingleMusic(List[SingleTrack]):
         #     yield _remain[1]
 
     def get_tracked_notes(
-        self, start_time: float, end_time: float = inf
+        self, start_time: float = 0, end_time: float = inf
     ) -> Generator[Iterator[SingleNote], Any, None]:
         """获取指定时间段的各个音轨的音符数据"""
         return (track.get_notes(start_time, end_time) for track in self.music_tracks)
 
     def get_tracked_minenotes(
-        self, start_time: float, end_time: float = inf
+        self, start_time: float = 0, end_time: float = inf
     ) -> Generator[Iterator[MineNote], Any, None]:
         """获取指定时间段的各个音轨的，供我的世界播放的音符数据类"""
         return (
@@ -889,7 +894,7 @@ class SingleMusic(List[SingleTrack]):
         )
 
     def get_notes(
-        self, start_time: float, end_time: float = inf
+        self, start_time: float = 0, end_time: float = inf
     ) -> Iterator[SingleNote]:
         """获取指定时间段的所有音符数据，按照时间顺序"""
         if self.track_amount == 0:
@@ -900,7 +905,7 @@ class SingleMusic(List[SingleTrack]):
         )
 
     def get_minenotes(
-        self, start_time: float, end_time: float = inf
+        self, start_time: float = 0, end_time: float = inf
     ) -> Iterator[MineNote]:
         """获取指定时间段所有的，供我的世界播放的音符数据类，按照时间顺序"""
         if self.track_amount == 0:

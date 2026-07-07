@@ -87,7 +87,7 @@ class McstructureExportConfig(PluginConfig):
 class MusicExportToMcstructureWithDelayPlayerPlugin(MusicOutputPluginBase):
 
     metainfo = PluginMetaInformation(
-        name="导出全曲结构插件（mcstructure结构、延迟播放器）",
+        name="导出全曲至结构（mcstructure结构、延迟播放器）",
         author="金羿、玉衡Alioth",
         description="将音·创 v3 的整首音乐数据，以指令方块延迟的播放形式，导出为基岩版 MCSTRUCTURE 结构",
         version=(0, 0, 1),

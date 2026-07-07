@@ -177,7 +177,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
     """Midi 音乐数据导入插件"""
 
     metainfo = PluginMetaInformation(
-        name="Midi 导入插件",
+        name="从 Midi 导入全曲",
         author="金羿、玉衡Alioth",
         description="从 Midi 文件导入音乐数据",
         version=(0, 0, 1),
