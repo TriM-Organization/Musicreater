@@ -509,7 +509,7 @@ class SingleTrack(List[SingleNote]):
 
         self.argument_curves = {item: None for item in CurvableParam}
 
-        super().__init__(*args)
+        super().__init__(args)
         super().sort()
 
     @classmethod

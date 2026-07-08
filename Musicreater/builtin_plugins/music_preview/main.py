@@ -48,7 +48,7 @@ from Musicreater.constants import MM_INSTRUMENT_DEVIATION_TABLE
 
 
 class MusicPreview:
-    
+
     # 当前的资源存储方法过于鸡肋
     # 应当依托于 SingleMusic 和 SingleTrack 提供的 extra_info 参数，得到更优的解法
     # 或者更理想的情况是把当前插件作为一个 Service 插件，然后通过 serve API 进行调用
@@ -102,11 +102,10 @@ class MusicPreview:
         self.output_sample_rate = sample_rate
         self.get_value_method = value_get_method
         self.resources_path = resource_folder
-        
+
         # 在当前算法下，小数点精度必须为 0
         # 此处 TODO，需待旧梦来完善
         self.pitch_precision_decimals = 0
-
 
         self.pitch_deviation = music_deviation
 
@@ -189,13 +188,13 @@ class MusicPreview:
         else:
             # if self.mode == 1:
             # 重采样, 不变调
-            print(">>", sound_name, pitch)
+            # print(">>", sound_name, pitch)
             self.res_data[sound_name][pitch] = librosa.resample(
                 y_orig,
                 orig_sr=sr_orig,
                 target_sr=self.output_sample_rate,
                 fix=False,  # 尽管这样不变调，但是也不应将 pitch 与打击乐器联系在一起
-            )
+            ) # 已经在下面重新用 0 取代了打击乐器的 pitch
             """elif self.mode == 0:
                 # 重采样, 不变调, 衰弱
                 self.cache_dict[raw_name] = librosa_resample(
@@ -221,14 +220,15 @@ class MusicPreview:
         duration: int,
     ):
 
-        print(
-            sound_name,
-            pitch,
-            ">>",
-            (pitch := self.make_pitch_accurate(pitch)),
-            percussive,
-            duration,
-        )
+        # print(
+        #     sound_name,
+        #     pitch,
+        #     ">>",
+        #     (pitch := self.make_pitch_accurate(pitch)),
+        #     percussive,
+        #     duration,
+        # )
+        pitch = 0 if percussive else self.make_pitch_accurate(pitch)
 
         if sound_name in self.res_data:
             if pitch in self.res_data[sound_name]:
@@ -333,24 +333,24 @@ class MusicPreview:
         out_sr = self.output_sample_rate
 
         for note in music.get_minenotes(start_time=start_tick, end_time=end_tick):
-            accurate_pitch = self.make_pitch_accurate(
-                note.pitch
-                - 60
-                - (
-                    0
-                    if note.percussive
-                    else MM_INSTRUMENT_DEVIATION_TABLE.get(note.instrument, 6)
+            accurate_pitch = (
+                0
+                if note.percussive
+                else self.make_pitch_accurate(
+                    note.pitch
+                    - 60
+                    - MM_INSTRUMENT_DEVIATION_TABLE.get(note.instrument, 6)
                 )
             )
-            print(
-                ":",
-                note.instrument,
-                note.pitch,
-                ">>",
-                accurate_pitch,
-                note.percussive,
-                note.duration_tick,
-            )
+            # print(
+            #     ":",
+            #     note.instrument,
+            #     note.pitch,
+            #     ">>",
+            #     accurate_pitch,
+            #     note.percussive,
+            #     note.duration_tick,
+            # )
             if not note.percussive:
                 overlay(
                     self.res_data[note.instrument][accurate_pitch]

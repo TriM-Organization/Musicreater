@@ -107,6 +107,9 @@ class NoteDataConvert2PcmPlugin(MusicOutputPluginBase):
         license="Apache 2.0",
     )
 
+
+    supported_formats = ("WAV", "WAVE", "PCM")
+
     def dump(self, data: SingleMusic, file_path: Path, config: PcmConversionConfig):
 
         pr = perf_counter_ns()
