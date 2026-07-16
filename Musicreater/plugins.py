@@ -133,7 +133,9 @@ def load_plugin_from_module(package: Union[Path, str]):
         else:
             return importlib.import_module(package)
     except ModuleNotFoundError as e:
-        raise PluginNotFoundError("无法找到名为`{}`的插件包".format(package)) from e
+        raise PluginNotFoundError(
+            "无法找到名为`{}`的插件包，或该插件包的依赖未正确安装。".format(package)
+        ) from e
 
 
 class PluginRegistry:

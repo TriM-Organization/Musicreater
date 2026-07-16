@@ -342,6 +342,9 @@ class SingleNote:
     # def __list__(self) -> List[int]:
     # 我不认为这个类应当被作为列表使用
 
+    def __bool__(self) -> bool:
+        return bool(self.volume)
+
     def __tuple__(
         self,
     ) -> Tuple[int, int, int, int, int]:
