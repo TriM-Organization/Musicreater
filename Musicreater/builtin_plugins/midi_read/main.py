@@ -66,6 +66,11 @@ class MidiImportConfig(PluginConfig):
     default_program_value: int = MIDI_DEFAULT_PROGRAM_VALUE
     default_volume_value: int = MIDI_DEFAULT_VOLUME_VALUE
     default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO
+    default_midi_charset: str = "latin1"
+    default_lyric_encoding: str = "utf-8"  # 默认歌词编码
+    """
+    默认歌词编码，设定为空时不进行二次编码处理
+    """
 
     # 对照表，此处 None 值在下边 post init 函数中有处理
     pitched_note_reference_table: Mapping[int, str] = None  # type: ignore
@@ -190,20 +195,28 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
     def loadbytes(
         self,
         bytes_buffer_in: BinaryIO,
-        config: Optional[MidiImportConfig] = MidiImportConfig(),
+        config: Optional[MidiImportConfig] = None,
     ) -> SingleMusic:
+        if config is None:
+            config = MidiImportConfig()
         return self.midifile_2_singlemusic(
-            mido.MidiFile(file=bytes_buffer_in, clip=True),
-            config if config else MidiImportConfig(),
+            mido.MidiFile(
+                file=bytes_buffer_in, clip=True, charset=config.default_midi_charset
+            ),
+            config,
         )
 
     def load(
-        self, file_path: Path, config: Optional[MidiImportConfig] = MidiImportConfig()
+        self, file_path: Path, config: Optional[MidiImportConfig] = None
     ) -> SingleMusic:
         """从 Midi 文件导入音乐数据"""
+        if config is None:
+            config = MidiImportConfig()
         return self.midifile_2_singlemusic(
-            mido.MidiFile(filename=file_path, clip=True),
-            config if config else MidiImportConfig(),
+            mido.MidiFile(
+                filename=file_path, clip=True, charset=config.default_midi_charset
+            ),
+            config,
         )
 
     @staticmethod
@@ -413,7 +426,13 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 volume_processing_method=config.volume_process_function,
                                 panning_processing_method=config.panning_processing_function,
                                 note_table_replacement=config.note_replacement_table,
-                                lyric_line=_lyric,
+                                lyric_line=(
+                                    _lyric.encode("latin1").decode(
+                                        config.default_lyric_encoding
+                                    )
+                                    if config.default_lyric_encoding
+                                    else _lyric
+                                ),
                             )
                         )
 
