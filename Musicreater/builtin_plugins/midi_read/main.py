@@ -66,10 +66,10 @@ class MidiImportConfig(PluginConfig):
     default_program_value: int = MIDI_DEFAULT_PROGRAM_VALUE
     default_volume_value: int = MIDI_DEFAULT_VOLUME_VALUE
     default_tempo_value: int = mido.midifiles.midifiles.DEFAULT_TEMPO
-    default_midi_charset: str = "latin1"
-    default_lyric_encoding: str = "utf-8"  # 默认歌词编码
+    midi_charset: str = "latin1"
+    string_encoding: str = "utf-8"  # 默认歌词编码
     """
-    默认歌词编码，设定为空时不进行二次编码处理
+    默认字串编码，设定为空时不对原 Midi 中的字符串二次编码
     """
 
     # 对照表，此处 None 值在下边 post init 函数中有处理
@@ -200,9 +200,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         if config is None:
             config = MidiImportConfig()
         return self.midifile_2_singlemusic(
-            mido.MidiFile(
-                file=bytes_buffer_in, clip=True, charset=config.default_midi_charset
-            ),
+            mido.MidiFile(file=bytes_buffer_in, clip=True, charset=config.midi_charset),
             config,
         )
 
@@ -213,9 +211,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         if config is None:
             config = MidiImportConfig()
         return self.midifile_2_singlemusic(
-            mido.MidiFile(
-                filename=file_path, clip=True, charset=config.default_midi_charset
-            ),
+            mido.MidiFile(filename=file_path, clip=True, charset=config.midi_charset),
             config,
         )
 
@@ -344,7 +340,9 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                     midi_copyright_list.append(msg.text)
                 elif msg.type == "track_name":
                     # 检测轨道名称事件
-                    midi_track_name_dict[track_no] = msg.name
+                    midi_track_name_dict[track_no] = msg.name.encode("latin1").decode(
+                        config.string_encoding
+                    )
                 elif msg.type == "note_on" and msg.velocity != 0:
                     # 一个音符开始弹奏
 
@@ -428,9 +426,9 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 note_table_replacement=config.note_replacement_table,
                                 lyric_line=(
                                     _lyric.encode("latin1").decode(
-                                        config.default_lyric_encoding
+                                        config.string_encoding
                                     )
-                                    if config.default_lyric_encoding
+                                    if config.string_encoding
                                     else _lyric
                                 ),
                             )
@@ -498,7 +496,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         for track_properties, every_single_track in divided_tracks.items():
             # [音轨编号, 通道编号, 乐器名称, 音量, 声相]
             if track_properties[0] and (
-                track_name := midi_track_name_dict.get(track_properties[0])
+                track_name := midi_track_name_dict.get(track_properties[0], "无名音轨")
             ):  # 音轨编号
                 every_single_track.name = track_name
             if track_properties[2]:  # 乐器名称

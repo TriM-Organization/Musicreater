@@ -204,7 +204,7 @@ def midi_msgs_to_noteinfo(
     return (
         SingleNote(
             note_pitch=note,
-            note_volume=velocity,
+            note_volume=velocity,   # 需要重新设计
             start_tick=(tk := int(start_time / float(play_speed) / 50000)),
             keep_tick=round(duration / float(play_speed) / 50000),
             mass_precision_time=round(

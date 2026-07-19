@@ -409,6 +409,7 @@ MC_PITCHED_INSTRUMENT_LIST: List[str] = [
 
 MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "note.bass": ("planks",),
+    "note.bassattack": ("planks",),  # 无法找到此音效
     "note.snare": ("sand",),
     "note.hat": ("glass",),
     "note.bd": ("stone",),
@@ -424,12 +425,11 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "note.bit": ("emerald_block",),
     "note.banjo": ("hay_block",),
     "note.pling": ("glowstone",),
-    "note.bassattack": ("stone",),  # 无法找到此音效
-    "note.harp": ("dirt",),
     "note.trumpet": ("waxed_copper",),
     "note.trumpet_exposed": ("waxed_exposed_copper",),
     "note.trumpet_weathered": ("waxed_weathered_copper",),
     "note.trumpet_oxidized": ("waxed_oxidized_copper",),
+    "note.harp": ("dirt",),
     # 呃……
     "firework.blast": ("sandstone",),
     "firework.twinkle": ("red_sandstone",),
@@ -437,6 +437,38 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
     "mob.zombie.wood": ("sand",),
 }
 """MC乐器对音符盒下垫方块对照表"""
+
+MC_INSTRUMENT_VOLUME_BALANCE_TABLE: Dict[str, float] = {
+    "note.bass": 0.18975738,
+    "note.bassattack": 0.19250469,
+    "note.snare": 0.09636449,
+    "note.hat": 0.041303635,
+    "note.bd": 0.25398168,
+    "note.bell": 0.03190162,
+    "note.flute": 0.050610494,
+    "note.chime": 0.011847978,
+    "note.guitar": 0.03356794,
+    "note.xylophone": 0.025973769,
+    "note.iron_xylophone": 0.044438824,
+    "note.cow_bell": 0.09123069,
+    "note.didgeridoo": 0.06332747,
+    "note.bit": 0.028824601,
+    "note.banjo": 0.02944984,
+    "note.pling": 0.11315284,
+    "note.trumpet": 0.069420114,
+    "note.trumpet_exposed": 0.083734825,
+    "note.trumpet_oxidized": 0.047252066,
+    "note.trumpet_weathered": 0.06659823,
+    "note.harp": 0.12101666,
+    # 嗯……
+    "fire.ignite": 0.004931174,
+    "firework.blast": 0.015445901,
+    "firework.twinkle": 0.032410737,
+    "mob.cat.meow-2": 0.0675417,
+    "mob.cat.meow-4": 0.05923138,
+    "mob.zombie.wood": 0.14135803,
+}
+
 
 MC_EILLES_RT261_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
     "note.trumpet": "note.flute",
@@ -505,7 +537,7 @@ MM_INSTRUMENT_RANGE_TABLE: Dict[str, Tuple[Tuple[int, int], int]] = {
 }
 """
 不同乐器的音域偏离对照表
-元组里的是范围，后面的整数是中央 C 所在
+元组里的是范围，后面的整数是游戏里的默认采样音高
 """
 
 MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {

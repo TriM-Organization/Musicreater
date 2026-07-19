@@ -113,6 +113,16 @@ class MusicPreview:
             if file.is_file():
                 self.res_raw_data[file.stem] = librosa.load(file, sr=None)
 
+                # print(
+                #     file.stem,": { 'AVG':",
+                #     np.average(np.absolute(self.res_raw_data[file.stem][0])),", 'MID' :",
+                #     np.median(np.absolute(self.res_raw_data[file.stem][0])),", 'MAX' :",
+                #     np.max(np.absolute(self.res_raw_data[file.stem][0])),", 'MIN' :",
+                #     np.min(np.absolute(self.res_raw_data[file.stem][0])),", 'VAR' :",
+                #     np.var(np.absolute(self.res_raw_data[file.stem][0])),"}",
+                #     flush=True,
+                # )
+
     def res_shift(
         self,
         sound_name: str,
@@ -121,24 +131,28 @@ class MusicPreview:
         duration: int,
         # rate: int
     ):
-        y_orig, sr_orig = self.res_raw_data[sound_name]
+        original_y, original_sample_rate = self.res_raw_data[sound_name]
         if not percussive:
             if self.mode == 1:
                 # 变调， 时域压扩， 重采样 mc方法
                 self.res_data[sound_name][pitch] = librosa.resample(
                     librosa.effects.time_stretch(
-                        librosa.effects.pitch_shift(y_orig, sr=sr_orig, n_steps=pitch),
+                        librosa.effects.pitch_shift(
+                            original_y, sr=original_sample_rate, n_steps=pitch
+                        ),
                         rate=2 ** (pitch / 12),
                     ),
-                    orig_sr=sr_orig,
+                    orig_sr=original_sample_rate,
                     target_sr=self.output_sample_rate,
                     fix=False,
                 )
             elif self.mode == 0:
                 # 重采样， 变调
                 self.res_data[sound_name][pitch] = librosa.resample(
-                    librosa.effects.pitch_shift(y_orig, sr=sr_orig, n_steps=pitch),
-                    orig_sr=sr_orig,
+                    librosa.effects.pitch_shift(
+                        original_y, sr=original_sample_rate, n_steps=pitch
+                    ),
+                    orig_sr=original_sample_rate,
                     target_sr=self.output_sample_rate,
                     fix=False,
                 )
@@ -146,16 +160,18 @@ class MusicPreview:
 
                 # 变调， 时域压扩， 重采样 MIDI-FFT
                 if self.overlay_mode_c == 2:
-                    rate = duration / 20 / (len(y_orig[0]) / sr_orig)
+                    rate = duration / 20 / (len(original_y[0]) / original_sample_rate)
                 else:
-                    rate = duration / 20 / (len(y_orig) / sr_orig)
+                    rate = duration / 20 / (len(original_y) / original_sample_rate)
                 rate = rate if rate != 0 else 1
                 self.res_data[sound_name][pitch] = librosa.resample(
                     librosa.effects.time_stretch(
-                        librosa.effects.pitch_shift(y_orig, sr=sr_orig, n_steps=pitch),
+                        librosa.effects.pitch_shift(
+                            original_y, sr=original_sample_rate, n_steps=pitch
+                        ),
                         rate=rate,
                     ),
-                    orig_sr=sr_orig,
+                    orig_sr=original_sample_rate,
                     target_sr=self.output_sample_rate,
                     fix=False,
                 )
@@ -163,38 +179,41 @@ class MusicPreview:
                 # 变调， 时域压扩， 重采样 MIDI-cut
                 if self.overlay_mode_c == 2:
                     deal = librosa.effects.pitch_shift(
-                        y_orig, sr=sr_orig, n_steps=pitch
+                        original_y, sr=original_sample_rate, n_steps=pitch
                     )[
                         ...,
                         : (
-                            int(duration / 20 * sr_orig)
-                            if duration / 20 * sr_orig > len(y_orig[0])
-                            else len(y_orig[0])
+                            int(duration / 20 * original_sample_rate)
+                            if duration / 20 * original_sample_rate > len(original_y[0])
+                            else len(original_y[0])
                         ),
                     ]
                 else:
                     deal = librosa.effects.pitch_shift(
-                        y_orig, sr=sr_orig, n_steps=pitch
+                        original_y, sr=original_sample_rate, n_steps=pitch
                     )[
                         : (
-                            int(duration / 20 * sr_orig)
-                            if duration / 20 * sr_orig > len(y_orig)
-                            else len(y_orig)
+                            int(duration / 20 * original_sample_rate)
+                            if duration / 20 * original_sample_rate > len(original_y)
+                            else len(original_y)
                         )
                     ]
                 self.res_data[sound_name][pitch] = librosa.resample(
-                    deal, orig_sr=sr_orig, target_sr=self.output_sample_rate, fix=False
+                    deal,
+                    orig_sr=original_sample_rate,
+                    target_sr=self.output_sample_rate,
+                    fix=False,
                 )
         else:
             # if self.mode == 1:
             # 重采样, 不变调
             # print(">>", sound_name, pitch)
             self.res_data[sound_name][pitch] = librosa.resample(
-                y_orig,
-                orig_sr=sr_orig,
+                original_y,
+                orig_sr=original_sample_rate,
                 target_sr=self.output_sample_rate,
                 fix=False,  # 尽管这样不变调，但是也不应将 pitch 与打击乐器联系在一起
-            ) # 已经在下面重新用 0 取代了打击乐器的 pitch
+            )  # 已经在下面重新用 0 取代了打击乐器的 pitch
             """elif self.mode == 0:
                 # 重采样, 不变调, 衰弱
                 self.cache_dict[raw_name] = librosa_resample(
@@ -354,20 +373,18 @@ class MusicPreview:
             if not note.percussive:
                 overlay(
                     self.res_data[note.instrument][accurate_pitch]
-                    * note.volume
-                    / (note.position.sound_distance + 0.5)
-                    / 127,
+                    * (1 - (note.position.sound_distance / 48)),
                     note.start_tick,
                 )
                 # 上述参数的原顺序应为
                 # x * (音量 / 127) * (1 / (距离 + 0.5))
                 # 乘法优先是为了提高计算精度，小的数的除法优先同理
+                # 下面是后来的注释
+                # 这种方式是错误的 —— 金羿 20260720
             else:
                 overlay(
                     self.res_data[note.instrument][accurate_pitch]
-                    * note.volume
-                    / (note.position.sound_distance + 0.5)
-                    / 127,
+                    * (1 - (note.position.sound_distance / 48)),
                     note.start_tick,
                 )
 
