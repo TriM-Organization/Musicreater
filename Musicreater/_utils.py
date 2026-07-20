@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """
 音·创 v3 的功能性内容合辑
+此处存放无需本体类的内容
 """
 
 """
@@ -35,13 +36,29 @@ def enumerated_stuffcopy_dictionary(
 
 
 def incremental_save_path(
-    file_name: str, suffix: str = ".file", appendix_connector: str = "-"
+    file_name: str,
+    suffix: str = ".file",
+    appendix_connector: str = "-",
+    parent_path: Union[Path, str] = Path.cwd(),
 ) -> Path:
-    ss_path = Path(file_name).with_suffix(suffix)
+    """
+    生成一个文件路径，该文件地址指向的文件名应为 `file_name` 添加一个后缀 `suffix`。\n
+    如果 `file_name` 已经存在，则添加一个后缀 `appendix_connector` 和一个数字。
+    此数字由 2 开始，每存在此文件，则递增 1。直到找到最后那个惟一的未被占用的文件路径。\n
+    例如：
+    -   file_name = "test", suffix = ".txt", appendix_connector = "-", parent_path = "/tmp/" \n
+        若在 `/tmp` 中：
+            1.  `test.txt` 不存在，则返回 Path("/tmp/test.txt")
+            2.  上述文件存在，且 `test-1.txt` 不存在，则返回 Path("/tmp/test-1.txt")
+            3.  上述文件皆存在，但 `test-2.txt` 不存在，则返回 Path("/tmp/test-2.txt")
+            ...
+    """
+    ss_path = parent_path / Path(file_name).with_suffix(suffix)
     if ss_path.exists():
         now_appendix = 2
         while (
-            ss_path := Path(file_name + appendix_connector + str(now_appendix) + suffix)
+            ss_path := parent_path
+            / Path(file_name + appendix_connector + str(now_appendix) + suffix)
         ).exists():
             now_appendix += 1
     return ss_path

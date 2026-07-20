@@ -59,6 +59,13 @@
         "sounddevice",
         "librosa",
     ]
+    preview-advanced = [
+        "numpy < 3.0",
+        "soundfile",
+        "sounddevice",
+        "librosa",
+        "pyloudnorm",
+    ]
     full = [
         "mido >= 1.3, < 2.0",
         "numpy < 3.0",
@@ -67,6 +74,7 @@
         "soundfile",
         "sounddevice",
         "librosa",
+        "pyloudnorm",
     ]
     dev = [
         "mido >= 1.3, < 2.0",
@@ -76,6 +84,8 @@
         "soundfile",
         "sounddevice",
         "librosa",
+        "pyloudnorm",
+        "matplotlib",
         "dill",
         "rich",
         "pyinstaller",
