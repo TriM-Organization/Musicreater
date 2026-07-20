@@ -60,10 +60,6 @@
         "librosa",
     ]
     preview-advanced = [
-        "numpy < 3.0",
-        "soundfile",
-        "sounddevice",
-        "librosa",
         "pyloudnorm",
     ]
     full = [

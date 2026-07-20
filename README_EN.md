@@ -35,7 +35,7 @@
 
 [简体中文 🇨🇳](README.md) | English🇬🇧
 
-**Notice that the localizations of documents may probably NOT be up-to-date. The original document is in Chinese.**
+> **NOTICE** The localizations of documents may probably NOT be up-to-date. The original document is in Chinese.
 
 ## Introduction🚀
 
@@ -43,11 +43,11 @@ Musicreater is a cost free, open-source, highly optimized library designed for e
 
 Welcome to join our QQ group: [861684859](https://jq.qq.com/?_wv=1027&k=hpeRxrYr)
 
-> **NOTICE** The project inside this repository is only the support library, which is mainly for the developers of music related software for _Minecraft: Bedrock Edition_.
+> **NOTICE** The project inside this repository is only a supportive library, which is mainly for the developers of music related software for _Minecraft: Bedrock Edition_.
 >
 > The _Bedrock Edition music convertor_ which is for common users is in [Linglun Converter](../../../Linglun-Converter). [Archived]
 > 
-> We are also developing a _BE music editor_ (sth like a digital audio workstation): [Linglun](../../../LinglunStudio)
+> We are also developing a _BE music editor_, a new _Minecraft_ digital audio workstation(DAW): [Linglun](../../../LinglunStudio)
 
 
 ## Installation 🔳
@@ -73,32 +73,42 @@ Commands such as `python`、`pip` could be changed to some like `python3` or `pi
 
 [仓库 API 文档](./docs/%E5%BA%93%E7%9A%84%E7%94%9F%E6%88%90%E4%B8%8E%E5%8A%9F%E8%83%BD%E6%96%87%E6%A1%A3.md)
 
-### Authors ✒
+## Authors ✒
 
-**Eilles (金羿)**：A student, individual developer, unfamous Bilibili UPer, which knows a little about commands in _Minecraft: Bedrock Edition_
+The names are in the order of each person's first contributing time of each part of the project.
 
-**Alioth (玉衡Alioth)**: A student, player of _Minecraft: Bedrock Edition_, which is a fan of music and programming.
+### Project Managers
 
-**Touch (偷吃不是 Touch)**: A man who is good at using command(s) in _Minecraft: Bedrock Edition_, who supported us of debugging and testing program and algorithm
+**Eilles (菀 金羿)**, **Alioth (玉衡Alioth)**
+
+### Developers
+
+**Eilles (菀 金羿)**, **Alioth (玉衡Alioth)**, **ElapsingDreams (鱼旧梦)**
+
+### Resource Providers
+
+**Charlie_Ping**, **Touch (偷吃不是Touch)**, **Eilles (菀 金羿)**
+
 
 ## Acknowledgements 🙏
 
-This list is not in any order.
+We thank:
 
--   Thank _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
--   Thank _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
--   Thank _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
--   Thank _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for his midi analysis algorithm brought to us, we had adapted it and made it applied in one of our working method; Also, thank him for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project.
--   Thank _Mono_\<QQ738893087\> for reporting problems while installing
--   Thank _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
--   Thank _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
--   Thank _指令师\_苦力怕 “playjuice123”_\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
--   Thank _雷霆_\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
--   Thank _小埋_\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
--   <table><tr><td>Thank <i>油炸</i> &lt;QQ2836146704&gt; for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
--   Thank _雨_\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
--   Thank _梦幻duang_\<QQ13753593\> for providing us with his knowlodeg of the command format in Minecraft: Java Edition Version 1.12.2.
--   Thank [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio)'s Project for giving us the power and energy of continual developing.
+-   _昀梦_\<QQ1515399885\> for finding and correcting the bugs in the commands that _Musicreater_ generated.
+-   _Charlie_Ping “查理平”_ for the bdx convert function for reference, and the reference chart that's used to convert the mid's instruments into Minecraft's instruments.
+-   _[CMA_2401PT](https://github.com/CMA2401PT)_ for BDXWorkShop for reference of the .bdx structure's operation, and his guidance in some aspects of our development.
+-   _[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”_ \<QQ1600515314\> for the [WebConvertor](https://dislink.github.io/midi2bdx/) which brought us so much pressure and power to develop as well as update our projects better, instead of loaf on our project.
+-   _Mono_\<QQ738893087\> for reporting problems while installing
+-   _Ammelia “艾米利亚”_\<QQ2838334637\> for urging us to develop new functions, and put forward a lot of excellent suggestions for new functions, as well as the BDX file's importing test support provided, which has given a lot of practical theoretical support for our new Structure Generating Algorithm
+-   _[神羽](https://gitee.com/snowykami) “[SnowyKami](https://github.com/snowyfirefly)”_ for supporting and promoting our project, and also thanks him for his server which given us to use for free.
+-   _指令师\_苦力怕 “playjuice123”_\<QQ240667197\> for finding bugs within our code, and noticed us to repair a big problem.
+-   _雷霆_\<QQ3555268519\> for his annoying and provoking operations which may awake some problems within the program by chance and reminding us to repair.
+-   _小埋_\<QQ2039310975\> for reporting the empty add-on packs title and description problem.
+-   <table><tr><td><i>油炸</i> &lt;QQ2836146704&gt; for inspiring us to constantly develop something new.</td><td><img width="260" src="https://foruda.gitee.com/images/1695478907647543027/08ea9909_9911226.jpeg" alt="The groupmate on the picture was saying that our convert-QQ-bot had once brought him great convinience but now it closed down by some reason so he was feeling regretful." title="&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;&#10;&quot;Until lose, I finally know cannot chase back what I needs&quot;"></td><td><small>&quot;It was once, a convert-QQ-bot is just in front my eyes&quot;<br>&quot;Until lose, I finally know cannot chase back what I needs&quot;</small></td></tr></table>
+-   _雨_\<QQ237667809\> for give us report that under the new `execute` command format that the scoreboard player's add-on packs cannot play correctly.
+-   _梦幻duang_\<QQ13753593\> for providing us with his knowlodeg of the command format in Minecraft: Java Edition Version 1.12.2.
+-   the project of [_Open Note Block Studio_](https://github.com/OpenNBS/NoteBlockStudio) for giving us the power and energy of continual developing.
+-   _启航与凡凡_\<QQ2777856500\> for pointing out the decoding error of _Musicreater v2_'s music sequence file, and the way to fix.
 
 > Thanks for the support and help of a lot of groupmates  
 > If you have given contributions but have not been in the list, please contact us!
@@ -123,8 +133,8 @@ NOT APPROVED BY OR ASSOCIATED WITH NETEASE.
 
 此项目不隶属或关联于 Mojang Studios 或 微软
 
-此项目亦不隶属或关联于 网易 相关
+此项目亦不隶属或关联于 网易
 
 “Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为必要的介绍性使用
 
--   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
+-   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易吾世界网络科技有限公司

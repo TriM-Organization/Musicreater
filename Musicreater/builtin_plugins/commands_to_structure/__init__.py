@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-音·创 v3 内置的 Minecraft 结构生成插件
+音·创 v3 内置的 Minecraft 指令结构生成插件
 """
 
 """

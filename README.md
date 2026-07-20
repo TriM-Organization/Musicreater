@@ -54,21 +54,42 @@
 
 ## 安装 🔳
 
--   使用 pypi
+使用 pypi 直接安装
 
-    ```bash
+-   ```bash
     pip install --upgrade Musicreater
     ```
 
--   如果无法更新至最新，可以尝试使用 pypi 的默认源：
+如果因第三方源同步较慢，无法更新至最新，可以尝试使用 pypi 的默认源：
 
-    ```bash
+-   ```bash
     pip install --upgrade -i https://pypi.python.org/simple Musicreater
     ```
 
--   采用最新的开发分支下的滚动更新：
+如果需要使用一些内置插件，则可以在库名称后面加上对应的可选依赖标签，现有的插件和可选依赖标签对应如下：
 
-    ```bash
+-   | 内置插件 | 插件功能 | 可选依赖标签 | 说明 |
+    | -------- | -------- | ------------ | ---- |
+    | Midi 读取 | 读取 MIDI 文件，导入音轨或全曲 | `midi` | 未来可能支持 MIDI 写入 |
+    | Minecraft 指令结构生成 | 导出乐曲，创建 Minecraft 指令方块存储的音乐结构 | `structure` | 当前支持 `.mcstructure`、`.bdx` 格式直接导出和 `.mcpack` 附加包格式的导出，具体导出格式请查阅[插件文档](./docs/内置插件相关/MC指令结构/) |
+    | 音乐预览 | 以 Minecraft 音效直接输出音乐的波形声音文件 <hr> 导入自制的 Minecraft 音乐资源包并解析，并输出预览结果波形（实验性） | `preview` <hr> `preview-advanced` | 输出为 `.wav` 格式的音乐文件，用于预览音乐的播放效果 <hr> 需与 preview 标签一并安装 |
+
+除了内置插件有对应的可选依赖标签外，还有另外两组可选依赖：
+
+-   | 标签 | 说明 |
+    | ------------ | ---- |
+    | `full` | 添加所有可选依赖，即包含所有插件的依赖项 |
+    | `dev` | 添加开发依赖，包括一些开发或测试功能时所用插件、以及 `full` 标签中的所有插件的依赖项。 |
+
+也就是说，如果需要使用 midi 读取和 Minecraft 指令结构生成，则需要安装 `midi` 和 `structure` 标签所对应的依赖项。例如：
+
+-   ```bash
+    pip install "Musicreater[midi,structure]"
+    ```
+
+参与开发，可以采用最新的开发分支下的滚动更新：
+
+-   ```bash
     pip install "git+https://gitee.com/TriM-Organization/Musicreater.git@develop[dev]"
     ```
 
@@ -80,20 +101,30 @@
 
 ## 作者 ✒
 
-**金羿 Eilles**：我的世界基岩版指令作者，个人开发者，B 站不知名 UP 主。
+以下人名依照对于各项的参与之序排布。
 
-**玉衡Alioth Alioth**：我的世界基岩版玩家，喜欢编程和音乐，学生。
+### 项目策划
 
-**偷吃不是Touch Touch**：我的世界基岩版指令制作者，提供测试支持
+**金羿 Eilles**、**玉衡Alioth Alioth**
+
+### 软件开发
+
+**金羿 Eilles**、**玉衡Alioth Alioth**、**鱼旧梦 ElapsingDreams**
+
+### 资源素材
+
+**Charlie_Ping “查理平”**、**偷吃不是Touch Touch**、**金羿 Eilles**
+
+
 
 ## 致谢 🙏
 
-本致谢列表排名无顺序。
+本致谢列表按照其提交的内容生效之时间依次排序。
 
 -   感谢 **昀梦**\<QQ1515399885\> 找出指令生成错误 bug 并指正
 -   感谢由 **Charlie_Ping “查理平”** 带来的 BDX 文件转换参考，以及 MIDI-我的世界对应乐器 参考表格
 -   感谢由 **[CMA_2401PT](https://github.com/CMA2401PT)** 为我们的软件开发的一些方面进行指导，同时我们参考了他的 BDXworkshop 作为 BDX 结构编辑的参考
--   感谢由 **[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”**\<QQ1600515314\> 带来的 midi 音色解析以及转换指令的算法，我们将其改编并应用；同时，感谢他的[网页版转换器](https://dislink.github.io/midi2bdx/)给我们的开发与更新带来巨大的压力和动力，让我们在原本一骑绝尘的摸鱼道路上转向开发。
+-   感谢由 **[Dislink Sforza](https://github.com/Dislink) “断联·斯福尔扎”**\<QQ1600515314\> 的[网页版转换器](https://dislink.github.io/midi2bdx/)给我们的开发与更新带来巨大的压力和动力，让我们在原本一骑绝尘的摸鱼道路上转向开发。
 -   感谢 **Mono**\<QQ738893087\> 反馈安装时的问题，辅助我们找到了视窗操作系统下的兼容性问题；感谢其反馈延迟播放器出现的重大问题，让我们得以修改全部延迟播放错误；尤其感谢他对于我们的软件的大力宣传
 -   感谢 **Ammelia “艾米利亚”**\<QQ2838334637\> 敦促我们进行新的功能开发，并为新功能提出了非常优秀的大量建议，以及提供的 BDX 导入测试支持，为我们的新结构生成算法提供了大量的实际理论支持
 -   感谢 **[神羽 “SnowyKami”](https://www.sfkm.me/)** 对我们项目的支持与宣传，非常感谢他为我们提供的服务器！
@@ -131,7 +162,7 @@
 
 “Minecraft”是 Mojang Synergies AB 的商标，此项目中所有对于“我的世界”、“Minecraft”等相关称呼均为必要的介绍性使用
 
--   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易璀璨网络科技有限公司
+-   上文提及的 网易 公司，指代的是在中国大陆运营《我的世界：中国版》的上海网之易吾世界网络科技有限公司
 
 NOT AN OFFICIAL MINECRAFT PRODUCT.
 
