@@ -90,6 +90,11 @@ class PcmConversionConfig(PluginConfig):
     音调处理精度，小数点后位数
     """
 
+    global_volume: float = 1.0
+    """
+    全局音量控制
+    """
+
     global_deviation: float = 0
     """
     全曲音调偏移
@@ -120,6 +125,7 @@ class NoteDataConvert2PcmPlugin(MusicOutputPluginBase):
             sample_rate=config.sample_rate,
             value_get_method=config.value_get_method,
             pitch_accuracy_decimals=config.pitch_accuracy_decimals,
+            music_volume=config.global_volume,
             music_deviation=config.global_deviation,
         )
         music_preview.to_wav_file(data, file_path)
@@ -138,6 +144,7 @@ class NoteDataConvert2PcmPlugin(MusicOutputPluginBase):
             sample_rate=config.sample_rate,
             value_get_method=config.value_get_method,
             pitch_accuracy_decimals=config.pitch_accuracy_decimals,
+            music_volume=config.global_volume,
             music_deviation=config.global_deviation,
         )
 

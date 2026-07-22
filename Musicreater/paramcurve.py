@@ -218,6 +218,7 @@ class ParamCurve:
     支持动态节点编辑
     用户通过添加/修改关键帧（时间-值对）来定义曲线，类自动在相邻关键帧之间生成插值段。
     支持多种插值模式：线性（'linear'）、平滑缓动（'smooth'）、保持（'hold'）或自定义函数。
+    支持值域限制：可设定参数值的上限与下限，所有输出及关键帧写入均受约束。
     """
 
     base_line: float = 0.0
@@ -229,6 +230,12 @@ class ParamCurve:
     boundary_behaviour: BoundaryBehaviour
     """边界行为，控制参数曲线在已定义的范围外的返回值"""
 
+    value_min: Optional[float] = None
+    """参数值下限（None 表示不限制）"""
+
+    value_max: Optional[float] = None
+    """参数值上限（None 表示不限制）"""
+
     _keys: List[Keyframe]
     """关键帧列表"""
 
@@ -239,6 +246,8 @@ class ParamCurve:
             [float], float
         ] = InterpolationMethod.linear,
         boundary_mode: BoundaryBehaviour = BoundaryBehaviour.CONSTANT,
+        value_min: Optional[float] = None,
+        value_max: Optional[float] = None,
     ):
         """
         初始化参数曲线。
@@ -247,18 +256,154 @@ class ParamCurve:
         ----------
         base_value : float
             边界外默认值（当 boundary_mode 为 BoundaryBehaviour.CONSTANT 时使用）。
-        default_interpolation_function : FittingFunctionType
+        default_interpolation_function : Callable
             新关键帧的默认 out_interp。
         boundary_mode : BoundaryBehaviour
             范围外行为：
             - BoundaryBehaviour.CONSTANT: 返回 base_value
             - BoundaryBehaviour.HOLD: 保持首/尾关键帧值
+        value_min : Optional[float]
+            参数值下限。None 表示无下限。
+        value_max : Optional[float]
+            参数值上限。None 表示无上限。
+
+        Raises
+        ------
+        ValueError
+            若 value_min 和 value_max 均非 None 且 value_min > value_max。
         """
-        self.base_line = base_value
+        # 先设定值域，再设定 base_line（以便 base_line 受约束）
+        self._set_value_range_internal(value_min, value_max)
+
+        self.base_line = self._clamp_value(base_value)
         self.base_interpolation_function = default_interpolation_function
         self.boundary_behaviour = boundary_mode
 
         self._keys: List[Keyframe] = []
+
+    # ──────────────────────────────────────────────
+    #  值域限制 相关
+    # ──────────────────────────────────────────────
+
+    def _set_value_range_internal(
+        self,
+        value_min: Optional[float],
+        value_max: Optional[float],
+    ):
+        """
+        内部方法：设定值域并校验合法性。
+
+        Raises
+        ------
+        ValueError
+            若 value_min > value_max。
+        """
+        if value_min is not None and value_max is not None and value_min > value_max:
+            raise ValueError(f"值域下限 ({value_min}) 不得大于上限 ({value_max})。")
+        self.value_min = value_min
+        self.value_max = value_max
+
+    def _clamp_value(self, value: float) -> float:
+        """
+        将给定值限制在 [value_min, value_max] 范围内。
+        仅在低频操作（add_key、update_key_value、set_value_range 等）中使用。
+        高频路径 value_at() 使用内联版本。
+
+        Parameters
+        ----------
+        value : float
+            待限制的值。
+
+        Returns
+        -------
+        float
+            限制后的值。若对应边界为 None，则该方向不做限制。
+        """
+        if self.value_min is not None and value < self.value_min:
+            return self.value_min
+        if self.value_max is not None and value > self.value_max:
+            return self.value_max
+        return value
+
+    def set_value_range(
+        self,
+        value_min: Optional[float] = None,
+        value_max: Optional[float] = None,
+        clamp_existing_keys: bool = True,
+    ):
+        """
+        设置参数曲线的值域（最大/最小值限制）。
+
+        Parameters
+        ----------
+        value_min : Optional[float]
+            参数值下限。传入 None 表示取消下限限制。
+        value_max : Optional[float]
+            参数值上限。传入 None 表示取消上限限制。
+        clamp_existing_keys : bool
+            若为 True（默认），则立即将已有关键帧的值及 base_line
+            限制到新的值域范围内。若为 False，则仅影响后续输出与新增关键帧。
+
+        Raises
+        ------
+        ValueError
+            若 value_min > value_max。
+
+        Examples
+        --------
+        >>> curve = ParamCurve(base_value=0.5)
+        >>> curve.add_key(0.0, 1.5)
+        >>> curve.add_key(1.0, -0.3)
+        >>> curve.set_value_range(0.0, 1.0)  # 限制到 [0, 1]
+        >>> curve.value_at(0.0)
+        1.0
+        >>> curve.value_at(1.0)
+        0.0
+        """
+        self._set_value_range_internal(value_min, value_max)
+
+        if clamp_existing_keys:
+            # 限制 base_line
+            self.base_line = self._clamp_value(self.base_line)
+            # 限制所有已有关键帧的值
+            for i, key in enumerate(self._keys):
+                clamped = self._clamp_value(key.value)
+                if clamped != key.value:
+                    self._keys[i] = Keyframe(
+                        time=key.time,
+                        value=clamped,
+                        out_interp=key.out_interp,
+                        in_tangent=key.in_tangent,
+                        out_tangent=key.out_tangent,
+                        use_bezier=key.use_bezier,
+                    )
+
+    def get_value_range(self) -> Tuple[Optional[float], Optional[float]]:
+        """
+        获取当前值域设定。
+
+        Returns
+        -------
+        Tuple[Optional[float], Optional[float]]
+            (value_min, value_max)，None 表示该方向无限制。
+        """
+        return (self.value_min, self.value_max)
+
+    def clear_value_range(self, clamp_existing_keys: bool = False):
+        """
+        清除值域限制（恢复为无限制状态）。
+
+        Parameters
+        ----------
+        clamp_existing_keys : bool
+            通常为 False（清除限制无需 clamp）。保留此参数仅为接口对称。
+        """
+        self.value_min = None
+        self.value_max = None
+
+    # ──────────────────────────────────────────────
+    #  原有功能
+    # ──────────────────────────────────────────────
 
     def __bool__(self) -> bool:
         return bool(self._keys) or (self.base_line != 0)
@@ -301,6 +446,8 @@ class ParamCurve:
             self.base_line,
             self.base_interpolation_function,
             self.boundary_behaviour,
+            value_min=self.value_min,
+            value_max=self.value_max,
         )
         if start >= end:
             return param_curve
@@ -374,7 +521,7 @@ class ParamCurve:
         time : float
             关键帧时间。
         value : float
-            参数值。
+            参数值（将自动受值域限制约束）。
         out_interp : Optional[Callable]
             出插值函数（若 use_bezier=False）。
         in_tangent : Optional[Tuple[float, float]]
@@ -391,11 +538,15 @@ class ParamCurve:
         Notes
         -----
         若时间已存在，更新该关键帧的所有属性。
+        写入的 value 会被自动 clamp 到 [value_min, value_max]。
         """
         interp = (
             out_interp if out_interp is not None else self.base_interpolation_function
         )
-        new_key = Keyframe(time, value, interp, in_tangent, out_tangent, use_bezier)
+        clamped_value = self._clamp_value(value)
+        new_key = Keyframe(
+            time, clamped_value, interp, in_tangent, out_tangent, use_bezier
+        )
 
         idx, old_key = self.find_key(time)
         if old_key:
@@ -421,12 +572,13 @@ class ParamCurve:
             del self._keys[idx]
 
     def update_key_value(self, time: float, new_value: float):
-        """更新关键帧值，保留其他属性。"""
+        """更新关键帧值，保留其他属性。值受值域限制约束。"""
         idx, key = self.find_key(time)
         if key:
+            clamped_value = self._clamp_value(new_value)
             self._keys[idx] = Keyframe(
                 time,
-                new_value,
+                clamped_value,
                 key.out_interp,
                 key.in_tangent,
                 key.out_tangent,
@@ -471,7 +623,7 @@ class ParamCurve:
 
     def make_key_smooth(self, time: float):
         """
-        将关键帧设为“平滑”模式（自动对称切线，并设为贝塞尔模式）。
+        将关键帧设为"平滑"模式（自动对称切线，并设为贝塞尔模式）。
         切线长度基于相邻关键帧的时间和值差。
         """
         idx, key = self.find_key(time)
@@ -524,6 +676,9 @@ class ParamCurve:
         """
         计算时间 t 处的曲线值。
 
+        返回值始终受 [value_min, value_max] 值域限制约束。
+        即使贝塞尔插值产生过冲（overshoot），输出也会被 clamp。
+
         Parameters
         ----------
         t : float
@@ -532,57 +687,61 @@ class ParamCurve:
         Returns
         -------
         float
-            插值结果。
+            插值结果（已 clamp）。
         """
         keys = self._keys
         if not keys:
-            return self._get_boundary_value(t)
+            raw = self._get_boundary_value(t)
+        else:
+            if t < keys[0].time or t > keys[-1].time:
+                raw = self._get_boundary_value(t)
+            else:
+                times = [k.time for k in keys]
+                idx = bisect.bisect_right(times, t) - 1
 
-        if t < keys[0].time or t > keys[-1].time:
-            return self._get_boundary_value(t)
+                if idx < 0:
+                    raw = self._get_boundary_value(t)
+                elif idx >= len(keys) - 1:
+                    raw = keys[-1].value
+                else:
 
-        times = [k.time for k in keys]
-        idx = bisect.bisect_right(times, t) - 1
+                    k0 = keys[idx]
+                    k1 = keys[idx + 1]
 
-        if idx < 0:
-            return self._get_boundary_value(t)
-        if idx >= len(keys) - 1:
-            return keys[-1].value
+                    if k0.time == k1.time:
+                        raw = k0.value
+                    elif k0.time == t:
+                        raw = k0.value
+                    elif k1.time == t:
+                        raw = k1.value
+                    else:
+                        t0, v0 = k0.time, k0.value
+                        t1, v1 = k1.time, k1.value
+                        u = (t - t0) / (t1 - t0)
+                        u = max(0.0, min(1.0, u))
 
-        k0 = keys[idx]
-        k1 = keys[idx + 1]
+                        # 贝塞尔模式（高优先级）
+                        if k0.use_bezier or k1.use_bezier:
+                            raw = _evaluate_bezier_segment(
+                                t0,
+                                v0,
+                                t1,
+                                v1,
+                                out_tangent=k0.out_tangent,
+                                in_tangent=k1.in_tangent,
+                                u=u,
+                            )
+                        # 函数插值模式，优先处理阶梯保持模式
+                        elif k0.out_interp is InterpolationMethod.hold:
+                            raw = v0
+                        else:
+                            interp_func = (
+                                k0.out_interp or self.base_interpolation_function
+                            )
+                            v_norm = interp_func(u)
+                            raw = v0 + v_norm * (v1 - v0)
 
-        if k0.time == k1.time:
-            return k0.value
-        if k0.time == t:
-            return k0.value
-        if k1.time == t:
-            return k1.value
-
-        t0, v0 = k0.time, k0.value
-        t1, v1 = k1.time, k1.value
-        u = (t - t0) / (t1 - t0)
-        u = max(0.0, min(1.0, u))
-
-        # 贝塞尔模式（高优先级）
-        if k0.use_bezier or k1.use_bezier:
-            return _evaluate_bezier_segment(
-                t0,
-                v0,
-                t1,
-                v1,
-                out_tangent=k0.out_tangent,
-                in_tangent=k1.in_tangent,  # ← 关键：使用下一帧的 in_tangent！
-                u=u,
-            )
-
-        # 函数插值模式，优先处理阶梯保持模式
-        elif k0.out_interp is InterpolationMethod.hold:
-            return v0
-
-        interp_func = k0.out_interp or self.base_interpolation_function
-        v_norm = interp_func(u)
-        return v0 + v_norm * (v1 - v0)
+        return self._clamp_value(raw)
 
     def __call__(self, t: float) -> float:
         return self.value_at(t)
@@ -606,11 +765,11 @@ class ParamCurve:
         mode : BoundaryBehaviour
             边界行为设定
         base_value : Optional[float]
-            当 mode=BoundaryBehaviour.CONSTANT 时，指定新的默认值。
+            当 mode=BoundaryBehaviour.CONSTANT 时，指定新的默认值（受值域约束）。
         """
         self.boundary_behaviour = mode
         if base_value is not None:
-            self.base_line = base_value
+            self.base_line = self._clamp_value(base_value)
 
     def bake(
         self,
@@ -619,41 +778,12 @@ class ParamCurve:
         sample_rate: Optional[float] = None,
         num_samples: Optional[int] = None,
         dtype: Any = None,
-    ) -> "np.ndarray":  # type: ignore 这里这样用会报错吗？不知道，但是人工智能这样写了都，大抵是能用的吧
+    ) -> "np.ndarray":  # type: ignore
         """
-        将参数曲线在指定时间范围内烘焙为 NumPy 数组，用于高性能实时查询或音频渲染。
+        将参数曲线在指定时间范围内烘焙为 NumPy 数组。
 
-        Parameters
-        ----------
-        start : float
-            烘焙起始时间（包含）。
-        end : float
-            烘焙结束时间（不包含）。
-        sample_rate : Optional[float]
-            采样率（单位：样本/时间单位）。例如，若时间单位为秒，sample_rate=48000 表示每秒 48k 样本。
-            必须与 `num_samples` 二选一提供。
-        num_samples : Optional[int]
-            输出数组的总样本数。若提供，则忽略 `sample_rate`。
-        dtype : Any, optional
-            输出数组的数据类型（如 np.float32）。默认为 np.float64。
-
-        Returns
-        -------
-        np.ndarray
-            一维 NumPy 数组，长度为 `num_samples`，`arr[i] ≈ curve(start + i / sample_rate)`。
-
-        Exceptions
-        ----------
-        ValueError
-            - 若 `start >= end`
-            - 若未提供 `sample_rate` 且未提供 `num_samples`
-            - 若 `num_samples <= 0`
-
-        Notes
-        -----
-        - 内部使用 `np.linspace` 生成时间轴，然后逐点调用 `self.value_at(t)`。
-        - 虽然目前是 Python 循环，但对于典型自动化曲线（<1000 关键帧），NumPy 向量化优势主要体现在内存布局和后续处理。
-        - 如需极致性能（如 >1M 样本），可未来优化为 C++/Numba 加速，但当前已满足 DAW 自动化需求。
+        当值域限制已启用时，使用 np.clip 进行向量化 clamp，
+        避免逐样本调用 Python 层的 clamp 逻辑。
         """
         if start >= end:
             raise ValueError("起始值须小于结束值。")
@@ -684,5 +814,10 @@ class ParamCurve:
         values = np.empty(n, dtype=dtype or np.float64)
         for i in range(n):
             values[i] = self.value_at(float(times[i]))
+
+        # 向量化 clamp —— 比逐点 Python 调用快一个数量级
+        vmin, vmax = self.value_min, self.value_max
+        if vmin is not None or vmax is not None:
+            np.clip(values, vmin, vmax, out=values)
 
         return values

@@ -43,6 +43,7 @@ from typing import (
     Set,
     Type,
     Mapping,
+    overload,
 )
 
 if sys.version_info >= (3, 11):
@@ -336,9 +337,7 @@ class MusicInputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def loadbytes(
-        self, bytes_buffer_in: BinaryIO, config: Optional[PluginConfig]
-    ) -> "SingleMusic":
+    def loadbytes(self, bytes_buffer_in: BinaryIO, config) -> "SingleMusic":
         """从字节流加载数据到完整曲目
 
         参数
@@ -353,10 +352,9 @@ class MusicInputPluginBase(TopInOutPluginBase, ABC):
         SingleMusic
             解析得到的完整曲目对象
         """
+        ...
 
-        pass
-
-    def load(self, file_path: Path, config: Optional[PluginConfig]) -> "SingleMusic":
+    def load(self, file_path: Path, config) -> "SingleMusic":
         """从文件加载数据到完整曲目
 
         参数
@@ -390,9 +388,7 @@ class TrackInputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def loadbytes(
-        self, bytes_buffer_in: BinaryIO, config: Optional[PluginConfig]
-    ) -> "SingleTrack":
+    def loadbytes(self, bytes_buffer_in: BinaryIO, config) -> "SingleTrack":
         """从字节流加载音符数据到单个音轨
 
         参数
@@ -407,9 +403,9 @@ class TrackInputPluginBase(TopInOutPluginBase, ABC):
         SingleTrack
             解析得到的单个音轨对象
         """
-        pass
+        ...
 
-    def load(self, file_path: Path, config: Optional[PluginConfig]) -> "SingleTrack":
+    def load(self, file_path: Path, config) -> "SingleTrack":
         """从文件加载音符数据到单个音轨
 
         参数
@@ -443,9 +439,7 @@ class MusicOperatePluginBase(TopPluginBase, ABC):
             )
 
     @abstractmethod
-    def process(
-        self, data: "SingleMusic", config: Optional[PluginConfig]
-    ) -> "SingleMusic":
+    def process(self, data: "SingleMusic", config) -> "SingleMusic":
         """处理完整曲目的数据
 
         参数
@@ -460,7 +454,7 @@ class MusicOperatePluginBase(TopPluginBase, ABC):
         SingleMusic
             处理后的完整曲目
         """
-        pass
+        ...
 
 
 class TrackOperatePluginBase(TopPluginBase, ABC):
@@ -478,9 +472,7 @@ class TrackOperatePluginBase(TopPluginBase, ABC):
             )
 
     @abstractmethod
-    def process(
-        self, data: "SingleTrack", config: Optional[PluginConfig]
-    ) -> "SingleTrack":
+    def process(self, data: "SingleTrack", config) -> "SingleTrack":
         """处理单个音轨的音符数据
 
         参数
@@ -495,7 +487,7 @@ class TrackOperatePluginBase(TopPluginBase, ABC):
         SingleTrack
             处理后的单个音轨
         """
-        pass
+        ...
 
 
 class MusicOutputPluginBase(TopInOutPluginBase, ABC):
@@ -513,9 +505,7 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def stream_dump(
-        self, data: "SingleMusic", config: Optional[PluginConfig]
-    ) -> Iterator[bytes]:
+    def stream_dump(self, data: "SingleMusic", config) -> Iterator[bytes]:
         """将完整曲目导出为对应格式的字节流
 
         参数
@@ -530,11 +520,9 @@ class MusicOutputPluginBase(TopInOutPluginBase, ABC):
         Iterator[bytes]
             分块导出的二进制字节串
         """
-        pass
+        ...
 
-    def dump(
-        self, data: "SingleMusic", file_path: Path, config: Optional[PluginConfig]
-    ):
+    def dump(self, data: "SingleMusic", file_path: Path, config):
         """将完整曲目导出为对应格式的文件
 
         参数
@@ -567,9 +555,7 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
             )
 
     @abstractmethod
-    def stream_dump(
-        self, data: "SingleTrack", config: Optional[PluginConfig]
-    ) -> Iterator[bytes]:
+    def stream_dump(self, data: "SingleTrack", config) -> Iterator[bytes]:
         """将单个音轨导出为对应格式的字节流
 
         参数
@@ -584,11 +570,9 @@ class TrackOutputPluginBase(TopInOutPluginBase, ABC):
         Iterator[bytes]
             分块导出的二进制字节串
         """
-        pass
+        ...
 
-    def dump(
-        self, data: "SingleTrack", file_path: Path, config: Optional[PluginConfig]
-    ):
+    def dump(self, data: "SingleTrack", file_path: Path, config):
         """将单个音轨导出为对应格式的文件
 
         参数
@@ -620,7 +604,7 @@ class ServicePluginBase(TopPluginBase, ABC):
             )
 
     @abstractmethod
-    def serve(self, config: Optional[PluginConfig]) -> None:
+    def serve(self, config=None) -> None:
         """服务插件的运行逻辑
 
         参数
@@ -628,7 +612,7 @@ class ServicePluginBase(TopPluginBase, ABC):
         config: Optional[PluginConfig]
             插件配置；**可选**
         """
-        pass
+        ...
 
 
 class LibraryPluginBase(TopPluginBase, ABC):

@@ -134,7 +134,7 @@ class MusicExportToMcstructureWithDelayPlayerPlugin(MusicOutputPluginBase):
         with file_path.open("wb") as f:
             struct.dump(f)
 
-        return size, max_delay
+        # return size, max_delay
 
     def stream_dump(
         self, data: SingleMusic, config: McstructureExportConfig

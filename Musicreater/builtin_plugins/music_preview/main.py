@@ -94,6 +94,7 @@ class MusicPreview:
         sample_rate: int = 44100,
         value_get_method: Literal[0, 1] = 1,
         pitch_accuracy_decimals: int = 0,
+        music_volume: float = 1,
         music_deviation: float = 0,
     ):
 
@@ -107,6 +108,7 @@ class MusicPreview:
         # 此处 TODO，需待旧梦来完善
         self.pitch_precision_decimals = 0
 
+        self.music_volume = music_volume
         self.pitch_deviation = music_deviation
 
         for file in self.resources_path.iterdir():
@@ -370,23 +372,22 @@ class MusicPreview:
             #     note.percussive,
             #     note.duration_tick,
             # )
-            if not note.percussive:
-                overlay(
-                    self.res_data[note.instrument][accurate_pitch]
-                    * (1 - (note.position.sound_distance / 48)),
-                    note.start_tick,
-                )
-                # 上述参数的原顺序应为
-                # x * (音量 / 127) * (1 / (距离 + 0.5))
-                # 乘法优先是为了提高计算精度，小的数的除法优先同理
-                # 下面是后来的注释
-                # 这种方式是错误的 —— 金羿 20260720
-            else:
-                overlay(
-                    self.res_data[note.instrument][accurate_pitch]
-                    * (1 - (note.position.sound_distance / 48)),
-                    note.start_tick,
-                )
+            # print(note.position)
+            # print("参数倍率", self.music_volume, (1-(note.position.sound_distance / 48)), flush=True)
+
+            # print("部分数据（前）：",self.res_data[note.instrument][accurate_pitch][:5])
+            overlay(
+                self.res_data[note.instrument][accurate_pitch]
+                * self.music_volume
+                * (1 - (note.position.sound_distance / 48)),
+                note.start_tick,
+            )
+            # print("部分数据（后）：", wav_model[:5])
+            # 上述参数的原顺序应为
+            # x * (音量 / 127) * (1 / (距离 + 0.5))
+            # 乘法优先是为了提高计算精度，小的数的除法优先同理
+            # 下面是后来的注释
+            # 这种方式是错误的 —— 金羿 20260720
 
         if self.get_value_method == 0:
             # 归一化，抚摸耳朵 (bushi

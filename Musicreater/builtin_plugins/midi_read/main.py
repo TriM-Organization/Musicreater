@@ -170,6 +170,8 @@ class TrackDivisionDict(
         self.division_by_volume = midi_import_config.divide_tracks_by_volume
         self.division_by_panning = midi_import_config.divide_tracks_by_panning
 
+        self.create_volume_curve = midi_import_config.keep_velocity_to_param_curve
+
     def __getitem__(
         self,
         key: Tuple[
@@ -192,7 +194,9 @@ class TrackDivisionDict(
         except KeyError:
             self[key] = SingleTrack(precise_time=True)
             if self.create_volume_curve:
-                self[key].argument_curves[CurvableParam.VOLUME] = ParamCurve()
+                self[key].argument_curves[CurvableParam.VOLUME] = ParamCurve(
+                    base_value=1.0, value_min=0.0, value_max=1.0
+                )
             return self[key]
 
 
@@ -287,12 +291,14 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
             )
         )
 
-        midi_tempo = config.default_tempo_value
-        """微秒每拍"""
-        note_count = 0
+        note_count: int = 0
         """音符计数"""
         note_count_per_instrument: Dict[str, int] = {}
         """乐器使用统计"""
+        master_volume: int = 16383
+        """主音量"""
+        music_name: str = ""
+        """音乐名称"""
 
         note_queue_A: Dict[int, List[Tuple[int, int]]] = (
             enumerated_stuffcopy_dictionary(staff=[])
@@ -312,24 +318,98 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
         """Midi 版权列表"""
         midi_track_name_dict: Dict[int, str] = {}
         """轨道名称字典 Dict[int轨道编号, str轨道名称]"""
+        track_0 = midi.tracks[0].copy()
+        should_insert_controls = len(midi.tracks) > 1
 
         for track_no, message_track in enumerate(midi.tracks):
             # 每个音轨单独重置
 
-            microseconds = 0
+            if track_no == 0 and should_insert_controls:
+                # 第零个音轨在多轨模式下只是作为全局的控制轨出现的，因此忽略
+                # 但是，以防这里出现了不符合的情况，我们做如下控制
+                trk = []
+                tk0 = []
+                for msg in mido.midifiles.tracks._to_abstime(track_0):
+                    if msg.type == "track_name":
+                        music_name = (
+                            msg.name.encode("latin1").decode(config.string_encoding)
+                            if config.string_encoding
+                            else msg.name
+                        )
+                    elif (msg.type == "set_tempo") or (msg.type == "sysex"):
+                        tk0.append(msg)
+                    else:
+                        trk.append(msg)
+
+                track_0 = mido.MidiTrack(
+                    mido.midifiles.tracks.fix_end_of_track(
+                        mido.midifiles.tracks._to_reltime(
+                            sorted(tk0, key=lambda a: a.time), skip_checks=True
+                        ),
+                        skip_checks=True,
+                    )
+                )
+
+                midi.tracks.insert(
+                    1,
+                    mido.MidiTrack(
+                        mido.midifiles.tracks.fix_end_of_track(
+                            mido.midifiles.tracks._to_reltime(
+                                sorted(trk, key=lambda a: a.time), skip_checks=True
+                            ),
+                            skip_checks=True,
+                        )
+                    ),
+                )
+                del tk0, trk
+                continue
+
+            # print("正在处理轨道：", track_no, "需要合并：", should_insert_controls, "合并长度：", len(track_0))
+
+            midi_tempo: int = config.default_tempo_value
+            """微秒每拍"""
+            microseconds: int = 0
             """当前的微妙时间"""
-            for msg in message_track:
-                if msg.type == "set_tempo":
-                    # Tempo 改变是一个全局的控制
-                    # 而且应该是很早出现的一个 Midi 消息
-                    midi_tempo = msg.tempo
+
+            for msg in (
+                mido.merge_tracks((track_0, message_track), skip_checks=True)
+                if should_insert_controls
+                else message_track
+            ):
 
                 if msg.time != 0:
                     # 微秒
                     # 通常情况下，tempo 是 500000，tpb 在
                     microseconds += msg.time * midi_tempo / midi.ticks_per_beat
 
-                if msg.type == "program_change":
+                if msg.type == "set_tempo":
+                    # Tempo 改变是一个全局的控制
+                    # 而且应该是很早出现的一个 Midi 消息
+                    midi_tempo = msg.tempo
+                    # print(
+                    #     "Tempo 改变：",
+                    #     midi_tempo,
+                    #     "出现在轨道：",
+                    #     track_no,
+                    #     "时间：",
+                    #     microseconds,
+                    #     flush=True,
+                    # )
+                elif msg.type == "sysex":
+                    # 系统执行消息
+                    data = msg.data  # 不包含 F0 和 F7
+                    # data: (7F, device_id, 04, 01, LSB, MSB)
+                    if (
+                        len(data) >= 6
+                        and data[0] == 0x7F
+                        and data[2] == 0x04
+                        and data[3] == 0x01
+                    ):
+                        # 检查 Master Volume 消息
+                        master_volume = (data[5] << 7) | data[
+                            4
+                        ]  # 14-bit value: 0 ~ 16383
+                elif msg.type == "program_change":
                     # 检测 乐器变化 之 midi 事件
                     value_controler_per_channel[msg.channel][
                         ControlerKeys.MIDI_PROGRAM
@@ -359,8 +439,10 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                     midi_copyright_list.append(msg.text)
                 elif msg.type == "track_name":
                     # 检测轨道名称事件
-                    midi_track_name_dict[track_no] = msg.name.encode("latin1").decode(
-                        config.string_encoding
+                    midi_track_name_dict[track_no] = (
+                        msg.name.encode("latin1").decode(config.string_encoding)
+                        if config.string_encoding
+                        else msg.name
                     )
                 elif msg.type == "note_on" and msg.velocity != 0:
                     # 一个音符开始弹奏
@@ -429,6 +511,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                             note=(_program if _is_percussion else msg.note),
                             percussive=_is_percussion,
                             volume=_volume,
+                            master_volume=master_volume,
                             velocity=_velocity,
                             panning=_panning,
                             start_time=_start_ms,  # 微秒
@@ -455,7 +538,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 track_no,
                                 msg.channel,
                                 sound_name,
-                                _volume,
+                                _volume * master_volume // 16383,
                                 sound_rotation,
                             )
                         ]
@@ -465,6 +548,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 time=that_note.precise_start_time,
                                 value=_velocity / 127,
                             )
+                            # print("VOLUME:", _velocity / 127, flush=True, end=", ")
 
                         # 更新统计信息
                         note_count += 1
@@ -479,7 +563,8 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                             print(
                                 "[WARRING] MIDI格式错误 音符不匹配`{}`无法在上文`{}`中找到与之匹配的音符开音消息".format(
                                     msg, note_queue_A[msg.channel]
-                                )
+                                ),
+                                flush=True,
                             )
                         else:
                             raise NoteOnOffMismatchError(
@@ -488,15 +573,14 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                                 "无法在上文中找到与之匹配的音符开音消息。",
                             )
 
-        del midi_tempo
-
         if midi_lyric_cache:
             # 怎么有歌词多啊
             if config.ignore_errors:
                 print(
                     "[WARRING] MIDI 解析错误 歌词对应错误，以下歌词未能填入音符之中，已经填入的仍可能有误 {}".format(
                         midi_lyric_cache
-                    )
+                    ),
+                    flush=True,
                 )
             else:
                 raise LyricMismatchError(
@@ -506,6 +590,7 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
                 )
 
         final_music = SingleMusic(
+            name=music_name,
             credits="; ".join(midi_copyright_list),
             extra_information={
                 "MIDI_TEXT_LIST": midi_text_list,
@@ -518,14 +603,20 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
             if track_properties[0] and (
                 track_name := midi_track_name_dict.get(track_properties[0], "无名音轨")
             ):  # 音轨编号
-                every_single_track.name = track_name
+                every_single_track.name = track_name or "空名称"
             if track_properties[2]:  # 乐器名称
                 every_single_track.instrument = Instrument(
                     track_properties[2],
                     config.instrument_information_table[track_properties[2]]["C-LUFS"],
                 )
             if track_properties[3]:  # 音量权
-                every_single_track.__volume_weight = track_properties[3]
+                # print(
+                #     "[INFO] 音轨 {} 音量权已设置为 {}".format(
+                #         every_single_track.name, track_properties[3]
+                #     ),
+                #     flush=True,
+                # )
+                every_single_track._volume_weight = track_properties[3]
             if track_properties[4]:  # 声相
                 every_single_track.sound_position = track_properties[4]
             super(SingleMusic, final_music).append(every_single_track)

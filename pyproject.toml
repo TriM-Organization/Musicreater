@@ -126,4 +126,4 @@
 
 
 [tool.pyright]
-    typeCheckingMode = "basic"
+    typeCheckingMode = "standard"

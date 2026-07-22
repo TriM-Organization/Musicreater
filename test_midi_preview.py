@@ -19,7 +19,9 @@ print("当前支持的导出格式：", _global_plugin_registry.supported_output
 
 msct = MusiCreater.import_music(
     Path(input("文件路径：")).resolve(),
-    plugin_config=MidiImportConfig(),
+    plugin_config=MidiImportConfig(
+        divide_tracks_by_volume=True,
+    ),
 )
 
 print("全局插件注册表：", _global_plugin_registry)

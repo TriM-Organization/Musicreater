@@ -95,7 +95,7 @@ class SoundAtmos:
 
         # 如果指定为零，那么为零，但如果不指定或者指定为负数，则为 0.01 的距离
         self.sound_distance = (
-            (16 if distance > 16 else (distance if distance >= 0 else 0.01))
+            (49 if distance > 48 else (distance if distance >= 0 else 0.01))
             if distance is not None
             else 0.01
         )
@@ -110,7 +110,7 @@ class SoundAtmos:
         """设置声源距离"""
 
         self.sound_distance = (
-            (16 if distance > 16 else (distance if distance >= 0 else 0.01))
+            (49 if distance > 48 else (distance if distance >= 0 else 0.01))
             if distance is not None
             else 0.01
         )
@@ -195,7 +195,7 @@ class DefaultInstrument(Enum):
     HARP = Instrument("note.harp", -1448)
 
 
-@dataclass(init=False)
+@dataclass(init=False, eq=False, order=False)
 class SingleNote:
     """存储单个音符的类"""
 
@@ -388,7 +388,9 @@ class SingleNote:
             self.high_precision_start_time,
         )
 
-    def __dict__(self):
+    def __dict__(  # pyright: ignore[reportIncompatibleVariableOverride]
+        self,
+    ) -> Dict[str, Any]:
         return {
             "Pitch": self.midi_pitch,
             "StartTick": self.start_time,
@@ -397,7 +399,9 @@ class SingleNote:
             "ExtraData": self.extra_info,
         }
 
-    def __eq__(self, other: "SingleNote") -> bool:
+    def __eq__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, other: "SingleNote"
+    ) -> bool:
         """比较两个音符是否具有相同的属性，不计附加信息"""
         if not isinstance(other, self.__class__):
             return False
@@ -452,7 +456,7 @@ class MineNote:
         is_percussive_note: bool,
         sound_position: SoundAtmos,
         adjust_note_pitch: float = 0.0,
-        adjust_note_volume_weight: float = 0.0,
+        multiple_note_volume_weight: float = 0.0,
         adjust_note_sound_distance: float = 0.0,
         adjust_note_leftright_panning_degree: float = 0.0,
         adjust_note_updown_panning_degree: float = 0.0,
@@ -467,21 +471,25 @@ class MineNote:
             percussive=is_percussive_note,
             position=(
                 SoundAtmos(
-                    sound_position.sound_distance
-                    + adjust_note_sound_distance
-                    + (
+                    (
                         (
                             (
                                 (
-                                    (sound_position.sound_distance - 48)
-                                    * (note_volume_weight + adjust_note_volume_weight)
+                                    (
+                                        sound_position.sound_distance
+                                        + adjust_note_sound_distance
+                                        - 48
+                                    )
+                                    * (note_volume_weight * multiple_note_volume_weight)
                                     / note_volume_weight
                                 )
                                 + 48
                             )
+                        )  # 此处调整须保证前提：音量权的增值必须为负
+                        if multiple_note_volume_weight
+                        else (
+                            sound_position.sound_distance + adjust_note_sound_distance
                         )
-                        if adjust_note_volume_weight
-                        else 0
                     ),
                     (
                         sound_position.sound_azimuth[0]
@@ -491,7 +499,7 @@ class MineNote:
                     ),
                 )
                 if (
-                    adjust_note_volume_weight
+                    multiple_note_volume_weight
                     or adjust_note_sound_distance
                     or adjust_note_leftright_panning_degree
                     or adjust_note_updown_panning_degree
@@ -505,7 +513,7 @@ class CurvableParam(str, Enum):
     """可曲线化的参数 枚举类"""
 
     PITCH = "adjust_note_pitch"
-    VOLUME = "adjust_note_volume_weight"
+    VOLUME = "multiple_note_volume_weight"
     DISTANCE = "adjust_note_sound_distance"
     LR_PANNING = "adjust_note_leftright_panning_degree"
     UD_PANNING = "adjust_note_updown_panning_degree"
@@ -529,10 +537,10 @@ class SingleTrack(List[SingleNote]):
     is_percussive: bool
     """该音轨是否标记为打击乐器轨道"""
 
-    __volume_weight: float = 10
+    _volume_weight: float = 10
     """音量权"""
 
-    __sound_distance: float = -1
+    _sound_distance: float = -1
     """声源距离"""
 
     sound_position: Tuple[float, float]
@@ -596,10 +604,10 @@ class SingleTrack(List[SingleNote]):
         self.is_percussive = percussion
         """是否为打击乐器"""
 
-        self.__volume_weight = volume_weight
+        self._volume_weight = volume_weight
         """音量权"""
 
-        self.__sound_distance = -1
+        self._sound_distance = -1
         """声源距离"""
 
         self.sound_position = sound_direction
@@ -643,18 +651,18 @@ class SingleTrack(List[SingleNote]):
     @property
     def volume_weight(self) -> float:
         """音量权"""
-        return self.__volume_weight
+        return self._volume_weight
 
     @property
     def sound_distance(self) -> float:
         """声源距离"""
-        if self.__sound_distance < 0:
+        if self._sound_distance < 0:
             raise ParameterCacheUnfreshError(
                 "未设置声源距离（`{}`），操作时不应直接访问 `__volume_weight` 属性".format(
-                    self.__sound_distance
+                    self._sound_distance
                 )
             )
-        return self.__sound_distance
+        return self._sound_distance
 
     @property
     def note_amount(self) -> int:
@@ -689,9 +697,9 @@ class SingleTrack(List[SingleNote]):
         由于我们存储的响度都是 百-LUFS，所以下面的计算除数为 2000
         """
 
-        self.__volume_weight = weight
+        self._volume_weight = weight
 
-        self.__sound_distance = volume_weight_to_sound_distance(
+        self._sound_distance = volume_weight_to_sound_distance(
             max_weight, minimal_loadness, weight, self.instrument.loadness
         )
         # print(
@@ -702,7 +710,7 @@ class SingleTrack(List[SingleNote]):
         #     "，设置声源距离为：",
         #     self.__sound_distance,
         # )
-        return self.__sound_distance
+        return self._sound_distance
 
     # 类操作
 
@@ -757,7 +765,7 @@ class SingleTrack(List[SingleNote]):
             volume_weight=self.volume_weight,
             sound_direction=self.sound_position,
         )
-        single_track.__sound_distance = self.sound_distance
+        single_track._sound_distance = self.sound_distance
         if with_argument_curve:
             single_track.argument_curves = {
                 item: (
@@ -996,6 +1004,7 @@ class SingleMusic(List[SingleTrack]):
     # 前置方法
 
     def _calc_values(self):
+        # print("收到音乐参数计算请求，当前最大：",self.__max_volume_weight, end="；")
         for track in self:
             self.__max_volume_weight = max(
                 track.volume_weight, self.__max_volume_weight
@@ -1009,6 +1018,7 @@ class SingleMusic(List[SingleTrack]):
                 minimal_loadness=self.__minimal_loadness,
                 weight=track.volume_weight,
             )
+        # print("计算后最大：",self.__max_volume_weight)
 
     # 类的构建方法
 
@@ -1076,7 +1086,7 @@ class SingleMusic(List[SingleTrack]):
         super().append(track)
         self._calc_values()
 
-    def extend(self, tracks: Sequence[SingleTrack]) -> None:
+    def extend(self, tracks: Iterable[SingleTrack]) -> None:
         """
         将一个音轨列表添加到全曲中，依顺序在所有音轨之后排列。
 
@@ -1085,7 +1095,7 @@ class SingleMusic(List[SingleTrack]):
         super().extend(tracks)
         self._calc_values()
 
-    def insert(self, index: int, track: SingleTrack) -> None:
+    def insert(self, index: SupportsIndex, track: SingleTrack) -> None:
         """
         将一个音轨插入到全曲中，在指定位置。
 
@@ -1136,7 +1146,9 @@ class SingleMusic(List[SingleTrack]):
     @overload
     def __setitem__(self, key: slice, value: Sequence[SingleTrack]) -> None: ...
 
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(  # pyright: ignore[reportIncompatibleMethodOverride]
+        self, key, value
+    ) -> None:
         """
         设置一个音轨
 
@@ -1183,18 +1195,20 @@ class SingleMusic(List[SingleTrack]):
         """音轨列表，不包含被禁用的音轨"""
         return (track for track in self if track.is_enabled)
 
-    def set_loadness(self, track: Union[int, SingleTrack], weight: float):
+    def set_loadness(self, track: Union[int, SingleTrack], weight: float) -> None:
         if weight > self.__max_volume_weight:
             if isinstance(track, int):
-                self[track].__volume_weight = weight
+                self[track]._volume_weight = weight
+
             elif isinstance(track, SingleTrack):
                 if track in self:
-                    track.__volume_weight = weight
+                    track._volume_weight = weight
                 else:
                     raise ParameterValueError(
                         "音轨：`{}`不属于此曲目".format(track.name)
                     )
             self._calc_values()
+            return
         else:
             if isinstance(track, int):
                 self[track].set_volume_weight(
@@ -1202,12 +1216,14 @@ class SingleMusic(List[SingleTrack]):
                     minimal_loadness=self.__minimal_loadness,
                     weight=weight,
                 )
+                return
             elif isinstance(track, SingleTrack):
                 track.set_volume_weight(
                     max_weight=self.__max_volume_weight,
                     minimal_loadness=self.__minimal_loadness,
                     weight=weight,
                 )
+                return
 
         raise ParameterTypeError("音轨不得为`{}`类型".format(type(track)))
 

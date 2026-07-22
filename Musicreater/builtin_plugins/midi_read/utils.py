@@ -24,6 +24,7 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Mapping
 from Musicreater import SingleNote, SoundAtmos
 
 
+
 def panning_2_rotation_linear(pan_: float) -> float:
     """
     Midi 左右平衡偏移值线性转为声源旋转角度
@@ -97,6 +98,7 @@ def midi_msgs_to_noteinfo(
     note: int,
     percussive: bool,  # 是否作为打击乐器启用
     volume: int,
+    master_volume: int,
     velocity: int,
     panning: int,
     start_time: int,
@@ -120,6 +122,8 @@ def midi_msgs_to_noteinfo(
         是否作为打击乐器启用
     volume: int
         音量
+    master_volume: int
+        主音量
     velocity: int
         力度
     panning: int
@@ -165,6 +169,7 @@ def midi_msgs_to_noteinfo(
                 "LYRIC_TEXT": lyric_line,
                 "VELOCITY_VALUE": velocity,
                 "VOLUME_VALUE": volume,
+                "MASTER_VOLUME_VALUE": master_volume,
                 "PIN_VALUE": panning,
             },
         ),
