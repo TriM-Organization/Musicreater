@@ -73,6 +73,15 @@ class InnerlyParameterError(MusicreaterInnerlyError):
         super().__init__("传参错误 - ", *args)
 
 
+class ParameterCacheUnfreshError(InnerlyParameterError):
+    """参数缓存未刷新"""
+
+    def __init__(self, *args):
+        """参数缓存未刷新"""
+        super().__init__("参数缓存未刷新：", *args)
+
+
+
 class ParameterTypeError(InnerlyParameterError, TypeError):
     """参数类型错误"""
 

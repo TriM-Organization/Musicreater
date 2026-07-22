@@ -15,6 +15,7 @@ Terms & Conditions: License.md in the root directory
 # Email TriM-Organization@hotmail.com
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
+import math
 import random
 
 # from io import BytesIO
@@ -46,6 +47,52 @@ from Musicreater.builtin_plugins.midi_read.utils import midi_inst_to_mc_sound
 
 from .subclass import MineNote, mctick2timestr, SingleNoteBox
 from .old_types import MidiInstrumentTableType, MineNoteChannelType, FittingFunctionType
+
+
+
+def volume_2_distance_natural(
+    vol: float,
+) -> float:
+    """
+    Midi 力度值/音量值拟合成的距离函数，一种更加自然的听感？
+
+    Parameters
+    ----------
+    vol: int
+        Midi 音符力度值（0~127）
+
+    Returns
+    -------
+    float播放中心到玩家的距离
+    """
+    return (
+        -8.081720684086314
+        * math.log(
+            vol + 14.579508825070013,
+        )
+        + 37.65806375944386
+        if vol < 60.64
+        else 0.2721359356095803 * ((vol + 2592.272889454798) ** 1.358571233418649)
+        + -6.313841334963396 * (vol + 2592.272889454798)
+        + 4558.496367823575
+    )
+
+
+def volume_2_distance_straight(vol: float) -> float:
+    """
+    Midi 力度值/音量值拟合成的距离函数，线性转换
+
+    Parameters
+    ----------
+    vol: int
+        Midi 音符力度值（0~127）
+
+    Returns
+    -------
+    float播放中心到玩家的距离
+    """
+    return (vol + 1) / -8 + 16
+
 
 
 def inst_to_sould_with_deviation(

@@ -33,6 +33,10 @@ vanilla_assets/
 /*.mid
 /*.midi
 
+# Fack Apple
+.DS_Store
+# Fack Microsoft
+Thumbs.db
 
 # Byte-compiled / optimized
 __pycache__/

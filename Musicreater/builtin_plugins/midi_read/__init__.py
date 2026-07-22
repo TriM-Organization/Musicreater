@@ -33,20 +33,13 @@ from .constants import (
     MM_NBS_PERCUSSION_INSTRUMENT_TABLE,
 )
 
-from .utils import (
-    volume_2_distance_natural,
-    volume_2_distance_straight,
-    panning_2_rotation_linear,
-    panning_2_rotation_trigonometric,
-)
+from .utils import panning_2_rotation_linear, panning_2_rotation_trigonometric
 
 __all__ = [
     # 插件参数和插件本体类
     "MidiImportConfig",
     "MidiImport2MusicPlugin",
     # 内置的拟合函数
-    "volume_2_distance_straight",
-    "volume_2_distance_natural",
     "panning_2_rotation_linear",
     "panning_2_rotation_trigonometric",
     # Midi 相关默认值

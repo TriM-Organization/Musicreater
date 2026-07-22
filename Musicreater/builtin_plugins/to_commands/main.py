@@ -510,7 +510,6 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
 
                 (
                     relative_coordinates,
-                    volume_percentage,
                     mc_pitch,
                 ) = minenote_to_command_parameters(
                     note,
@@ -527,10 +526,9 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                                 .replace("(", r"{")
                                 .replace(")", r"}")
                             )
-                            + r"playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                            + "playsound {} @s ^{} ^{} ^{} 3.0 {} {}".format(
                                 track.instrument,
                                 *relative_coordinates,
-                                volume_percentage,
                                 1.0 if note.percussive else mc_pitch,
                                 minimum_volume,
                             )
@@ -595,7 +593,6 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
 
             (
                 relative_coordinates,
-                volume_percentage,
                 mc_pitch,
             ) = minenote_to_command_parameters(
                 note,
@@ -606,10 +603,9 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                 MineCommand(
                     command=(
                         execute_command_head.format(player_selector)
-                        + "playsound {} @s ^{} ^{} ^{} {} {} {}".format(
+                        + "playsound {} @s ^{} ^{} ^{} 3.0 {} {}".format(
                             note.instrument,
                             *relative_coordinates,
-                            volume_percentage,
                             1.0 if note.percussive else mc_pitch,
                             minimum_volume,
                         )

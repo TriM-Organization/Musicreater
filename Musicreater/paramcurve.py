@@ -268,7 +268,7 @@ class ParamCurve:
         if idx < len(self._keys) and self._keys[idx].time == time:
             return idx, self._keys[idx]
         else:
-            print("[警告] ParamCurve.find_key: 找不到指定时间点所对应之关键帧")
+            # print("[警告] ParamCurve.find_key: 找不到指定时间点所对应之关键帧")
             return idx, None
 
     def copy(

@@ -38,7 +38,6 @@ def minenote_to_command_parameters(
     pitch_deviation: float = 0,
 ) -> Tuple[
     Tuple[float, float, float],
-    float,
     Union[float, Literal[None]],
 ]:
     """
@@ -53,13 +52,12 @@ def minenote_to_command_parameters(
 
     返回
     ----
-    tuple[float, float, float], float, float
-        播放视角坐标, 指令音量参数, 指令音调参数
+    tuple[float, float, float], float
+        播放视角坐标, 指令音调参数
     """
 
     return (
         mine_note.position.position_displacement,
-        mine_note.volume / 127,
         (
             None
             if mine_note.percussive

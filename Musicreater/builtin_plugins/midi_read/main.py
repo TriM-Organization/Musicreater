@@ -23,7 +23,15 @@ from enum import Enum
 from pathlib import Path
 from typing import BinaryIO, Optional, Dict, List, Callable, Tuple, Mapping
 
-from Musicreater import SingleMusic, SingleTrack, SingleNote, SoundAtmos
+from Musicreater import (
+    SingleMusic,
+    SingleTrack,
+    SingleNote,
+    SoundAtmos,
+    CurvableParam,
+    ParamCurve,
+    Instrument,
+)
 from Musicreater.plugins import (
     music_input_plugin,
     PluginConfig,
@@ -31,7 +39,9 @@ from Musicreater.plugins import (
     PluginTypes,
     MusicInputPluginBase,
 )
+from Musicreater.constants import SoundInformation, MC_INSTRUMENT_SOUND_INFO_TABLE
 from Musicreater.exceptions import ZeroSpeedError, IllegalMinimumVolumeError
+from Musicreater.paramcurve import Keyframe as ParamKeyframe
 from Musicreater._utils import enumerated_stuffcopy_dictionary
 
 from .constants import (
@@ -46,7 +56,6 @@ from .exceptions import (
     LyricMismatchError,
 )
 from .utils import (
-    volume_2_distance_natural,
     panning_2_rotation_trigonometric,
     midi_msgs_to_noteinfo,
 )
@@ -76,9 +85,10 @@ class MidiImportConfig(PluginConfig):
     pitched_note_reference_table: Mapping[int, str] = None  # type: ignore
     percussion_note_reference_table: Mapping[int, str] = None  # type: ignore
     note_replacement_table: Mapping[str, str] = None  # type: ignore
+    instrument_information_table: Mapping[str, SoundInformation] = None  # type: ignore
 
-    # 参数转换函数
-    volume_process_function: Callable[[float], float] = volume_2_distance_natural
+    # 参数转换相关
+    keep_velocity_to_param_curve: bool = True
     panning_processing_function: Callable[[float], float] = (
         panning_2_rotation_trigonometric
     )
@@ -103,6 +113,11 @@ class MidiImportConfig(PluginConfig):
         )
         self.note_replacement_table = (
             self.note_replacement_table if self.note_replacement_table else {}
+        )
+        self.instrument_information_table = (
+            self.instrument_information_table
+            if self.instrument_information_table
+            else MC_INSTRUMENT_SOUND_INFO_TABLE
         )
 
 
@@ -140,6 +155,8 @@ class TrackDivisionDict(
     division_by_volume: bool = False
     division_by_panning: bool = False
 
+    create_volume_curve: bool = True
+
     def __init__(
         self,
         *args,
@@ -173,7 +190,9 @@ class TrackDivisionDict(
         try:
             return super().__getitem__(key)
         except KeyError:
-            self[key] = SingleTrack()
+            self[key] = SingleTrack(precise_time=True)
+            if self.create_volume_curve:
+                self[key].argument_curves[CurvableParam.VOLUME] = ParamCurve()
             return self[key]
 
 
@@ -401,50 +420,51 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
 
                         # 更新结果信息
 
-                        that_note, sound_name, orign_distance, sound_rotation = (
-                            midi_msgs_to_noteinfo(
-                                inst=(
-                                    msg.note
-                                    if (_is_percussion := (msg.channel == 9))
-                                    else _program
-                                ),
-                                note=(_program if _is_percussion else msg.note),
-                                percussive=_is_percussion,
-                                volume=_volume,
-                                velocity=_velocity,
-                                panning=_panning,
-                                start_time=_start_ms,  # 微秒
-                                duration=microseconds - _start_ms,  # 微秒
-                                play_speed=config.speed_multiplier,
-                                midi_reference_table=(
-                                    config.percussion_note_reference_table
-                                    if _is_percussion
-                                    else config.pitched_note_reference_table
-                                ),
-                                volume_processing_method=config.volume_process_function,
-                                panning_processing_method=config.panning_processing_function,
-                                note_table_replacement=config.note_replacement_table,
-                                lyric_line=(
-                                    _lyric.encode("latin1").decode(
-                                        config.string_encoding
-                                    )
-                                    if config.string_encoding
-                                    else _lyric
-                                ),
-                            )
+                        that_note, sound_name, sound_rotation = midi_msgs_to_noteinfo(
+                            inst=(
+                                msg.note
+                                if (_is_percussion := (msg.channel == 9))
+                                else _program
+                            ),
+                            note=(_program if _is_percussion else msg.note),
+                            percussive=_is_percussion,
+                            volume=_volume,
+                            velocity=_velocity,
+                            panning=_panning,
+                            start_time=_start_ms,  # 微秒
+                            duration=microseconds - _start_ms,  # 微秒
+                            play_speed=config.speed_multiplier,
+                            midi_reference_table=(
+                                config.percussion_note_reference_table
+                                if _is_percussion
+                                else config.pitched_note_reference_table
+                            ),
+                            panning_processing_method=config.panning_processing_function,
+                            note_table_replacement=config.note_replacement_table,
+                            lyric_line=(
+                                _lyric.encode("latin1").decode(config.string_encoding)
+                                if config.string_encoding
+                                else _lyric
+                            ),
                         )
 
                         # print(that_note.start_time, end=", ")
 
-                        divided_tracks[
+                        now_track = divided_tracks[
                             (
                                 track_no,
                                 msg.channel,
                                 sound_name,
-                                orign_distance,
+                                _volume,
                                 sound_rotation,
                             )
-                        ].add(that_note)
+                        ]
+                        now_track.add(that_note)
+                        if config.keep_velocity_to_param_curve:
+                            now_track.argument_curves[CurvableParam.VOLUME].add_key(  # type: ignore
+                                time=that_note.precise_start_time,
+                                value=_velocity / 127,
+                            )
 
                         # 更新统计信息
                         note_count += 1
@@ -500,11 +520,15 @@ class MidiImport2MusicPlugin(MusicInputPluginBase):
             ):  # 音轨编号
                 every_single_track.name = track_name
             if track_properties[2]:  # 乐器名称
-                every_single_track.instrument = track_properties[2]
-            if track_properties[3]:  # 音量
-                every_single_track.sound_position.sound_distance = track_properties[3]
+                every_single_track.instrument = Instrument(
+                    track_properties[2],
+                    config.instrument_information_table[track_properties[2]]["C-LUFS"],
+                )
+            if track_properties[3]:  # 音量权
+                every_single_track.__volume_weight = track_properties[3]
             if track_properties[4]:  # 声相
-                every_single_track.sound_position.sound_azimuth = track_properties[4]
-            final_music.append(every_single_track)
-
+                every_single_track.sound_position = track_properties[4]
+            super(SingleMusic, final_music).append(every_single_track)
+        final_music._calc_values()
+        # print("所有声源距离表：",{i:t.sound_distance for i, t in enumerate(final_music)})
         return final_music

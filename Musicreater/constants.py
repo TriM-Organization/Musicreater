@@ -17,7 +17,7 @@ Terms & Conditions: License.md in the root directory
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 # from .types import Dict, List, Tuple, MidiInstrumentTableType, MidiNoteNameTableType
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, TypedDict
 
 x = "x"
 """
@@ -438,7 +438,17 @@ MC_INSTRUMENT_BLOCKS_TABLE: Dict[str, Tuple[str, ...]] = {
 }
 """MC乐器对音符盒下垫方块对照表"""
 
-MC_INSTRUMENT_SOUND_INFO_TABLE: Dict[str, Dict[str, float]] = {
+SoundInformation = TypedDict(
+    "SoundInformation",
+    {
+        "C-LUFS": int,
+        "MS": float,
+        "SR": int,
+    },
+)
+"""MC乐器信息类定义"""
+
+MC_INSTRUMENT_SOUND_INFO_TABLE: Dict[str, SoundInformation] = {
     "note.bass": {"C-LUFS": -1178, "MS": 532.0, "SR": 7218},
     "note.bassattack": {"C-LUFS": -1188, "MS": 484.8, "SR": 7921},
     "note.snare": {"C-LUFS": -1173, "MS": 80.0, "SR": 48000},
@@ -514,6 +524,7 @@ MC_INSTRUMENT_VOLUME_BALANCE_TABLE: Dict[str, float] = {
     "mob.zombie.wood": 0.32247793193163765,
 }
 """乐器响度平衡表，倍率"""
+# 上表用处不大
 
 MC_EILLES_RT261_INSTRUMENT_REPLACE_TABLE: Dict[str, str] = {
     "note.trumpet": "note.flute",
@@ -625,8 +636,4 @@ MM_INSTRUMENT_DEVIATION_TABLE: Dict[str, int] = {
 
 # 金羿ELS 音符方块对照表
 
-MN_EILLES_NOTE_BLOCK_TABLE: Dict[int, str] = {
-}
-
-
-
+MN_EILLES_NOTE_BLOCK_TABLE: Dict[int, str] = {}

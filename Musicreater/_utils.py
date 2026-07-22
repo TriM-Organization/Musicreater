@@ -62,3 +62,47 @@ def incremental_save_path(
         ).exists():
             now_appendix += 1
     return ss_path
+
+
+def volume_weight_to_sound_distance(
+    max_weight: float, minimal_loadness: int, weight: float, loadness: int
+) -> float:
+    """
+    通过音量权计算声源距离
+
+    Parameters
+    ==========
+    max_weight: float
+        全曲最大音量权
+    minimal_loadness: int
+        曲目中响度最小乐器的响度
+    weight: float
+        当前乐器的音量权
+    loadness: int
+        当前乐器的响度
+
+    Returns
+    =======
+    float
+        声源距离
+
+    Notes
+    =====
+
+    以下关于距离的计算逻辑请见[计算过程](./resources/响度公式/计算过程.jpg)\n
+    关于响度的计算方法请见[此脚本](./resources/experiments/exam_loadness.py)\n
+    最终公式为：\n
+    声源距离 = 48 - (48 * 音量权 * ( 10 ** ((当前乐器的响度 - 响度最小乐器的响度) / 20 ))) / 全曲最大音量权\n
+        D_t = 48 - \\frac{48 \\cdot P_t \\cdot 10^{\\frac{V_t - V_x}{20}}}{P_m}
+    由于我们存储的响度都是 百-LUFS，所以下面的计算除数为 2000
+    """
+
+    if weight == 0:
+        return 48
+    elif weight == max_weight:
+        # print("音量权最大，差比：", ((loadness - minimal_loadness) / 2000), "，率：", (1 - pow(10, (minimal_loadness - loadness)/2000)))
+        return 48 * (1 - pow(10, (minimal_loadness - loadness) / 2000))
+    else:
+        return 48 * (
+            1 - pow(10, (minimal_loadness - loadness) / 2000) * weight / max_weight
+        )

@@ -27,7 +27,7 @@ https://gitee.com/TriM-Organization/Musicreater/blob/master/LICENSE.md。
 # 若需转载或借鉴 许可声明请查看仓库目录下的 License.md
 
 
-__version__ = "3.0.0-alpha"
+__version__ = "3.0.0-beta"
 
 __author__ = (
     ("金羿", "Eilles"),
@@ -44,6 +44,8 @@ from .data import (
     SoundAtmos,
     MineNote,
     CurvableParam,
+    Instrument,
+    DefaultInstrument,
 )
 
 from .plugins import load_plugin_from_module
@@ -64,7 +66,10 @@ __all__ = [
     "SoundAtmos",
     "MineNote",
     "CurvableParam",
+    "Instrument",
     # 工程项目相关
     "load_plugin_from_module",
     "MusiCreater",
+    # 默认乐器
+    "DefaultInstrument",
 ]

@@ -24,50 +24,6 @@ from typing import Callable, Dict, List, Optional, Sequence, Tuple, Mapping
 from Musicreater import SingleNote, SoundAtmos
 
 
-def volume_2_distance_natural(
-    vol: float,
-) -> float:
-    """
-    Midi 力度值/音量值拟合成的距离函数，一种更加自然的听感？
-
-    Parameters
-    ----------
-    vol: int
-        Midi 音符力度值（0~127）
-
-    Returns
-    -------
-    float播放中心到玩家的距离
-    """
-    return (
-        -8.081720684086314
-        * math.log(
-            vol + 14.579508825070013,
-        )
-        + 37.65806375944386
-        if vol < 60.64
-        else 0.2721359356095803 * ((vol + 2592.272889454798) ** 1.358571233418649)
-        + -6.313841334963396 * (vol + 2592.272889454798)
-        + 4558.496367823575
-    )
-
-
-def volume_2_distance_straight(vol: float) -> float:
-    """
-    Midi 力度值/音量值拟合成的距离函数，线性转换
-
-    Parameters
-    ----------
-    vol: int
-        Midi 音符力度值（0~127）
-
-    Returns
-    -------
-    float播放中心到玩家的距离
-    """
-    return (vol + 1) / -8 + 16
-
-
 def panning_2_rotation_linear(pan_: float) -> float:
     """
     Midi 左右平衡偏移值线性转为声源旋转角度
@@ -147,11 +103,10 @@ def midi_msgs_to_noteinfo(
     duration: int,
     play_speed: float,
     midi_reference_table: Mapping[int, str],
-    volume_processing_method: Callable[[float], float],
     panning_processing_method: Callable[[float], float],
     note_table_replacement: Mapping[str, str] = {},
     lyric_line: str = "",
-) -> Tuple[SingleNote, str, float, Tuple[float, float]]:
+) -> Tuple[SingleNote, str, Tuple[float, float]]:
     """
     将 Midi信息转为音符对象
 
@@ -177,8 +132,6 @@ def midi_msgs_to_noteinfo(
         曲目播放速度
     midi_reference_table: Dict[int, str]
         转换对照表
-    volume_processing_method: Callable[[float], float]
-        音量处理函数
     panning_processing_method: Callable[[float], float]
         立体声相偏移处理函数
     note_table_replacement: Dict[str, str]
@@ -191,7 +144,6 @@ def midi_msgs_to_noteinfo(
     Tuple[
         MineNote我的世界音符对象,
         str我的世界声音名,
-        float播放中心到玩家的距离,
         Tuple[float, float]声源旋转角度
     ]
     """
@@ -204,7 +156,6 @@ def midi_msgs_to_noteinfo(
     return (
         SingleNote(
             note_pitch=note,
-            note_volume=velocity,   # 需要重新设计
             start_tick=(tk := int(start_time / float(play_speed) / 50000)),
             keep_tick=round(duration / float(play_speed) / 50000),
             mass_precision_time=round(
@@ -212,11 +163,11 @@ def midi_msgs_to_noteinfo(
             ),
             extra_information={
                 "LYRIC_TEXT": lyric_line,
+                "VELOCITY_VALUE": velocity,
                 "VOLUME_VALUE": volume,
                 "PIN_VALUE": panning,
             },
         ),
         note_table_replacement.get(mc_sound_ID, mc_sound_ID),
-        volume_processing_method(volume),
         (panning_processing_method(panning), 0),
     )
