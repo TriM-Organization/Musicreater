@@ -3,10 +3,11 @@
 
 """
 音·创
-是一款免费开源的《我的世界》数字音频支持库。
+是一款免费、开源、高性能、插件化的《我的世界》数字音频支持库。
 
 Musicreater (音·创)
-A cost free and open-source library for handling with **Minecraft** digital music.
+A cost free, open-source, blazing fast and plugin-
+supported library for editing _Minecraft_ digital music.
 
 版权所有 © 2026 睿乐组织
 Copyright © 2026 TriM-Organization

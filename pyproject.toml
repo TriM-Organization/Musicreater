@@ -18,7 +18,7 @@
         { name = "金羿Eilles", email = "EillesWan@outlook.com" },
     ]
 
-    description = "A free open source library used for dealing with **Minecraft** digital musics."
+    description = "A blazing fast and plugin-supported library for editing _Minecraft_ digital music."
     readme      = "README_EN.md"
     license     = { file = "LICENSE.md" }
 
