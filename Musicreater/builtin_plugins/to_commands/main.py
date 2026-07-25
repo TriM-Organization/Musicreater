@@ -526,7 +526,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                                 .replace("(", r"{")
                                 .replace(")", r"}")
                             )
-                            + "playsound {} @s ^{} ^{} ^{} 3.0 {} {}".format(
+                            + "playsound {} @s ^{:.4f} ^{:.4f} ^{:.4f} 3.0 {:.6f} {}".format(
                                 track.instrument,
                                 *relative_coordinates,
                                 1.0 if note.percussive else mc_pitch,
@@ -603,7 +603,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                 MineCommand(
                     command=(
                         execute_command_head.format(player_selector)
-                        + "playsound {} @s ^{} ^{} ^{} 3.0 {} {}".format(
+                        + "playsound {} @s ^{:.4f} ^{:.4f} ^{:.4f} 3.0 {:.6f} {}".format(
                             note.instrument,
                             *relative_coordinates,
                             1.0 if note.percussive else mc_pitch,
@@ -630,7 +630,8 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         if music_command_list:
             return (
                 music_command_list,
-                last_note.start_tick + last_note.duration_tick,
+                last_note.start_tick  # pyright: ignore[reportPossiblyUnboundVariable]
+                + last_note.duration_tick,  # pyright: ignore[reportPossiblyUnboundVariable]
                 max_multi + 1,
             )
         else:
