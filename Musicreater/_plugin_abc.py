@@ -219,7 +219,7 @@ class PluginMetaInformation(ABC):
     """插件版本号"""
     type: PluginTypes
     """插件类型"""
-    license: str = "MIT License"
+    license: str
     """插件发布时采用的许可协议"""
     dependencies: Sequence[str] = tuple()
     """插件是否对其他插件存在依赖"""

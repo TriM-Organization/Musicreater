@@ -529,7 +529,7 @@ class SingleTrack(List[SingleNote]):
     """该音轨是否启用"""
 
     instrument: Instrument
-    """乐器ID"""
+    """该音轨所用的乐器"""
 
     is_high_time_precision: bool
     """该音轨是否使用高精度时间"""
@@ -596,7 +596,7 @@ class SingleTrack(List[SingleNote]):
         self.instrument = (
             track_instrument if track_instrument else DefaultInstrument.HARP.value
         )
-        """乐器ID"""
+        """该音轨所用之乐器"""
 
         self.is_high_time_precision = precise_time
         """是否使用高精度时间"""
