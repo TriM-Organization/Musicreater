@@ -759,6 +759,7 @@ class SingleTrack(List[SingleNote]):
                 if self.is_high_time_precision
                 else [x for x in self if start_time <= x.start_time <= end_time]
             ),
+            track_name="副本 "+self.name,
             track_instrument=self.instrument.copy(),
             precise_time=self.is_high_time_precision,
             percussion=self.is_percussive,
