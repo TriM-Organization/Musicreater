@@ -91,7 +91,7 @@ class MusicPreview:
         resource_folder: Path,
         synthesis_mode: Literal[0, 1, 2, 3, 4] = 1,
         overlay_mode: Literal[1, 2] = 1,
-        sample_rate: int = 44100,
+        target_sample_rate: int = 44100,
         value_get_method: Literal[0, 1] = 1,
         pitch_accuracy_decimals: int = 0,
         music_volume: float = 1,
@@ -100,7 +100,7 @@ class MusicPreview:
 
         self.mode = synthesis_mode
         self.overlay_mode_c = overlay_mode
-        self.output_sample_rate = sample_rate
+        self.output_sample_rate = target_sample_rate
         self.get_value_method = value_get_method
         self.resources_path = resource_folder
 

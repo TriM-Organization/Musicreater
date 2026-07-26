@@ -74,7 +74,7 @@ class PcmConversionConfig(PluginConfig):
     """
     没看懂这个参数的意思
     """
-    sample_rate: int = 44100
+    target_sample_rate: int = 44100
     """
     目标输出的采样率
     """
@@ -122,7 +122,7 @@ class NoteDataConvert2PcmPlugin(MusicOutputPluginBase):
             resource_folder=config.assets_path,
             synthesis_mode=config.synthesis_mode,
             overlay_mode=config.overlay_mode,
-            sample_rate=config.sample_rate,
+            target_sample_rate=config.target_sample_rate,
             value_get_method=config.value_get_method,
             pitch_accuracy_decimals=config.pitch_accuracy_decimals,
             music_volume=config.global_volume,
@@ -141,7 +141,7 @@ class NoteDataConvert2PcmPlugin(MusicOutputPluginBase):
             resource_folder=config.assets_path,
             synthesis_mode=config.synthesis_mode,
             overlay_mode=config.overlay_mode,
-            sample_rate=config.sample_rate,
+            target_sample_rate=config.target_sample_rate,
             value_get_method=config.value_get_method,
             pitch_accuracy_decimals=config.pitch_accuracy_decimals,
             music_volume=config.global_volume,
