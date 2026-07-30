@@ -508,6 +508,24 @@ class MineNote:
             ),
         )
 
+    def minecraft_pitch(self, pitch_deviation: float):
+        return (
+            None
+            if self.percussive
+            else (
+                2
+                ** (
+                    (
+                        self.pitch
+                        - 60
+                        # - MM_INSTRUMENT_DEVIATION_TABLE.get(self.instrument, 6)
+                        + pitch_deviation
+                    )
+                    / 12
+                )
+            )
+        )
+
 
 class CurvableParam(str, Enum):
     """可曲线化的参数 枚举类"""
@@ -759,7 +777,7 @@ class SingleTrack(List[SingleNote]):
                 if self.is_high_time_precision
                 else [x for x in self if start_time <= x.start_time <= end_time]
             ),
-            track_name="副本 "+self.name,
+            track_name="副本 " + self.name,
             track_instrument=self.instrument.copy(),
             precise_time=self.is_high_time_precision,
             percussion=self.is_percussive,
