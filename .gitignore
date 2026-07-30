@@ -6,8 +6,6 @@
 # mystuff
 /*.zip
 /.vscode
-/*.mid
-/*.midi
 /*.mcpack
 /*.bdx
 /*.msq
@@ -27,6 +25,18 @@ RES.txt
 /bgArrayLib
 /fcwslib
 test_lyric-mido.py
+test_doing_things.py
+TEST-*.*
+
+# Copyrighted
+vanilla_assets/
+/*.mid
+/*.midi
+
+# Fack Apple
+.DS_Store
+# Fack Microsoft
+Thumbs.db
 
 # Byte-compiled / optimized
 __pycache__/
