@@ -32,6 +32,7 @@ TEST-*.*
 vanilla_assets/
 /*.mid
 /*.midi
+/*.wav
 
 # Fack Apple
 .DS_Store

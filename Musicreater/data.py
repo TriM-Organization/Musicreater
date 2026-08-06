@@ -426,7 +426,7 @@ class SingleNote:
 class MineNote:
     """我的世界音符对象（仅提供我的世界相关接口）"""
 
-    pitch: float
+    midi_pitch: float
     """Midi 音高"""
     instrument: str
     """乐器标识"""
@@ -463,7 +463,7 @@ class MineNote:
     ) -> "MineNote":
         """从SingleNote对象创建MineNote对象"""
         return cls(
-            pitch=note.midi_pitch + adjust_note_pitch,
+            midi_pitch=note.midi_pitch + adjust_note_pitch,
             instrument=note_instrument,
             start_tick=note.start_time,
             duration_tick=note.duration,
@@ -508,15 +508,21 @@ class MineNote:
             ),
         )
 
-    def minecraft_pitch(self, pitch_deviation: float):
+    
+    def minecraft_pitch(self, pitch_deviation: float) -> float:
+        """
+        获取该音符在 Minecraft Playsound 指令中对应的音调参数
+        """
+
+        # TODO 当前的设计方法并未考虑到自定义乐器的音调偏移
         return (
-            None
+            1.0
             if self.percussive
             else (
                 2
                 ** (
                     (
-                        self.pitch
+                        self.midi_pitch
                         - 60
                         # - MM_INSTRUMENT_DEVIATION_TABLE.get(self.instrument, 6)
                         + pitch_deviation

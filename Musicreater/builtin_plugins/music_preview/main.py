@@ -292,7 +292,7 @@ class MusicPreview:
                                 + len(
                                     self.get_res(
                                         sound_name=i.instrument,
-                                        pitch=i.pitch
+                                        pitch=i.midi_pitch
                                         - 60
                                         - MM_INSTRUMENT_DEVIATION_TABLE.get(
                                             i.instrument, 6
@@ -328,7 +328,7 @@ class MusicPreview:
                                     + len(
                                         self.get_res(
                                             sound_name=i.instrument,
-                                            pitch=i.pitch
+                                            pitch=i.midi_pitch
                                             - 60
                                             - MM_INSTRUMENT_DEVIATION_TABLE.get(
                                                 i.instrument, 6
@@ -358,7 +358,7 @@ class MusicPreview:
                 0
                 if note.percussive
                 else self.make_pitch_accurate(
-                    note.pitch
+                    note.midi_pitch
                     - 60
                     - MM_INSTRUMENT_DEVIATION_TABLE.get(note.instrument, 6)
                 )

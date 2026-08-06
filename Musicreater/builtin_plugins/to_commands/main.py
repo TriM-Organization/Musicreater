@@ -35,7 +35,7 @@ from Musicreater.exceptions import ZeroSpeedError, IllegalMinimumVolumeError
 from Musicreater._utils import enumerated_stuffcopy_dictionary
 
 from .progressbar import ProgressBarStyle, DEFAULT_PROGRESSBAR_STYLE, mctick2timestr
-from .utils import minenote_to_command_parameters
+from .utils import get_accurate_deviation
 
 # @dataclass
 # class CommandConvertionConfig(PluginConfig):
@@ -505,16 +505,13 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
 
             this_channel = []
 
+            __deviation = get_accurate_deviation(
+                track.instrument.name,
+                pitch_deviation=music_deviation,
+            )
+
             for note in track.minenotes:
                 max_score = max(max_score, note.start_tick)
-
-                (
-                    relative_coordinates,
-                    mc_pitch,
-                ) = minenote_to_command_parameters(
-                    note,
-                    pitch_deviation=music_deviation,
-                )
 
                 this_channel.append(
                     MineCommand(
@@ -527,9 +524,9 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                                 .replace(")", r"}")
                             )
                             + "playsound {} @s ^{:.4f} ^{:.4f} ^{:.4f} 3.0 {:.6f} {}".format(
-                                track.instrument,
-                                *relative_coordinates,
-                                1.0 if note.percussive else mc_pitch,
+                                note.instrument,
+                                *note.position.position_displacement,
+                                mc_pitch := note.minecraft_pitch(__deviation),
                                 minimum_volume,
                             )
                         ),
@@ -591,22 +588,16 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                 max_multi = max(max_multi, multi)
                 multi = 0
 
-            (
-                relative_coordinates,
-                mc_pitch,
-            ) = minenote_to_command_parameters(
-                note,
-                pitch_deviation=music_deviation,
-            )
-
             music_command_list.append(
                 MineCommand(
                     command=(
                         execute_command_head.format(player_selector)
                         + "playsound {} @s ^{:.4f} ^{:.4f} ^{:.4f} 3.0 {:.6f} {}".format(
                             note.instrument,
-                            *relative_coordinates,
-                            1.0 if note.percussive else mc_pitch,
+                            *note.position.position_displacement,
+                            mc_pitch := note.minecraft_pitch(
+                                get_accurate_deviation(note.instrument, music_deviation)
+                            ),
                             minimum_volume,
                         )
                     ),
