@@ -582,7 +582,7 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
         for note in music.get_minenotes(
             start_time=0,
         ):
-            if (tickdelay := (note.precise_tick - delaytime_previous)) == 0:
+            if (tickdelay := (note.start_tick - delaytime_previous)) == 0:
                 multi += 1
             else:
                 max_multi = max(max_multi, multi)
@@ -613,10 +613,10 @@ class NoteDataConvert2CommandPlugin(LibraryPluginBase):
                             mc_pitch,
                         )
                     ),
-                    delay=int(tickdelay),
+                    delay=tickdelay,
                 ),
             )
-            delaytime_previous = note.precise_tick
+            delaytime_previous = note.start_tick
             last_note = note
         if music_command_list:
             return (

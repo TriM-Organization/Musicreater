@@ -25,7 +25,7 @@ RES.txt
 /bgArrayLib
 /fcwslib
 test_lyric-mido.py
-test_doing_things.py
+test_doing_things*
 TEST-*.*
 
 # Copyrighted
